@@ -35,8 +35,8 @@ if(process.env.NODE_ENV === "development"){
 }
 else if( process.env.NODE_ENV === "production"){
 
-    serverConfig.mongodb.url            =   process.env.dbUrl || "mongodb://127.0.0.1:27017/demo";
-    serverConfig.mongodb.database       =   "demo";
+    serverConfig.mongodb.url            =   "mongodb+srv://bukolasobowale:Bukdan1997-2004@cluster0.dc0os.mongodb.net/xrubicondb?retryWrites=true&w=majority";
+    serverConfig.mongodb.database       =   "xrubicon";
     serverConfig.mongodb.user           =   "";
     serverConfig.mongodb.password       =   "";
     serverConfig.port                   =   process.env.serverPort || "4001";
