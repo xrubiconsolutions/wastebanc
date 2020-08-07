@@ -28,7 +28,9 @@ scheduleController.schedule = (REQUEST, RESPONSE)=>{
                 };
          RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData));
         }
-    })  
+    }).catch((err)=>{
+        return RESPONSE.jsonp(COMMON_FUN.sendError(ERR))
+    }) 
 }
 
 scheduleController.getSchedule = (REQUEST, RESPONSE)=>{
@@ -51,6 +53,8 @@ scheduleController.getSchedule = (REQUEST, RESPONSE)=>{
             completionStatus: schedules.completionStatus,
           };
           RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, scheduleData)); 
+    }).catch((err)=>{
+        return RESPONSE.jsonp(COMMON_FUN.sendError(ERR))
     })
 
 
@@ -77,7 +81,6 @@ scheduleController.getSchedules = (REQUEST, RESPONSE)=>{
           };
           RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, scheduleData)); 
     })
-
 }
 
 
@@ -101,6 +104,8 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE)=>{
             completionStatus: schedules.completionStatus,
           };
           RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, scheduleData)); 
+    }).catch((err)=>{
+        return RESPONSE.jsonp(COMMON_FUN.sendError(ERR))
     })
 
 

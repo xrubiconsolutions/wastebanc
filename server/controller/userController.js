@@ -98,10 +98,7 @@ userController.loginUser = (REQUEST, RESPONSE)=>{
         PROJECTION = {__v : 0, createAt: 0};
 
     /** find user is exists or not */
-    MODEL.userModel.findOne(CRITERIA, PROJECTION, {lean: true}).then((USER) => {
-        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, USER));
-
-    }).then((USER)=>{
+    MODEL.userModel.findOne(CRITERIA, PROJECTION, {lean: true}).then((USER)=>{
 
         USER ? /** matching password */
             COMMON_FUN.decryptPswrd(REQUEST.query.password, USER.password, (ERR, MATCHED)=>{
@@ -114,7 +111,6 @@ userController.loginUser = (REQUEST, RESPONSE)=>{
                         jwtToken  = COMMON_FUN.createToken(dataToJwt); /** creating jwt token */
                     dataToJwt.token = jwtToken;
                     return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, dataToJwt));
-                    
                 }
             })
         :RESPONSE.jsonp(COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL));
