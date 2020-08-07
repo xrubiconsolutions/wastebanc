@@ -29,4 +29,19 @@ describe('Test', () => {
             });
       });
   });
+  describe('/GET schedule', () => {
+    it('it should GET all the schedules', (done) => {
+      
+      /** We can also place server.js file here rather than only link **/ 
+      chai.request(testConfig.BaseUrl)
+          .get('/getSchedule')
+          .end((err, res) => {
+              
+              res.should.have.status(200);
+              res.body.should.be.eql('cool');
+              res.body.length.should.be.eql(4);
+            done();
+          });
+    });
+});
 });

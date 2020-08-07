@@ -8,5 +8,6 @@
  ******** to create API *********
  ********************************/
 module.exports = function(app){
-    require("./userRoutes")(app)
+    require("./userRoutes")(app);
+    require("./scheduleRoutes")(app)
 };

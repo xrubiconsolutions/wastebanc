@@ -6,11 +6,15 @@ const Schema        =   MONGOOSE.Schema;
 const Constants     =   require("../util/constants");
 
 /**************************************************
- ************* User Model or collection ***********
+ ************* Schedule Model or collection ***********
  **************************************************/
-const schedulePick_Schema = new Schema({
+const schedulePick = new Schema({
+    client:{
+        type:String,
+        required: true,
+    },
     quantity: {
-        type: [String],
+        type: String,
         enum : ["plastic bottles", "cans", "rubber", "paper materials"],
         required: true,
     },
@@ -24,10 +28,12 @@ const schedulePick_Schema = new Schema({
     },
     pickUpDate: {
         type: Date,
+        required: true,
         default: Date.now
     },
     reminder:{
         type: Date,
+        required: true,
         default: Date.now
     },
     callOnArrival :{
@@ -38,11 +44,7 @@ const schedulePick_Schema = new Schema({
     completionStatus: {
         type: [String],
         enum: ["completed", "pending", "missed"]
-    },
-    status: {
-        type: Number,
-        default: 0
     }
 });
 
-module.exports =  MONGOOSE.model("schedulePick", schedulePick_Schema);
+module.exports =  MONGOOSE.model("schedulePick", schedulePick);

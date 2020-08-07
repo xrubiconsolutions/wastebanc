@@ -222,6 +222,28 @@ userController.changedlogedInPassword = (REQUEST, RESPONSE)=>{
     })
 };
 
+userController.resendVerification = (REQUEST, RESPONSE)=>{
+    authy.register_user(dataToSave.email, dataToSave.phoneNumber, dataToSave.countryCode, function (regErr, regRes) {
+        console.log('In Registration...');
+        if (regErr) {
+          console.log(regErr);
+          RESPONSE.send('There was some error registering the user.');
+        } else if (regRes) {
+          console.log(regRes);
+          authy.request_sms(regRes.user.id, function (smsErr, smsRes) {
+            console.log('Requesting SMS...');
+            if (smsErr) {
+              console.log(smsErr);
+              RESPONSE.send('There was some error sending OTP to cell phone.');
+            } else if (smsRes) {
+              console.log(smsRes);
+              RESPONSE.send('OTP Sent to the cell phone.');
+            }
+          });
+        }
+      });
+
+}
 userController.verifyPhone = (REQUEST, RESPONSE)=>{
     var id = REQUEST.param('id');
 	var token = REQUEST.param('token');
@@ -236,7 +258,6 @@ userController.verifyPhone = (REQUEST, RESPONSE)=>{
 			RESPONSE.send('OTP Verified.');	
 		}
 	});
-
 }
 
 

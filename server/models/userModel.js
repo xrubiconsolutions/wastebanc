@@ -38,10 +38,7 @@ const user_Schema = new Schema({
         type: Date,
         default: Date.now
     },
-    status: {
-        type: Number,
-        default: 0
-    },
+
     countryCode: {
         type: String,
         default: "+234",

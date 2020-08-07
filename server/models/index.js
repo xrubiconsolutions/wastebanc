@@ -7,6 +7,6 @@
 module.exports = {
     userModel       : require("./userModel"),
     appVersionModel : require("./appVersionModel"),
-    schedulePickModel : require("./SchedulePick")
+    scheduleModel : require("./scheduleModel")
 };
 

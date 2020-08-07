@@ -5,6 +5,6 @@
  ************** Controller Manager ****************
  **************************************************/
 module.exports = {
-    userController          :   require("./userController"),
-    schedulePickController : require("./schedulePickController")
+    userController         :   require("./userController"),
+    scheduleController : require("./scheduleController")
 };
