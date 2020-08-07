@@ -68,6 +68,7 @@ userController.registerUser = (REQUEST, RESPONSE)=>{
                   });
                 }
               });
+            
             MODEL.userModel(dataToSave).save({},(ERR, RESULT) => {
                 if(ERR)
                     RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
@@ -98,7 +99,8 @@ userController.loginUser = (REQUEST, RESPONSE)=>{
 
     /** find user is exists or not */
     MODEL.userModel.findOne(CRITERIA, PROJECTION, {lean: true}).then((USER) => {
-        return USER;
+        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, USER));
+
     }).then((USER)=>{
 
         USER ? /** matching password */
@@ -108,10 +110,11 @@ userController.loginUser = (REQUEST, RESPONSE)=>{
                 else if (!MATCHED)
                     return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD));
                 else{
-                    let dataToJwt = {username: USER.username, Date: Date.now, email: USER.email, role: USER.roles},
+                    let dataToJwt = {username: USER.username, Date: Date.now, email: USER.email, role: USER.roles, phoneNumber: USER.phoneNumber, verified:USER.verified },
                         jwtToken  = COMMON_FUN.createToken(dataToJwt); /** creating jwt token */
                     dataToJwt.token = jwtToken;
                     return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, dataToJwt));
+                    
                 }
             })
         :RESPONSE.jsonp(COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL));

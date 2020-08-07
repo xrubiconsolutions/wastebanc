@@ -78,8 +78,32 @@ scheduleController.getSchedules = (REQUEST, RESPONSE)=>{
           RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, scheduleData)); 
     })
 
-
 }
 
+
+scheduleController.collectorSchedule = (REQUEST, RESPONSE)=>{
+    // let CRITERIA = {$or: [{client: REQUEST.query.username}]},
+    // PROJECTION = {__v : 0, createAt: 0};
+
+    
+    MODEL.scheduleModel.find({}).then((schedules) => {
+        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
+        return schedules;
+    }).then((schedules)=>{
+        var scheduleData = {
+            client: schedules.client,
+            quantity: schedules.quantity,
+            details: schedules.details,
+            address: schedules.address,
+            pickUpDate: schedules.pickUpDate,
+            reminder: schedules.reminder,
+            callOnArrival: schedules.callOnArrival,
+            completionStatus: schedules.completionStatus,
+          };
+          RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, scheduleData)); 
+    })
+
+
+}
 
 module.exports = scheduleController;

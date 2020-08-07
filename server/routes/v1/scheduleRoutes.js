@@ -17,6 +17,9 @@ module.exports = (APP)=>{
     APP.route('/api/getSchedules')
         .get(CONTROLLER.scheduleController.getSchedules);
 
+    APP.route('/api/collectorSchedule')
+        .get(CONTROLLER.scheduleController.collectorSchedule);
+
     
     APP.route('/getSchedule')
         .get((req, res)=>{

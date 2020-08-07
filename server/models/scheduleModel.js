@@ -13,10 +13,15 @@ const schedulePick = new Schema({
         type:String,
         required: true,
     },
-    quantity: {
+    Category: {
         type: String,
         enum : ["plastic bottles", "cans", "rubber", "paper materials"],
         required: true,
+    },
+    quantity:{
+            type: String,
+            enum : ["3 bags", "A Drum"],
+            required: true
     },
     details: {
         type: String,
