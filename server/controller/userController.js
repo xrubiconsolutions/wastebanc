@@ -10,6 +10,7 @@ let COMMON_FUN          = require("../util/commonFunction");
 let SERVICE             = require("../services/commonService");
 let CONSTANTS           = require("../util/constants");
 let FS                  = require('fs');
+const { Response } = require("aws-sdk");
 
 /**************************************************
  ****** Upload image or media (under process) *****
@@ -38,6 +39,8 @@ userController.upload = (REQUEST, RESPONSE)=> {
 /**************************************************
  ******************* Register User ****************
  **************************************************/
+var authy = require('authy')('YHRjYqZNqXhIIUJ8oC7MIYKUZ6BN2pee');
+
 userController.registerUser = (REQUEST, RESPONSE)=>{
     // RESPONSE.jsonp(REQUEST.body);
     let dataToSave = { ...REQUEST.body };
@@ -46,15 +49,36 @@ userController.registerUser = (REQUEST, RESPONSE)=>{
             return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
         else {
             dataToSave.password = PASSWORD;
+            authy.register_user(dataToSave.email, dataToSave.phoneNumber, dataToSave.countryCode, function (regErr, regRes) {
+                console.log('In Registration...');
+                if (regErr) {
+                  console.log(regErr);
+                  RESPONSE.send('There was some error registering the user.');
+                } else if (regRes) {
+                  console.log(regRes);
+                  authy.request_sms(regRes.user.id, function (smsErr, smsRes) {
+                    console.log('Requesting SMS...');
+                    if (smsErr) {
+                      console.log(smsErr);
+                      RESPONSE.send('There was some error sending OTP to cell phone.');
+                    } else if (smsRes) {
+                      console.log(smsRes);
+                      RESPONSE.send('OTP Sent to the cell phone.');
+                    }
+                  });
+                }
+              });
             MODEL.userModel(dataToSave).save({},(ERR, RESULT) => {
                 if(ERR)
                     RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
                 else{
                     let UserData = {
                       email: RESULT.email,
+                      phoneNumber: RESULT.phoneNumber,
                       username: RESULT.username,
                       roles: RESULT.roles
                     };
+             
                     RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData));
                 }
             });
@@ -198,6 +222,22 @@ userController.changedlogedInPassword = (REQUEST, RESPONSE)=>{
     })
 };
 
+userController.verifyPhone = (REQUEST, RESPONSE)=>{
+    var id = REQUEST.param('id');
+	var token = REQUEST.param('token');
+
+	authy.verify(id, token, function (verifyErr, verifyRes) {
+		console.log('In Verification...');
+		if (verifyErr) {
+			console.log(verifyErr);
+			RESPONSE.send('OTP verification failed.');
+		} else if (verifyRes) {
+			console.log(verifyRes);
+			RESPONSE.send('OTP Verified.');	
+		}
+	});
+
+}
 
 
 

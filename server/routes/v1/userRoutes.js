@@ -18,6 +18,9 @@ module.exports = (APP)=>{
     APP.route('/api/login')
         .get(CONTROLLER.userController.loginUser);
 
+    APP.route('/api/verify')
+        .post(CONTROLLER.userController.verifyPhone);   
+
     APP.route('/api/forgotPassword')
         .post(CONTROLLER.userController.forgotPassword);
 
