@@ -63,7 +63,7 @@ userController.registerUser = (REQUEST, RESPONSE)=>{
                       RESPONSE.send('There was some error sending OTP to cell phone.');
                     } else if (smsRes) {
                       console.log(smsRes);
-                      RESPONSE.send('OTP Sent to the cell phone.');
+                    //   RESPONSE.send('OTP Sent to the cell phone.');
                     }
                   });
                 }

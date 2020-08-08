@@ -1,4 +1,6 @@
-var authy = require('authy')('your-auth-key');
+
+
+var authy = require('authy')('YHRjYqZNqXhIIUJ8oC7MIYKUZ6BN2pee');
 router.get('/register', function(req, res) {
   console.log('New register request...');
   var isSuccessful = false;

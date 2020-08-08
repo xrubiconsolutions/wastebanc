@@ -22,7 +22,6 @@ const user_Schema = new Schema({
     },
     fullname:{
         type: String,
-
     },
     email: {
         type: String,
@@ -35,8 +34,8 @@ const user_Schema = new Schema({
         unique:true
     },
     password: {
-        type: String
-        // "required": true,
+        type: String,
+        "required": true,
     },
     createAt: {
         type: Date,

@@ -20,7 +20,6 @@ module.exports = (APP)=>{
     APP.route('/api/collectorSchedule')
         .get(CONTROLLER.scheduleController.collectorSchedule);
 
-    
     APP.route('/getSchedule')
         .get((req, res)=>{
             res.jsonp('cool')
