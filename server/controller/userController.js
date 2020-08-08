@@ -105,14 +105,14 @@ userController.registerUser = (REQUEST, RESPONSE)=>{
  **************************************************/
 userController.loginUser = (REQUEST, RESPONSE)=>{
 
-    let CRITERIA = {$or: [{username: REQUEST.query.username},{email: REQUEST.query.username}]},
+    let CRITERIA = {$or: [{username: REQUEST.body.username},{email: REQUEST.body.username}]},
         PROJECTION = {__v : 0, createAt: 0};
 
     /** find user is exists or not */
     MODEL.userModel.findOne(CRITERIA, PROJECTION, {lean: true}).then((USER)=>{
 
         USER ? /** matching password */
-            COMMON_FUN.decryptPswrd(REQUEST.query.password, USER.password, (ERR, MATCHED)=>{
+            COMMON_FUN.decryptPswrd(REQUEST.body.password, USER.password, (ERR, MATCHED)=>{
                 if( ERR )
                     return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
                 else if (!MATCHED)

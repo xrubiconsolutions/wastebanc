@@ -42,6 +42,11 @@ const user_Schema = new Schema({
         default: Date.now
     },
 
+    roles: {
+        type: String,
+        enum: ["client", "collector", "admin"],
+        required: true
+    },
     countryCode: {
         type: String,
         default: "+234",

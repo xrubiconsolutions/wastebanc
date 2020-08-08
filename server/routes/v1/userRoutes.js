@@ -16,7 +16,7 @@ module.exports = (APP) => {
         .post(CONTROLLER.userController.upload);
 
     APP.route('/api/login')
-        .get(CONTROLLER.userController.loginUser);
+        .post(CONTROLLER.userController.loginUser);
 
     APP.route('/api/verify')
         .post(CONTROLLER.userController.verifyPhone);   
