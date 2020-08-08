@@ -6,7 +6,7 @@
  *******************************/
 let MONGOOSE   =  require('mongoose');
 
-
+MONGOOSE.set('useFindAndModify', false);
 /*******************************
  ***** Mongodb connection  *****
  *******************************/

@@ -7,3 +7,4 @@ node_modules/
 # Remove unnessary file's
 .idea
 .eslintrc
+.vercel

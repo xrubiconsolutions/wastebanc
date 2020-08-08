@@ -44,45 +44,56 @@ var authy = require('authy')('YHRjYqZNqXhIIUJ8oC7MIYKUZ6BN2pee');
 userController.registerUser = (REQUEST, RESPONSE)=>{
     // RESPONSE.jsonp(REQUEST.body);
     let dataToSave = { ...REQUEST.body };
+
+
     COMMON_FUN.encryptPswrd(dataToSave.password, (ERR, PASSWORD)=>{
         if(ERR)
             return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
         else {
             dataToSave.password = PASSWORD;
-            authy.register_user(dataToSave.email, dataToSave.phoneNumber, dataToSave.countryCode, function (regErr, regRes) {
-                console.log('In Registration...');
-                if (regErr) {
-                  console.log(regErr);
-                  RESPONSE.send('There was some error registering the user.');
-                } else if (regRes) {
-                  console.log(regRes);
-                  authy.request_sms(regRes.user.id, function (smsErr, smsRes) {
-                    console.log('Requesting SMS...');
-                    if (smsErr) {
-                      console.log(smsErr);
-                      RESPONSE.send('There was some error sending OTP to cell phone.');
-                    } else if (smsRes) {
-                      console.log(smsRes);
-                    //   RESPONSE.send('OTP Sent to the cell phone.');
-                    }
-                  });
+            var errors = {};
+              MODEL.userModel.findOne({ email: dataToSave.email }).then(user => {
+                if (user) {
+                  errors.email = "Email already exists";
+                  RESPONSE.status(400).jsonp(errors)
+                    } else {
+                    MODEL.userModel(dataToSave).save({},(ERR, RESULT) => {
+                        if(ERR)
+                            RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+                        else{
+                            authy.register_user(dataToSave.email, dataToSave.phoneNumber, dataToSave.countryCode, function (regErr, regRes) {
+                                console.log('In Registration...');
+                                if (regErr) {
+                                  console.log(regErr);
+                                //   RESPONSE.send('There was some error registering the user.');
+                                } else if (regRes) {
+                                  console.log(regRes);
+                                  authy.request_sms(regRes.user.id, function (smsErr, smsRes) {
+                                    console.log('Requesting SMS...');
+                                    if (smsErr) {
+                                      console.log(smsErr);
+                                    //   RESPONSE.send('There was some error sending OTP to cell phone.');
+                                    } else if (smsRes) {
+                                      console.log(smsRes);
+                                    //   RESPONSE.send('OTP Sent to the cell phone.');
+                                    }
+                                  });
+                                }
+                              });
+                            let UserData = {
+                              email: RESULT.email,
+                              phoneNumber: RESULT.phoneNumber,
+                              username: RESULT.username,
+                              roles: RESULT.roles
+                            };
+                     
+                            RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData));
+                        }
+                    });
                 }
               });
-            
-            MODEL.userModel(dataToSave).save({},(ERR, RESULT) => {
-                if(ERR)
-                    RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
-                else{
-                    let UserData = {
-                      email: RESULT.email,
-                      phoneNumber: RESULT.phoneNumber,
-                      username: RESULT.username,
-                      roles: RESULT.roles
-                    };
-             
-                    RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData));
-                }
-            });
+
+      
         }
     })
 

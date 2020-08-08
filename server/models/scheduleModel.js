@@ -20,7 +20,7 @@ const schedulePick = new Schema({
     },
     quantity:{
             type: String,
-            enum : ["3 bags", "A Drum"],
+            enum : ["3 bags", "a drum"],
             required: true
     },
     details: {
@@ -48,7 +48,8 @@ const schedulePick = new Schema({
     },
     completionStatus: {
         type: [String],
-        enum: ["completed", "pending", "missed"]
+        enum: ["completed", "pending", "missed"],
+        default: "pending"
     }
 });
 
