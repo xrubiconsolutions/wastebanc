@@ -45,7 +45,8 @@ const user_Schema = new Schema({
     roles: {
         type: String,
         enum: ["client", "collector", "admin"],
-        required: true
+        required: true,
+        default: "client"
     },
     countryCode: {
         type: String,

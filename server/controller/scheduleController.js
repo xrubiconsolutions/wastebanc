@@ -59,4 +59,59 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE)=>{
         }).catch (err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
 }
 
+
+scheduleController.updateSchedule = (REQUEST, RESPONSE)=>{
+
+    MODEL.scheduleModel.updateOne({_id: REQUEST.body._id},{$set: { "completionStatus" : REQUEST.body.completionStatus}}).then((SUCCESS) => {
+        return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
+    }).catch((ERR) => {
+        return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+    });
+
+}
+
+scheduleController.acceptCollection = (REQUEST, RESPONSE) =>{
+
+    var errors = {};
+    MODEL.userModel.findOne({email: REQUEST.body.client},{},{lean: true}).then(result=>{ if(result.roles != "collector"){
+        errors.message = "Only a collector can accept or decline an offer";
+        return RESPONSE.jsonp(errors);
+    } else {
+        MODEL.scheduleModel.updateOne({_id: REQUEST.body._id},{$set: { "collectorStatus" : REQUEST.body.collectorStatus}}).then((SUCCESS) => {
+            return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
+        }).catch((ERR) => {
+            return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+        });
+    }}).catch((err)=> { return RESPONSE.jsonp(err)}
+    )
+
+}
+
+scheduleController.allMissedSchedules = (REQUEST, RESPONSE) =>{
+    MODEL.scheduleModel.find({ completionStatus: "missed", client: REQUEST.body.client}).then((schedules)=>{
+        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
+        }).catch (err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
+
+}
+  
+
+scheduleController.allPendingSchedules = (REQUEST, RESPONSE) =>{
+    MODEL.scheduleModel.find({ completionStatus: "pending", "client": REQUEST.body.client}).then((schedules)=>{
+        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
+        }).catch (err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
+
+}
+
+scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) =>{
+    MODEL.scheduleModel.find({ completionStatus: "completed", client: REQUEST.body.client}).then((schedules)=>{
+        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
+        }).catch (err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
+
+}
+  
+  
+
+
+
 module.exports = scheduleController;
+
