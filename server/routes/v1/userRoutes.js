@@ -29,6 +29,14 @@ module.exports = (APP) => {
 
     APP.route('/api/changePassword')
         .post(CONTROLLER.userController.changePassword);
+    
+    APP.route('/api/getAllClients')
+        .get(CONTROLLER.userController.getAllClients);
+     
+    APP.route('/api/getAllCollectors')
+        .get(CONTROLLER.userController.getAllCollectors);
+    
+    
     APP.route('/getUser')
         .get((req, res)=>{
             res.jsonp('cool')

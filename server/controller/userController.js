@@ -270,6 +270,34 @@ userController.verifyPhone = (REQUEST, RESPONSE)=>{
 	});
 }
 
+userController.getAllClients = async (REQUEST, RESPONSE)=>{
+
+    try {
+        /* check user exist or not*/
+        let users = await MODEL.userModel.find({roles: "client"});
+        RESPONSE.jsonp(users);
+    }
+    catch(err){
+            RESPONSE.jsonp(err);
+    }
+
+}
+
+
+userController.getAllCollectors = async (REQUEST, RESPONSE)=>{
+
+    try {
+        /* check user exist or not*/
+        let users = await MODEL.userModel.find({roles: "collector"});
+        RESPONSE.jsonp(users);
+    }
+    catch(err){
+            RESPONSE.jsonp(err);
+    }
+
+}
+
+
 
 
 /* export userControllers */
