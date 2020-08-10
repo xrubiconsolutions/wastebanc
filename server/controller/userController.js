@@ -121,7 +121,7 @@ userController.loginUser = (REQUEST, RESPONSE)=>{
                     let dataToJwt = {username: USER.username, Date: Date.now, email: USER.email, role: USER.roles, phoneNumber: USER.phoneNumber, verified:USER.verified },
                         jwtToken  = COMMON_FUN.createToken(dataToJwt); /** creating jwt token */
                     dataToJwt.token = jwtToken;
-                    return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, dataToJwt));
+                    return RESPONSE.jsonp(dataToJwt);
                 }
             })
         :RESPONSE.jsonp(COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL));
