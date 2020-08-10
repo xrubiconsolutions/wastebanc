@@ -54,8 +54,10 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE)=>{
     // let CRITERIA = {$or: [{client: REQUEST.query.username}]},
     // PROJECTION = {__v : 0, createAt: 0};
 
-        MODEL.scheduleModel.find({}).then((schedules)=>{
-        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
+        MODEL.scheduleModel.find({}).sort({"pickUpDate" : -1}).then((schedules)=>{
+        console.log(schedules)
+        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules));
+        
         }).catch (err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
 }
 
