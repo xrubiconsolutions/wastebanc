@@ -45,6 +45,18 @@ userController.registerUser = (REQUEST, RESPONSE)=>{
     // RESPONSE.jsonp(REQUEST.body);
     let dataToSave = { ...REQUEST.body };
 
+    // https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer
+
+    // {
+    //     "firstname":"Touchandpay",
+    //     "lastname":"Xrubicon",
+    //     "othernames":"Lawma",
+    //     "email":"xrubicon@touchandpay.me",
+    //     "phone":"0800000000000",
+    //     "address":"Lagos",
+    //     "cardID":"9999"
+    // }
+
 
     COMMON_FUN.encryptPswrd(dataToSave.password, (ERR, PASSWORD)=>{
         if(ERR)

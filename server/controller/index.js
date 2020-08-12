@@ -6,5 +6,6 @@
  **************************************************/
 module.exports = {
     userController         :   require("./userController"),
-    scheduleController : require("./scheduleController")
+    scheduleController : require("./scheduleController"),
+    webPushController : require("./webPushController")
 };
