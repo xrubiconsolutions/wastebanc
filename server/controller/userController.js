@@ -43,6 +43,7 @@ var authy = require("authy")("YHRjYqZNqXhIIUJ8oC7MIYKUZ6BN2pee");
 
 userController.registerUser = (REQUEST, RESPONSE) => {
   // RESPONSE.jsonp(REQUEST.body);
+  var need = {};
   let dataToSave = { ...REQUEST.body };
 
   COMMON_FUN.encryptPswrd(dataToSave.password, (ERR, PASSWORD) => {
@@ -88,19 +89,15 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                     }
                   }
                 }, function(err,res){
-                  // console.log("response", JSON.stringify(res));
-                  MODEL.userModel(JSON.parse(JSON.stringify(res.body.content.data ))).save({}, (ERR, RESULT) => {  
-                    console.log("RESULT SAVED SUCCESSFULLY", RESULT)
-                             })
-
+                  let card_id = res.body.content.data.cardID
+                  need = {cardID: card_id, ...RESULT }
+                  console.log("response", res.body.content.data.cardID );
+                   return MODEL.userModel.updateOne({email: RESULT.email},{ $set: { "cardID" : card_id } },(res)=>{
+                    console.log(res);
+                  });                 
                             })
                           })
-
-              // MODEL.userModel.updateOne({email: REQUEST.body.email}, { $set: res.body.content.data })  
-
-
-
-
+                          console.log("Card details here", need)
 
               authy.register_user(
                 dataToSave.email,
