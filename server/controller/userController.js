@@ -415,7 +415,7 @@ userController.getWalletBalance = (req, res)=>{
                  },
           json: true,        },
           function(error, response, body) {
-            res.jsonp(JSON.stringify(response));
+            res.jsonp(JSON.stringify(response.body.content.data));
           }
          )
         }
