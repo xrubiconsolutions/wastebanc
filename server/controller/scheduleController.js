@@ -236,9 +236,8 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) =>{
 
 scheduleController.rewardSystem = (req, res)=> {
 
-  MODEL.userModel.find({"cardID": req.cardID}).then(result=>{
+  MODEL.userModel.find({"cardID": req.body.cardID}).then(result=>{
     MODEL.scheduleModel.find({"_id": req.body._id}).then(schedule => {
-  
       request(
         {
           url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
@@ -260,7 +259,7 @@ scheduleController.rewardSystem = (req, res)=> {
             "data": {
                     "deviceID": "DEVICE_ID", //"DEVICE_ID"
                     "organizationID": "7", // 7
-                    "weight": schedule.weight,
+                    "weight": schedule.quantity,
                     "cardID": req.body.cardID,
               }
           }
