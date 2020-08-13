@@ -34,6 +34,9 @@ module.exports = (APP)=>{
 
     APP.route('/api/allCompleted')
         .get(CONTROLLER.scheduleController.allCompletedSchedules);
+    
+    APP.route('/api/rewardUser')
+        .post(CONTROLLER.scheduleController.rewardSystem);
         
     APP.route('/getSchedule')
         .get((req, res)=>{

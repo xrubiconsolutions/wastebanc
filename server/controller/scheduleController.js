@@ -232,10 +232,55 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) =>{
         }).catch (err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
 
 }
-  
-  
 
+
+scheduleController.rewardSystem = (req, res)=> {
+
+  MODEL.userModel.find({"cardID": req.cardID}).then(result=>{
+    MODEL.scheduleModel.find({"_id": req.body._id}).then(schedule => {
+  
+      request(
+        {
+          url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+          method: "POST",
+          json: true,
+          body: { data: { username: "xrubicon", password: "xrubicon1234" } },
+        },
+        function (error, response, body){
+         request({
+          url: "https://apis.touchandpay.me/lawma-backend/v1/agent/create/agent/transaction",
+          method: "POST",
+          headers:{
+              'Accept': 'application/json',
+              'Accept-Charset': 'utf-8',
+              'Token': response.headers.token
+          },
+          json: true,
+          body:  {
+            "data": {
+                    "deviceID": "DEVICE_ID", //"DEVICE_ID"
+                    "organizationID": "7", // 7
+                    "weight": schedule.weight,
+                    "cardID": req.body.cardID,
+              }
+          }
+        }, function(res){
+          console.log(res.json())
+        }
+         )
+      }
+      )
+    }
+    )
+  }
+  )
+
+}
 
 
 module.exports = scheduleController;
+
+
+
+
 
