@@ -266,7 +266,7 @@ scheduleController.rewardSystem = (req, res)=> {
           }
         }, function(err,response){
           // console.log(response)
-         return res.jsonp(response)
+         return res.jsonp(response.body.content.data)
 
         }
      )
