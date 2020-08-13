@@ -154,7 +154,7 @@ userController.loginUser = (REQUEST, RESPONSE) => {
   let CRITERIA = {
       $or: [
         { username: REQUEST.body.username },
-        { email: REQUEST.body.username },
+        { email: REQUEST.body.email },
       ],
     },
     PROJECTION = { __v: 0, createAt: 0 };
@@ -176,20 +176,20 @@ userController.loginUser = (REQUEST, RESPONSE) => {
                   )
                 );
               else {
-                let dataToJwt = {
-                    username: USER.username,
-                    Date: Date.now,
-                    email: USER.email,
-                    role: USER.roles,
-                    cardID: USER.cardID,
-                    phoneNumber: USER.phoneNumber,
-                    verified: USER.verified,
-                  },
-                  jwtToken = COMMON_FUN.createToken(
-                    dataToJwt
+                // let dataToJwt = {
+                //     username: USER.username,
+                //     Date: Date.now,
+                //     email: USER.email,
+                //     role: USER.roles,
+                //     cardID: USER.cardID,
+                //     phoneNumber: USER.phoneNumber,
+                //     verified: USER.verified,
+                //   },
+                 var  jwtToken = COMMON_FUN.createToken(
+                    USER
                   ); /** creating jwt token */
-                dataToJwt.token = jwtToken;
-                return RESPONSE.jsonp(dataToJwt);
+                USER.token = jwtToken;
+                return RESPONSE.jsonp(USER);
               }
             }
           )
