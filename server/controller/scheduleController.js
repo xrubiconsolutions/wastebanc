@@ -279,6 +279,40 @@ scheduleController.rewardSystem = (req, res)=> {
 
 }
 
+scheduleController.allAgentTransaction = (req,res)=>{
+
+  request(
+    {
+      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+      method: "POST",
+      json: true,
+      body: { data: { username: "xrubicon", password: "xrubicon1234" } },
+    },
+    function (error, response, body){
+
+     request({
+      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/get/agent/transactions",
+      method: "GET",
+      headers:{
+          'Accept': 'application/json',
+          'Accept-Charset': 'utf-8',
+          'Token': response.headers.token
+      },
+      json: true,
+    }, function(err,response){
+      // console.log(response)
+     return res.jsonp(response.body.content.data.reverse().slice(0,5))
+
+    }
+ )
+}
+
+  )
+}
+
+
+
+
 
 module.exports = scheduleController;
 

@@ -37,6 +37,9 @@ module.exports = (APP)=>{
     
     APP.route('/api/rewardUser')
         .post(CONTROLLER.scheduleController.rewardSystem);
+
+    APP.route('/api/agentTransactions')
+        .get(CONTROLLER.scheduleController.allAgentTransaction);
         
     APP.route('/getSchedule')
         .get((req, res)=>{
