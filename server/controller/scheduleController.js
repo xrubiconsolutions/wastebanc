@@ -238,6 +238,7 @@ scheduleController.rewardSystem = (req, res)=> {
 
   MODEL.userModel.find({"cardID": req.body.cardID}).then(result=>{
     MODEL.scheduleModel.find({"_id": req.body._id}).then(schedule => {
+      // console.log("schedule here", schedule[0].quantity)
       request(
         {
           url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
@@ -257,16 +258,18 @@ scheduleController.rewardSystem = (req, res)=> {
           json: true,
           body:  {
             "data": {
-                    "deviceID": "DEVICE_ID", //"DEVICE_ID"
+                    "deviceID": "XRUBICON", //"DEVICE_ID"
                     "organizationID": "7", // 7
-                    "weight": schedule.quantity,
+                    "weight": schedule[0].quantity,
                     "cardID": req.body.cardID,
               }
           }
-        }, function(res){
-          console.log(res.json())
+        }, function(err,response){
+          // console.log(response)
+         return res.jsonp(response)
+
         }
-         )
+     )
       }
       )
     }
