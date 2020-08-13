@@ -184,6 +184,7 @@ userController.loginUser = (REQUEST, RESPONSE) => {
                     Date: Date.now,
                     email: USER.email,
                     role: USER.roles,
+                    cardID: USER.cardID,
                     phoneNumber: USER.phoneNumber,
                     verified: USER.verified,
                   },

@@ -131,7 +131,6 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE)=>{
                         }
                       },
                         function(error, response, body) {
-                          console.log(body);
                           console.log(response);
                         }
                       );   
