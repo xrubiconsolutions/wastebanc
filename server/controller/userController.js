@@ -23,7 +23,6 @@ userController.upload = (REQUEST, RESPONSE) => {
   /** Stream
         // let myReadStream = FS.createReadStream(__dirname + '/index.js');
         // let myWriteStream = FS.createWriteStream( 'client/uploads/newfile.js' );
-
         // myReadStream.on('data', (chunks) => {
         //         console.log('new chunks received--- ', chunks);
         //         myWriteStream.write(chunks);
@@ -46,19 +45,6 @@ userController.registerUser = (REQUEST, RESPONSE) => {
   // RESPONSE.jsonp(REQUEST.body);
   let dataToSave = { ...REQUEST.body };
 
-  request(
-    {
-      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
-      method: "POST",
-      json: true,
-      body: { data: { username: "xrubicon", password: "xrubicon1234" } },
-    },
-    function (error, response, body) {
-     return response.headers.token;
-    }
-  );
-
-
   COMMON_FUN.encryptPswrd(dataToSave.password, (ERR, PASSWORD) => {
     if (ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
     else {
@@ -70,7 +56,6 @@ userController.registerUser = (REQUEST, RESPONSE) => {
           RESPONSE.status(400).jsonp(errors);
         } else {
           MODEL.userModel(dataToSave).save({}, (ERR, RESULT) => {
-            console.log("RESULT", RESULT)
             if (ERR) RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
             else {
               request(
@@ -82,7 +67,6 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                 },
                 function (error, response, body) {
                 //  return response.headers.token;
-
                  request({
                   url: "https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer",
                   method: "POST",
@@ -101,48 +85,22 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                       "email": RESULT.email,
                       "phone":RESULT.phone,
                       "address": RESULT.address,
-                      "cardID": RESULT.cardID
                     }
                   }
-                },
-                  function(error, response, body) {
-                    console.log(body);
-                    console.log(response);
-                    console.log(error)
-                  }
-                );
-                }
-              );
-            
+                }, function(err,res){
+                  // console.log("response", JSON.stringify(res));
+                  MODEL.userModel(JSON.parse(JSON.stringify(res.body.content.data ))).save({}, (ERR, RESULT) => {  
+                    console.log("RESULT SAVED SUCCESSFULLY", RESULT)
+                             })
 
-                // request({
-                //     url: "https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer",
-                //     method: "POST",
-                //     headers: {
-                //         'Accept': 'application/json',
-                //         'Accept-Charset': 'utf-8',
-                //         'Token': `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTAsInVzZXJuYW1lIjoieHJ1Ymljb24iLCJmaXJzdG5hbWUiOiJYcnViaWNvbiIsImxhc3RuYW1lIjoiWHJ1Ymljb24iLCJvdGhlcm5hbWVzIjoiIiwicGhvbmUiOiIwODAzNDUyNDc1MyIsImVtYWlsIjoiaGVsb0B4cnViaWNvbi5jb20iLCJhZGRyZXNzIjoiTGFnb3MiLCJvcmdhbml6YXRpb25JRCI6NywidXNlcnR5cGUiOjIsInB1YmxpY0tleSI6IlhheVp2YjV4QXdmcyIsImlzcyI6InBheXJvbGxtbmdyIiwiYXVkIjoicGF5cm9sbG1uZ3IiLCJpYXQiOjE1OTcyNjkxMTMsIm5iZiI6MTU5NzI2OTExM30.DQY1Im98imxgK03_iQvemOn0fhmQWlX_Bm7qr1WjvjA`,
-                //     },
-                //     json: true,
-                //     body:  {
-                //       "data": {
-                //         "username": RESULT.username,
-                //         "firstname":RESULT.firstname,
-                //        "lastname": RESULT.lastname,
-                //         "othernames": RESULT.othernames,
-                //         "email": RESULT.email,
-                //         "phone":RESULT.phone,
-                //         "address": RESULT.address,
-                //         "cardID": RESULT.cardID
-                //       }
-                //     }
-                //   },
-                //     function(error, response, body) {
-                //       console.log(body);
-                //       console.log(response);
-                //       console.log(error)
-                //     }
-                //   );
+                            })
+                          })
+
+              // MODEL.userModel.updateOne({email: REQUEST.body.email}, { $set: res.body.content.data })  
+
+
+
+
 
               authy.register_user(
                 dataToSave.email,
@@ -176,8 +134,8 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                 phoneNumber: RESULT.phoneNumber,
                 username: RESULT.username,
                 roles: RESULT.roles,
+                cardID: RESULT.cardID
               };
-
               RESPONSE.jsonp(
                 COMMON_FUN.sendSuccess(
                   CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,

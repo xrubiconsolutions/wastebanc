@@ -34,9 +34,9 @@ const user_Schema = new Schema({
         default: "Lagos"
     },
     cardID :{
-        type: String,
+        type: Number,
         required: true,
-        default: "0x54"
+        default: 1200
     },
     fullname:{
         type: String,
@@ -74,6 +74,18 @@ const user_Schema = new Schema({
     verified: {
         type: Boolean,
         default:false
+    },
+    id: {
+        type: Number,
+    },
+    userType : {
+        type: Number,
+        default:5
+    },
+    availablePoints: {
+        type: Number,
+        required: true,
+        default: 0
     }
 });
 
