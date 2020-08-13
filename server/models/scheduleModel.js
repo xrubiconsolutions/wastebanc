@@ -18,10 +18,10 @@ const schedulePick = new Schema({
         enum : ["plastic bottles", "cans", "rubber", "paper materials"],
         required: true,
     },
-    weight:{
+    quantity:{
             type: Number,
-            required: true,
-            default: 0
+            default: 0,
+            required: true
     },
     details: {
         type: String,
