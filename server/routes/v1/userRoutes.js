@@ -36,6 +36,9 @@ module.exports = (APP) => {
     APP.route('/api/getAllCollectors')
         .get(CONTROLLER.userController.getAllCollectors);
     
+    APP.route('/api/getBalance')
+        .get(CONTROLLER.userController.getWalletBalance);
+    
     
     APP.route('/getUser')
         .get((req, res)=>{

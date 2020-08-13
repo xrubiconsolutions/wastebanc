@@ -12,7 +12,7 @@ MONGOOSE.set('useFindAndModify', false);
  *******************************/
 module.exports = (URL) => {
     return new Promise((resolve, reject) => {
-        MONGOOSE.connect(URL, (err, response)=>{
+        MONGOOSE.connect(URL, { useNewUrlParser: true }, (err, response)=>{
             if(err)
                 reject(err);
             else

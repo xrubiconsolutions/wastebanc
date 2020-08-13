@@ -6,6 +6,7 @@ let COMMON_FUN          = require("../util/commonFunction");
 let CONSTANTS           = require("../util/constants");
 
 
+var request = require("request");
 
 const OneSignal = require('onesignal-node');    
 
@@ -84,13 +85,97 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE)=>{
 
 scheduleController.updateSchedule = (REQUEST, RESPONSE)=>{
 
- 
+    // request(
+    //     {
+    //       url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+    //       method: "POST",
+    //       json: true,
+    //       body: { data: { username: "xrubicon", password: "xrubicon1234" } },
+    //     },
+    //     function (error, response, body) {
+    //      response.headers.token
+    //     }
+    //   );
 
-    MODEL.scheduleModel.updateOne({_id: REQUEST.body._id},{$set: { "completionStatus" : REQUEST.body.completionStatus}}).then((SUCCESS) => {
-        return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
-    }).catch((ERR) => {
-        return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
-    });
+   
+    MODEL.userModel.find({'cardID': REQUEST.cardID}).then((result)=>{
+        MODEL.scheduleModel.find({client: result.email , _id: REQUEST.body._id}).then( schedule => {
+            MODEL.scheduleModel.updateOne({_id: schedule._id},{$set: { "completionStatus" : REQUEST.body.completionStatus}}).then((SUCCESS) => {   
+                
+                request(
+                    {
+                      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+                      method: "POST",
+                      json: true,
+                      body: { data: { username: "xrubicon", password: "xrubicon1234" } },
+                    },
+                    function (error, response, body) {
+                     response.headers.token
+
+                     request({
+                        url: "https://apis.touchandpay.me/lawma-backend/v1/agent/create/agent/transaction",
+                        method: "POST",
+                        headers: {
+                            'Accept': 'application/json',
+                            'Accept-Charset': 'utf-8',
+                            'Token': response.headers.token
+                               },
+                        json: true,
+                        body:  {
+                          "data": {
+                            "deviceID": "DEVICE_ID", //"DEVICE_ID"
+                            "organizationID": "7", // 7
+                            "weight": REQUEST.body.weight,
+                            "cardID": REQUEST.body.cardID
+                          }
+                        }
+                      },
+                        function(error, response, body) {
+                          console.log(body);
+                          console.log(response);
+                        }
+                      );   
+
+
+                    }
+                  );
+
+                // request({
+                //     url: "https://apis.touchandpay.me/lawma-backend/v1/agent/create/agent/transaction",
+                //     method: "POST",
+                //     headers: {
+                //         'Accept': 'application/json',
+                //         'Accept-Charset': 'utf-8',
+                //         'Token': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTAsInVzZXJuYW1lIjoieHJ1Ymljb24iLCJmaXJzdG5hbWUiOiJYcnViaWNvbiIsImxhc3RuYW1lIjoiWHJ1Ymljb24iLCJvdGhlcm5hbWVzIjoiIiwicGhvbmUiOiIwODAzNDUyNDc1MyIsImVtYWlsIjoiaGVsb0B4cnViaWNvbi5jb20iLCJhZGRyZXNzIjoiTGFnb3MiLCJvcmdhbml6YXRpb25JRCI6NywidXNlcnR5cGUiOjIsInB1YmxpY0tleSI6Ik4zSkYzdHVKVlFPeiIsImlzcyI6InBheXJvbGxtbmdyIiwiYXVkIjoicGF5cm9sbG1uZ3IiLCJpYXQiOjE1OTcyNzkyNjcsIm5iZiI6MTU5NzI3OTI2N30.LTr76ZZH6Xe9raRBT3n7yssb9CeqU1fMLV_ogBbtavs",
+                //     },
+                //     json: true,
+                //     body:  {
+                //       "data": {
+                //         "deviceID": "DEVICE_ID", //"DEVICE_ID"
+                //         "organizationID": "7", // 7
+                //         "weight": SUCCESS.quantity,
+                //         "cardID": SUCCESS.cardID
+                //       }
+                //     }
+                //   },
+                //     function(error, response, body) {
+                //       console.log(body);
+                //       console.log(response);
+                //     }
+                //   );            
+                  return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
+            }).catch((ERR) => {
+                return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+            });
+
+        })
+    }).catch(err=>RESPONSE.jsonp(err));
+
+    // MODEL.scheduleModel.updateOne({_id: REQUEST.body._id},{$set: { "completionStatus" : REQUEST.body.completionStatus}}).then((SUCCESS) => {
+    //     return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
+    // }).catch((ERR) => {
+    //     return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+    // });
 
 }
 
