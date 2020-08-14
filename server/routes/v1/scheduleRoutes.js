@@ -1,6 +1,7 @@
 'use strict';
 
 let CONTROLLER      =   require("../../controller");
+let auth            =   require("../../util/auth");
 
 /****************************************
  ***** Managing Schedule Routes here ********
@@ -23,7 +24,7 @@ module.exports = (APP)=>{
     APP.route('/api/updateSchedule')
         .post(CONTROLLER.scheduleController.updateSchedule);
     
-    APP.route('/api/acceptCollection')
+    APP.route('/api/acceptCollection', )
         .post(CONTROLLER.scheduleController.acceptCollection);
 
     APP.route('/api/allMissed')
