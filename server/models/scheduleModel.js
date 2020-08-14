@@ -8,6 +8,17 @@ const Constants     =   require("../util/constants");
 /**************************************************
  ************* Schedule Model or collection ***********
  **************************************************/
+const geolocation = new Schema({
+    lat: {
+        type: Number,
+        default: 6.4654
+    },
+    long :{
+        type: Number,
+        default: 3.4064
+    }
+})
+
 const schedulePick = new Schema({
     client:{
         type:String,
@@ -56,6 +67,13 @@ const schedulePick = new Schema({
         enum: ["decline", "accept"],
         default: "accept",
         required: true,
+    },
+    geolocation :{
+        type: geolocation,
+        default: { lat: "6.4654",
+        long : "3.4064"
+        },
+        required: true
     }
 });
 

@@ -40,6 +40,7 @@ scheduleController.schedule = (REQUEST, RESPONSE)=>{
                       pickUpDate: RESULT.pickUpDate,
                       reminder: RESULT.reminder,
                       callOnArrival: RESULT.callOnArrival,
+                      geolocation: RESULT.geolocation,
                       completionStatus: RESULT.completionStatus,
                     };
 
