@@ -176,15 +176,6 @@ userController.loginUser = (REQUEST, RESPONSE) => {
                   )
                 );
               else {
-                // let dataToJwt = {
-                //     username: USER.username,
-                //     Date: Date.now,
-                //     email: USER.email,
-                //     role: USER.roles,
-                //     cardID: USER.cardID,
-                //     phoneNumber: USER.phoneNumber,
-                //     verified: USER.verified,
-                //   },
                  var  jwtToken = COMMON_FUN.createToken(
                     USER
                   ); /** creating jwt token */
@@ -193,12 +184,12 @@ userController.loginUser = (REQUEST, RESPONSE) => {
               }
             }
           )
-        : RESPONSE.jsonp(
+        : RESPONSE.status(400).jsonp(
             COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
           );
     })
     .catch((err) => {
-      return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+      return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err));
     });
 };
 

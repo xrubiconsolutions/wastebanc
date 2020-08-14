@@ -8,12 +8,12 @@ let COMMON_FUN      =   require("../util/commonFunction");
 let CONSTANTS       =   require("../util/constants");
 const JWT           =   require("jsonwebtoken");
 
-let velidateUser = {};
+let validateUser = {};
 
 /********************************
  ********* validate user ********
  ********************************/
-velidateUser.userValidation = ( REQUEST, RESPONSE, NEXT )=>{
+validateUser.userValidation = ( REQUEST, RESPONSE, NEXT )=>{
     let status = JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY);
     (status && status.role === CONSTANTS.DATABASE.USER_ROLES.USER) ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
@@ -21,7 +21,7 @@ velidateUser.userValidation = ( REQUEST, RESPONSE, NEXT )=>{
 /********************************
  ****** admin authentication ****
  ********************************/
-velidateUser.adminValidation = ( REQUEST, RESPONSE, NEXT )=>{
+validateUser.adminValidation = ( REQUEST, RESPONSE, NEXT )=>{
     let status = REQUEST.headers.authorization ?
         JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY):
         JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
@@ -32,7 +32,7 @@ velidateUser.adminValidation = ( REQUEST, RESPONSE, NEXT )=>{
 /********************************
 ****** admin check model ********
 *********************************/
-velidateUser.adminCheck = ( REQUEST, RESPONSE, NEXT )=>{
+validateUser.adminCheck = ( REQUEST, RESPONSE, NEXT )=>{
     let dataObj = REQUEST.query.username;
     if(REQUEST.query.username){
         dataObj = REQUEST.query;
@@ -67,7 +67,7 @@ velidateUser.adminCheck = ( REQUEST, RESPONSE, NEXT )=>{
 /********************************
  ****** User check model ********
  *********************************/
-velidateUser.userCheck = ( REQUEST, RESPONSE, NEXT )=>{
+validateUser.userCheck = ( REQUEST, RESPONSE, NEXT )=>{
     let dataObj = REQUEST.query.username;
     if(REQUEST.query.username){
         dataObj = REQUEST.query;
@@ -98,4 +98,4 @@ velidateUser.userCheck = ( REQUEST, RESPONSE, NEXT )=>{
 };
 
 /* export userControllers */
-module.exports = velidateUser;
+module.exports = validateUser;
