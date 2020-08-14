@@ -48,7 +48,7 @@ scheduleController.schedule = (REQUEST, RESPONSE)=>{
                     .then(response => { console.log(response)})
                     .catch(e => { console.log(e)});
                           
-            return  RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData));
+            return  RESPONSE.status(200).jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData));
             }
         })
     }
@@ -68,7 +68,7 @@ scheduleController.getSchedules = (REQUEST, RESPONSE)=>{
     PROJECTION = {__v : 0, createAt: 0};
       MODEL.scheduleModel.find(CRITERIA, PROJECTION, {lean: true}).then((schedules)=>{
     RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
-        }).catch(err=>RESPONSE.jsonp(COMMON_FUN.sendError(err)))
+        }).catch(err=>RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err)))
 }
 
 
@@ -77,27 +77,13 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE)=>{
     // PROJECTION = {__v : 0, createAt: 0};
 
         MODEL.scheduleModel.find({}).sort({"pickUpDate" : -1}).then((schedules)=>{
-        console.log(schedules)
         RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules));
         
-        }).catch (err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
+        }).catch(err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
 }
 
 
 scheduleController.updateSchedule = (REQUEST, RESPONSE)=>{
-
-    // request(
-    //     {
-    //       url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
-    //       method: "POST",
-    //       json: true,
-    //       body: { data: { username: "xrubicon", password: "xrubicon1234" } },
-    //     },
-    //     function (error, response, body) {
-    //      response.headers.token
-    //     }
-    //   );
-
    
     MODEL.userModel.find({'cardID': REQUEST.cardID}).then((result)=>{
         MODEL.scheduleModel.find({client: result.email , _id: REQUEST.body._id}).then( schedule => {
@@ -138,38 +124,14 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE)=>{
 
 
                     }
-                  );
-
-                // request({
-                //     url: "https://apis.touchandpay.me/lawma-backend/v1/agent/create/agent/transaction",
-                //     method: "POST",
-                //     headers: {
-                //         'Accept': 'application/json',
-                //         'Accept-Charset': 'utf-8',
-                //         'Token': "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTAsInVzZXJuYW1lIjoieHJ1Ymljb24iLCJmaXJzdG5hbWUiOiJYcnViaWNvbiIsImxhc3RuYW1lIjoiWHJ1Ymljb24iLCJvdGhlcm5hbWVzIjoiIiwicGhvbmUiOiIwODAzNDUyNDc1MyIsImVtYWlsIjoiaGVsb0B4cnViaWNvbi5jb20iLCJhZGRyZXNzIjoiTGFnb3MiLCJvcmdhbml6YXRpb25JRCI6NywidXNlcnR5cGUiOjIsInB1YmxpY0tleSI6Ik4zSkYzdHVKVlFPeiIsImlzcyI6InBheXJvbGxtbmdyIiwiYXVkIjoicGF5cm9sbG1uZ3IiLCJpYXQiOjE1OTcyNzkyNjcsIm5iZiI6MTU5NzI3OTI2N30.LTr76ZZH6Xe9raRBT3n7yssb9CeqU1fMLV_ogBbtavs",
-                //     },
-                //     json: true,
-                //     body:  {
-                //       "data": {
-                //         "deviceID": "DEVICE_ID", //"DEVICE_ID"
-                //         "organizationID": "7", // 7
-                //         "weight": SUCCESS.quantity,
-                //         "cardID": SUCCESS.cardID
-                //       }
-                //     }
-                //   },
-                //     function(error, response, body) {
-                //       console.log(body);
-                //       console.log(response);
-                //     }
-                //   );            
-                  return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
+                  );      
+                  return RESPONSE.status(200).jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
             }).catch((ERR) => {
-                return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+                return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
             });
 
         })
-    }).catch(err=>RESPONSE.jsonp(err));
+    }).catch(err=>RESPONSE.status(500).jsonp(err));
 
     // MODEL.scheduleModel.updateOne({_id: REQUEST.body._id},{$set: { "completionStatus" : REQUEST.body.completionStatus}}).then((SUCCESS) => {
     //     return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
@@ -203,34 +165,33 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) =>{
             .then(response => { console.log(response)})
             .catch(e => { console.log(e)});
                   
-            return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
+            return RESPONSE.status(200).jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
         }).catch((ERR) => {
-            return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+            return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
         });
-    }}).catch((err)=> { return RESPONSE.jsonp(err)}
+    }}).catch((err)=> { return RESPONSE.status(500).jsonp(err)}
     )
 
 }
 
 scheduleController.allMissedSchedules = (REQUEST, RESPONSE) =>{
     MODEL.scheduleModel.find({ completionStatus: "missed", client: REQUEST.body.client}).then((schedules)=>{
-        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
-        }).catch (err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
-
+        RESPONSE.status(200).jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
+        }).catch (err=> RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)))
 }
   
 
 scheduleController.allPendingSchedules = (REQUEST, RESPONSE) =>{
     MODEL.scheduleModel.find({ completionStatus: "pending", "client": REQUEST.body.client}).then((schedules)=>{
-        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
-        }).catch (err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
+        RESPONSE.status(200).jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
+        }).catch (err=> RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err))) 
 
 }
 
 scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) =>{
     MODEL.scheduleModel.find({ completionStatus: "completed", client: REQUEST.body.client}).then((schedules)=>{
-        RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
-        }).catch (err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
+        RESPONSE.status(200).jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
+        }).catch (err=> RESPONSE.status(200).jsonp(COMMON_FUN.sendError(err))) 
 
 }
 
