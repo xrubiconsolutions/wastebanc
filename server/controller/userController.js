@@ -161,7 +161,7 @@ userController.loginUser = (REQUEST, RESPONSE) => {
 
   /** find user is exists or not */
   MODEL.userModel
-    .findOne({ email: REQUEST.body.email },
+    .findOne(CRITERIA,
        PROJECTION, { lean: true })
     .then((USER) => {
       USER /** matching password */

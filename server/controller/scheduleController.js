@@ -67,6 +67,17 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE)=>{
         }).catch(err=> RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err))) 
 }
 
+scheduleController.collectorSchedule = (REQUEST, RESPONSE)=>{
+  // let CRITERIA = {$or: [{client: REQUEST.query.username}]},
+  // PROJECTION = {__v : 0, createAt: 0};
+
+      MODEL.scheduleModel.find({}).sort({"pickUpDate" : -1}).then((schedules)=>{
+      RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules));
+      console.log(schedules)
+      
+      }).catch(err=> RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err))) 
+}
+
 
 scheduleController.updateSchedule = (REQUEST, RESPONSE)=>{
    
