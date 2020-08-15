@@ -51,7 +51,7 @@ scheduleController.getSchedule = (REQUEST, RESPONSE)=>{
 scheduleController.getSchedules = (REQUEST, RESPONSE)=>{
     let CRITERIA = {$or: [{client: REQUEST.query.username}]},
     PROJECTION = {__v : 0, createAt: 0};
-      MODEL.scheduleModel.find(CRITERIA, PROJECTION, {lean: true}).then((schedules)=>{
+      MODEL.scheduleModel.find(CRITERIA, PROJECTION, {lean: true}).sort({"pickUpDate" : -1}).then((schedules)=>{
     RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
         }).catch(err=>RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err)))
 }
