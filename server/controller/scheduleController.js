@@ -15,45 +15,43 @@ const client = new OneSignal.Client('9ca54830-96be-4c58-9c8a-a024a0960acd', 'NzJ
 scheduleController.schedule = (REQUEST, RESPONSE)=>{
     var data = { ...REQUEST.body };
 
-    const notification = {
-        contents: {
-          'en': 'There is a new schedule',
-        },
-        included_segments: ['Subscribed Users'],
-        filters: [
-          { field: 'tag', key: 'level', relation: '>', value: 10 }
-        ]
-      };
+    // const notification = {
+    //     contents: {
+    //       'en': 'There is a new schedule',
+    //     },
+    //     included_segments: ['Subscribed Users'],
+    //     filters: [
+    //       { field: 'tag', key: 'level', relation: '>', value: 10 }
+    //     ]
+    //   };
 
      
     
     MODEL.scheduleModel(data).save({},(ERR, RESULT) => {
-            if(ERR) {
-                return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
-            }
-            else {
-                    let UserData = {
-                      client: RESULT.client,
-                      quantity: RESULT.quantity,
-                      details: RESULT.details,
-                      address: RESULT.address,
-                      pickUpDate: RESULT.pickUpDate,
-                      reminder: RESULT.reminder,
-                      callOnArrival: RESULT.callOnArrival,
-                      geolocation: JSON.stringify(RESULT.geolocation),
-                      completionStatus: RESULT.completionStatus,
-                    };
-
-                    client.createNotification(notification)
-                    .then(response => { console.log(response)})
-                    .catch(e => { console.log(e)});
-                          
-            return  RESPONSE.status(200).jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData));
-            }
-        })
+      try {
+        if(ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));  
+              let UserData = {
+                client: RESULT.client,
+                quantity: RESULT.quantity,
+                details: RESULT.details,
+                address: RESULT.address,
+                pickUpDate: RESULT.pickUpDate,
+                reminder: RESULT.reminder,
+                callOnArrival: RESULT.callOnArrival,
+                lat: RESULT.lat,
+                long: RESULT.long,
+                completionStatus: RESULT.completionStatus,
+              }            
+              if(!RESULT.lat && !RESULT.long){
+                return RESPONSE.status(400)
+              }
+        return  RESPONSE.status(200).jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData));
+      } catch(err){
+        return RESPONSE.status(400).json(err)
     }
- 
-
+  })
+}
+    
 scheduleController.getSchedule = (REQUEST, RESPONSE)=>{
     let CRITERIA = {$or: [{client: REQUEST.query.username}]},
     PROJECTION = {__v : 0, createAt: 0};

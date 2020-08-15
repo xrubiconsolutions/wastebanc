@@ -68,11 +68,12 @@ const schedulePick = new Schema({
         default: "accept",
         required: true,
     },
-    geolocation :{
-        type: geolocation,
-        default: { lat: "6.4654",
-        long : "3.4064"
-        },
+    lat: {
+        type: Number,
+        required: true
+    },
+    long: {
+        type: Number,
         required: true
     }
 });
