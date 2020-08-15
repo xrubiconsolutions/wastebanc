@@ -16,7 +16,7 @@ scheduleController.schedule = (REQUEST, RESPONSE)=>{
     var data = { ...REQUEST.body };    
     MODEL.scheduleModel(data).save({},(ERR, RESULT) => {
       try {
-        if(ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));  
+        if(ERR) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));  
               let UserData = {
                 client: RESULT.client,
                 quantity: RESULT.quantity,
@@ -45,7 +45,7 @@ scheduleController.getSchedule = (REQUEST, RESPONSE)=>{
 
         MODEL.scheduleModel.findOne(CRITERIA, PROJECTION, {lean: true}).then((schedules)=>{
         return RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)); 
-        }).catch(err=>RESPONSE.jsonp(COMMON_FUN.sendError(err)))
+        }).catch(err=>RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)))
 }
 
 scheduleController.getSchedules = (REQUEST, RESPONSE)=>{
