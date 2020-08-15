@@ -42,8 +42,8 @@ scheduleController.schedule = (REQUEST, RESPONSE)=>{
                 long: RESULT.long,
                 completionStatus: RESULT.completionStatus,
               }            
-              if(!RESULT.lat && !RESULT.long){
-                return RESPONSE.status(400)
+              if(!RESULT.lat || !RESULT.long){
+                return RESPONSE.status(400).jsonp(RESPONSE)
               }
         return  RESPONSE.status(200).jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData));
       } catch(err){
@@ -116,6 +116,9 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE)=>{
                         }
                       },
                         function(error, response, body) {
+                          return MODEL.scheduleModel.updateOne({"_id": schedule._id},{ $set: { "completionStatus" : "completed" } },(res)=>{
+                            console.log(res);
+                          });
                           console.log(response);
                         }
                       );   
