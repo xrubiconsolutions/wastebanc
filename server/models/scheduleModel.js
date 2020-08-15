@@ -45,7 +45,6 @@ const schedulePick = new Schema({
     pickUpDate: {
         type: Date,
         required: true,
-        default: Date.now
     },
     reminder:{
         type: Date,
@@ -66,7 +65,6 @@ const schedulePick = new Schema({
         type: String,
         enum: ["decline", "accept"],
         default: "accept",
-        required: true,
     },
     lat: {
         type: Number,
