@@ -26,7 +26,7 @@ const schedulePick = new Schema({
     },
     Category: {
         type: String,
-        enum : ["plastic bottles", "cans", "rubber", "paper materials"],
+        // enum : ["plastic bottles", "cans", "rubber", "paper materials"],
         required: true,
     },
     quantity:{

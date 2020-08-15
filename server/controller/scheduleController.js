@@ -13,20 +13,7 @@ const OneSignal = require('onesignal-node');
 const client = new OneSignal.Client('9ca54830-96be-4c58-9c8a-a024a0960acd', 'NzJhMmMwYjctZjA0My00NzMyLWExMTQtZGZkZTBjZmFmOTY0', { apiRoot: 'https://onesignal.com/api/v2'});
 
 scheduleController.schedule = (REQUEST, RESPONSE)=>{
-    var data = { ...REQUEST.body };
-
-    // const notification = {
-    //     contents: {
-    //       'en': 'There is a new schedule',
-    //     },
-    //     included_segments: ['Subscribed Users'],
-    //     filters: [
-    //       { field: 'tag', key: 'level', relation: '>', value: 10 }
-    //     ]
-    //   };
-
-     
-    
+    var data = { ...REQUEST.body };    
     MODEL.scheduleModel(data).save({},(ERR, RESULT) => {
       try {
         if(ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));  
