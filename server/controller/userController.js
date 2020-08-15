@@ -57,7 +57,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
           RESPONSE.status(400).jsonp(errors);
         } else {
           MODEL.userModel(dataToSave).save({}, (ERR, RESULT) => {
-            if (ERR) RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+            if (ERR) RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
             else {
               request(
                 {
@@ -81,7 +81,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                     "data": {
                       "username": RESULT.username,
                       "firstname":RESULT.firstname,
-                     "lastname": RESULT.lastname,
+                      "lastname": RESULT.lastname,
                       "othernames": RESULT.othernames,
                       "email": RESULT.email,
                       "phone":RESULT.phone,
@@ -133,7 +133,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                 roles: RESULT.roles,
                 cardID: RESULT.cardID
               };
-              RESPONSE.jsonp(
+              RESPONSE.status(200).jsonp(
                 COMMON_FUN.sendSuccess(
                   CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
                   UserData
@@ -168,9 +168,9 @@ userController.loginUser = (REQUEST, RESPONSE) => {
             REQUEST.body.password,
             USER.password,
             (ERR, MATCHED) => {
-              if (ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+              if (ERR) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
               else if (!MATCHED)
-                return RESPONSE.jsonp(
+                return RESPONSE.status(400).jsonp(
                   COMMON_FUN.sendSuccess(
                     CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
                   )
@@ -223,7 +223,7 @@ userController.forgotPassword = (REQUEST, RESPONSE) => {
       );
     })
     .catch((ERR) => {
-      return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+      return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
     });
 };
 
@@ -366,7 +366,7 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
     console.log("In Verification...");
     if (verifyErr) {
       console.log(verifyErr);
-      RESPONSE.send("OTP verification failed.");
+      RESPONSE.status(422).send("OTP verification failed.");
     } else if (verifyRes) {
       console.log(verifyRes);
       RESPONSE.send("OTP Verified.");
@@ -380,7 +380,7 @@ userController.getAllClients = async (REQUEST, RESPONSE) => {
     let users = await MODEL.userModel.find({ roles: "client" });
     RESPONSE.jsonp(users);
   } catch (err) {
-    RESPONSE.jsonp(err);
+    RESPONSE.status(400).jsonp(err);
   }
 };
 
@@ -419,7 +419,7 @@ userController.getAllCollectors = async (REQUEST, RESPONSE) => {
     let users = await MODEL.userModel.find({ roles: "collector" });
     RESPONSE.jsonp(users);
   } catch (err) {
-    RESPONSE.jsonp(err);
+    RESPONSE.status(400).jsonp(err);
   }
 };
 

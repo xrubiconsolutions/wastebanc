@@ -64,7 +64,7 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE)=>{
         MODEL.scheduleModel.find({}).sort({"pickUpDate" : -1}).then((schedules)=>{
         RESPONSE.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules));
         
-        }).catch(err=> RESPONSE.jsonp(COMMON_FUN.sendError(err))) 
+        }).catch(err=> RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err))) 
 }
 
 
@@ -145,7 +145,7 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) =>{
 
     MODEL.userModel.findOne({email: REQUEST.body.client},{},{lean: true}).then(result=>{ if(result.roles != "collector"){
         errors.message = "Only a collector can accept or decline an offer";
-        return RESPONSE.jsonp(errors);
+        return RESPONSE.status(400).jsonp(errors);
     } else {
 
         MODEL.scheduleModel.updateOne({_id: REQUEST.body._id},{$set: { "collectorStatus" : REQUEST.body.collectorStatus}}).then((SUCCESS) => {
