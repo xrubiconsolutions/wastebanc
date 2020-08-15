@@ -103,7 +103,7 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE)=>{
                         }
                       },
                         function(error, response, body) {
-                          return MODEL.scheduleModel.updateOne({"_id": schedule._id},{ $set: { "completionStatus" : "completed" } },(res)=>{
+                          MODEL.scheduleModel.updateOne({"_id": schedule._id},{ $set: { "completionStatus" : "completed" } },(res)=>{
                             console.log(res);
                           });
                           console.log(response);
