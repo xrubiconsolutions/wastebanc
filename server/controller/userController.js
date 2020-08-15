@@ -161,7 +161,8 @@ userController.loginUser = (REQUEST, RESPONSE) => {
 
   /** find user is exists or not */
   MODEL.userModel
-    .findOne(CRITERIA, PROJECTION, { lean: true })
+    .findOne({ email: REQUEST.body.email },
+       PROJECTION, { lean: true })
     .then((USER) => {
       USER /** matching password */
         ? COMMON_FUN.decryptPswrd(
