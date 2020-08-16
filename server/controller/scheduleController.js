@@ -251,7 +251,7 @@ scheduleController.allAgentTransaction = (req,res)=>{
     function (error, response, body){
 
      request({
-      url: `https://apis.touchandpay.me/lawma-backend/v1/agent/get/customer/card/${cardID}`,
+      url:`https://apis.touchandpay.me/lawma-backend/v1/customer/get/customer/card/${cardID}/transactions`,
       method: "GET",
       headers:{
           'Accept': 'application/json',
