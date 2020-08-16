@@ -215,7 +215,9 @@ scheduleController.rewardSystem = (req, res)=> {
           }
         }, function(err,response){
 
-          return res.status(400).jsonp(response)
+          if(err) return res.status(400).jsonp(err)
+
+          return res.status(200).jsonp(response.body.content.data)
           // MODEL.userModel.find({"email": result[0].email}).then(points=>{
           //   console.log("is this really undefined",points[0] )
           //   // console.log("summation", points[0].availablePoints + response.body.content.data.customer.availablePoints )
