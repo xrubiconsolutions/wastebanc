@@ -20,10 +20,10 @@ exports.bootstrapAdmin = function (callback) {
             roles: 'ADMIN'
         },
         {
-            email: 'radhey@example.com',
+            email: 'packam.com',
             password: 'fa59d2b94e355a8b5fd0c6bac0c81be5',       //asdfghjkl
-            username: 'example1',
-            roles: 'USER'
+            username: 'xrubicon',
+            roles: 'admin'
         }
     ];
 

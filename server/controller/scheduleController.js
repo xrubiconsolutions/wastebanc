@@ -185,6 +185,8 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) =>{
 
 scheduleController.rewardSystem = (req, res)=> {
 
+  var points;
+
   MODEL.userModel.find({"cardID": req.body.cardID}).then(result=>{
     MODEL.scheduleModel.find({"_id": req.body._id}).then(schedule => {
       // console.log("schedule here", schedule[0].quantity)
@@ -214,9 +216,14 @@ scheduleController.rewardSystem = (req, res)=> {
               }
           }
         }, function(err,response){
+          points =  schedule[0].quantity * 10
           // console.log(response)
-         return res.jsonp(response.body.content.data)
-
+          MODEL.userModel.find({'email': schedule.client}).then((result)=>{
+            MODEL.userModel.updateOne({"cardID": result.cardID},{ $set: { "availablePoints" : points }},(res)=>{
+              console.log(res);
+            });
+          })
+          return res.jsonp(response.body.content.data)
         }
      )
       }
