@@ -185,11 +185,9 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) =>{
 
 scheduleController.rewardSystem = (req, res)=> {
 
-  var points;
-
-  MODEL.userModel.find({"cardID": req.body.cardID}).then(result=>{
-    MODEL.scheduleModel.find({"_id": req.body._id}).then(schedule => {
-      // console.log("schedule here", schedule[0].quantity)
+  MODEL.scheduleModel.find({"_id": req.body._id}).then(schedule => {
+    console.log("actual schedule", schedule)
+  MODEL.userModel.find({"email": schedule[0].client}).then(result=>{
       request(
         {
           url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
@@ -216,15 +214,16 @@ scheduleController.rewardSystem = (req, res)=> {
               }
           }
         }, function(err,response){
-          points =  schedule[0].quantity * 10
-          // console.log(response)
-          MODEL.userModel.find({'email': schedule.client}).then((result)=>{
-            MODEL.userModel.updateOne({"cardID": result.cardID},{ $set: { "availablePoints" : points }},(res)=>{
-              console.log(res);
-            });
+          MODEL.userModel.find({"email": result[0].email}).then(points=>{
+            console.log("is this really undefined",points[0] )
+            // console.log("summation", points[0].availablePoints + response.body.content.data.customer.availablePoints )
+            MODEL.userModel.updateOne({"cardID": points[0].cardID},{ $set: { "availablePoints" : "0"}}).then(res=>console.log(res)).catch(err=>console.log(err))
+          return res.jsonp(response.body.content.data.customer.availablePoints)
+            //points[0].availablePoints + response.body.content.data.customer.availablePoints 
           })
-          return res.jsonp(response.body.content.data)
+            
         }
+       
      )
       }
       )
@@ -247,7 +246,7 @@ scheduleController.allAgentTransaction = (req,res)=>{
     function (error, response, body){
 
      request({
-      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/get/agent/transactions",
+      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/get/customer/card/9999",
       method: "GET",
       headers:{
           'Accept': 'application/json',
@@ -266,8 +265,39 @@ scheduleController.allAgentTransaction = (req,res)=>{
   )
 }
 
+scheduleController.getBalance = (req,res)=>{
 
+let cardID = req.query.cardID;
 
+  request(
+    {
+      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+      method: "POST",
+      json: true,
+      body: { data: { username: "xrubicon", password: "xrubicon1234" } },
+    },
+    function (error, response, body){
+
+     request({
+      url: `https://apis.touchandpay.me/lawma-backend/v1/agent/get/customer/card/${cardID}`,
+      method: "GET",
+      headers:{
+          'Accept': 'application/json',
+          'Accept-Charset': 'utf-8',
+          'Token': response.headers.token
+      },
+      json: true,
+    }, function(err,response){
+      // console.log(response)
+     return res.jsonp(response.body.content.data.reverse().slice(0,5))
+
+    }
+ )
+}
+
+  )
+    
+}
 
 
 module.exports = scheduleController;

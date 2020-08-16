@@ -41,6 +41,11 @@ module.exports = (APP)=>{
 
     APP.route('/api/agentTransactions')
         .get(CONTROLLER.scheduleController.allAgentTransaction);
+
+    APP.route('/api/getBalance')
+        .get(CONTROLLER.scheduleController.getBalance);
+
+    
         
     APP.route('/getSchedule')
         .get((req, res)=>{
