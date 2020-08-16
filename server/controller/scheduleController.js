@@ -239,6 +239,7 @@ scheduleController.rewardSystem = (req, res)=> {
 }
 
 scheduleController.allAgentTransaction = (req,res)=>{
+  let cardID = req.query.cardID
 
   request(
     {
@@ -250,7 +251,7 @@ scheduleController.allAgentTransaction = (req,res)=>{
     function (error, response, body){
 
      request({
-      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/get/customer/card/9999",
+      url: `https://apis.touchandpay.me/lawma-backend/v1/agent/get/customer/card/${cardID}`,
       method: "GET",
       headers:{
           'Accept': 'application/json',
@@ -259,8 +260,8 @@ scheduleController.allAgentTransaction = (req,res)=>{
       },
       json: true,
     }, function(err,response){
-      // console.log(response)
-     return res.jsonp(response.body.content.data.reverse().slice(0,5))
+      console.log(response)
+     return res.jsonp(response.body.content.data)
 
     }
  )
