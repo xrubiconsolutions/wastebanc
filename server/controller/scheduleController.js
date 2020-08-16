@@ -214,13 +214,15 @@ scheduleController.rewardSystem = (req, res)=> {
               }
           }
         }, function(err,response){
-          MODEL.userModel.find({"email": result[0].email}).then(points=>{
-            console.log("is this really undefined",points[0] )
-            // console.log("summation", points[0].availablePoints + response.body.content.data.customer.availablePoints )
-            MODEL.userModel.updateOne({"cardID": points[0].cardID},{ $set: { "availablePoints" : "0"}}).then(res=>console.log(res)).catch(err=>console.log(err))
-          return res.jsonp(response.body.content.data.customer.availablePoints)
-            //points[0].availablePoints + response.body.content.data.customer.availablePoints 
-          })
+
+          return res.status(400).jsonp(response)
+          // MODEL.userModel.find({"email": result[0].email}).then(points=>{
+          //   console.log("is this really undefined",points[0] )
+          //   // console.log("summation", points[0].availablePoints + response.body.content.data.customer.availablePoints )
+          //   MODEL.userModel.updateOne({"cardID": points[0].cardID},{ $set: { "availablePoints" : "0"}}).then(res=>console.log(res)).catch(err=>console.log(err))
+          // return res.jsonp(response.body.content.data.customer.availablePoints)
+          //   //points[0].availablePoints + response.body.content.data.customer.availablePoints 
+          // })
             
         }
        

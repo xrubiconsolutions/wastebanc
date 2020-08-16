@@ -37,6 +37,8 @@
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.1",
     "path": "^0.12.7",
+    "pusher": "^3.0.1",
+    "pusher-js": "^7.0.0",
     "randomstring": "^1.1.5",
     "request": "^2.85.0",
     "sendinblue-api": "^1.0.8",
