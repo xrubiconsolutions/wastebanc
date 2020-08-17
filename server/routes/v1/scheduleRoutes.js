@@ -42,6 +42,10 @@ module.exports = (APP)=>{
     APP.route('/api/agentTransactions')
         .get(CONTROLLER.scheduleController.allAgentTransaction);
     
+    
+    APP.route('/api/viewAllSchedules')
+        .get(CONTROLLER.scheduleController.viewAllSchedules);
+    
     APP.route('/api/allWeight')
         .get(CONTROLLER.scheduleController.allWeight);
 

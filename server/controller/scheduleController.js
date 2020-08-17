@@ -80,8 +80,9 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE) => {
     .find({})
     .sort({ _id: -1 })
     .then((schedules) => {
+      var collect = schedules.filter(x=>x.completionStatus !== "completed")
       RESPONSE.jsonp(
-        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, collect)
       );
     })
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
@@ -167,16 +168,6 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE) => {
 scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
   var errors = {};
 
-  // const notification = {
-  //     contents: {
-  //       'en': 'Your schedule was just accepted',
-  //     },
-  //     included_segments: ['Subscribed Users'],
-  //     filters: [
-  //       { field: 'tag', key: 'level', relation: '>', value: 10 }
-  //     ]
-  //   };
-
   MODEL.userModel
     .findOne({ email: REQUEST.body.client }, {}, { lean: true })
     .then((result) => {
@@ -217,6 +208,24 @@ scheduleController.allMissedSchedules = (REQUEST, RESPONSE) => {
     })
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
+
+
+
+scheduleController.viewAllSchedules = (REQUEST, RESPONSE) => {
+  // let CRITERIA = {$or: [{client: REQUEST.query.username}]},
+  // PROJECTION = {__v : 0, createAt: 0};
+
+  MODEL.scheduleModel
+    .find({})
+    .sort({ _id: -1 })
+    .then((schedules) => {
+      RESPONSE.jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
+
 
 scheduleController.allPendingSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
