@@ -381,4 +381,56 @@ scheduleController.allWeight = (req, res) => {
     .catch((err) => res.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
+
+
+scheduleController.allCoins = (req, res)=>{
+
+  request(
+    {
+      url:
+        "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+      method: "POST",
+      json: true,
+      body: {
+        data: { username: "xrubicon", password: "xrubicon1234" },
+      },
+    },
+    function (error, response, body) {
+      response.headers.token;
+
+      request(
+        {
+          url:
+            "https://apis.touchandpay.me/lawma-backend/v1/agent/get/agent/transactions",
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+            Token: response.headers.token,
+          },
+          json: true,
+        },
+        function (error, response, body) {
+          if(error) return res.status(400).jsonp(error)
+          var rubicon = JSON.parse(JSON.stringify(response.body.content.data));
+          var needed = rubicon.filter(x=>x.deviceID == "xrubicon")
+
+          const test = JSON.parse(JSON.stringify(needed));
+          
+          const allCoins = test.map(x=>x.point).reduce((acc,curr) => {
+            return Number(acc) + Number(curr)
+          })
+         return res.status(200).jsonp(
+            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, allCoins)
+          );
+
+        }
+      );
+    }
+  );
+
+
+
+}
+
 module.exports = scheduleController;
