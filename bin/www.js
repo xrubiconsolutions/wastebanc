@@ -78,14 +78,14 @@ module.exports = () => {
     /*******************************
      ****** Admin Bootstrapping ****
      *******************************/
-    BOOTSTRAPING.bootstrapAdmin((ERR, RESULT)=>{
-        if(ERR){
-            ALLFILES.COMMON_FUN.messageLogs(ERR.message, null);
-            process.exit(0);
-        }else{
-            ALLFILES.COMMON_FUN.messageLogs(null, "**************Bootstraping done**************");
-        }
-    });
+    // BOOTSTRAPING.bootstrapAdmin((ERR, RESULT)=>{
+    //     if(ERR){
+    //         ALLFILES.COMMON_FUN.messageLogs(ERR.message, null);
+    //         process.exit(0);
+    //     }else{
+    //         ALLFILES.COMMON_FUN.messageLogs(null, "**************Bootstraping done**************");
+    //     }
+    // });
 
     /*******************************
      ****** Version Controller* ****

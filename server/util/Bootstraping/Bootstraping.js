@@ -9,55 +9,55 @@ let UniversalFunction   = require('../commonFunction');
 /******************************************
  * Bootstraping for default admin user... *
  ******************************************/
-exports.bootstrapAdmin = function (callback) {
+// exports.bootstrapAdmin = function (callback) {
 
-    /**Default users**/
-    let defaultUser = [
-        {
-            email: 'admin@example.com',
-            password: 'fa59d2b94e355a8b5fd0c6bac0c81be5',
-            username: 'example',
-            roles: 'ADMIN'
-        },
-        {
-            email: 'packam.com',
-            password: 'fa59d2b94e355a8b5fd0c6bac0c81be5',       //asdfghjkl
-            username: 'xrubicon',
-            roles: 'admin'
-        }
-    ];
+//     /**Default users**/
+//     let defaultUser = [
+//         {
+//             email: 'admin@example.com',
+//             password: 'fa59d2b94e355a8b5fd0c6bac0c81be5',
+//             username: 'example',
+//             roles: 'ADMIN'
+//         },
+//         {
+//             email: 'packam.com',
+//             password: 'fa59d2b94e355a8b5fd0c6bac0c81be5',       //asdfghjkl
+//             username: 'xrubicon',
+//             roles: 'admin'
+//         }
+//     ];
 
-    /******************************************
-     ******** Default user mapping... *********
-     ******************************************/
-    return Promise.all(defaultUser.map( USER => {
+//     /******************************************
+//      ******** Default user mapping... *********
+//      ******************************************/
+//     return Promise.all(defaultUser.map( USER => {
 
-        UniversalFunction.encryptPswrd(USER.password, (ERR, HASH)=> {
-            if(ERR){
-                throw ERR;
-            }
-            else {
-                USER.password = HASH;
-                return Models.userModel.findOneAndUpdate(
-                    {email: USER.email, username: USER.username},
-                    {$set: USER},
-                    {new: true, upsert: true, lean: true, setDefaultsOnInsert: true}
-                ).then(RESULT => {
+//         UniversalFunction.encryptPswrd(USER.password, (ERR, HASH)=> {
+//             if(ERR){
+//                 throw ERR;
+//             }
+//             else {
+//                 USER.password = HASH;
+//                 return Models.userModel.findOneAndUpdate(
+//                     {email: USER.email, username: USER.username},
+//                     {$set: USER},
+//                     {new: true, upsert: true, lean: true, setDefaultsOnInsert: true}
+//                 ).then(RESULT => {
 
-                    return RESULT;
-                }).catch(ERROR => {
-                    throw ERROR;
-                })
-            }
-        });
-    })).then(RESULT => {
+//                     return RESULT;
+//                 }).catch(ERROR => {
+//                     throw ERROR;
+//                 })
+//             }
+//         });
+//     })).then(RESULT => {
 
-        callback(null, CONSTANTS.STATUS_MSG.SUCCESS.CREATED);
-    }).catch(ERROR => {
+//         callback(null, CONSTANTS.STATUS_MSG.SUCCESS.CREATED);
+//     }).catch(ERROR => {
 
-        callback(UniversalFunction.sendError(ERROR));
-    });
-};
+//         callback(UniversalFunction.sendError(ERROR));
+//     });
+// };
 
 /****************************************************************
  **** Maping app version with app model with respect to user*****
