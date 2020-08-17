@@ -24,7 +24,7 @@ module.exports = (APP)=>{
     APP.route('/api/updateSchedule')
         .post(CONTROLLER.scheduleController.updateSchedule);
     
-    APP.route('/api/acceptCollection', )
+    APP.route('/api/acceptCollection')
         .post(CONTROLLER.scheduleController.acceptCollection);
 
     APP.route('/api/allMissed')
@@ -41,6 +41,10 @@ module.exports = (APP)=>{
 
     APP.route('/api/agentTransactions')
         .get(CONTROLLER.scheduleController.allAgentTransaction);
+    
+    APP.route('/api/allWeight')
+        .get(CONTROLLER.scheduleController.allWeight);
+
 
     APP.route('/api/getBalance')
         .get(CONTROLLER.scheduleController.getBalance);

@@ -132,15 +132,15 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) =>{
 
     var errors = {};
 
-    const notification = {
-        contents: {
-          'en': 'Your schedule was just accepted',
-        },
-        included_segments: ['Subscribed Users'],
-        filters: [
-          { field: 'tag', key: 'level', relation: '>', value: 10 }
-        ]
-      };
+    // const notification = {
+    //     contents: {
+    //       'en': 'Your schedule was just accepted',
+    //     },
+    //     included_segments: ['Subscribed Users'],
+    //     filters: [
+    //       { field: 'tag', key: 'level', relation: '>', value: 10 }
+    //     ]
+    //   };
 
     MODEL.userModel.findOne({email: REQUEST.body.client},{},{lean: true}).then(result=>{ if(result.roles != "collector"){
         errors.message = "Only a collector can accept or decline an offer";
@@ -148,10 +148,9 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) =>{
     } else {
 
         MODEL.scheduleModel.updateOne({_id: REQUEST.body._id},{$set: { "collectorStatus" : REQUEST.body.collectorStatus}}).then((SUCCESS) => {
-            client.createNotification(notification)
-            .then(response => { console.log(response)})
-            .catch(e => { console.log(e)});
-                  
+            // client.createNotification(notification)
+            // .then(response => { console.log(response)})
+            // .catch(e => { console.log(e)});                
             return RESPONSE.status(200).jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED));
         }).catch((ERR) => {
             return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
@@ -186,10 +185,7 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) =>{
 scheduleController.rewardSystem = (req, res)=> {
 
   MODEL.scheduleModel.find({"_id": req.body._id}).then(schedule => {
-    console.log("actual schedule", schedule)
   MODEL.userModel.find({"email": schedule[0].client}).then(result=>{
-    console.log("Client just here ready to cash out", result)
-    console.log("ID I need", result[0].cardID);
       request(
         {
           url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
@@ -216,18 +212,20 @@ scheduleController.rewardSystem = (req, res)=> {
               }
           }
         }, function(err,response){
-
+          console.log("error here", response.body)
+          var test = 5
+          MODEL.userModel.updateOne({"email": result[0].email}, { $set: { "availablePoints" :  test}}, (err,res)=>console.log("error", err, "response", res))
           if(err) return res.status(400).jsonp(err)
+          console.log("Email I am looking for", result[0].email)
 
+          MODEL.scheduleModel.updateOne({"client": result[0].email}, { $set : { "completionStatus" : "completed" } }, (err, res)=>{
+            console.log("My response here", res)
+            if(err) return res.status(400).jsonp(response.body.error)
+            MODEL.userModel.updateOne({"email": result[0].email}, { $set: { "availablePoints" :  5}})
+          })
+          console.log("My points are here",response.body.error);
+          // response.body.content.data.customer.availablePoints
           return res.status(200).jsonp(response.body.content.data)
-          // MODEL.userModel.find({"email": result[0].email}).then(points=>{
-          //   console.log("is this really undefined",points[0] )
-          //   // console.log("summation", points[0].availablePoints + response.body.content.data.customer.availablePoints )
-          //   MODEL.userModel.updateOne({"cardID": points[0].cardID},{ $set: { "availablePoints" : "0"}}).then(res=>console.log(res)).catch(err=>console.log(err))
-          // return res.jsonp(response.body.content.data.customer.availablePoints)
-          //   //points[0].availablePoints + response.body.content.data.customer.availablePoints 
-          // })
-            
         }
        
      )
@@ -253,7 +251,7 @@ scheduleController.allAgentTransaction = (req,res)=>{
     function (error, response, body){
 
      request({
-      url:`https://apis.touchandpay.me/lawma-backend/v1/customer/get/customer/card/${cardID}/transactions`,
+      url:`https://apis.touchandpay.me/lawma-backend/v1/agent/get/agent/transactions`,
       method: "GET",
       headers:{
           'Accept': 'application/json',
@@ -263,7 +261,7 @@ scheduleController.allAgentTransaction = (req,res)=>{
       json: true,
     }, function(err,response){
       console.log(response)
-     return res.jsonp(response.body.content.data)
+     return res.jsonp(response.body.content.data.reverse().slice(0,5))
 
     }
  )
@@ -304,6 +302,25 @@ let cardID = req.query.cardID;
 
   )
     
+}
+
+
+scheduleController.allWeight = (req, res)=>{
+
+
+  MODEL.scheduleModel.find({}).sort({"_id" : -1}).then((schedules)=>{
+
+    var test = JSON.parse(JSON.stringify(schedules))
+    let weight = test.reduce((acc,curr)=>{
+          return acc.quantity + curr.quantity
+
+    })
+
+
+    res.jsonp(COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, weight));
+    
+    }).catch(err=> res.status(400).jsonp(COMMON_FUN.sendError(err))) 
+
 }
 
 
