@@ -57,100 +57,148 @@ userController.registerUser = (REQUEST, RESPONSE) => {
           RESPONSE.status(400).jsonp(errors);
         } else {
           MODEL.userModel(dataToSave).save({}, (ERR, RESULT) => {
-            if (ERR) RESPONSE.status(400).jsonp((ERR));
+            if (ERR) RESPONSE.status(400).jsonp(ERR);
             else {
               request(
                 {
-                  url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+                  url:
+                    "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
                   method: "POST",
                   json: true,
-                  body: { data: { username: "xrubicon", password: "xrubicon1234" } },
+                  body: {
+                    data: { username: "xrubicon", password: "xrubicon1234" },
+                  },
                 },
                 function (error, response, body) {
-                //  return response.headers.token;
-                 request({
-                  url: "https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer",
-                  method: "POST",
-                  headers: {
-                      'Accept': 'application/json',
-                      'Accept-Charset': 'utf-8',
-                      'Token': response.headers.token
-                  },
-                  json: true,
-                  body:  {
-                    "data": {
-                      "username": RESULT.username,
-                      "firstname":RESULT.firstname,
-                      "lastname": RESULT.lastname,
-                      "othernames": RESULT.othernames,
-                      "email": RESULT.email,
-                      "phone":RESULT.phone,
-                      "address": RESULT.address,
-                    }
-                  }
-                }, function(err,res){
-                  let card_id = res.body.content.data.cardID
-                  need = {cardID: card_id, ...RESULT }
+                  //  return response.headers.token;
+                  request(
+                    {
+                      url:
+                        "https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer",
+                      method: "POST",
+                      headers: {
+                        Accept: "application/json",
+                        "Accept-Charset": "utf-8",
+                        Token: response.headers.token,
+                      },
+                      json: true,
+                      body: {
+                        data: {
+                          username: RESULT.username,
+                          firstname: RESULT.firstname,
+                          lastname: RESULT.lastname,
+                          othernames: RESULT.othernames,
+                          email: RESULT.email,
+                          phone: RESULT.phone,
+                          address: RESULT.address,
+                        },
+                      },
+                    },
+                    function (err, res) {
+                      let card_id = res.body.content.data.cardID;
+                      need = { cardID: card_id, ...RESULT };
 
-                  authy.register_user(
-                    dataToSave.email,
-                    dataToSave.phone,
-                    "+234",
-                    function (regErr, regRes) {
-                      console.log("In Registration...");
-                      if (regErr) {
-                        return res.status(400).jsonp(regErr);
-                        console.log(regErr);
-                        //   RESPONSE.send('There was some error registering the user.');
-                      } else if (regRes) {
-                        console.log(regRes);
-                        authy.request_sms(regRes.user.id, function (
-                          smsErr,
-                          smsRes
-                        ) {
-                          console.log("Requesting SMS...");
-                          if (smsErr) {
-                            return res.status(400).jsonp(smsErr);
-                            console.log(smsErr);
-                            //   RESPONSE.send('There was some error sending OTP to cell phone.');
-                          } else if (smsRes) {
-                            console.log("Twilio response here", smsRes)
-                            return MODEL.userModel.updateOne({email: dataToSave.email},{ $set: { "id" : regRes.user.id } },(res)=>{
-                              console.log(res);
-                            });   
-                            console.log(smsRes);
-                            //   RESPONSE.send('OTP Sent to the cell phone.');
+                      authy.register_user(
+                        dataToSave.email,
+                        dataToSave.phone,
+                        "+234",
+                        function (regErr, regRes) {
+                          console.log("In Registration...");
+                          if (regErr) {
+                            return res.status(400).jsonp(regErr);
+                            console.log(regErr);
+                            //   RESPONSE.send('There was some error registering the user.');
+                          } else if (regRes) {
+                            console.log(regRes);
+                            authy.request_sms(regRes.user.id, function (
+                              smsErr,
+                              smsRes
+                            ) {
+                              console.log("Requesting SMS...");
+                              if (smsErr) {
+                                return res.status(400).jsonp(smsErr);
+                                console.log(smsErr);
+                                //   RESPONSE.send('There was some error sending OTP to cell phone.');
+                              } else if (smsRes) {
+                                console.log("Twilio response here", smsRes);
+                                return MODEL.userModel.updateOne(
+                                  { email: dataToSave.email },
+                                  { $set: { id: regRes.user.id } },
+                                  (err, res) => {
+
+                                    if (err) return RESPONSE.status(400).jsonp(err)
+                                    MODEL.userModel
+                                      .find({ email: dataToSave.email })
+                                      .then((res) => {
+                                        console.log(
+                                          "The id I am looking for",
+                                          res[0]
+                                        );
+
+                                        let UserData = {
+                                          email: RESULT.email,
+                                          phoneNumber: RESULT.phoneNumber,
+                                          username: RESULT.username,
+                                          roles: RESULT.roles,
+                                          id: res[0].id,
+                                        };
+                                        return RESPONSE.status(200).jsonp(
+                                          COMMON_FUN.sendSuccess(
+                                            CONSTANTS.STATUS_MSG.SUCCESS
+                                              .DEFAULT,
+                                            UserData
+                                          )
+                                        );
+
+                                        console.log(
+                                          "All response here",
+                                          resUpdate[0]
+                                        );
+                                      })
+                                      .catch((err) =>{
+                                        return RESPONSE.status(500).jsonp(err)
+
+                                      }
+                                      );
+
+                                    // MODEL.userModel.find({"email": dataToSave.email}).then(res=>console.log("All response here", res[0])).catch(err=> RESPONSE.status(400).jsonp(err))
+                                    // console.log(res);
+                                  }
+                                );
+                                console.log(smsRes);
+                                //   RESPONSE.send('OTP Sent to the cell phone.');
+                              }
+                            });
                           }
-                        });
-                      }
+                        }
+                      );
+                      return MODEL.userModel.updateOne(
+                        { email: RESULT.email },
+                        { $set: { cardID: card_id } },
+                        (res) => {
+                          console.log(res);
+                        }
+                      );
                     }
-                  )
-                  console.log("response", res.body.content.data.cardID );
-                   return MODEL.userModel.updateOne({email: RESULT.email},{ $set: { "cardID" : card_id } },(res)=>{
-                    console.log(res);
-                  });                 
-                            })
-                          })
-                          console.log("Card details here", need)
-
-                          // if (dataToSave.p.substr(0,1) == "0")
-                          // {
-                          //     string = string.substr(1);
-                          //     console.log(string)
-                          // }
-
-              let UserData = {
-                email: RESULT.email,
-                phoneNumber: RESULT.phoneNumber,
-                username: RESULT.username,
-                roles: RESULT.roles,
-              };
-              RESPONSE.status(200).jsonp(
-                COMMON_FUN.sendSuccess(
-                  CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-                  UserData
-                )
+                  );
+                }
               );
+              console.log("Card details here", need);
+
+              // let UserData = {
+              //   email: RESULT.email,
+              //   phoneNumber: RESULT.phoneNumber,
+              //   username: RESULT.username,
+              //   roles: RESULT.roles,
+              //   id: resUpdate[0].id
+
+              // };
+              // RESPONSE.status(200).jsonp(
+              //   COMMON_FUN.sendSuccess(
+              //     CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+              //     UserData
+              //   )
+              // );
             }
           });
         }
@@ -164,24 +212,21 @@ userController.registerUser = (REQUEST, RESPONSE) => {
  **************************************************/
 userController.loginUser = (REQUEST, RESPONSE) => {
   let CRITERIA = {
-      $or: [
-        { username: REQUEST.body.username },
-        { email: REQUEST.body.email },
-      ],
+      $or: [{ username: REQUEST.body.username }, { email: REQUEST.body.email }],
     },
     PROJECTION = { __v: 0, createAt: 0 };
 
   /** find user is exists or not */
   MODEL.userModel
-    .findOne(CRITERIA,
-       PROJECTION, { lean: true })
+    .findOne(CRITERIA, PROJECTION, { lean: true })
     .then((USER) => {
       USER /** matching password */
         ? COMMON_FUN.decryptPswrd(
             REQUEST.body.password,
             USER.password,
             (ERR, MATCHED) => {
-              if (ERR) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+              if (ERR)
+                return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
               else if (!MATCHED)
                 return RESPONSE.status(400).jsonp(
                   COMMON_FUN.sendSuccess(
@@ -189,9 +234,9 @@ userController.loginUser = (REQUEST, RESPONSE) => {
                   )
                 );
               else {
-                 var  jwtToken = COMMON_FUN.createToken(
-                    USER
-                  ); /** creating jwt token */
+                var jwtToken = COMMON_FUN.createToken(
+                  USER
+                ); /** creating jwt token */
                 USER.token = jwtToken;
                 return RESPONSE.jsonp(USER);
               }
@@ -372,34 +417,35 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
   );
 };
 userController.verifyPhone = (REQUEST, RESPONSE) => {
-  var error = {}
-  var user = REQUEST.query.email;
-  MODEL.userModel.findOne(
-    { email: user },
-    {},
-    { lean: true }, (err,res)=>{
-      // console.log("error here", err)
-      // console.log("Verifying you", res.id)
-      var token = REQUEST.param.token;
-      if(!token){
-          error.message = "Enter a valid token"
-        return RESPONSE.status(422).jsonp(error)
-      }
-      authy.verify(res.id, token, function (verifyErr, verifyRes) {
-        console.log("In Verification...");
-        if (verifyErr) {
-         return RESPONSE.status(400).jsonp(verifyErr);
-          // RESPONSE.status(422).send("OTP verification failed.");
-        } else if (verifyRes) {
-          console.log(verifyRes);
-          RESPONSE.send("OTP Verified.");
-        }
-      });
+  var error = {};
+  // var user = REQUEST.query.email;
+  var auth_id = REQUEST.query.id;
+  var token = REQUEST.param.token;
 
-
+  // console.log("error here", err)
+  // console.log("Verifying you", res.id)
+  if (!token) {
+    error.message = "Enter a valid token";
+    return RESPONSE.status(422).jsonp(error);
+  }
+  authy.verify(auth_id, token, function (verifyErr, verifyRes) {
+    console.log("In Verification...");
+    if (verifyErr) {
+      return RESPONSE.status(400).jsonp(verifyErr);
+      // RESPONSE.status(422).send("OTP verification failed.");
+    } else if (verifyRes) {
+      console.log(verifyRes);
+      RESPONSE.send("OTP Verified.");
     }
-  );
+  });
 
+  // MODEL.userModel.findOne(
+  //   { email: user },
+  //   {},
+  //   { lean: true }, (err,res)=>{
+
+  //   }
+  // );
 };
 
 userController.getAllClients = async (REQUEST, RESPONSE) => {
@@ -412,34 +458,35 @@ userController.getAllClients = async (REQUEST, RESPONSE) => {
   }
 };
 
-userController.getWalletBalance = (req, res)=>{
-
+userController.getWalletBalance = (req, res) => {
   request(
-        {
-          url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
-          method: "POST",
-          json: true,
-          body: { data: { username: "xrubicon", password: "xrubicon1234" } },
-        },
-        function (error, response, body) {
-         response.headers.token
+    {
+      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+      method: "POST",
+      json: true,
+      body: { data: { username: "xrubicon", password: "xrubicon1234" } },
+    },
+    function (error, response, body) {
+      response.headers.token;
 
-         request({
+      request(
+        {
           url: `https://apis.touchandpay.me/lawma-backend/v1/agent/get/customer/card/${req.query.cardID}`,
           method: "GET",
           headers: {
-              'Accept': 'application/json',
-              'Accept-Charset': 'utf-8',
-              'Token': response.headers.token
-                 },
-          json: true,        },
-          function(error, response, body) {
-            res.jsonp(response.body.content.data);
-          }
-         )
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+            Token: response.headers.token,
+          },
+          json: true,
+        },
+        function (error, response, body) {
+          res.jsonp(response.body.content.data);
         }
       );
-}
+    }
+  );
+};
 
 userController.getAllCollectors = async (REQUEST, RESPONSE) => {
   try {
