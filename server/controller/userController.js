@@ -91,6 +91,34 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                 }, function(err,res){
                   let card_id = res.body.content.data.cardID
                   need = {cardID: card_id, ...RESULT }
+
+                  authy.register_user(
+                    dataToSave.email,
+                    dataToSave.phone,
+                    "+234",
+                    function (regErr, regRes) {
+                      console.log("In Registration...");
+                      if (regErr) {
+                        console.log(regErr);
+                        //   RESPONSE.send('There was some error registering the user.');
+                      } else if (regRes) {
+                        console.log(regRes);
+                        authy.request_sms(regRes.user.id, function (
+                          smsErr,
+                          smsRes
+                        ) {
+                          console.log("Requesting SMS...");
+                          if (smsErr) {
+                            console.log(smsErr);
+                            //   RESPONSE.send('There was some error sending OTP to cell phone.');
+                          } else if (smsRes) {
+                            console.log(smsRes);
+                            //   RESPONSE.send('OTP Sent to the cell phone.');
+                          }
+                        });
+                      }
+                    }
+                  )
                   console.log("response", res.body.content.data.cardID );
                    return MODEL.userModel.updateOne({email: RESULT.email},{ $set: { "cardID" : card_id } },(res)=>{
                     console.log(res);
@@ -105,33 +133,6 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                           //     console.log(string)
                           // }
 
-              authy.register_user(
-                dataToSave.email,
-                dataToSave.phone,
-                "+234",
-                function (regErr, regRes) {
-                  console.log("In Registration...");
-                  if (regErr) {
-                    console.log(regErr);
-                    //   RESPONSE.send('There was some error registering the user.');
-                  } else if (regRes) {
-                    console.log(regRes);
-                    authy.request_sms(regRes.user.id, function (
-                      smsErr,
-                      smsRes
-                    ) {
-                      console.log("Requesting SMS...");
-                      if (smsErr) {
-                        console.log(smsErr);
-                        //   RESPONSE.send('There was some error sending OTP to cell phone.');
-                      } else if (smsRes) {
-                        console.log(smsRes);
-                        //   RESPONSE.send('OTP Sent to the cell phone.');
-                      }
-                    });
-                  }
-                }
-              );
               let UserData = {
                 email: RESULT.email,
                 phoneNumber: RESULT.phoneNumber,
