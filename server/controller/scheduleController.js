@@ -287,7 +287,7 @@ scheduleController.rewardSystem = (req, res) => {
               if (!!response.body.content.data[0]) {
                 var coin_reward = response.body.content.data.customer.availablePoints
                 MODEL.scheduleModel.updateOne(
-                  { _id: schedule[0]._id },
+                  { "_id": schedule[0]._id },
                   { $set: { completionStatus: "completed" } },
                   (err, res) => {
                     if (err) return res.status(400).jsonp(response.body.error);
