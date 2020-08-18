@@ -57,7 +57,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
           RESPONSE.status(400).jsonp(errors);
         } else {
           MODEL.userModel(dataToSave).save({}, (ERR, RESULT) => {
-            if (ERR) RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+            if (ERR) RESPONSE.status(400).jsonp((ERR));
             else {
               request(
                 {
@@ -99,6 +99,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                     function (regErr, regRes) {
                       console.log("In Registration...");
                       if (regErr) {
+                        return res.status(400).jsonp(regErr);
                         console.log(regErr);
                         //   RESPONSE.send('There was some error registering the user.');
                       } else if (regRes) {
@@ -109,9 +110,14 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                         ) {
                           console.log("Requesting SMS...");
                           if (smsErr) {
+                            return res.status(400).jsonp(smsErr);
                             console.log(smsErr);
                             //   RESPONSE.send('There was some error sending OTP to cell phone.');
                           } else if (smsRes) {
+                            console.log("Twilio response here", smsRes)
+                            return MODEL.userModel.updateOne({email: dataToSave.email},{ $set: { "id" : regRes.user.id } },(res)=>{
+                              console.log(res);
+                            });   
                             console.log(smsRes);
                             //   RESPONSE.send('OTP Sent to the cell phone.');
                           }
@@ -366,19 +372,34 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
   );
 };
 userController.verifyPhone = (REQUEST, RESPONSE) => {
-  var id = REQUEST.param("id");
-  var token = REQUEST.param("token");
+  var error = {}
+  var user = REQUEST.query.email;
+  MODEL.userModel.findOne(
+    { email: user },
+    {},
+    { lean: true }, (err,res)=>{
+      // console.log("error here", err)
+      // console.log("Verifying you", res.id)
+      var token = REQUEST.param.token;
+      if(!token){
+          error.message = "Enter a valid token"
+        return RESPONSE.status(422).jsonp(error)
+      }
+      authy.verify(res.id, token, function (verifyErr, verifyRes) {
+        console.log("In Verification...");
+        if (verifyErr) {
+         return RESPONSE.status(400).jsonp(verifyErr);
+          // RESPONSE.status(422).send("OTP verification failed.");
+        } else if (verifyRes) {
+          console.log(verifyRes);
+          RESPONSE.send("OTP Verified.");
+        }
+      });
 
-  authy.verify(id, token, function (verifyErr, verifyRes) {
-    console.log("In Verification...");
-    if (verifyErr) {
-      console.log(verifyErr);
-      RESPONSE.status(422).send("OTP verification failed.");
-    } else if (verifyRes) {
-      console.log(verifyRes);
-      RESPONSE.send("OTP Verified.");
+
     }
-  });
+  );
+
 };
 
 userController.getAllClients = async (REQUEST, RESPONSE) => {
