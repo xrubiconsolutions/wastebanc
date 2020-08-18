@@ -16,6 +16,19 @@ const client = new OneSignal.Client(
 );
 
 scheduleController.schedule = (REQUEST, RESPONSE) => {
+
+  const notification = {
+    contents: {
+      'en': 'New schedule made',
+    },
+    included_segments: ['Subscribed Users'],
+    filters: [
+      { field: 'tag', key: 'level', relation: '>', value: 10 }
+    ]
+  };
+
+
+
   var data = { ...REQUEST.body };
   MODEL.scheduleModel(data).save({}, (ERR, RESULT) => {
     try {
@@ -35,6 +48,12 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
       if (!RESULT.lat || !RESULT.long) {
         return RESPONSE.status(400).jsonp(RESPONSE);
       }
+
+      client
+        .createNotification(notification)
+        .then((response) => { console.log (response)})
+        .catch((e) => {console.error(e)});
+
       return RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData)
       );
