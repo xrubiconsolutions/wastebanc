@@ -99,10 +99,16 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                           })
                           console.log("Card details here", need)
 
+                          // if (dataToSave.p.substr(0,1) == "0")
+                          // {
+                          //     string = string.substr(1);
+                          //     console.log(string)
+                          // }
+
               authy.register_user(
                 dataToSave.email,
-                dataToSave.phoneNumber,
-                dataToSave.countryCode,
+                dataToSave.phone,
+                "+234",
                 function (regErr, regRes) {
                   console.log("In Registration...");
                   if (regErr) {
