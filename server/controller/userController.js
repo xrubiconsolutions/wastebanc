@@ -131,7 +131,6 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                 phoneNumber: RESULT.phoneNumber,
                 username: RESULT.username,
                 roles: RESULT.roles,
-                cardID: RESULT.cardID
               };
               RESPONSE.status(200).jsonp(
                 COMMON_FUN.sendSuccess(
