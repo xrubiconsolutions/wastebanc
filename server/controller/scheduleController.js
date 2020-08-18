@@ -19,12 +19,12 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
 
   const notification = {
     contents: {
-      'en': 'New schedule made',
+      'en': `A new schedule was made by ${REQUEST.body.client}`,
     },
     included_segments: ['Subscribed Users'],
-    filters: [
-      { field: 'tag', key: 'level', relation: '>', value: 10 }
-    ]
+    // filters: [
+    //   { field: 'tag', key: 'level', relation: '>', value: 10 }
+    // ]
   };
 
 
@@ -185,6 +185,22 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE) => {
 };
 
 scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
+
+
+
+
+
+  const notification = {
+    contents: {
+      'en': `A collector just accepted your schedule pick up`,
+    },
+    included_segments: ['Subscribed Users'],
+    // filters: [
+    //   { field: 'tag', key: 'level', relation: '>', value: 10 }
+    // ]
+  };
+
+
   var errors = {};
 
   MODEL.userModel
@@ -200,9 +216,12 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
             { $set: { collectorStatus: REQUEST.body.collectorStatus } }
           )
           .then((SUCCESS) => {
-            // client.createNotification(notification)
-            // .then(response => { console.log(response)})
-            // .catch(e => { console.log(e)});
+            client
+            .createNotification(notification)
+            .then((response) => { console.log (response)})
+            .catch((e) => {console.error(e)});
+    
+
             return RESPONSE.status(200).jsonp(
               COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
             );
@@ -269,6 +288,18 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
 };
 
 scheduleController.rewardSystem = (req, res) => {
+
+  const notification = {
+    contents: {
+      'en': `You got credited with coins from packam`,
+    },
+    included_segments: ['Subscribed Users'],
+    // filters: [
+    //   { field: 'tag', key: 'level', relation: '>', value: 10 }
+    // ]
+  };
+
+
   MODEL.scheduleModel.find({ _id: req.body._id }).then((schedule) => {
     MODEL.userModel.find({ email: schedule[0].client }).then((result) => {
       request(
@@ -311,8 +342,8 @@ scheduleController.rewardSystem = (req, res) => {
                   (err, res) => {
                     if (err) return res.status(400).jsonp(response.body.error);
                     MODEL.userModel.updateOne(
-                      { email: result[0].email },
-                      { $set: { availablePoints: coin_reward } }
+                      { "email" : result[0].email },
+                      { $set: { "availablePoints": coin_reward } }
                     );
                   }
                 );
@@ -321,6 +352,11 @@ scheduleController.rewardSystem = (req, res) => {
                 error.message = "Transaction incomplete, coin not credited";
                 return res.status(400).jsonp(error);
               }
+              client
+              .createNotification(notification)
+              .then((response) => { console.log (response)})
+              .catch((e) => {console.error(e)});
+      
               return res.status(200).jsonp(response.body.content.data);
             }
           );
