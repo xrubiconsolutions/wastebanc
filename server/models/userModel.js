@@ -69,7 +69,6 @@ const user_Schema = new Schema({
     countryCode: {
         type: String,
         default: "+234",
-        required: true,
     },
     verified: {
         type: Boolean,
