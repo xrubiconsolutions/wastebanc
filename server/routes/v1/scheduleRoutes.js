@@ -56,6 +56,14 @@ module.exports = (APP)=>{
     APP.route('/api/allCoins')
         .get(CONTROLLER.scheduleController.allCoins);
 
+    APP.route('/api/allAccepted')
+        .get(CONTROLLER.scheduleController.allAccepted);
+
+    APP.route('/api/allDeclined')
+        .get(CONTROLLER.scheduleController.allDeclined);
+
+
+
 
     
         

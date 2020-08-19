@@ -492,9 +492,34 @@ scheduleController.allCoins = (req, res)=>{
       );
     }
   );
-
-
-
 }
+
+
+
+scheduleController.allAccepted = (REQUEST,RESPONSE)=>{
+  MODEL.scheduleModel
+  .find({ collectorStatus: "accept"})
+  .then((schedules) => {
+    RESPONSE.status(200).jsonp(
+      COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+    );
+  })
+  .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+}
+
+
+
+scheduleController.allDeclined = (REQUEST,RESPONSE)=>{
+  MODEL.scheduleModel
+  .find({ collectorStatus: "decline"})
+  .then((schedules) => {
+    RESPONSE.status(200).jsonp(
+      COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+    );
+  })
+  .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+}
+
+
 
 module.exports = scheduleController;
