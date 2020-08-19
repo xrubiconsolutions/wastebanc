@@ -434,10 +434,9 @@ scheduleController.allWeight = (req, res) => {
     .sort({ _id: -1 })
     .then((schedules) => {
       var test = JSON.parse(JSON.stringify(schedules));
-      let weight = test.reduce((acc, curr) => {
-        return acc.quantity + curr.quantity;
+      let weight = test.map(x=>x.quantity).reduce((acc, curr) => {
+        return acc + curr;
       });
-
       res.jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, weight)
       );
