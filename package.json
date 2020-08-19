@@ -37,11 +37,13 @@
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.1",
     "path": "^0.12.7",
+    "pubnub": "^4.29.4",
     "pusher": "^3.0.1",
     "pusher-js": "^7.0.0",
     "randomstring": "^1.1.5",
     "request": "^2.85.0",
     "sendinblue-api": "^1.0.8",
+    "socket.io": "^2.3.0",
     "swagger-express": "^1.0.5",
     "swagger-node-express": "^2.1.3",
     "web-push": "^3.4.4"

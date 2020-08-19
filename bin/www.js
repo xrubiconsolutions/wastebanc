@@ -14,6 +14,42 @@ const SWAGGER      = require('./swagger/swagger_lib/swagger-express');
 const PATH         = require("path");
 const BOOTSTRAPING = require("../server/util/Bootstraping/Bootstraping");
 
+const PubNub = require('pubnub');
+const uuid = PubNub.generateUUID();
+const pubnub = new PubNub({
+  publishKey: "pub-c-fc18a8e9-3662-4d35-89e9-e71e91cc4fd0",
+  subscribeKey: "sub-c-169862d4-e21e-11ea-89a6-b2966c0cfe96",
+  uuid: uuid
+});
+
+const publishConfig = {
+  channel: "pubnub_onboarding_channel",
+  message: {"sender": uuid, "content": "Hello From Packam"}
+}
+
+pubnub.addListener({
+  message: function(message) {
+    console.log(message);
+  },
+  presence: function(presenceEvent) {
+    console.log(presenceEvent);
+  }
+})
+
+pubnub.subscribe({
+  channels: ["pubnub_onboarding_channel"],
+  withPresence: true,
+});
+
+pubnub.publish(publishConfig, function(status, response) {
+  console.log(status, response);
+});
+
+
+pubnub.publish(publishConfig, function(status, response) {
+    console.log(status, response);
+  });
+
 
 /**creating express server app for server */
 const app         = EXPRESS();
