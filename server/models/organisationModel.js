@@ -11,6 +11,7 @@ const organisation_Schema = new Schema({
   companyName: {
     type: String,
     required: true,
+    unique: true,
   },
   email: {
     type: String,

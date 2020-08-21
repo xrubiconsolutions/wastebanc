@@ -15,23 +15,43 @@ var request = require("request");
 
 
 organisationController.createOrganisation = (req, res) =>{
+    const organisation_data = { ...req.body }
+    const errors = {};
+    MODEL.organisationModel.findOne({ companyName: organisation_data.companyName}).then((user) => {
+      if (user) {
+        errors.email = "Company already exists";
+        RESPONSE.status(400).jsonp(errors);
+      } else {
+        MODEL.organisationModel(organisation_data).save({}, (ERR, RESULT) => {
 
-    const organisaion_data = { ...req.body }
+          if(ERR) return res.status(400).json(err)
+          return res.status(200).json(RESULT);
+        })
+      
+      }
+    }).catch(err=> res.status(500).json(err))
+ 
 
-    request(
-        {
-          url: `https://xrubiconp.herokuapp.com/api/login`,
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Accept-Charset": "utf-8",
-            Token: response.headers.token,
-          },
-          json: true,
-        },
-        function (error, response, body) {
-          res.jsonp(response.body.content.data);
-        }
-      );
-
+    
 }
+
+
+organisationController.listOrganisation = (req,res)=>{
+
+  let errors = {}
+
+   MODEL.organisationModel.find({}).then((result)=>{
+
+    //  if (err) {
+    //   errors.message = "There was an issue fetching the organisations"
+    //   return res.status(400).jsonp(errors)
+    //  }
+    return res.status(200).jsonp(result)
+   }).catch(err=>res.status(400).jsonp(err))
+}
+
+
+
+
+/* export organisationControllers */
+module.exports = organisationController;
