@@ -57,7 +57,7 @@ validateUser.adminCheck = ( REQUEST, RESPONSE, NEXT )=>{
                     return RESPONSE.jsonp(COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_USERNAME));
                 }
                 else{
-                    RESULT.roles === CONSTANTS.DATABASE.USER_ROLES.ADMIN ? NEXT() : RESPONSE.jsonp(COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED));
+                    RESULT.roles === admin ? NEXT() : RESPONSE.status(400).jsonp(COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED));
                 }
             })
         }

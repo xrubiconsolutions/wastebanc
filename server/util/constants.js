@@ -2,9 +2,9 @@
  *********** Server Constants ***********
  ****************************************/
 let SERVER = {
-    APP_NAME: 'demo',
+    APP_NAME: 'packam',
     TOKEN_EXPIRATION_IN_MINUTES: 600,
-    JWT_SECRET_KEY: 'demo_application_JWT_SECRET_KEY',
+    JWT_SECRET_KEY:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjNjMmZhNDIxMzU0NDAwMTdkMWYyMjgiLCJmaXJzdG5hbWUiOiJhZG1pbiIsImxhc3RuYW1lIjoiYWRtaW4iLCJvdGhlcm5hbWVzIjoiYWRtaW4iLCJhZGRyZXNzIjoiTGFnb3MiLCJjYXJkSUQiOm51bGwsInJvbGVzIjoiYWRtaW4iLCJjb3VudHJ5Q29kZSI6IisyMzQiLCJ2ZXJpZmllZCI6dHJ1ZSwidXNlclR5cGUiOjUsImF2YWlsYWJsZVBvaW50cyI6MCwidXNlcm5hbWUiOiJwYWNrYW1hZG1pbiIsImVtYWlsIjoicGFja2FtYWRtaW5AZ21haWwuY29tIiwicGhvbmUiOiIwNzAzMDY3NDAzNSIsImZ1bGxuYW1lIjoiYW5vbnltb3VzIiwicGFzc3dvcmQiOiIkMmEkMTAkaFM0NkpDbk5QdUFOWlJOVWZVeUpyLjBsdXVKeTFUWXdqbVNueG91RVQuL3diLy5xZEw0NXEiLCJpZCI6Mjg0MDMzMTA1LCJpYXQiOjE1OTc5MzA4MDYsImV4cCI6MTU5NzkzMDgwN30.PS-eNVtrgoCQLkqPeai3d0mMaQC7fumRLPF7XcptcXs", //'demo_application_JWT_SECRET_KEY',
     GOOGLE_API_KEY : '',
     COUNTRY_CODE : '+91',
     MAX_DISTANCE_RADIUS_TO_SEARCH : '1',
@@ -62,9 +62,9 @@ let SERVER = {
     DOCUMENT_PREFIX : 'document_',
   
     USER_ROLES: {
-        ADMIN: 'ADMIN',
-        USER: 'USER',
-        SUB_ADMIN: "SUBADMIN"
+        ADMIN: 'admin',
+        USER: 'client',
+        SUB_ADMIN: 'collector'
     },
   
    

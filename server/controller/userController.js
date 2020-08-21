@@ -16,6 +16,18 @@ var request = require("request");
  ****** Upload image or media (under process) *****
  **************************************************/
 
+
+const io = require('socket.io')();
+
+io.on('connection', (client) => {
+  client.on('subscribeToTimer', (interval) => {
+    console.log('client is subscribing to event ', interval);
+    // setInterval(() => {
+    //   client.emit('timer', new Date());
+    // }, interval);
+  });
+});
+
 const tax_url =
   "https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer";
 
