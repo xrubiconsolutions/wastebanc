@@ -30,6 +30,9 @@ module.exports = (APP) => {
     APP.route('/api/changePassword')
         .post(CONTROLLER.userController.changePassword);
     
+    APP.route('/api/updateUser')
+        .post(CONTROLLER.userController.updateUser);
+
     APP.route('/api/getAllClients')
         .get(CONTROLLER.userController.getAllClients);
      

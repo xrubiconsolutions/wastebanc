@@ -9,7 +9,7 @@ const Constants     =   require("../util/constants");
  ************* User Model or collection ***********
  **************************************************/
 const user_Schema = new Schema({
-        username: {
+    username: {
             type: String,
             required: true,
         },
@@ -85,6 +85,12 @@ const user_Schema = new Schema({
         type: Number,
         required: true,
         default: 0
+    },
+    gender:{
+        type: String
+    },
+    dateOfBirth:{
+        type: String
     }
 });
 

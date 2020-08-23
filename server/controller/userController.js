@@ -334,6 +334,52 @@ userController.changePassword = async (REQUEST, RESPONSE) => {
   }
 };
 
+
+userController.updateUser = async (REQUEST, RESPONSE) => {
+  try {
+    /* check user exist or not*/
+    let checkUserExist = await MODEL.userModel.findOne(
+      { email: REQUEST.body.email },
+      {},
+      { lean: true }
+    );
+
+    if (checkUserExist) {
+      /********** encrypt password ********/
+      // COMMON_FUN.encryptPswrd(REQUEST.body.password, (ERR, HASH) => {
+      //   /********** update password in usermodel ********/
+      //   MODEL.userModel
+      //     .update({ email: REQUEST.body.email }, { $set: { password: HASH } })
+      //     .then((SUCCESS) => {
+      //       return RESPONSE.jsonp(
+      //         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
+      //       );
+      //     })
+      //     .catch((ERR) => {
+      //       return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+      //     });
+      // });
+
+      MODEL.userModel
+      .update({ email: REQUEST.body.email }, { $set: { phone : REQUEST.body.phone, gender: REQUEST.body.gender,  dateOfBirth: REQUEST.body.dateOfBirth, address: REQUEST.body.address , fullname: REQUEST.body.fullname } })
+      .then((SUCCESS) => {
+        return RESPONSE.jsonp(
+          COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
+        );
+      })
+      .catch((ERR) => {
+        return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+      });
+
+    } else {
+      return RESPONSE.status(400).jsonp(
+        COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+      );
+    }
+  } catch (ERR) {
+    return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+  }
+};
 /**************************************************
  ********* change loggged in user password ********
  **************************************************/
