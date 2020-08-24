@@ -17,7 +17,6 @@ const collector_Schema = new Schema({
   },
   IdNumber: {
     type: String,
-    unique:true
   },
   email: {
     type: String,
