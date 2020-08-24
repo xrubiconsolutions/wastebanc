@@ -11,6 +11,6 @@ module.exports = (APP) => {
     APP.route('/api/collector/register')
         .post(CONTROLLER.collectorController.registerCollector);
         
-    APP.route('/api/fileUpload')
-        .post(CONTROLLER.userController.upload);
+    APP.route('/api/collector/login')
+        .post(CONTROLLER.collectorController.loginCollector);
 }

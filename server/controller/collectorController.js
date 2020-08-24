@@ -20,7 +20,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
   let dataToSave = { ...REQUEST.body };
 
   COMMON_FUN.encryptPswrd(dataToSave.password, (ERR, PASSWORD) => {
-    if (ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+    if (ERR) return RESPONSE.status(422).jsonp(COMMON_FUN.sendError(ERR));
     else {
       dataToSave.password = PASSWORD;
       var errors = {};
@@ -148,6 +148,48 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
   });
 };
 
+
+
+collectorController.loginCollector = (REQUEST, RESPONSE) => {
+  let CRITERIA = {
+      $or: [{ username: REQUEST.body.username }, { email: REQUEST.body.email }],
+    },
+    PROJECTION = { __v: 0, createAt: 0 };
+
+  /** find user is exists or not */
+  MODEL.collectorModel
+    .findOne({fullname: REQUEST.body.fullname}, PROJECTION, { lean: true })
+    .then((USER) => {
+      USER /** matching password */
+        ? COMMON_FUN.decryptPswrd(
+            REQUEST.body.password,
+            USER.password,
+            (ERR, MATCHED) => {
+              if (ERR)
+                return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+              else if (!MATCHED)
+                return RESPONSE.status(400).jsonp(
+                  COMMON_FUN.sendSuccess(
+                    CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
+                  )
+                );
+              else {
+                var jwtToken = COMMON_FUN.createToken(
+                  USER
+                ); /** creating jwt token */
+                USER.token = jwtToken;
+                return RESPONSE.jsonp(USER);
+              }
+            }
+          )
+        : RESPONSE.status(400).jsonp(
+            COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+          );
+    })
+    .catch((err) => {
+      return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err));
+    });
+};
 
 
 module.exports = collectorController;
