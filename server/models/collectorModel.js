@@ -15,9 +15,6 @@ const collector_Schema = new Schema({
   address: {
     type: String,
   },
-  IdNumber: {
-    type: String,
-  },
   email: {
     type: String,
     unique: true,
@@ -54,6 +51,9 @@ const collector_Schema = new Schema({
   },
   organisation :{
       type: String
+  },
+  IdNumber: {
+    type: String,
   }
 });
 
