@@ -13,5 +13,6 @@ module.exports = {
     userController         :   require("./userController"),
     scheduleController : require("./scheduleController"),
     organisationController: require("./organisationController"),
-    webPushController : require("./webPushController")
+    webPushController : require("./webPushController"),
+    collectorController : require("./collectorController"),
 };

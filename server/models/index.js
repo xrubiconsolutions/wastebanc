@@ -9,5 +9,6 @@ module.exports = {
     appVersionModel : require("./appVersionModel"),
     scheduleModel : require("./scheduleModel"),
     organisationModel: require("./organisationModel"),
+    collectorModel: require("./collectorModel"),
 };
 

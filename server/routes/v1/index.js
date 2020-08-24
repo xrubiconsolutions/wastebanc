@@ -11,4 +11,5 @@ module.exports = function(app){
     require("./userRoutes")(app);
     require("./scheduleRoutes")(app);
     require("./organisationRoute")(app);
+    require("./collectorRoute")(app);
 };
