@@ -64,7 +64,7 @@ const schedulePick = new Schema({
     collectorStatus: {
         type: String,
         enum: ["decline", "accept"],
-        default: "accept",
+        default: "decline",
     },
     lat: {
         type: Number,
