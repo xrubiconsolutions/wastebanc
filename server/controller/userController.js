@@ -533,20 +533,16 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
     code: `${token}`,
   })
   .then((verification_check) => {
-
-
     if(verification_check.status == "approved"){
-      MODEL.userModel.UpdateOne(
-          { phone: phone },
-          { verified: true},
-          { lean: true }, (res)=>{
-            if(res) return RESPONSE.status(200).jsonp({message: "Successfully verified your phone number"})
+      console.log(verification_check.status)
+      MODEL.userModel.updateOne(
+          { "phone": phone },
+          { "verified": true},
+           (res)=>{
+             return RESPONSE.status(200).jsonp({message: "Successfully verified your phone number"})
           }
         );
     }
-    console.log(verification_check.status)
-    return RESPONSE.status(400).jsonp({message: "Phone verification not successful"})
-
   }
 
   ).catch(err=>RESPONSE.status(404).jsonp(err));

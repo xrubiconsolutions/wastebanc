@@ -67,6 +67,9 @@ module.exports = (APP)=>{
     APP.route('/api/acceptCollection')
         .post(CONTROLLER.scheduleController.acceptCollection);
 
+    APP.route('/api/all/acceptCollection')
+        .post(CONTROLLER.scheduleController.acceptAllCollections);
+
     APP.route('/api/allMissed')
         .get(CONTROLLER.scheduleController.allMissedSchedules);
 

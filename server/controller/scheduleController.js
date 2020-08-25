@@ -185,11 +185,6 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE) => {
 };
 
 scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
-
-
-
-
-
   const notification = {
     contents: {
       'en': `A collector just accepted your schedule pick up`,
@@ -199,8 +194,6 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
     //   { field: 'tag', key: 'level', relation: '>', value: 10 }
     // ]
   };
-
-
   var errors = {};
 
   MODEL.userModel
@@ -229,6 +222,58 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
           .catch((ERR) => {
             return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
           });
+      }
+    })
+    .catch((err) => {
+      return RESPONSE.status(500).jsonp(err);
+    });
+};
+
+scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
+  const notification = {
+    contents: {
+      'en': `A collector just accepted your schedule pick up`,
+    },
+    included_segments: ['Subscribed Users'],
+    // filters: [
+    //   { field: 'tag', key: 'level', relation: '>', value: 10 }
+    // ]
+  };
+  var errors = {};
+
+  MODEL.userModel
+    .findOne({ email: REQUEST.body.client }, {}, { lean: true })
+    .then((result) => {
+      if (result.roles != "collector") {
+        errors.message = "Only a collector can accept or decline an offer";
+        return RESPONSE.status(400).jsonp(errors);
+      } else {
+        REQUEST.body.schedules.map( picks =>{
+
+          MODEL.scheduleModel
+          .updateOne(
+            { _id: picks._id },
+            { $set: { collectorStatus: REQUEST.body.collectorStatus } }
+          )
+          .then((SUCCESS) => {
+            client
+            .createNotification(notification)
+            .then((response) => { console.log (response)})
+            .catch((e) => {console.error(e)});
+    
+
+            return RESPONSE.status(200).jsonp(
+              COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
+            );
+          })
+          .catch((ERR) => {
+            return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+          });
+
+        }
+
+        )
+    
       }
     })
     .catch((err) => {
