@@ -20,7 +20,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
   let dataToSave = { ...REQUEST.body };
 
   COMMON_FUN.encryptPswrd(dataToSave.password, (ERR, PASSWORD) => {
-    if (ERR) return RESPONSE.status(422).jsonp(COMMON_FUN.sendError(ERR));
+    if (ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
     else {
       dataToSave.password = PASSWORD;
       var errors = {};
@@ -71,64 +71,22 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                       let card_id = res.body.content.data.cardID;
                       need = { cardID: card_id, ...RESULT };
 
-                      authy.register_user(
-                        dataToSave.email,
-                        dataToSave.phone,
-                        "+234",
-                        function (regErr, regRes) {
-                          console.log("In Registration...");
-                          if (regErr) {
-                            return res.status(400).jsonp(regErr);
-                            console.log(regErr);
-                            //   RESPONSE.send('There was some error registering the user.');
-                          } else if (regRes) {
-                            console.log(regRes);
-                            authy.request_sms(regRes.user.id, function (
-                              smsErr,
-                              smsRes
-                            ) {
-                              console.log("Requesting SMS...");
-                              if (smsErr) {
-                                return res.status(400).jsonp(smsErr);
-                                console.log(smsErr);
-                                //   RESPONSE.send('There was some error sending OTP to cell phone.');
-                              } else if (smsRes) {
-                                console.log("Twilio response here", smsRes);
-                                return MODEL.collectorModel.updateOne(
-                                  { email: dataToSave.email },
-                                  { $set: { id: regRes.user.id } },
-                                  (err, res) => {
-                                    if (err)
-                                      return RESPONSE.status(400).jsonp(err);
-                                    MODEL.collectorModel
-                                      .find({ email: dataToSave.email })
-                                      .then((res) => {
-                                        let UserData = {
-                                          email: RESULT.email,
-                                          phone: RESULT.phone,
-                                          fullname: RESULT.fullname,
-                                          id: res[0].id,
-                                        };
-                                        return RESPONSE.status(200).jsonp(
-                                          COMMON_FUN.sendSuccess(
-                                            CONSTANTS.STATUS_MSG.SUCCESS
-                                              .DEFAULT,
-                                            UserData
-                                          )
-                                        );
+                      const accountSid = "AC0e54e99aff7296ab5c7bf52d86eee9d8";
+                      const authToken = "549de52669fc3ecc350232c978f52bb0";
+                      const client = require("twilio")(accountSid, authToken);
 
-                                      })
-                                      .catch((err) => {
-                                        return RESPONSE.status(500).jsonp(err);
-                                      });
-                                  }
-                                );
-                              }
-                            });
-                          }
-                        }
-                      );
-                      return MODEL.collectorModel.updateOne(
+                      client.verify
+                        .services("VAd381ebb546a1c58a240474d1a16ee26b")
+                        .verifications.create({
+                          to: `+234${dataToSave.phone}`,
+                          channel: "sms",
+                        })
+                        .then((verification) =>
+                          console.log(verification.status)
+                        );
+
+                    
+                      MODEL.collectorModel.updateOne(
                         { email: RESULT.email },
                         { $set: { cardID: card_id } },
                         (res) => {
@@ -140,6 +98,20 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                 }
               );
               console.log("Card details here", need);
+
+              let UserData = {
+                                    email: RESULT.email,
+                                    phone: RESULT.phone,
+                                    username: RESULT.username,
+                                    roles: RESULT.roles,
+                                  };
+                                  return RESPONSE.status(200).jsonp(
+                                    COMMON_FUN.sendSuccess(
+                                      CONSTANTS.STATUS_MSG.SUCCESS
+                                        .DEFAULT,
+                                      UserData
+                                    )
+                                  );
             }
           });
         }
