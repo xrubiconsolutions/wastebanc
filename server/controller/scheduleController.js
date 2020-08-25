@@ -206,7 +206,7 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
         MODEL.scheduleModel
           .updateOne(
             { _id: REQUEST.body._id },
-            { $set: { collectorStatus: REQUEST.body.collectorStatus } }
+            { $set: { "collectorStatus": "accept" } }
           )
           .then((SUCCESS) => {
             client
@@ -240,45 +240,42 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
     // ]
   };
   var errors = {};
+  try{
 
-  MODEL.userModel
-    .findOne({ email: REQUEST.body.client }, {}, { lean: true })
-    .then((result) => {
+    MODEL.userModel
+    .findOne({ email: REQUEST.body.client }, {}, { lean: true }, (error, result) => {
+      if(error) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(error));
+      
       if (result.roles != "collector") {
         errors.message = "Only a collector can accept or decline an offer";
         return RESPONSE.status(400).jsonp(errors);
       } else {
-        REQUEST.body.schedules.map( picks =>{
+        REQUEST.body.schedules.map( picks => {
 
           MODEL.scheduleModel
           .updateOne(
             { _id: picks._id },
-            { $set: { collectorStatus: REQUEST.body.collectorStatus } }
-          )
-          .then((SUCCESS) => {
-            client
-            .createNotification(notification)
-            .then((response) => { console.log (response)})
-            .catch((e) => {console.error(e)});
-    
+            { $set: { "collectorStatus": "accept" } }, 
+            
+          (error, res)=>{
 
-            return RESPONSE.status(200).jsonp(
-              COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
-            );
-          })
-          .catch((ERR) => {
-            return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-          });
+              if (error) return RESPONSE.status(400).jsonp(error)
+          }
+          )
 
         }
 
         )
+        return RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
     
       }
     })
-    .catch((err) => {
-      return RESPONSE.status(500).jsonp(err);
-    });
+  }
+  catch(err){
+    return RESPONSE.status(500).jsonp(err)
+  }
+
+  
 };
 
 scheduleController.allMissedSchedules = (REQUEST, RESPONSE) => {
