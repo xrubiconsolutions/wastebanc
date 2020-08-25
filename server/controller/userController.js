@@ -11,17 +11,17 @@ let CONSTANTS = require("../util/constants");
 let FS = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
+var twilio = require("twilio");
 
 /**************************************************
  ****** Upload image or media (under process) *****
  **************************************************/
 
+const io = require("socket.io")();
 
-const io = require('socket.io')();
-
-io.on('connection', (client) => {
-  client.on('subscribeToTimer', (interval) => {
-    console.log('client is subscribing to event ', interval);
+io.on("connection", (client) => {
+  client.on("subscribeToTimer", (interval) => {
+    console.log("client is subscribing to event ", interval);
     // setInterval(() => {
     //   client.emit('timer', new Date());
     // }, interval);
@@ -51,7 +51,6 @@ userController.upload = (REQUEST, RESPONSE) => {
 /**************************************************
  ******************* Register User ****************
  **************************************************/
-var authy = require("authy")("YHRjYqZNqXhIIUJ8oC7MIYKUZ6BN2pee");
 
 userController.registerUser = (REQUEST, RESPONSE) => {
   // RESPONSE.jsonp(REQUEST.body);
@@ -110,81 +109,96 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                       let card_id = res.body.content.data.cardID;
                       need = { cardID: card_id, ...RESULT };
 
-                      authy.register_user(
-                        dataToSave.email,
-                        dataToSave.phone,
-                        "+234",
-                        function (regErr, regRes) {
-                          console.log("In Registration...");
-                          if (regErr) {
-                            return res.status(400).jsonp(regErr);
-                            console.log(regErr);
-                            //   RESPONSE.send('There was some error registering the user.');
-                          } else if (regRes) {
-                            console.log(regRes);
-                            authy.request_sms(regRes.user.id, function (
-                              smsErr,
-                              smsRes
-                            ) {
-                              console.log("Requesting SMS...");
-                              if (smsErr) {
-                                return res.status(400).jsonp(smsErr);
-                                console.log(smsErr);
-                                //   RESPONSE.send('There was some error sending OTP to cell phone.');
-                              } else if (smsRes) {
-                                console.log("Twilio response here", smsRes);
-                                return MODEL.userModel.updateOne(
-                                  { email: dataToSave.email },
-                                  { $set: { id: regRes.user.id } },
-                                  (err, res) => {
+                      const accountSid = "AC0e54e99aff7296ab5c7bf52d86eee9d8";
+                      const authToken = "549de52669fc3ecc350232c978f52bb0";
+                      const client = require("twilio")(accountSid, authToken);
 
-                                    if (err) return RESPONSE.status(400).jsonp(err)
-                                    MODEL.userModel
-                                      .find({ email: dataToSave.email })
-                                      .then((res) => {
-                                        console.log(
-                                          "The id I am looking for",
-                                          res[0]
-                                        );
+                      client.verify
+                        .services("VAd381ebb546a1c58a240474d1a16ee26b")
+                        .verifications.create({
+                          to: `+234${dataToSave.phone}`,
+                          channel: "sms",
+                        })
+                        .then((verification) =>
+                          console.log(verification.status)
+                        );
 
-                                        let UserData = {
-                                          email: RESULT.email,
-                                          phoneNumber: RESULT.phoneNumber,
-                                          username: RESULT.username,
-                                          roles: RESULT.roles,
-                                          id: res[0].id,
-                                        };
-                                        return RESPONSE.status(200).jsonp(
-                                          COMMON_FUN.sendSuccess(
-                                            CONSTANTS.STATUS_MSG.SUCCESS
-                                              .DEFAULT,
-                                            UserData
-                                          )
-                                        );
+                     
+                      // authy.register_user(
+                      //   dataToSave.email,
+                      //   dataToSave.phone,
+                      //   "+234",
+                      //   function (regErr, regRes) {
+                      //     console.log("In Registration...");
+                      //     if (regErr) {
+                      //       return res.status(400).jsonp(regErr);
+                      //       console.log(regErr);
+                      //       //   RESPONSE.send('There was some error registering the user.');
+                      //     } else if (regRes) {
+                      //       console.log(regRes);
+                      //       authy.request_sms(regRes.user.id, function (
+                      //         smsErr,
+                      //         smsRes
+                      //       ) {
+                      //         console.log("Requesting SMS...");
+                      //         if (smsErr) {
+                      //           return res.status(400).jsonp(smsErr);
+                      //           console.log(smsErr);
+                      //           //   RESPONSE.send('There was some error sending OTP to cell phone.');
+                      //         } else if (smsRes) {
+                      //           console.log("Twilio response here", smsRes);
+                      //           return MODEL.userModel.updateOne(
+                      //             { email: dataToSave.email },
+                      //             { $set: { id: regRes.user.id } },
+                      //             (err, res) => {
 
-                                        console.log(
-                                          "All response here",
-                                          resUpdate[0]
-                                        );
-                                      })
-                                      .catch((err) =>{
-                                        return RESPONSE.status(500).jsonp(err)
+                      //               if (err) return RESPONSE.status(400).jsonp(err)
+                      //               MODEL.userModel
+                      //                 .find({ email: dataToSave.email })
+                      //                 .then((res) => {
+                      //                   console.log(
+                      //                     "The id I am looking for",
+                      //                     res[0]
+                      //                   );
 
-                                      }
-                                      );
+                      //                   let UserData = {
+                      //                     email: RESULT.email,
+                      //                     phoneNumber: RESULT.phoneNumber,
+                      //                     username: RESULT.username,
+                      //                     roles: RESULT.roles,
+                      //                     id: res[0].id,
+                      //                   };
+                      //                   return RESPONSE.status(200).jsonp(
+                      //                     COMMON_FUN.sendSuccess(
+                      //                       CONSTANTS.STATUS_MSG.SUCCESS
+                      //                         .DEFAULT,
+                      //                       UserData
+                      //                     )
+                      //                   );
 
-                                    // MODEL.userModel.find({"email": dataToSave.email}).then(res=>console.log("All response here", res[0])).catch(err=> RESPONSE.status(400).jsonp(err))
-                                    // console.log(res);
-                                  }
-                                );
-                                console.log(smsRes);
-                                //   RESPONSE.send('OTP Sent to the cell phone.');
-                              }
-                            });
-                          }
-                        }
-                      );
-                      return MODEL.userModel.updateOne(
+                      //                   console.log(
+                      //                     "All response here",
+                      //                     resUpdate[0]
+                      //                   );
+                      //                 })
+                      //                 .catch((err) =>{
+                      //                   return RESPONSE.status(500).jsonp(err)
+
+                      //                 }
+                      //                 );
+
+                      //               // MODEL.userModel.find({"email": dataToSave.email}).then(res=>console.log("All response here", res[0])).catch(err=> RESPONSE.status(400).jsonp(err))
+                      //               // console.log(res);
+                      //             }
+                      //           );
+                      //           console.log(smsRes);
+                      //           //   RESPONSE.send('OTP Sent to the cell phone.');
+                      //         }
+                      //       });
+                      //     }
+                      //   }
+                      // );
+                      MODEL.userModel.updateOne(
                         { email: RESULT.email },
                         { $set: { cardID: card_id } },
                         (res) => {
@@ -211,6 +225,20 @@ userController.registerUser = (REQUEST, RESPONSE) => {
               //     UserData
               //   )
               // );
+
+              let UserData = {
+                                    email: RESULT.email,
+                                    phone: RESULT.phone,
+                                    username: RESULT.username,
+                                    roles: RESULT.roles,
+                                  };
+                                  return RESPONSE.status(200).jsonp(
+                                    COMMON_FUN.sendSuccess(
+                                      CONSTANTS.STATUS_MSG.SUCCESS
+                                        .DEFAULT,
+                                      UserData
+                                    )
+                                  );
             }
           });
         }
@@ -227,6 +255,10 @@ userController.loginUser = (REQUEST, RESPONSE) => {
       $or: [{ username: REQUEST.body.username }, { email: REQUEST.body.email }],
     },
     PROJECTION = { __v: 0, createAt: 0 };
+
+  // Download the helper library from https://www.twilio.com/docs/node/install
+  // Your Account Sid and Auth Token from twilio.com/console
+  // DANGER! This is insecure. See http://twil.io/secure
 
   /** find user is exists or not */
   MODEL.userModel
@@ -334,7 +366,6 @@ userController.changePassword = async (REQUEST, RESPONSE) => {
   }
 };
 
-
 userController.updateUser = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
@@ -361,16 +392,26 @@ userController.updateUser = async (REQUEST, RESPONSE) => {
       // });
 
       MODEL.userModel
-      .update({ email: REQUEST.body.email }, { $set: { phone : REQUEST.body.phone, gender: REQUEST.body.gender,  dateOfBirth: REQUEST.body.dateOfBirth, address: REQUEST.body.address , fullname: REQUEST.body.fullname } })
-      .then((SUCCESS) => {
-        return RESPONSE.jsonp(
-          COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
-        );
-      })
-      .catch((ERR) => {
-        return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-      });
-
+        .update(
+          { email: REQUEST.body.email },
+          {
+            $set: {
+              phone: REQUEST.body.phone,
+              gender: REQUEST.body.gender,
+              dateOfBirth: REQUEST.body.dateOfBirth,
+              address: REQUEST.body.address,
+              fullname: REQUEST.body.fullname,
+            },
+          }
+        )
+        .then((SUCCESS) => {
+          return RESPONSE.jsonp(
+            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
+          );
+        })
+        .catch((ERR) => {
+          return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+        });
     } else {
       return RESPONSE.status(400).jsonp(
         COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
@@ -449,62 +490,71 @@ userController.changedlogedInPassword = (REQUEST, RESPONSE) => {
 };
 
 userController.resendVerification = (REQUEST, RESPONSE) => {
-  authy.register_user(
-    dataToSave.email,
-    dataToSave.phoneNumber,
-    dataToSave.countryCode,
-    function (regErr, regRes) {
-      console.log("In Registration...");
-      if (regErr) {
-        console.log(regErr);
-        RESPONSE.send("There was some error registering the user.");
-      } else if (regRes) {
-        console.log(regRes);
-        authy.request_sms(regRes.user.id, function (smsErr, smsRes) {
-          console.log("Requesting SMS...");
-          if (smsErr) {
-            console.log(smsErr);
-            RESPONSE.send("There was some error sending OTP to cell phone.");
-          } else if (smsRes) {
-            console.log(smsRes);
-            RESPONSE.send("OTP Sent to the cell phone.");
-          }
-        });
-      }
+
+
+  var error = {};
+  var phone = REQUEST.body.phone;
+
+  const accountSid = "AC0e54e99aff7296ab5c7bf52d86eee9d8";
+  const authToken = "549de52669fc3ecc350232c978f52bb0";
+  const client = require("twilio")(accountSid, authToken);
+
+  client.verify
+    .services("VAd381ebb546a1c58a240474d1a16ee26b")
+    .verifications.create({
+      to: `+234${phone}`,
+      channel: "sms",
+    })
+    .then((verification) => {
+      console.log(verification.status)
+      RESPONSE.status(200).jsonp({message: "Verification code sent"})
     }
-  );
+      
+    ).catch(err=>RESPONSE.status(404).jsonp(err));
+
 };
+
+
+
 userController.verifyPhone = (REQUEST, RESPONSE) => {
   var error = {};
-  // var user = REQUEST.query.email;
-  var auth_id = REQUEST.query.id;
-  var token = REQUEST.param.token;
+  var token = REQUEST.body.token;
+  var phone = REQUEST.body.phone;
+  const accountSid = "AC0e54e99aff7296ab5c7bf52d86eee9d8";
+  const authToken = "549de52669fc3ecc350232c978f52bb0";
+  const client = require("twilio")(accountSid, authToken);
 
-  // console.log("error here", err)
-  // console.log("Verifying you", res.id)
-  if (!token) {
-    error.message = "Enter a valid token";
-    return RESPONSE.status(422).jsonp(error);
-  }
-  authy.verify(auth_id, token, function (verifyErr, verifyRes) {
-    console.log("In Verification...");
-    if (verifyErr) {
-      return RESPONSE.status(400).jsonp(verifyErr);
-      // RESPONSE.status(422).send("OTP verification failed.");
-    } else if (verifyRes) {
-      console.log(verifyRes);
-      RESPONSE.send("OTP Verified.");
+
+
+  client.verify
+  .services("VAd381ebb546a1c58a240474d1a16ee26b")
+  .verificationChecks.create({
+    to: `+234${phone}`,
+    code: `${token}`,
+  })
+  .then((verification_check) => {
+
+
+    if(verification_check.status == "approved"){
+      MODEL.userModel.UpdateOne(
+          { phone: phone },
+          { verified: true},
+          { lean: true }, (res)=>{
+            if(res) return RESPONSE.status(200).jsonp({message: "Successfully verified your phone number"})
+          }
+        );
     }
-  });
+    console.log(verification_check.status)
+    return RESPONSE.status(400).jsonp({message: "Phone verification not successful"})
 
-  // MODEL.userModel.findOne(
-  //   { email: user },
-  //   {},
-  //   { lean: true }, (err,res)=>{
+  }
 
-  //   }
-  // );
+  ).catch(err=>RESPONSE.status(404).jsonp(err));
 };
+
+
+
+
 
 userController.getAllClients = async (REQUEST, RESPONSE) => {
   try {

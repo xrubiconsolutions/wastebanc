@@ -19,7 +19,7 @@ module.exports = (APP) => {
         .post(CONTROLLER.userController.loginUser);
 
     APP.route('/api/verify')
-        .get(CONTROLLER.userController.verifyPhone);   
+        .post(CONTROLLER.userController.verifyPhone);   
     
     APP.route('/api/resendVerification')
         .post(CONTROLLER.userController.resendVerification);   
