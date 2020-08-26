@@ -207,11 +207,11 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
 
         MODEL.scheduleModel
         .updateOne(
-          { _id: REQUEST.body._id },
+          { "_id": REQUEST.body._id },
           { $set: { "collectorStatus": "accept" } }
         )
         .then((SUCCESS) => {
-          client
+          clients
           .createNotification(notification)
           .then((response) => { console.log (response)})
           .catch((e) => {console.error(e)});
@@ -261,19 +261,46 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
       // } 
 
       else {
-        REQUEST.body.schedules.map(picks => {
+
+        REQUEST.body.schedules.every(picks => {
           MODEL.scheduleModel
-          .update(
-            { "_id" : picks._id },
+          .updateOne(
+            { "_id" : picks._id},
             {$set: { "collectorStatus" : "accept" }}, 
 
             (err,res)=>{
+              if(!res.nModified) {
+                 RESPONSE.status(400).jsonp({message: "This schedule has already been accepted by another recycler"})
+                 return false;
+              }
+              RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
               console.log(res)
             }
           )
+        }
+    );
 
-        })
-        return RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
+      //  return RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
+
+
+        // REQUEST.body.schedules.map(picks => {
+        //   MODEL.scheduleModel
+        //   .update(
+        //     { "_id" : picks._id , "collectorStatus": "decline"},
+        //     {$set: { "collectorStatus" : "accept" }}, 
+
+        //     (err,res)=>{
+        //       if(!res.n) {
+        //         RESPONSE.status(400).jsonp({message: "This schedule has already been accepted by another recycler"})
+        //       }
+        //       console.log(res)
+        //       if(res.n) RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
+
+        //     }
+        //   )
+
+        // })
+        // return RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
       }
 
     
