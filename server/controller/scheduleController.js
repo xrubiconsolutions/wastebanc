@@ -259,23 +259,23 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
       //   errors.message = "Only a collector can accept or decline an offer";
       //   return RESPONSE.status(400).jsonp(errors);
       // } 
-        REQUEST.body.schedules.map( picks => {
 
+      else {
+        REQUEST.body.schedules.map(picks => {
           MODEL.scheduleModel
-          .updateOne(
-            { _id: picks._id },
-            { $set: { "collectorStatus": "accept" } }, 
-            
-          (error, res)=>{
+          .update(
+            { "_id" : picks._id },
+            {$set: { "collectorStatus" : "accept" }}, 
 
-              if (error) return RESPONSE.status(400).jsonp(error)
-          }
+            (err,res)=>{
+              console.log(res)
+            }
           )
 
-        }
-
-        )
+        })
         return RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
+      }
+
     
       
     })
