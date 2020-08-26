@@ -274,6 +274,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
                  return false;
               }
               RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
+              return true
               console.log(res)
             }
           )
