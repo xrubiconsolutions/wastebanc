@@ -28,3 +28,17 @@ router.get('/register', function(req, res) {
     }
   });
 });
+
+
+
+// Download the helper library from https://www.twilio.com/docs/node/install
+// Your Account Sid and Auth Token from twilio.com/console
+// DANGER! This is insecure. See http://twil.io/secure
+const accountSid = 'AC0e54e99aff7296ab5c7bf52d86eee9d8';
+const authToken = 'your_auth_token';
+const client = require('twilio')(accountSid, authToken);
+
+client.verify.services('VAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+             .verifications
+             .create({to: '+15017122661', channel: 'sms'})
+             .then(verification => console.log(verification.status));

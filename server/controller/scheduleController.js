@@ -374,10 +374,11 @@ scheduleController.rewardSystem = (req, res) => {
             },
             function (err, response) {
               //Coin reward system
-
+              console.log("You need to check here boss", response)
               if (err) return res.status(400).jsonp(err);
               if (!!response.body.content.data[0]) {
                 var coin_reward = response.body.content.data.customer.availablePoints
+                console.log("My coin reward is here guys", coin_reward)
                 MODEL.scheduleModel.updateOne(
                   { "_id": schedule[0]._id },
                   { $set: { completionStatus: "completed" } },

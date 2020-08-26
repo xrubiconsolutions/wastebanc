@@ -109,12 +109,12 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                       let card_id = res.body.content.data.cardID;
                       need = { cardID: card_id, ...RESULT };
 
-                      const accountSid = "AC0e54e99aff7296ab5c7bf52d86eee9d8";
-                      const authToken = "549de52669fc3ecc350232c978f52bb0";
+                      const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
+                      const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
                       const client = require("twilio")(accountSid, authToken);
 
                       client.verify
-                        .services("VAd381ebb546a1c58a240474d1a16ee26b")
+                        .services("VA703183e103532fd4fe69da94ef2c12c1")
                         .verifications.create({
                           to: `+234${dataToSave.phone}`,
                           channel: "sms",
@@ -495,12 +495,16 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
   var error = {};
   var phone = REQUEST.body.phone;
 
-  const accountSid = "AC0e54e99aff7296ab5c7bf52d86eee9d8";
-  const authToken = "549de52669fc3ecc350232c978f52bb0";
+  const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
+  const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
   const client = require("twilio")(accountSid, authToken);
 
-  client.verify
-    .services("VAd381ebb546a1c58a240474d1a16ee26b")
+  try {
+    
+    
+
+    client.verify
+    .services("VA703183e103532fd4fe69da94ef2c12c1")
     .verifications.create({
       to: `+234${phone}`,
       channel: "sms",
@@ -508,9 +512,15 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
     .then((verification) => {
       console.log(verification.status)
       RESPONSE.status(200).jsonp({message: "Verification code sent"})
-    }
+    }   
       
-    ).catch(err=>RESPONSE.status(404).jsonp(err));
+    ).catch(err=> RESPONSE.status(404).jsonp(err));
+    
+  }
+  catch(err){
+    return RESPONSE.status(404).jsonp(err)
+  }
+
 
 };
 
@@ -520,14 +530,14 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
   var error = {};
   var token = REQUEST.body.token;
   var phone = REQUEST.body.phone;
-  const accountSid = "AC0e54e99aff7296ab5c7bf52d86eee9d8";
-  const authToken = "549de52669fc3ecc350232c978f52bb0";
+  const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
+  const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
   const client = require("twilio")(accountSid, authToken);
 
 
 
   client.verify
-  .services("VAd381ebb546a1c58a240474d1a16ee26b")
+  .services("VA703183e103532fd4fe69da94ef2c12c1")
   .verificationChecks.create({
     to: `+234${phone}`,
     code: `${token}`,
