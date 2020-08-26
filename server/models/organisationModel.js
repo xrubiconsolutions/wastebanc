@@ -35,6 +35,22 @@ const organisation_Schema = new Schema({
     type: String,
     required: true
   },
+  areaOfAccess:{
+    type: [String],
+    required: true
+  },
+  canEquivalent:{
+    type: Number
+  },
+  petBottleEquivalent :{
+    type: Number
+  },
+  rubberEquivalent:{
+    type: Number
+  },
+  plasticEquivalent:{
+    type: Number
+  },
   createAt: {
     type: Date,
     default: Date.now,
