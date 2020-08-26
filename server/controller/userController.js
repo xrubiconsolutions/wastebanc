@@ -123,7 +123,6 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                           console.log(verification.status)
                         );
 
-                     
                       // authy.register_user(
                       //   dataToSave.email,
                       //   dataToSave.phone,
@@ -227,18 +226,17 @@ userController.registerUser = (REQUEST, RESPONSE) => {
               // );
 
               let UserData = {
-                                    email: RESULT.email,
-                                    phone: RESULT.phone,
-                                    username: RESULT.username,
-                                    roles: RESULT.roles,
-                                  };
-                                  return RESPONSE.status(200).jsonp(
-                                    COMMON_FUN.sendSuccess(
-                                      CONSTANTS.STATUS_MSG.SUCCESS
-                                        .DEFAULT,
-                                      UserData
-                                    )
-                                  );
+                email: RESULT.email,
+                phone: RESULT.phone,
+                username: RESULT.username,
+                roles: RESULT.roles,
+              };
+              return RESPONSE.status(200).jsonp(
+                COMMON_FUN.sendSuccess(
+                  CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                  UserData
+                )
+              );
             }
           });
         }
@@ -490,8 +488,6 @@ userController.changedlogedInPassword = (REQUEST, RESPONSE) => {
 };
 
 userController.resendVerification = (REQUEST, RESPONSE) => {
-
-
   var error = {};
   var phone = REQUEST.body.phone;
 
@@ -500,31 +496,21 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
   const client = require("twilio")(accountSid, authToken);
 
   try {
-    
-    
-
     client.verify
-    .services("VA703183e103532fd4fe69da94ef2c12c1")
-    .verifications.create({
-      to: `+234${phone}`,
-      channel: "sms",
-    })
-    .then((verification) => {
-      console.log(verification.status)
-      RESPONSE.status(200).jsonp({message: "Verification code sent"})
-    }   
-      
-    ).catch(err=> RESPONSE.status(404).jsonp(err));
-    
+      .services("VA703183e103532fd4fe69da94ef2c12c1")
+      .verifications.create({
+        to: `+234${phone}`,
+        channel: "sms",
+      })
+      .then((verification) => {
+        console.log(verification.status);
+        RESPONSE.status(200).jsonp({ message: "Verification code sent" });
+      })
+      .catch((err) => RESPONSE.status(404).jsonp(err));
+  } catch (err) {
+    return RESPONSE.status(404).jsonp(err);
   }
-  catch(err){
-    return RESPONSE.status(404).jsonp(err)
-  }
-
-
 };
-
-
 
 userController.verifyPhone = (REQUEST, RESPONSE) => {
   var error = {};
@@ -534,33 +520,41 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
   const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
   const client = require("twilio")(accountSid, authToken);
 
-
-
   client.verify
-  .services("VA703183e103532fd4fe69da94ef2c12c1")
-  .verificationChecks.create({
-    to: `+234${phone}`,
-    code: `${token}`,
-  })
-  .then((verification_check) => {
-    if(verification_check.status == "approved"){
-      console.log(verification_check.status)
-      MODEL.userModel.updateOne(
-          { "phone": phone },
-          { "verified": true},
-           (res)=>{
-             return RESPONSE.status(200).jsonp({message: "Successfully verified your phone number"})
+    .services("VA703183e103532fd4fe69da94ef2c12c1")
+    .verificationChecks.create({
+      to: `+234${phone}`,
+      code: `${token}`,
+    })
+    .then((verification_check) => {
+      if (verification_check.status == "approved") {
+        console.log(verification_check.status);
+        MODEL.userModel.updateOne(
+          { phone: phone },
+          { verified: true },
+          (res) => {
+
+            MODEL.userModel
+              .findOne({ "phone": phone }, (err,USER) => {
+
+                var test = JSON.parse(JSON.stringify(USER))
+
+                if (err) return RESPONSE.status(400).jsonp(error)
+                console.log("user here at all", USER)
+                var jwtToken = COMMON_FUN.createToken(
+                  test
+                ); /** creating jwt token */
+                console.log("user token here at all", USER)
+                test.token = jwtToken;
+                return RESPONSE.jsonp(test);
+                  
+              })
           }
         );
-    }
-  }
-
-  ).catch(err=>RESPONSE.status(404).jsonp(err));
+      }
+    })
+    .catch((err) => RESPONSE.status(404).jsonp(err));
 };
-
-
-
-
 
 userController.getAllClients = async (REQUEST, RESPONSE) => {
   try {

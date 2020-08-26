@@ -81,6 +81,9 @@ module.exports = (APP)=>{
     
     APP.route('/api/rewardUser')
         .post(CONTROLLER.scheduleController.rewardSystem);
+    
+    APP.route('/api/user/completed')
+        .post(CONTROLLER.scheduleController.userComplete);
 
     APP.route('/api/agentTransactions')
         .get(CONTROLLER.scheduleController.allAgentTransaction);

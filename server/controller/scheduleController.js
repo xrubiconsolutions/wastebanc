@@ -549,7 +549,30 @@ scheduleController.allAccepted = (REQUEST,RESPONSE)=>{
   .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 }
 
+scheduleController.userComplete = (req,resp)=>{
 
+  var scheduleID = req.body._id;
+  var userID = req.body.userID;
+  
+  try {
+
+    MODEL.scheduleModel.find({ _id: scheduleID}).then((schedule) => {
+      MODEL.userModel.find({ _id: userID }).then((result) => {
+    MODEL.scheduleModel.updateOne(
+      { "_id": scheduleID },
+      { $set: { completionStatus: "completed" } },
+      (err, res) => {
+        if (err) return resp.status(400).jsonp(response.body.error);
+      }
+    );
+      })
+    })
+  }
+  catch (err) {
+    return resp.status(404),jsonp(err)
+  }
+
+}
 
 scheduleController.allDeclined = (REQUEST,RESPONSE)=>{
   MODEL.scheduleModel
