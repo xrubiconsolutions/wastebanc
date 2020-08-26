@@ -381,6 +381,7 @@ scheduleController.rewardSystem = (req, res) => {
 
   MODEL.scheduleModel.find({ _id: req.body._id }).then((schedule) => {
     MODEL.userModel.find({ email: schedule[0].client }).then((result) => {
+      if(result[0].cardID == null) return res.status(400).jsonp({message: "you don't have a valid card ID"})
       request(
         {
           url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
@@ -411,7 +412,6 @@ scheduleController.rewardSystem = (req, res) => {
             },
             function (err, response) {
               //Coin reward system
-              console.log("You need to check here boss", response)
               if (err) return res.status(400).jsonp(err);
               if (!!response.body.content.data[0]) {
                 var coin_reward = response.body.content.data.customer.availablePoints
