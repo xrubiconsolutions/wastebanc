@@ -196,33 +196,42 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
   };
   var errors = {};
 
-  MODEL.userModel
+  MODEL.collectorModel
     .findOne({ email: REQUEST.body.client }, {}, { lean: true })
     .then((result) => {
-      if (result.roles != "collector") {
-        errors.message = "Only a collector can accept or decline an offer";
-        return RESPONSE.status(400).jsonp(errors);
-      } else {
-        MODEL.scheduleModel
-          .updateOne(
-            { _id: REQUEST.body._id },
-            { $set: { "collectorStatus": "accept" } }
-          )
-          .then((SUCCESS) => {
-            client
-            .createNotification(notification)
-            .then((response) => { console.log (response)})
-            .catch((e) => {console.error(e)});
-    
+      // if (result.roles != "collector") {
+      //   errors.message = "Only a collector can accept or decline an offer";
+      //   return RESPONSE.status(400).jsonp(errors);
+      // } 
+      if(result) {
 
-            return RESPONSE.status(200).jsonp(
-              COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
-            );
-          })
-          .catch((ERR) => {
-            return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-          });
+        MODEL.scheduleModel
+        .updateOne(
+          { _id: REQUEST.body._id },
+          { $set: { "collectorStatus": "accept" } }
+        )
+        .then((SUCCESS) => {
+          client
+          .createNotification(notification)
+          .then((response) => { console.log (response)})
+          .catch((e) => {console.error(e)});
+  
+
+          return RESPONSE.status(200).jsonp(
+            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
+          );
+        })
+        .catch((ERR) => {
+          return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+        });
+
       }
+     
+      else {
+           errors.message = "Only a collector can accept or decline an offer";
+        return RESPONSE.status(400).jsonp(errors);
+      }
+      
     })
     .catch((err) => {
       return RESPONSE.status(500).jsonp(err);
@@ -242,14 +251,14 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
   var errors = {};
   try{
 
-    MODEL.userModel
+    MODEL.collectorModel
     .findOne({ email: REQUEST.body.client }, {}, { lean: true }, (error, result) => {
       if(error) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(error));
       
-      if (result.roles != "collector") {
-        errors.message = "Only a collector can accept or decline an offer";
-        return RESPONSE.status(400).jsonp(errors);
-      } else {
+      // if (result.roles != "collector") {
+      //   errors.message = "Only a collector can accept or decline an offer";
+      //   return RESPONSE.status(400).jsonp(errors);
+      // } 
         REQUEST.body.schedules.map( picks => {
 
           MODEL.scheduleModel
@@ -268,7 +277,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
         )
         return RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
     
-      }
+      
     })
   }
   catch(err){
