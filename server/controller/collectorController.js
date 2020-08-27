@@ -178,6 +178,20 @@ collectorController.checkAccepted = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
+
+collectorController.checkTotalAccepted = (REQUEST, RESPONSE) => {
+
+  const collectorID = REQUEST.query.ID
+  MODEL.scheduleModel
+    .find({ collectorStatus: "accept", collectedBy : collectorID })
+    .then((schedules) => {
+      RESPONSE.status(200).jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules.length)
+      );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
+
 collectorController.checkCompleted = (REQUEST, RESPONSE) => {
   const collectorID = REQUEST.query.ID
 
@@ -186,6 +200,20 @@ collectorController.checkCompleted = (REQUEST, RESPONSE) => {
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
+
+
+collectorController.checkTotalCompleted = (REQUEST, RESPONSE) => {
+  const collectorID = REQUEST.query.ID
+
+  MODEL.scheduleModel
+    .find({ completionStatus: "completed", collectedBy: collectorID})
+    .then((schedules) => {
+      RESPONSE.status(200).jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules.length)
       );
     })
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
@@ -205,6 +233,19 @@ collectorController.checkMissed = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
+
+collectorController.checkTotalMissed = (REQUEST, RESPONSE) => {
+  const collectorID = REQUEST.query.ID
+
+  MODEL.scheduleModel
+    .find({ completionStatus: "missed",  collectedBy: collectorID })
+    .then((schedules) => {
+      RESPONSE.status(200).jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules.length)
+      );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
 // collectorController.checkAccepted = (REQUEST, RESPONSE) => {
 //   MODEL.scheduleModel
 //     .find({ completionStatus: "missed", client: REQUEST.body.client })

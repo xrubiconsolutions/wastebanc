@@ -25,12 +25,22 @@ module.exports = (APP) => {
 
     APP.route('/api/collector/accepted')
         .get(CONTROLLER.collectorController.checkAccepted);
+    
+    APP.route('/api/collector/total/accepted')
+        .get(CONTROLLER.collectorController.checkTotalAccepted);
 
     APP.route('/api/collector/completed')
         .get(CONTROLLER.collectorController.checkCompleted);
     
+    APP.route('/api/collector/total/completed')
+        .get(CONTROLLER.collectorController.checkTotalCompleted);
+    
     APP.route('/api/collector/missed')
         .get(CONTROLLER.collectorController.checkMissed);
+    
+    APP.route('/api/collector/total/missed')
+        .get(CONTROLLER.collectorController.checkTotalMissed);
+
 
 
     // APP.route('/api/collector/accepted')
