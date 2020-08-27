@@ -262,6 +262,77 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
   }
 };
 
+collectorController.verifyPhone = (REQUEST, RESPONSE) => {
+  var error = {};
+  var token = REQUEST.body.token;
+  var phone = REQUEST.body.phone;
+  const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
+  const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
+  const client = require("twilio")(accountSid, authToken);
+
+  client.verify
+    .services("VA703183e103532fd4fe69da94ef2c12c1")
+    .verificationChecks.create({
+      to: `+234${phone}`,
+      code: `${token}`,
+    })
+    .then((verification_check) => {
+      if (verification_check.status == "approved") {
+        console.log(verification_check.status);
+        MODEL.collectorModel.updateOne(
+          { phone: phone },
+          { verified: true },
+          (res) => {
+
+            MODEL.collectorModel
+              .findOne({ "phone": phone }, (err,USER) => {
+
+                var test = JSON.parse(JSON.stringify(USER))
+
+                if (err) return RESPONSE.status(400).jsonp(error)
+                console.log("user here at all", USER)
+                var jwtToken = COMMON_FUN.createToken(
+                  test
+                ); /** creating jwt token */
+                console.log("user token here at all", USER)
+                test.token = jwtToken;
+                return RESPONSE.jsonp(test);
+                  
+              })
+          }
+        );
+      }
+    })
+    .catch((err) => RESPONSE.status(404).jsonp(err));
+};
+
+
+
+collectorController.resendVerification = (REQUEST, RESPONSE) => {
+  var error = {};
+  var phone = REQUEST.body.phone;
+
+  const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
+  const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
+  const client = require("twilio")(accountSid, authToken);
+
+  try {
+    client.verify
+      .services("VA703183e103532fd4fe69da94ef2c12c1")
+      .verifications.create({
+        to: `+234${phone}`,
+        channel: "sms",
+      })
+      .then((verification) => {
+        console.log(verification.status);
+        RESPONSE.status(200).jsonp({ message: "Verification code sent" });
+      })
+      .catch((err) => RESPONSE.status(404).jsonp(err));
+  } catch (err) {
+    return RESPONSE.status(404).jsonp(err);
+  }
+};
+
 
 
 module.exports = collectorController;

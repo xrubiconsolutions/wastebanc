@@ -14,6 +14,12 @@ module.exports = (APP) => {
     APP.route('/api/collector/login')
         .post(CONTROLLER.collectorController.loginCollector);
 
+    APP.route('/api/collector/verify')
+        .post(CONTROLLER.collectorController.verifyPhone);
+
+    APP.route('/api/collector/resendVerification')
+        .post(CONTROLLER.collectorController.resendVerification);
+
     APP.route('/api/collector/update')
         .post(CONTROLLER.collectorController.updateCollector);
 
@@ -25,6 +31,7 @@ module.exports = (APP) => {
     
     APP.route('/api/collector/missed')
         .get(CONTROLLER.collectorController.checkMissed);
+
 
     // APP.route('/api/collector/accepted')
     //     .get(CONTROLLER.collectorController.checkAccepted);
