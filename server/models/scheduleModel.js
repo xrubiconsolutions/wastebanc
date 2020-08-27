@@ -72,6 +72,12 @@ const schedulePick = new Schema({
     collectedBy: {
         type: String,
     },
+    rating:{
+        type: Number
+    },
+    comment: {
+        type: String
+    },
     lat: {
         type: Number,
         required: true

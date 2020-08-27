@@ -600,6 +600,8 @@ scheduleController.userComplete = (req,resp)=>{
 
   var scheduleID = req.body._id;
   var userID = req.body.userID;
+  var rating = req.body.rating;
+  var comment = req.body.comment;
   
   try {
 
@@ -607,7 +609,10 @@ scheduleController.userComplete = (req,resp)=>{
       MODEL.userModel.find({ _id: userID }).then((result) => {
     MODEL.scheduleModel.updateOne(
       { "_id": scheduleID },
-      { $set: { completionStatus: "completed" } },
+      { $set: { completionStatus: "completed" ,
+                rating : rating,
+                comment: comment
+    } },
       (err, res) => {
         if (err) return resp.status(400).jsonp(response.body.error);
         return resp.status(200).jsonp({message: "Your schedule update was successful"})
