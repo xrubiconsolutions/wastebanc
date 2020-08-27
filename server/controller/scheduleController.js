@@ -327,7 +327,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
 
 scheduleController.allMissedSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: "missed", client: REQUEST.body.client })
+    .find({ completionStatus: "missed", client: REQUEST.query.client })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
