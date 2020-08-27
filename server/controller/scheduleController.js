@@ -600,6 +600,7 @@ scheduleController.userComplete = (req,resp)=>{
       { $set: { completionStatus: "completed" } },
       (err, res) => {
         if (err) return resp.status(400).jsonp(response.body.error);
+        return resp.status(200).jsonp({message: "Your schedule update was successful"})
       }
     );
       })
