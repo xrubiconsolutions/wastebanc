@@ -337,6 +337,19 @@ scheduleController.allMissedSchedules = (REQUEST, RESPONSE) => {
 };
 
 
+scheduleController.allUserMissedSchedules = (REQUEST, RESPONSE) => {
+  var user = REQUEST.query.email
+  MODEL.scheduleModel
+    .find({ completionStatus: "completed", client: user })
+    .then((schedules) => {
+      RESPONSE.status(200).jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
+
+
 
 scheduleController.viewAllSchedules = (REQUEST, RESPONSE) => {
   // let CRITERIA = {$or: [{client: REQUEST.query.username}]},
@@ -356,7 +369,7 @@ scheduleController.viewAllSchedules = (REQUEST, RESPONSE) => {
 
 scheduleController.allPendingSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: "pending", client: REQUEST.body.client })
+    .find({ completionStatus: "pending", client: REQUEST.query.client })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -367,8 +380,9 @@ scheduleController.allPendingSchedules = (REQUEST, RESPONSE) => {
 
 scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: "completed", client: REQUEST.body.client })
+    .find({ completionStatus: "completed", client: REQUEST.query.client })
     .then((schedules) => {
+      console.log("Completed schedules here", schedules)
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
       );

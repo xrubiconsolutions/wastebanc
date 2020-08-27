@@ -70,6 +70,10 @@ module.exports = (APP) => {
     CONTROLLER.scheduleController.allMissedSchedules
   );
 
+  APP.route("/api/user/missed").get(
+    CONTROLLER.scheduleController.allUserMissedSchedules
+  );
+
   APP.route("/api/allPending").get(
     CONTROLLER.scheduleController.allPendingSchedules
   );
