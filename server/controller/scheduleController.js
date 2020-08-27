@@ -638,6 +638,37 @@ scheduleController.userDelete = (req,resp)=>{
 
 }
 
+scheduleController.userCancel = (req,resp)=>{
+
+  var scheduleID = req.body._id;
+  var userID = req.body.userID;
+  var reason = req.body.reason;
+  
+  try {
+
+    MODEL.scheduleModel.find({ _id: scheduleID}).then((schedule) => {
+      MODEL.userModel.find({ _id: userID }).then((result) => {
+    MODEL.scheduleModel.updateOne(
+      { "_id": scheduleID },
+      { $set: { completionStatus: "cancelled" , 
+                cancelReason : reason 
+      } },
+      (err, res) => {
+        if (err) return resp.status(400).jsonp(response.body.error);
+        return resp.status(200).jsonp({message: "Your schedule cancellation was successful"})
+      }
+    );
+      })
+    })
+  }
+  catch (err) {
+    return resp.status(404),jsonp(err)
+  }
+
+}
+
+
+
 
 
 

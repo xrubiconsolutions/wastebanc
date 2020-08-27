@@ -58,8 +58,11 @@ const schedulePick = new Schema({
     },
     completionStatus: {
         type: String,
-        enum: ["completed", "pending", "missed"],
+        enum: ["completed", "pending", "missed", "cancelled"],
         default: "pending"
+    },
+    cancelReason : {
+        type: String
     },
     collectorStatus: {
         type: String,

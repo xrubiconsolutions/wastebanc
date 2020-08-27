@@ -1,15 +1,12 @@
-'use strict';
+"use strict";
 
-let CONTROLLER      =   require("../../controller");
-let auth            =   require("../../util/auth");
-const express  = require("express")
+let CONTROLLER = require("../../controller");
+let auth = require("../../util/auth");
+const express = require("express");
 
-
-const  ProtectedRoutes = express.Router(); 
-
+const ProtectedRoutes = express.Router();
 
 // ProtectedRoutes.use((req, res, next) =>{
-
 
 //     // check header for the token
 //     var token = req.headers['access-token'];
@@ -18,107 +15,98 @@ const  ProtectedRoutes = express.Router();
 //     if (token) {
 
 //       // verifies secret and checks if the token is expired
-//       jwt.verify(token, app.get('Secret'), (err, decoded) =>{      
+//       jwt.verify(token, app.get('Secret'), (err, decoded) =>{
 //         if (err) {
-//           return res.json({ message: 'invalid token' });    
+//           return res.json({ message: 'invalid token' });
 //         } else {
 //           // if everything is good, save to request for use in other routes
-//           req.decoded = decoded;    
+//           req.decoded = decoded;
 //           next();
 //         }
 //       });
 
 //     } else {
 
-//       // if there is no token  
+//       // if there is no token
 
-//       res.send({ 
+//       res.send({
 
-//           message: 'No token provided.' 
+//           message: 'No token provided.'
 //       });
 
 //     }
 //   });
 
-
-
-
 /****************************************
  ***** Managing Schedule Routes here ********
  ***** @param APP (express instance)*****
  ****************************************/
-module.exports = (APP)=>{
+module.exports = (APP) => {
+  APP.route("/api/schedule").post(CONTROLLER.scheduleController.schedule);
 
-    APP.route('/api/schedule')
-        .post(CONTROLLER.scheduleController.schedule);
+  APP.route("/api/getSchedule").get(CONTROLLER.scheduleController.getSchedule);
 
-    APP.route('/api/getSchedule')
-        .get(CONTROLLER.scheduleController.getSchedule);
+  APP.route("/api/getSchedules").get(
+    CONTROLLER.scheduleController.getSchedules
+  );
 
-    APP.route('/api/getSchedules')
-        .get(CONTROLLER.scheduleController.getSchedules);
+  APP.route("/api/collectorSchedule").get(
+    CONTROLLER.scheduleController.collectorSchedule
+  );
 
-    APP.route('/api/collectorSchedule')
-        .get(CONTROLLER.scheduleController.collectorSchedule);
-    
-    APP.route('/api/updateSchedule')
-        .post(CONTROLLER.scheduleController.updateSchedule);
-    
-    APP.route('/api/acceptCollection')
-        .post(CONTROLLER.scheduleController.acceptCollection);
+  APP.route("/api/updateSchedule").post(
+    CONTROLLER.scheduleController.updateSchedule
+  );
 
-    APP.route('/api/all/acceptCollection')
-        .post(CONTROLLER.scheduleController.acceptAllCollections);
+  APP.route("/api/acceptCollection").post(
+    CONTROLLER.scheduleController.acceptCollection
+  );
 
-    APP.route('/api/allMissed')
-        .get(CONTROLLER.scheduleController.allMissedSchedules);
+  APP.route("/api/all/acceptCollection").post(
+    CONTROLLER.scheduleController.acceptAllCollections
+  );
 
-    APP.route('/api/allPending')
-        .get(CONTROLLER.scheduleController.allPendingSchedules);
+  APP.route("/api/allMissed").get(
+    CONTROLLER.scheduleController.allMissedSchedules
+  );
 
-    APP.route('/api/allCompleted')
-        .get(CONTROLLER.scheduleController.allCompletedSchedules);
-    
-    APP.route('/api/rewardUser')
-        .post(CONTROLLER.scheduleController.rewardSystem);
-    
-    APP.route('/api/user/completed')
-        .post(CONTROLLER.scheduleController.userComplete);
+  APP.route("/api/allPending").get(
+    CONTROLLER.scheduleController.allPendingSchedules
+  );
 
-    APP.route('/api/user/delete')
-        .post(CONTROLLER.scheduleController.userDelete);
+  APP.route("/api/allCompleted").get(
+    CONTROLLER.scheduleController.allCompletedSchedules
+  );
 
-    APP.route('/api/agentTransactions')
-        .get(CONTROLLER.scheduleController.allAgentTransaction);
-    
-    
-    APP.route('/api/viewAllSchedules')
-        .get(CONTROLLER.scheduleController.viewAllSchedules);
-    
-    APP.route('/api/allWeight')
-        .get(CONTROLLER.scheduleController.allWeight);
+  APP.route("/api/rewardUser").post(CONTROLLER.scheduleController.rewardSystem);
 
+  APP.route("/api/user/completed").post(
+    CONTROLLER.scheduleController.userComplete
+  );
 
-    APP.route('/api/getBalance')
-        .get(CONTROLLER.scheduleController.getBalance);
+  APP.route("/api/user/delete").post(CONTROLLER.scheduleController.userDelete);
 
-    APP.route('/api/allCoins')
-        .get(CONTROLLER.scheduleController.allCoins);
+  APP.route("/api/user/cancel").post(CONTROLLER.scheduleController.userCancel);
 
-    APP.route('/api/allAccepted')
-        .get(CONTROLLER.scheduleController.allAccepted);
+  APP.route("/api/agentTransactions").get(
+    CONTROLLER.scheduleController.allAgentTransaction
+  );
 
-    APP.route('/api/allDeclined')
-        .get(CONTROLLER.scheduleController.allDeclined);
+  APP.route("/api/viewAllSchedules").get(
+    CONTROLLER.scheduleController.viewAllSchedules
+  );
 
+  APP.route("/api/allWeight").get(CONTROLLER.scheduleController.allWeight);
 
+  APP.route("/api/getBalance").get(CONTROLLER.scheduleController.getBalance);
 
+  APP.route("/api/allCoins").get(CONTROLLER.scheduleController.allCoins);
 
-    
-        
-    APP.route('/getSchedule')
-        .get((req, res)=>{
-            res.jsonp('cool')
-        })    
+  APP.route("/api/allAccepted").get(CONTROLLER.scheduleController.allAccepted);
 
+  APP.route("/api/allDeclined").get(CONTROLLER.scheduleController.allDeclined);
+
+  APP.route("/getSchedule").get((req, res) => {
+    res.jsonp("cool");
+  });
 };
