@@ -14,6 +14,9 @@ module.exports = (APP) => {
     APP.route('/api/collector/login')
         .post(CONTROLLER.collectorController.loginCollector);
 
+    APP.route('/api/collector/update')
+        .post(CONTROLLER.collectorController.updateCollector);
+
     APP.route('/api/collector/accepted')
         .get(CONTROLLER.collectorController.checkAccepted);
 

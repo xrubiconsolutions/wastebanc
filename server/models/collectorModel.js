@@ -54,6 +54,15 @@ const collector_Schema = new Schema({
   },
   IdNumber: {
     type: String,
+  },
+  state: {
+    type: String
+  },
+  place:{
+    type: String
+  },
+  localGovernment: {
+    type:String
   }
 });
 
