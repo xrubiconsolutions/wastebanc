@@ -69,6 +69,9 @@ const schedulePick = new Schema({
         enum: ["decline", "accept"],
         default: "decline",
     },
+    collectedBy: {
+        type: String,
+    },
     lat: {
         type: Number,
         required: true

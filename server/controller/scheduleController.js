@@ -202,19 +202,25 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
       // if (result.roles != "collector") {
       //   errors.message = "Only a collector can accept or decline an offer";
       //   return RESPONSE.status(400).jsonp(errors);
+
       // } 
+
+
+      console.log("Collected by this baba", result._id)
       if(result) {
 
         MODEL.scheduleModel
         .updateOne(
           { "_id": REQUEST.body._id },
-          { $set: { "collectorStatus": "accept" } }
+          { $set: { "collectorStatus": "accept",
+                    collectedBy: result._id
+          }}
         )
         .then((SUCCESS) => {
-          clients
-          .createNotification(notification)
-          .then((response) => { console.log (response)})
-          .catch((e) => {console.error(e)});
+          // clients
+          // .createNotification(notification)
+          // .then((response) => { console.log (response)})
+          // .catch((e) => {console.error(e)});
   
 
           return RESPONSE.status(200).jsonp(
@@ -266,7 +272,11 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
           MODEL.scheduleModel
           .updateOne(
             { "_id" : picks._id},
-            {$set: { "collectorStatus" : "accept" }}, 
+            {$set: { "collectorStatus" : "accept",
+          
+            collectedBy: result._id
+
+          }}, 
 
             (err,res)=>{
               if(!res.nModified) {
