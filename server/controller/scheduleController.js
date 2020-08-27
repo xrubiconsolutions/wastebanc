@@ -612,6 +612,37 @@ scheduleController.userComplete = (req,resp)=>{
 
 }
 
+
+scheduleController.userDelete = (req,resp)=>{
+
+  var scheduleID = req.body._id;
+  var userID = req.body.userID;
+  
+  try {
+
+    MODEL.scheduleModel.find({ _id: scheduleID}).then((schedule) => {
+      MODEL.userModel.find({ _id: userID }).then((result) => {
+    MODEL.scheduleModel.deleteOne(
+      { "_id": scheduleID },
+      (err, res) => {
+        if (err) return resp.status(400).jsonp(response.body.error);
+        return resp.status(200).jsonp({message: "Your schedule delete was successful"})
+      }
+    );
+      })
+    })
+  }
+  catch (err) {
+    return resp.status(404),jsonp(err)
+  }
+
+}
+
+
+
+
+
+
 scheduleController.allDeclined = (REQUEST,RESPONSE)=>{
   MODEL.scheduleModel
   .find({ collectorStatus: "decline"})

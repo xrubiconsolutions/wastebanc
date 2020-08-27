@@ -85,6 +85,9 @@ module.exports = (APP)=>{
     APP.route('/api/user/completed')
         .post(CONTROLLER.scheduleController.userComplete);
 
+    APP.route('/api/user/delete')
+        .post(CONTROLLER.scheduleController.userDelete);
+
     APP.route('/api/agentTransactions')
         .get(CONTROLLER.scheduleController.allAgentTransaction);
     
