@@ -375,5 +375,13 @@ collectorController.resendVerification = (REQUEST, RESPONSE) => {
 };
 
 
+collectorController.getTransactions = (req,res)=>{
+  const collectorID = req.query.ID
+
+  MODEL.transactionModel.find({completedBy: collectorID}).then(transaction=>res.status(200).jsonp(transaction)).catch(err=>res.status(500).jsonp(err))
+  
+
+}
+
 
 module.exports = collectorController;

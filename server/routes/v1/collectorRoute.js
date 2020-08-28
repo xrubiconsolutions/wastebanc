@@ -41,6 +41,11 @@ module.exports = (APP) => {
     APP.route('/api/collector/total/missed')
         .get(CONTROLLER.collectorController.checkTotalMissed);
 
+    APP.route('/api/collector/transactions')
+        .get(CONTROLLER.collectorController.getTransactions);
+
+
+
 
 
     // APP.route('/api/collector/accepted')

@@ -390,7 +390,14 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(200).jsonp(COMMON_FUN.sendError(err)));
 };
 
-scheduleController.rewardSystem = (req, res) => {
+scheduleController.rewardSystem = (req, resp) => {
+
+  const collectorID = req.body.collectorID;
+  // MODEL.collectorModel.find({
+  //   _id: collectorID
+  // }).then((err,resp)=>{
+  //   if(err) return  res.status(400).jsonp(err)
+  // }).catch(err=>res.status(500).jsonp(err))
 
   const notification = {
     contents: {
@@ -407,6 +414,14 @@ scheduleController.rewardSystem = (req, res) => {
     console.log("Whats going on here", schedule )
     MODEL.userModel.find({ email: schedule[0].client }).then((result) => {
       if(result[0].cardID == null) return res.status(400).jsonp({message: "you don't have a valid card ID"})
+
+  MODEL.transactionModel.findOne({ scheduleId: req.body._id }).then((transaction) => {
+
+      if(transaction.cardID){
+        return resp.status(400).jsonp({message: "This transaction had been completed by another recycler"})
+      }
+      console.log("transaction here", transaction)
+      
       request(
         {
           url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
@@ -444,41 +459,58 @@ scheduleController.rewardSystem = (req, res) => {
                 console.log("My coin reward is here guys", coin_reward)
                 MODEL.scheduleModel.updateOne(
                   { "_id": schedule[0]._id },
-                  { $set: { completionStatus: "completed"                 
+                  { $set: { completionStatus: "completed",
+                            collectedBy: collectorID                 
                 } },
                   (err, res) => {
-                    console.log("Error is here guys", err)
-                    console.log("Is this actually an error", result[0].email)
                     if (err) return res.status(400).jsonp(response.body.error);
                     else {
-
                       MODEL.userModel.updateOne(
                         { email : result[0].email },
                         { $set: { availablePoints: coin_reward,
                                   
                         } }, (err,res)=>{
                           console.log("Was this actually updated", res)
+                          var dataToSave = {
+
+                            "weight": schedule[0].quantity,
+                          
+                            "coin": response.body.content.data.point,
+                          
+                            "cardID": result[0].cardID,
+
+                            "scheduleId": schedule[0]._id,
+                          
+                            "completedBy": collectorID,
+
+                            "Category": schedule[0].Category
+                          }
+                          MODEL.transactionModel(dataToSave).save({}, (ERR, RESULT) => {
+                            
+                            if(ERR) return resp.status(400).jsonp(ERR)
+                              console.log("Transaction saved on database", RESULT)
+                           })
                         }
                       );
-
                     } 
                   }
                 );
               } else {
                 var error = {};
                 error.message = "Transaction incomplete, coin not credited";
-                return res.status(400).jsonp(error);
+                return resp.status(400).jsonp(error);
               }
               // client
               // .createNotification(notification)
               // .then((response) => { console.log (response)})
               // .catch((e) => {console.error(e)});
-              return res.status(200).jsonp(response.body.content.data);
+              return resp.status(200).jsonp(response.body.content.data);
             }
           );
         }
       );
     });
+  }).catch(err=>resp.status(500).jsonp(err))
   });
 };
 

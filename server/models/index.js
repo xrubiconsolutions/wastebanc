@@ -10,5 +10,6 @@ module.exports = {
     scheduleModel : require("./scheduleModel"),
     organisationModel: require("./organisationModel"),
     collectorModel: require("./collectorModel"),
+    transactionModel: require("./transactionModel"),
 };
 
