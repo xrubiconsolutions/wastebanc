@@ -412,12 +412,14 @@ scheduleController.rewardSystem = (req, resp) => {
 
   MODEL.scheduleModel.find({ _id: req.body._id }).then((schedule) => {
     console.log("Whats going on here", schedule )
-    MODEL.userModel.find({ email: schedule[0].client }).then((result) => {
-      if(result[0].cardID == null) return res.status(400).jsonp({message: "you don't have a valid card ID"})
-
+    MODEL.userModel.findOne({ email: schedule[0].client }).then((result) => {
+      console.log("Is this result even valid", result)
+      if(result.cardID == null) return res.status(400).jsonp({message: "you don't have a valid card ID"})
   MODEL.transactionModel.findOne({ scheduleId: req.body._id }).then((transaction) => {
 
-      if(transaction.cardID){
+    console.log("transaction here at all ? ", transaction)
+
+      if(transaction){
         return resp.status(400).jsonp({message: "This transaction had been completed by another recycler"})
       }
       console.log("transaction here", transaction)
@@ -446,7 +448,7 @@ scheduleController.rewardSystem = (req, resp) => {
                   deviceID: "XRUBICON", //"DEVICE_ID"
                   organizationID: "7", // 7
                   weight: schedule[0].quantity,
-                  cardID: result[0].cardID,
+                  cardID: result.cardID,
                 },
               },
             },
@@ -466,7 +468,7 @@ scheduleController.rewardSystem = (req, resp) => {
                     if (err) return res.status(400).jsonp(response.body.error);
                     else {
                       MODEL.userModel.updateOne(
-                        { email : result[0].email },
+                        { email : result.email },
                         { $set: { availablePoints: coin_reward,
                                   
                         } }, (err,res)=>{
@@ -477,7 +479,7 @@ scheduleController.rewardSystem = (req, resp) => {
                           
                             "coin": response.body.content.data.point,
                           
-                            "cardID": result[0].cardID,
+                            "cardID": result.cardID,
 
                             "scheduleId": schedule[0]._id,
                           
