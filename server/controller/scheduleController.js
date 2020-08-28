@@ -404,6 +404,7 @@ scheduleController.rewardSystem = (req, res) => {
 
 
   MODEL.scheduleModel.find({ _id: req.body._id }).then((schedule) => {
+    console.log("Whats going on here", schedule )
     MODEL.userModel.find({ email: schedule[0].client }).then((result) => {
       if(result[0].cardID == null) return res.status(400).jsonp({message: "you don't have a valid card ID"})
       request(
@@ -435,20 +436,32 @@ scheduleController.rewardSystem = (req, res) => {
               },
             },
             function (err, response) {
+              // console.log("IS this even an error", response.body.content.data)
               //Coin reward system
               if (err) return res.status(400).jsonp(err);
-              if (!!response.body.content.data[0]) {
+              if (response.body.content.data) {
                 var coin_reward = response.body.content.data.customer.availablePoints
                 console.log("My coin reward is here guys", coin_reward)
                 MODEL.scheduleModel.updateOne(
                   { "_id": schedule[0]._id },
-                  { $set: { completionStatus: "completed" } },
+                  { $set: { completionStatus: "completed"                 
+                } },
                   (err, res) => {
+                    console.log("Error is here guys", err)
+                    console.log("Is this actually an error", result[0].email)
                     if (err) return res.status(400).jsonp(response.body.error);
-                    MODEL.userModel.updateOne(
-                      { "email" : result[0].email },
-                      { $set: { "availablePoints": coin_reward } }
-                    );
+                    else {
+
+                      MODEL.userModel.updateOne(
+                        { email : result[0].email },
+                        { $set: { availablePoints: coin_reward,
+                                  
+                        } }, (err,res)=>{
+                          console.log("Was this actually updated", res)
+                        }
+                      );
+
+                    } 
                   }
                 );
               } else {
@@ -456,11 +469,10 @@ scheduleController.rewardSystem = (req, res) => {
                 error.message = "Transaction incomplete, coin not credited";
                 return res.status(400).jsonp(error);
               }
-              client
-              .createNotification(notification)
-              .then((response) => { console.log (response)})
-              .catch((e) => {console.error(e)});
-      
+              // client
+              // .createNotification(notification)
+              // .then((response) => { console.log (response)})
+              // .catch((e) => {console.error(e)});
               return res.status(200).jsonp(response.body.content.data);
             }
           );
