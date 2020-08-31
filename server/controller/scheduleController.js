@@ -390,6 +390,18 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(200).jsonp(COMMON_FUN.sendError(err)));
 };
 
+scheduleController.dashboardCompleted = (REQUEST, RESPONSE) => {
+  MODEL.scheduleModel
+    .find({ completionStatus: "completed" })
+    .then((schedules) => {
+      console.log("Completed schedules here", schedules)
+      RESPONSE.status(200).jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(200).jsonp(COMMON_FUN.sendError(err)));
+};
+
 scheduleController.rewardSystem = (req, resp) => {
 
   const collectorID = req.body.collectorID;

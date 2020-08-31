@@ -81,6 +81,10 @@ module.exports = (APP) => {
   APP.route("/api/allCompleted").get(
     CONTROLLER.scheduleController.allCompletedSchedules
   );
+  
+  APP.route("/api/dashboard/Completed").get(
+    CONTROLLER.scheduleController.dashboardCompleted
+  );
 
   APP.route("/api/rewardUser").post(CONTROLLER.scheduleController.rewardSystem);
 
