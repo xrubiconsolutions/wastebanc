@@ -70,10 +70,10 @@ organisationController.agentApproval = (req,res)=>{
 
 organisationController.agentDecline = (req,res)=>{
   const agentID = req.body.agentID;
-  const organisationID = req.body.organisationID;
-  if(!organisationID) {
-    return res.status(400).jsonp({message: "The recycler's ID and organisation ID is required"})
-  }
+  // const organisationID = req.body.organisationID;
+  // if(!organisationID) {
+  //   return res.status(400).jsonp({message: "The recycler's ID and organisation ID is required"})
+  // }
   MODEL.collectorModel.updateOne({_id: agentID}, { verified: false }, (err,resp)=>{
       if (err) {
         return res.status(400).jsonp(err)
