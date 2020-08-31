@@ -99,9 +99,9 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE) => {
     .find({})
     .sort({ _id: -1 })
     .then((schedules) => {
-      var collect = schedules.filter(x=>x.completionStatus !== "completed")
+      // var collect = schedules.filter(x=>x.completionStatus !== "completed")
       RESPONSE.jsonp(
-        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, collect)
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
       );
     })
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
