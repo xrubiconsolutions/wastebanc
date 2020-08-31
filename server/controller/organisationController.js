@@ -24,7 +24,7 @@ organisationController.createOrganisation = (req, res) =>{
       } else {
         MODEL.organisationModel(organisation_data).save({}, (ERR, RESULT) => {
 
-          if(ERR) return res.status(400).json(err)
+          if(ERR) return res.status(400).json(ERR)
           return res.status(200).json(RESULT);
         })
       

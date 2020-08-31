@@ -44,6 +44,10 @@ module.exports = (APP) => {
     APP.route('/api/collector/transactions')
         .get(CONTROLLER.collectorController.getTransactions);
 
+    APP.route('/api/collector/analytics')
+        .get(CONTROLLER.collectorController.collectorAnalysis);
+
+
 
 
 

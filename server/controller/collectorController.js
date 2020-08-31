@@ -85,7 +85,6 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                           console.log(verification.status)
                         );
 
-                    
                       MODEL.collectorModel.updateOne(
                         { email: RESULT.email },
                         { $set: { cardID: card_id } },
@@ -100,18 +99,17 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
               console.log("Card details here", need);
 
               let UserData = {
-                                    email: RESULT.email,
-                                    phone: RESULT.phone,
-                                    username: RESULT.username,
-                                    roles: RESULT.roles,
-                                  };
-                                  return RESPONSE.status(200).jsonp(
-                                    COMMON_FUN.sendSuccess(
-                                      CONSTANTS.STATUS_MSG.SUCCESS
-                                        .DEFAULT,
-                                      UserData
-                                    )
-                                  );
+                email: RESULT.email,
+                phone: RESULT.phone,
+                username: RESULT.username,
+                roles: RESULT.roles,
+              };
+              return RESPONSE.status(200).jsonp(
+                COMMON_FUN.sendSuccess(
+                  CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                  UserData
+                )
+              );
             }
           });
         }
@@ -119,8 +117,6 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
     }
   });
 };
-
-
 
 collectorController.loginCollector = (REQUEST, RESPONSE) => {
   let CRITERIA = {
@@ -130,7 +126,7 @@ collectorController.loginCollector = (REQUEST, RESPONSE) => {
 
   /** find user is exists or not */
   MODEL.collectorModel
-    .findOne({fullname: REQUEST.body.fullname}, PROJECTION, { lean: true })
+    .findOne({ fullname: REQUEST.body.fullname }, PROJECTION, { lean: true })
     .then((USER) => {
       USER /** matching password */
         ? COMMON_FUN.decryptPswrd(
@@ -163,13 +159,10 @@ collectorController.loginCollector = (REQUEST, RESPONSE) => {
     });
 };
 
-
-
 collectorController.checkAccepted = (REQUEST, RESPONSE) => {
-
-  const collectorID = REQUEST.query.ID
+  const collectorID = REQUEST.query.ID;
   MODEL.scheduleModel
-    .find({ collectorStatus: "accept", collectedBy : collectorID })
+    .find({ collectorStatus: "accept", collectedBy: collectorID })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -178,25 +171,26 @@ collectorController.checkAccepted = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
-
 collectorController.checkTotalAccepted = (REQUEST, RESPONSE) => {
-
-  const collectorID = REQUEST.query.ID
+  const collectorID = REQUEST.query.ID;
   MODEL.scheduleModel
-    .find({ collectorStatus: "accept", collectedBy : collectorID })
+    .find({ collectorStatus: "accept", collectedBy: collectorID })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
-        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules.length)
+        COMMON_FUN.sendSuccess(
+          CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+          schedules.length
+        )
       );
     })
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
 collectorController.checkCompleted = (REQUEST, RESPONSE) => {
-  const collectorID = REQUEST.query.ID
+  const collectorID = REQUEST.query.ID;
 
   MODEL.scheduleModel
-    .find({ completionStatus: "completed", collectedBy: collectorID})
+    .find({ completionStatus: "completed", collectedBy: collectorID })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -205,26 +199,84 @@ collectorController.checkCompleted = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
+collectorController.collectorAnalysis = (REQUEST, RESPONSE) => {
+  var completed;
+  var missed;
+  var transactions;
+  var accepted;
+
+  const collectorID = REQUEST.query.ID;
+
+  MODEL.scheduleModel
+    .find({ completionStatus: "completed", collectedBy: collectorID })
+    .then((schedules) => {
+      completed = schedules.length;
+      MODEL.scheduleModel
+        .find({ completionStatus: "missed", collectedBy: collectorID })
+        .then((schedules) => {
+          missed = schedules.length;
+          MODEL.transactionModel
+            .find({ completedBy: collectorID })
+            .then((transaction) => {
+              transactions = transaction.length;
+
+              // res.status(200).jsonp(transaction)
+              MODEL.scheduleModel
+                .find({ collectorStatus: "accept", collectedBy: collectorID })
+                .then((schedules) => {
+                  accepted = schedules.length;
+                  RESPONSE.status(200).jsonp(
+                    COMMON_FUN.sendSuccess(
+                      CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                      {
+                        completed: completed,
+                        transactions: transactions,
+                        accepted: accepted,
+                        missed: missed,
+                      }
+                    )
+                  );
+                })
+                .catch((err) =>
+                  RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err))
+                );
+            })
+            .catch((err) => res.status(500).jsonp(err));
+
+          // RESPONSE.status(200).jsonp(
+          //   COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+          // );
+        })
+        .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+
+      // RESPONSE.status(200).jsonp(
+      //   COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules.length)
+      // );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
 
 collectorController.checkTotalCompleted = (REQUEST, RESPONSE) => {
-  const collectorID = REQUEST.query.ID
+  const collectorID = REQUEST.query.ID;
 
   MODEL.scheduleModel
-    .find({ completionStatus: "completed", collectedBy: collectorID})
+    .find({ completionStatus: "completed", collectedBy: collectorID })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
-        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules.length)
+        COMMON_FUN.sendSuccess(
+          CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+          schedules.length
+        )
       );
     })
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
-
 collectorController.checkMissed = (REQUEST, RESPONSE) => {
-  const collectorID = REQUEST.query.ID
+  const collectorID = REQUEST.query.ID;
 
   MODEL.scheduleModel
-    .find({ completionStatus: "missed",  collectedBy: collectorID })
+    .find({ completionStatus: "missed", collectedBy: collectorID })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -233,15 +285,17 @@ collectorController.checkMissed = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
-
 collectorController.checkTotalMissed = (REQUEST, RESPONSE) => {
-  const collectorID = REQUEST.query.ID
+  const collectorID = REQUEST.query.ID;
 
   MODEL.scheduleModel
-    .find({ completionStatus: "missed",  collectedBy: collectorID })
+    .find({ completionStatus: "missed", collectedBy: collectorID })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
-        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules.length)
+        COMMON_FUN.sendSuccess(
+          CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+          schedules.length
+        )
       );
     })
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
@@ -256,8 +310,6 @@ collectorController.checkTotalMissed = (REQUEST, RESPONSE) => {
 //     })
 //     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 // };
-
-
 
 collectorController.updateCollector = async (REQUEST, RESPONSE) => {
   try {
@@ -281,7 +333,7 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
               fullname: REQUEST.body.fullname,
               state: REQUEST.body.state,
               place: REQUEST.body.place,
-              localGovernment: REQUEST.body.localGovernment
+              localGovernment: REQUEST.body.localGovernment,
             },
           }
         )
@@ -324,30 +376,24 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
           { phone: phone },
           { verified: true },
           (res) => {
+            MODEL.collectorModel.findOne({ phone: phone }, (err, USER) => {
+              var test = JSON.parse(JSON.stringify(USER));
 
-            MODEL.collectorModel
-              .findOne({ "phone": phone }, (err,USER) => {
-
-                var test = JSON.parse(JSON.stringify(USER))
-
-                if (err) return RESPONSE.status(400).jsonp(error)
-                console.log("user here at all", USER)
-                var jwtToken = COMMON_FUN.createToken(
-                  test
-                ); /** creating jwt token */
-                console.log("user token here at all", USER)
-                test.token = jwtToken;
-                return RESPONSE.jsonp(test);
-                  
-              })
+              if (err) return RESPONSE.status(400).jsonp(error);
+              console.log("user here at all", USER);
+              var jwtToken = COMMON_FUN.createToken(
+                test
+              ); /** creating jwt token */
+              console.log("user token here at all", USER);
+              test.token = jwtToken;
+              return RESPONSE.jsonp(test);
+            });
           }
         );
       }
     })
     .catch((err) => RESPONSE.status(404).jsonp(err));
 };
-
-
 
 collectorController.resendVerification = (REQUEST, RESPONSE) => {
   var error = {};
@@ -374,14 +420,13 @@ collectorController.resendVerification = (REQUEST, RESPONSE) => {
   }
 };
 
+collectorController.getTransactions = (req, res) => {
+  const collectorID = req.query.ID;
 
-collectorController.getTransactions = (req,res)=>{
-  const collectorID = req.query.ID
-
-  MODEL.transactionModel.find({completedBy: collectorID}).then(transaction=>res.status(200).jsonp(transaction)).catch(err=>res.status(500).jsonp(err))
-  
-
-}
-
+  MODEL.transactionModel
+    .find({ completedBy: collectorID })
+    .then((transaction) => res.status(200).jsonp(transaction))
+    .catch((err) => res.status(500).jsonp(err));
+};
 
 module.exports = collectorController;
