@@ -19,6 +19,6 @@ module.exports = (APP) => {
         .post(CONTROLLER.organisationController.agentApproval);
     
     APP.route('/api/decline/organisation')
-        .post(CONTROLLER.organisationController.agentApproval);
+        .post(CONTROLLER.organisationController.agentDecline);
            
 };
