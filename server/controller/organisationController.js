@@ -51,6 +51,39 @@ organisationController.listOrganisation = (req,res)=>{
 }
 
 
+organisationController.agentApproval = (req,res)=>{
+  const agentID = req.body.agentID;
+  const organisationID = req.body.organisationID;
+  if(!organisationID) {
+    return res.status(400).jsonp({message: "The recycler's ID and organisation ID is required"})
+  }
+  MODEL.collectorModel.updateOne({_id: agentID}, { verified: true , approvedBy : organisationID }, (err,resp)=>{
+      if (err) {
+        return res.status(400).jsonp(err)
+      }
+      console.log("approved by us")
+     return res.jsonp({message: "You just approved a recycler"})
+  })
+
+}
+
+
+organisationController.agentDecline = (req,res)=>{
+  const agentID = req.body.agentID;
+  const organisationID = req.body.organisationID;
+  if(!organisationID) {
+    return res.status(400).jsonp({message: "The recycler's ID and organisation ID is required"})
+  }
+  MODEL.collectorModel.updateOne({_id: agentID}, { verified: false }, (err,resp)=>{
+      if (err) {
+        return res.status(400).jsonp(err)
+      }
+      console.log("declined by us")
+     return res.jsonp({message: "You just declined a recycler's request "})
+  })
+
+}
+
 
 
 /* export organisationControllers */

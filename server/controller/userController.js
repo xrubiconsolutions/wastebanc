@@ -299,7 +299,7 @@ userController.loginUser = (REQUEST, RESPONSE) => {
 userController.forgotPassword = (REQUEST, RESPONSE) => {
   let CRITERIA = { email: REQUEST.body.email },
     PROJECTION = { __v: 0, createAt: 0 };
-  /** find user is exists or not */
+  /** check if user exists or not */
   MODEL.userModel
     .findOne(CRITERIA, PROJECTION, { lean: true })
     .then((USER) => {

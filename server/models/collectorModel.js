@@ -63,6 +63,9 @@ const collector_Schema = new Schema({
   },
   localGovernment: {
     type:String
+  },
+  approvedBy: {
+    type: String
   }
 });
 

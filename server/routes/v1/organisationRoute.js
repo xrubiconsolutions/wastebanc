@@ -14,4 +14,11 @@ module.exports = (APP) => {
         
     APP.route('/api/check/organisation')
         .get(CONTROLLER.organisationController.listOrganisation);
+
+    APP.route('/api/approve/organisation')
+        .post(CONTROLLER.organisationController.agentApproval);
+    
+    APP.route('/api/decline/organisation')
+        .post(CONTROLLER.organisationController.agentApproval);
+           
 };
