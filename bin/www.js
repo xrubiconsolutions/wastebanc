@@ -13,6 +13,16 @@ const ALLFILES     = require("./../filebundle");
 const SWAGGER      = require('./swagger/swagger_lib/swagger-express');
 const PATH         = require("path");
 const BOOTSTRAPING = require("../server/util/Bootstraping/Bootstraping");
+const OpenTok = require('opentok');
+
+const apiKey = "46903784"
+const secret = "7c433b3970838bffa4ec979d8337c19a8962fba8"
+
+var opentok = new OpenTok(apiKey, secret);
+
+
+
+
 
 const PubNub = require('pubnub');
 const uuid = PubNub.generateUUID();

@@ -12,4 +12,5 @@ module.exports = function(app){
     require("./scheduleRoutes")(app);
     require("./organisationRoute")(app);
     require("./collectorRoute")(app);
+    require("./reportRoute")(app);
 };

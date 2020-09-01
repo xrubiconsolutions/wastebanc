@@ -11,5 +11,6 @@ module.exports = {
     organisationModel: require("./organisationModel"),
     collectorModel: require("./collectorModel"),
     transactionModel: require("./transactionModel"),
+    reportModel: require("./reportModel"),
 };
 
