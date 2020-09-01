@@ -27,69 +27,71 @@ reportController.report = (req, res) => {
   var token;
   var roomToSessionIdDictionary = {};
 
-
-  MODEL.reportModel.findOne({
-    userReportID: userID
-}).then((result,user)=>{
-    // console.log("------>",result)
-    if(result) {
+  MODEL.reportModel
+    .findOne({
+      userReportID: userID,
+    })
+    .then((result, user) => {
+      // console.log("------>",result)
+      if (result) {
         return res.status(200).json(result);
-    }       
-    else {
+      } else {
+        opentok.createSession({ mediaMode: "routed" }, function (err, session) {
+          if (err) {
+            console.log(err);
+            res.status(500).send({ error: "createSession error:" + err });
+            return;
+          }
 
-  opentok.createSession({ mediaMode: "routed" }, function (err, session) {
-    if (err) {
-      console.log(err);
-      res.status(500).send({ error: "createSession error:" + err });
-      return;
-    }
+          // roomToSessionIdDictionary[roomName] = session.sessionId;
 
-    // roomToSessionIdDictionary[roomName] = session.sessionId;
-
-    // generate token
-    token = opentok.generateToken(session.sessionId);
-            MODEL.reportModel({
-                apiKey: apiKey,
-                sessionID: session.sessionId,
-                token: token,
-                userReportID: userID,
-                lat: lat,
-                long: long,
-              }).save({},(err,result)=>{
-                  console.log("error here", err)
-                  if(err) return res.status(400).json({ message: "Could not save report incidence"})
-                  console.log(result);
-              });
-              res.setHeader("Content-Type", "application/json");
-    return res.json({
-      apiKey: apiKey,
-      sessionId: session.sessionId,
-      token: token,
+          // generate token
+          token = opentok.generateToken(session.sessionId);
+          MODEL.reportModel({
+            apiKey: apiKey,
+            sessionID: session.sessionId,
+            token: token,
+            userReportID: userID,
+            lat: lat,
+            long: long,
+          }).save({}, (err, result) => {
+            console.log("error here", err);
+            if (err)
+              return res
+                .status(400)
+                .json({ message: "Could not save report incidence" });
+            console.log(result);
+          });
+          res.setHeader("Content-Type", "application/json");
+          return res.json({
+            apiKey: apiKey,
+            sessionId: session.sessionId,
+            token: token,
+          });
+        });
+      }
     });
-        })
-    
-     } 
-    
-  });
 };
 
+reportController.getReport = (req, res) => {
+  var ID = req.body.userID;
 
+  MODEL.reportModel
+    .findOne({ userReportID: ID })
+    .then((user) => {
+      return res.status(200).json(user);
+    })
+    .catch((err) => res.status(500).json(err));
+};
 
-reportController.getReport = (req,res)=>{
- var ID = req.body.userID;
-
- MODEL.reportModel.findOne({ "userReportID" : ID }).then(user=>{
-    return res.status(200).json(user);
- }).catch(err=> res.status(500).json(err))
-
-}
-
-reportController.allReport = (req,res)=>{   
-    MODEL.reportModel.findOne({}).then(user=>{
-       return res.status(200).json(user);
-    }).catch(err=> res.status(500).json(err))
-   
-   }
+reportController.allReport = (req, res) => {
+  MODEL.reportModel
+    .find({})
+    .then((user) => {
+      return res.status(200).json(user);
+    })
+    .catch((err) => res.status(500).json(err));
+};
 
 /* export reportControllers */
 module.exports = reportController;
