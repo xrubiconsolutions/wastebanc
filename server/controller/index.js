@@ -11,4 +11,5 @@ module.exports = {
   webPushController: require("./webPushController"),
   collectorController: require("./collectorController"),
   reportController: require("./reportController"),
+  realtimeController : require("./realtimeController"),
 };

@@ -13,12 +13,17 @@ const ALLFILES     = require("./../filebundle");
 const SWAGGER      = require('./swagger/swagger_lib/swagger-express');
 const PATH         = require("path");
 const BOOTSTRAPING = require("../server/util/Bootstraping/Bootstraping");
-const OpenTok = require('opentok');
+// const OpenTok = require('opentok');
 
-const apiKey = "46903784"
-const secret = "7c433b3970838bffa4ec979d8337c19a8962fba8"
+// const apiKey = "46903784"
+// const secret = "7c433b3970838bffa4ec979d8337c19a8962fba8"
 
-var opentok = new OpenTok(apiKey, secret);
+// var opentok = new OpenTok(apiKey, secret);
+
+
+
+
+
 
 
 
@@ -62,8 +67,36 @@ pubnub.publish(publishConfig, function(status, response) {
 
 
 /**creating express server app for server */
-const app         = EXPRESS();
+const app  = EXPRESS();
 
+const Http = require("http").Server(app)
+
+const Socketio = require("socket.io")(Http);
+
+
+app.get("/api/location/realtime" , (req, res) => {
+
+  var lat = req.query.lat;
+  var long = req.query.long;
+
+  // return res.json({latitude: lat})
+
+  const locations = [{x: lat , y : long }];
+  Socketio.on("connection", socket=>{
+    return res.send({data: socket})
+    console.log("connections here", socket)
+    res.send(socket)
+              for(let i = 0 ; i < locations.length; i ++){
+                  socket.emit("location", locations[i]);
+              }
+              socket.on("location", data=>{
+                  locations.push(data);
+                  Socketio.emit("location", data)
+                    res.send({message: "Opoor yeye"})
+        })
+  })
+}
+)
 
 /********************************
  ***** Server Configuration *****
