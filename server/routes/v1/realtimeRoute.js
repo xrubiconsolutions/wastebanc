@@ -8,7 +8,7 @@ let auth            =   require("../../util/auth");
  ****************************************/
 module.exports = (APP) => {
 
-    APP.route('/api/realtime/locations')
-        .post(CONTROLLER.realtimeController.report);
+    APP.route('/api/realtime')
+        .get(CONTROLLER.realtimeController.report);
         
 }

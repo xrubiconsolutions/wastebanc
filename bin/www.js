@@ -21,7 +21,7 @@ const BOOTSTRAPING = require("../server/util/Bootstraping/Bootstraping");
 // var opentok = new OpenTok(apiKey, secret);
 
 
-
+const cors = require("cors");
 
 
 
@@ -69,17 +69,24 @@ pubnub.publish(publishConfig, function(status, response) {
 /**creating express server app for server */
 const app  = EXPRESS();
 
-const Http = require("http").Server(app)
+
+
+const Http = require("https").Server(app)
 
 const Socketio = require("socket.io")(Http);
 
 
 app.get("/api/location/realtime" , (req, res) => {
 
+
+
+
   var lat = req.query.lat;
-  var long = req.query.long;
+  // var long = req.query.long;
 
   // return res.json({latitude: lat})
+  res.send({message: "Hello"})
+
 
   const locations = [{x: lat , y : long }];
   Socketio.on("connection", socket=>{

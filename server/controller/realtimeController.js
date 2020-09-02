@@ -12,15 +12,12 @@ let CONSTANTS = require("../util/constants");
 let FS = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
-const Socketio = require("socket.io");
 
+const app = require("express")()
 
+const Http = require("http").Server(app)
 
-
-
-
-
-
+const Socketio = require("socket.io")(Http);
 
 
 realtimeController.report = (req, res) => {

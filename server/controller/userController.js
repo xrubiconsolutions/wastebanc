@@ -416,7 +416,7 @@ userController.updateUser = async (REQUEST, RESPONSE) => {
       );
     }
   } catch (ERR) {
-    return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+    return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(ERR));
   }
 };
 /**************************************************
