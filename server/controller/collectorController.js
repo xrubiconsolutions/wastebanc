@@ -338,9 +338,17 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
           }
         )
         .then((SUCCESS) => {
-          return RESPONSE.jsonp(
-            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
-          );
+          MODEL.collectorModel.find({ email: REQUEST.body.email }).then(user=>{
+            if(!user){
+              return RESPONSE.status(400).json({
+                message: "User not found"
+              })
+            }
+            return RESPONSE.jsonp(
+              COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED, user)
+            );
+
+          }).catch(err=>RESPONSE.status(500).json(err))
         })
         .catch((ERR) => {
           return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
