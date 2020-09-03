@@ -93,5 +93,22 @@ reportController.allReport = (req, res) => {
     .catch((err) => res.status(500).json(err));
 };
 
+
+reportController.endReport = (req,res)=>{
+  var ID = req.body.userID;
+
+  MODEL.reportModel
+  .findOne({ userReportID: ID })
+  .then((user) => {
+    MODEL.reportModel.updateOne({ userReportID: ID }, { $set: { "active" : false } }, (err, resp)=>{
+      if(err) return res.status(400).json(err)
+      return res.status(200).json({message: "Session successfully ended"})
+    })
+  })
+  .catch((err) => res.status(500).json(err));
+
+}
+
+
 /* export reportControllers */
 module.exports = reportController;

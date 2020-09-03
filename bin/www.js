@@ -81,16 +81,15 @@ app.get("/api/location/realtime" , (req, res) => {
 
 
 
-  var lat = req.query.lat;
+  // var lat = req.query.lat;
   // var long = req.query.long;
 
-  // return res.json({latitude: lat})
-  res.send({message: "Hello"})
 
 
-  const locations = [{x: lat , y : long }];
-  Socketio.on("connection", socket=>{
-    return res.send({data: socket})
+  const locations = [];
+  Socketio.on("connection", socket => {
+    console.log(socket)
+    // return res.send({data: socket})
     console.log("connections here", socket)
     res.send(socket)
               for(let i = 0 ; i < locations.length; i ++){
@@ -99,7 +98,7 @@ app.get("/api/location/realtime" , (req, res) => {
               socket.on("location", data=>{
                   locations.push(data);
                   Socketio.emit("location", data)
-                    res.send({message: "Opoor yeye"})
+                    res.send({message: " " })
         })
   })
 }

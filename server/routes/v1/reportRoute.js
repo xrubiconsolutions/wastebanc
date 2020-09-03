@@ -11,6 +11,9 @@ module.exports = (APP) => {
     APP.route('/api/report')
         .post(CONTROLLER.reportController.report);
 
+    APP.route('/api/end/report')
+        .post(CONTROLLER.reportController.endReport);
+
     APP.route('/api/user/report')
         .post(CONTROLLER.reportController.getReport);
 

@@ -27,6 +27,11 @@ const report_Schema = new Schema({
       required: true,
       unique: true
   },
+  active:{
+    type: Boolean,
+    required: true,
+    default: true
+  },
   lat: {
         type: String
   },
