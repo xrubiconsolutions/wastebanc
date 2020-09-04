@@ -772,5 +772,50 @@ scheduleController.allDeclined = (REQUEST,RESPONSE)=>{
 }
 
 
+scheduleController.smartRoute = (REQUEST, RESPONSE) => {
+  const collectorID = REQUEST.query.collectorID;
+  var need = [];
+  var count = 0;
+  var geofencedSchedules = [];
+
+
+  MODEL.collectorModel.findOne({ _id: collectorID }).then((collector) => {
+    var accessArea = collector.areaOfAccess;
+
+    MODEL.scheduleModel
+      .find({})
+      .sort({ _id: -1 })
+      .then((schedules) => {
+        schedules.forEach((schedule, index) => {
+          var test = schedule.address.split(" ");
+          (function route() {
+            for (let i = 0; i < accessArea.length; i++) {
+              for (let j = 0; j < test.length; j++) {
+                if (accessArea[i].includes(test[j])) {
+                  need.push(test[j]);
+                  geofencedSchedules.push(schedule)
+                  count++
+                  
+                }
+              }
+            }
+            return !!need;
+          })()
+      
+
+
+        });
+        var geoSchedules = geofencedSchedules.filter(x=>x.completionStatus !== "completed")
+        RESPONSE.jsonp(
+          COMMON_FUN.sendSuccess(
+            CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+            geoSchedules
+          )
+        );
+      })
+      .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+  });
+};
+
 
 module.exports = scheduleController;

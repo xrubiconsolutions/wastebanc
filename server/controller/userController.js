@@ -17,6 +17,8 @@ var twilio = require("twilio");
  ****** Upload image or media (under process) *****
  **************************************************/
 
+var nodemailer = require('nodemailer');
+
 const io = require("socket.io")();
 
 io.on("connection", (client) => {
@@ -30,6 +32,16 @@ io.on("connection", (client) => {
 
 const tax_url =
   "https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer";
+
+
+
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'pakambusiness@gmail.com',
+      pass: 'pakambusiness-2000'
+    }
+  });
 
 userController.upload = (REQUEST, RESPONSE) => {
   /** Stream
@@ -300,6 +312,22 @@ userController.forgotPassword = (REQUEST, RESPONSE) => {
   let CRITERIA = { email: REQUEST.body.email },
     PROJECTION = { __v: 0, createAt: 0 };
   /** check if user exists or not */
+  var mailOptions = {
+    from: 'pakambusiness@gmail.com',
+    // to: `${REQUEST.body.email}`,
+    to: `sobowalebukola@gmail.com`,
+    subject: 'FORGOT PASSWORD MAIL',
+    text: 'Forgot password?'
+  }
+
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
+  
   MODEL.userModel
     .findOne(CRITERIA, PROJECTION, { lean: true })
     .then((USER) => {

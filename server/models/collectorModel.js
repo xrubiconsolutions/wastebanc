@@ -50,7 +50,8 @@ const collector_Schema = new Schema({
     type: String,
   },
   organisation :{
-      type: String
+      type: String,
+      required: true
   },
   IdNumber: {
     type: String,
@@ -63,6 +64,9 @@ const collector_Schema = new Schema({
   },
   localGovernment: {
     type:String
+  },
+  areaOfAccess: {
+    type : Array
   },
   approvedBy: {
     type: String

@@ -54,6 +54,10 @@ module.exports = (APP) => {
     CONTROLLER.scheduleController.collectorSchedule
   );
 
+  APP.route("/api/geofenced/schedule").get(
+    CONTROLLER.scheduleController.smartRoute
+  );
+
   APP.route("/api/updateSchedule").post(
     CONTROLLER.scheduleController.updateSchedule
   );
