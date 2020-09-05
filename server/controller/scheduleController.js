@@ -405,6 +405,7 @@ scheduleController.dashboardCompleted = (REQUEST, RESPONSE) => {
 scheduleController.rewardSystem = (req, resp) => {
 
   const collectorID = req.body.collectorID;
+  const quantity = req.body.quantity;
   // MODEL.collectorModel.find({
   //   _id: collectorID
   // }).then((err,resp)=>{
@@ -428,7 +429,7 @@ scheduleController.rewardSystem = (req, resp) => {
       if(result.cardID == null) return res.status(400).jsonp({message: "you don't have a valid card ID"})
   MODEL.transactionModel.findOne({ scheduleId: req.body._id }).then((transaction) => {
 
-    console.log("transaction here at all ? ", transaction)
+    // console.log("transaction here at all ? ", transaction)
 
       if(transaction){
         return resp.status(400).jsonp({message: "This transaction had been completed by another recycler"})
@@ -458,7 +459,8 @@ scheduleController.rewardSystem = (req, resp) => {
                 data: {
                   deviceID: "XRUBICON", //"DEVICE_ID"
                   organizationID: "7", // 7
-                  weight: schedule[0].quantity,
+                  // weight: schedule[0].quantity,
+                  weight: quantity,
                   cardID: result.cardID,
                 },
               },
@@ -486,7 +488,7 @@ scheduleController.rewardSystem = (req, resp) => {
                           console.log("Was this actually updated", res)
                           var dataToSave = {
 
-                            "weight": schedule[0].quantity,
+                            "weight": quantity,
                           
                             "coin": response.body.content.data.point,
                           
@@ -794,8 +796,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
                 if (accessArea[i].includes(test[j])) {
                   need.push(test[j]);
                   geofencedSchedules.push(schedule)
-                  count++
-                  
+                  count++           
                 }
               }
             }
