@@ -51,8 +51,7 @@ const collector_Schema = new Schema({
     type: String,
   },
   organisation :{
-      type: String,
-      required: true
+      type: String
   },
   IdNumber: {
     type: String,
