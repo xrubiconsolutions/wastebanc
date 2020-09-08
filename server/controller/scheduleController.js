@@ -208,10 +208,16 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
       // CHeck for multiple accept
 
       if(result) {
+
+        MODEL.scheduleModel.findOne({"_id": REQUEST.body._id }).then((result,err)=>{
+          if(err) return RESPONSE.status(400).json(err)
+          if(result.collectorStatus == "accept"){
+            return RESPONSE.status(400).json({message: "This schedule had been accepted by another collector"})
+          }
         
         MODEL.scheduleModel
         .updateOne(
-          { "_id": REQUEST.body._id },
+          { "_id": REQUEST.body._id , "collectorStatus": "decline" },
           { $set: { "collectorStatus": "accept",
                     collectedBy: result._id
           }}
@@ -221,16 +227,20 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
           // .createNotification(notification)
           // .then((response) => { console.log (response)})
           // .catch((e) => {console.error(e)});
+
+          MODEL.scheduleModel.find({"_id": REQUEST.body._id}).then((result, err)=>{
+          if(err) return RESPONSE.status(400).json(err)
+          return RESPONSE.status(200).jsonp(
+            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED, result)
+          );
+          })
   
 
-          return RESPONSE.status(200).jsonp(
-            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
-          );
         })
         .catch((ERR) => {
           return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
         });
-
+      })
       }
      
       else {
@@ -255,16 +265,15 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
     // ]
   };
   var errors = {};
+  var updates = [];
+
   try{
 
     MODEL.collectorModel
     .findOne({ email: REQUEST.body.client }, {}, { lean: true }, (error, result) => {
       if(error) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(error));
       
-      // if (result.roles != "collector") {
-      //   errors.message = "Only a collector can accept or decline an offer";
-      //   return RESPONSE.status(400).jsonp(errors);
-      // } 
+     
 
       else {
 
@@ -283,6 +292,8 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
                  RESPONSE.status(400).jsonp({message: "This schedule has already been accepted by another recycler"})
                  return false;
               }
+
+              
               RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
               return true
               console.log(res)
@@ -290,28 +301,8 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
           )
         }
     );
-
-      //  return RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
-
-
-        // REQUEST.body.schedules.map(picks => {
-        //   MODEL.scheduleModel
-        //   .update(
-        //     { "_id" : picks._id , "collectorStatus": "decline"},
-        //     {$set: { "collectorStatus" : "accept" }}, 
-
-        //     (err,res)=>{
-        //       if(!res.n) {
-        //         RESPONSE.status(400).jsonp({message: "This schedule has already been accepted by another recycler"})
-        //       }
-        //       console.log(res)
-        //       if(res.n) RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
-
-        //     }
-        //   )
-
-        // })
-        // return RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
+    
+    
       }
 
     
