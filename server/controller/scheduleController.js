@@ -205,10 +205,10 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
 
       // } 
 
+      // CHeck for multiple accept
 
-      console.log("Collected by this baba", result._id)
       if(result) {
-
+        
         MODEL.scheduleModel
         .updateOne(
           { "_id": REQUEST.body._id },
@@ -789,7 +789,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
       .sort({ _id: -1 })
       .then((schedules) => {
         schedules.forEach((schedule, index) => {
-          var test = schedule.address.split(" ");
+          var test = schedule.address.split(",");
           (function route() {
             for (let i = 0; i < accessArea.length; i++) {
               for (let j = 0; j < test.length; j++) {
