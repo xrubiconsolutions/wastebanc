@@ -344,6 +344,7 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
               fullname: REQUEST.body.fullname,
               state: REQUEST.body.state,
               place: REQUEST.body.place,
+              organisation: REQUEST.body.organisation,
               localGovernment: REQUEST.body.localGovernment,
             },
           }
