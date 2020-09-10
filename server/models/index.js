@@ -12,5 +12,6 @@ module.exports = {
     collectorModel: require("./collectorModel"),
     transactionModel: require("./transactionModel"),
     reportModel: require("./reportModel"),
+    payModel: require("./payModel"),
 };
 

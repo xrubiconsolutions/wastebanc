@@ -12,4 +12,5 @@ module.exports = {
   collectorController: require("./collectorController"),
   reportController: require("./reportController"),
   realtimeController : require("./realtimeController"),
+  payController : require("./payController"),
 };
