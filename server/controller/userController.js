@@ -135,120 +135,68 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                           console.log(verification.status)
                         );
 
-                      // authy.register_user(
-                      //   dataToSave.email,
-                      //   dataToSave.phone,
-                      //   "+234",
-                      //   function (regErr, regRes) {
-                      //     console.log("In Registration...");
-                      //     if (regErr) {
-                      //       return res.status(400).jsonp(regErr);
-                      //       console.log(regErr);
-                      //       //   RESPONSE.send('There was some error registering the user.');
-                      //     } else if (regRes) {
-                      //       console.log(regRes);
-                      //       authy.request_sms(regRes.user.id, function (
-                      //         smsErr,
-                      //         smsRes
-                      //       ) {
-                      //         console.log("Requesting SMS...");
-                      //         if (smsErr) {
-                      //           return res.status(400).jsonp(smsErr);
-                      //           console.log(smsErr);
-                      //           //   RESPONSE.send('There was some error sending OTP to cell phone.');
-                      //         } else if (smsRes) {
-                      //           console.log("Twilio response here", smsRes);
-                      //           return MODEL.userModel.updateOne(
-                      //             { email: dataToSave.email },
-                      //             { $set: { id: regRes.user.id } },
-                      //             (err, res) => {
+                     /*Bypass verification for testing purposes*/
 
-                      //               if (err) return RESPONSE.status(400).jsonp(err)
-                      //               MODEL.userModel
-                      //                 .find({ email: dataToSave.email })
-                      //                 .then((res) => {
-                      //                   console.log(
-                      //                     "The id I am looking for",
-                      //                     res[0]
-                      //                   );
-
-                      //                   let UserData = {
-                      //                     email: RESULT.email,
-                      //                     phoneNumber: RESULT.phoneNumber,
-                      //                     username: RESULT.username,
-                      //                     roles: RESULT.roles,
-                      //                     id: res[0].id,
-                      //                   };
-                      //                   return RESPONSE.status(200).jsonp(
-                      //                     COMMON_FUN.sendSuccess(
-                      //                       CONSTANTS.STATUS_MSG.SUCCESS
-                      //                         .DEFAULT,
-                      //                       UserData
-                      //                     )
-                      //                   );
-
-                      //                   console.log(
-                      //                     "All response here",
-                      //                     resUpdate[0]
-                      //                   );
-                      //                 })
-                      //                 .catch((err) =>{
-                      //                   return RESPONSE.status(500).jsonp(err)
-
-                      //                 }
-                      //                 );
-
-                      //               // MODEL.userModel.find({"email": dataToSave.email}).then(res=>console.log("All response here", res[0])).catch(err=> RESPONSE.status(400).jsonp(err))
-                      //               // console.log(res);
-                      //             }
-                      //           );
-                      //           console.log(smsRes);
-                      //           //   RESPONSE.send('OTP Sent to the cell phone.');
-                      //         }
-                      //       });
-                      //     }
+                      // MODEL.userModel.updateOne(
+                      //   { phone: phone },
+                      //   { verified: true },
+                      //   (res) => {
+              
+                      //     MODEL.userModel
+                      //       .findOne({ "phone": phone }, (err,USER) => {
+              
+                      //         var test = JSON.parse(JSON.stringify(USER))
+              
+                      //         if (err) return RESPONSE.status(400).jsonp(error)
+                      //         console.log("user here at all", USER)
+                      //         var jwtToken = COMMON_FUN.createToken(
+                      //           test
+                      //         ); /** creating jwt token */
+                      //         console.log("user token here at all", USER)
+                      //         test.token = jwtToken;
+                      //         return RESPONSE.jsonp(test);
+                                
+                      //       })
                       //   }
                       // );
-                      MODEL.userModel.updateOne(
+
+
+                      MODEL.userModel.updateOne(  
                         { email: RESULT.email },
                         { $set: { cardID: card_id } },
                         (res) => {
+
+                          //BYPASS FOR TESTING PURPOSE
+                          MODEL.userModel
+                          .findOne({ cardID: card_id }, (err,USER) => {
+            
+                            var test = JSON.parse(JSON.stringify(USER))
+            
+                            if (err) return RESPONSE.status(400).jsonp(error)
+                            console.log("user here at all", USER)
+                            var jwtToken = COMMON_FUN.createToken(
+                              test
+                            ); /** creating jwt token */
+                            console.log("user token here at all", USER)
+                            test.token = jwtToken;
+                            return RESPONSE.status(200).jsonp(
+                              COMMON_FUN.sendSuccess(
+                                CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                                test
+                              )
+                            );
+                              
+                          })
+
+
+
                           console.log(res);
                         }
                       );
                     }
                   );
                 }
-              );
-              console.log("Card details here", need);
-
-              // let UserData = {
-              //   email: RESULT.email,
-              //   phoneNumber: RESULT.phoneNumber,
-              //   username: RESULT.username,
-              //   roles: RESULT.roles,
-              //   id: resUpdate[0].id
-
-              // };
-              // RESPONSE.status(200).jsonp(
-              //   COMMON_FUN.sendSuccess(
-              //     CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-              //     UserData
-              //   )
-              // );
-
-              let UserData = {
-                email: RESULT.email,
-                phone: RESULT.phone,
-                username: RESULT.username,
-                roles: RESULT.roles,
-              };
-              return RESPONSE.status(200).jsonp(
-                COMMON_FUN.sendSuccess(
-                  CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-                  UserData
-                )
-              );
+              );         
             }
           });
         }

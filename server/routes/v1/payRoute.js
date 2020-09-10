@@ -12,5 +12,8 @@ module.exports = (APP) => {
         .get(CONTROLLER.payController.getBanks);
         
     APP.route('/api/resolve/account')
-        .post(CONTROLLER.payController.resolveAccount);
+        .get(CONTROLLER.payController.resolveAccount);
+
+    APP.route('/api/payment/receipt')
+        .post(CONTROLLER.payController.saveReceipt);
 }

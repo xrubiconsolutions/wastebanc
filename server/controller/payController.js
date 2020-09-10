@@ -12,16 +12,17 @@ let CONSTANTS = require("../util/constants");
 let FS = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
+const https = require('https')
 
 payController.getBanks = (req, res) => {
   request(
     {
-      url: "https://api.flutterwave.com/v3/banks/NG",
+      url: "https://api.paystack.co/bank",
       method: "GET",
       headers: {
         Accept: "application/json",
         "Accept-Charset": "utf-8",
-        Authorization: `Bearer FLWSECK_TEST-cf7dcc9bff513482affd9dab1b7bf7ce-X`,
+        Authorization: `Bearer sk_test_a9fa4b3ea294cde982654ac464b9f3e20e90a24c`,
       },
       json: true,
     },
@@ -33,81 +34,63 @@ payController.getBanks = (req, res) => {
 };
 
 payController.resolveAccount = (req, res) => {
-  const account_number = req.body.account_number;
-  const bank_code = req.body.account_bank;
+  const account_number = req.query.account_number;
+  const bank_code = req.query.bank_code
 
   request(
     {
-      url: "https://api.flutterwave.com/v3/accounts/resolve",
-      method: "POST",
+      url: `https://api.paystack.co/bank/resolve?account_number=${account_number}&bank_code=${bank_code}`,
+      method: "GET",
       headers: {
-        Accept: "application/json",
+        "Accept": "application/json",
         "Accept-Charset": "utf-8",
-        Authorization: `Bearer FLWSECK_TEST-cf7dcc9bff513482affd9dab1b7bf7ce-X`,
+        "Authorization": `Bearer sk_test_a9fa4b3ea294cde982654ac464b9f3e20e90a24c`,
       },
-      json: true,
-      body: {
-            "account_number": `${account_number}`,
-            "account_bank": `${bank_code}`,  
-      },
+      json: true,  
     },
     (err, result) => {
+        console.log("err=>", err)
       if (err) return res.status(400).json(err);
-      return res.status(200).json(result);
+      return res.status(200).json(result.body.data);
     }
   );
 };
 
-payController.listOrganisation = (req, res) => {
+payController.saveReceipt = (req, res) => {
   let errors = {};
+  const receipt = { ...req.body }
+  // let userId = req.body.userId;
+  // let fullname = req.body.fullname;
+  // let bankAcNo = req.body.bankAcNo;
+  // let bankName = req.body.bankName;
+  let cardID = req.body.cardID;
+  let amount = req.body.amount;
+  var balance;
 
-  MODEL.organisationModel
-    .find({})
-    .then((result) => {
-      //  if (err) {
-      //   errors.message = "There was an issue fetching the organisations"
-      //   return res.status(400).jsonp(errors)
-      //  }
-      return res.status(200).jsonp(result);
-    })
-    .catch((err) => res.status(400).jsonp(err));
+
+  MODEL.userModel.findOne({ "cardID" : cardID }).then((result, err)=>{
+          if(!result) return res.status(400).json({message: "Enter a valid card ID"})
+          if(result){
+              balance = result.availablePoints - amount
+              if( balance <= 0 ) {
+                return res.status(406).json({message: "You don't have enough points to complete this transaction"})
+              }
+              MODEL.userModel.updateOne({cardID: cardID}, {availablePoints: balance }, (err,resp)=>{
+                  MODEL.payModel(receipt).save({},(err, result) => {
+                    console.log("error here", err);
+                    if (err)
+                      return res
+                        .status(400)
+                        .json({ message: "Could not save receipt" });
+                    console.log(result);
+                    return res.status(201).json(result)
+                  })
+              })
+          }
+  })
 };
 
-payController.agentApproval = (req, res) => {
-  const agentID = req.body.agentID;
-  const organisationID = req.body.organisationID;
-  if (!organisationID) {
-    return res
-      .status(400)
-      .jsonp({ message: "The recycler's ID and organisation ID is required" });
-  }
-  MODEL.collectorModel.updateOne(
-    { _id: agentID },
-    { verified: true, approvedBy: organisationID },
-    (err, resp) => {
-      if (err) {
-        return res.status(400).jsonp(err);
-      }
-      console.log("approved by us");
-      return res.jsonp({ message: "You just approved a recycler" });
-    }
-  );
-};
 
-payController.agentDecline = (req, res) => {
-  const agentID = req.body.agentID;
 
-  MODEL.collectorModel.updateOne(
-    { _id: agentID },
-    { verified: false },
-    (err, resp) => {
-      if (err) {
-        return res.status(400).jsonp(err);
-      }
-      return res.jsonp({ message: "You just declined a recycler's request " });
-    }
-  );
-};
-
-/* export payControllers */
+/* export payController */
 module.exports = payController;

@@ -13,12 +13,6 @@ const ALLFILES     = require("./../filebundle");
 const SWAGGER      = require('./swagger/swagger_lib/swagger-express');
 const PATH         = require("path");
 const BOOTSTRAPING = require("../server/util/Bootstraping/Bootstraping");
-// const OpenTok = require('opentok');
-
-// const apiKey = "46903784"
-// const secret = "7c433b3970838bffa4ec979d8337c19a8962fba8"
-
-// var opentok = new OpenTok(apiKey, secret);
 
 
 const cors = require("cors");
@@ -29,41 +23,41 @@ const cors = require("cors");
 
 
 
-const PubNub = require('pubnub');
-const uuid = PubNub.generateUUID();
-const pubnub = new PubNub({
-  publishKey: "pub-c-fc18a8e9-3662-4d35-89e9-e71e91cc4fd0",
-  subscribeKey: "sub-c-169862d4-e21e-11ea-89a6-b2966c0cfe96",
-  uuid: uuid
-});
+// const PubNub = require('pubnub');
+// const uuid = PubNub.generateUUID();
+// const pubnub = new PubNub({
+//   publishKey: "pub-c-fc18a8e9-3662-4d35-89e9-e71e91cc4fd0",
+//   subscribeKey: "sub-c-169862d4-e21e-11ea-89a6-b2966c0cfe96",
+//   uuid: uuid
+// });
 
-const publishConfig = {
-  channel: "pubnub_onboarding_channel",
-  message: {"sender": uuid, "content": "Hello From Packam"}
-}
+// const publishConfig = {
+//   channel: "pubnub_onboarding_channel",
+//   message: {"sender": uuid, "content": "Hello From Packam"}
+// }
 
-pubnub.addListener({
-  message: function(message) {
-    console.log(message);
-  },
-  presence: function(presenceEvent) {
-    console.log(presenceEvent);
-  }
-})
+// pubnub.addListener({
+//   message: function(message) {
+//     console.log(message);
+//   },
+//   presence: function(presenceEvent) {
+//     console.log(presenceEvent);
+//   }
+// })
 
-pubnub.subscribe({
-  channels: ["pubnub_onboarding_channel"],
-  withPresence: true,
-});
+// pubnub.subscribe({
+//   channels: ["pubnub_onboarding_channel"],
+//   withPresence: true,
+// });
 
-pubnub.publish(publishConfig, function(status, response) {
-  console.log(status, response);
-});
+// pubnub.publish(publishConfig, function(status, response) {
+//   console.log(status, response);
+// });
 
 
-pubnub.publish(publishConfig, function(status, response) {
-    console.log(status, response);
-  });
+// pubnub.publish(publishConfig, function(status, response) {
+//     console.log(status, response);
+//   });
 
 
 /**creating express server app for server */
@@ -71,38 +65,38 @@ const app  = EXPRESS();
 
 
 
-const Http = require("https").Server(app)
+// const Http = require("https").Server(app)
 
-const Socketio = require("socket.io")(Http);
-
-
-app.get("/api/location/realtime" , (req, res) => {
+// const Socketio = require("socket.io")(Http);
 
 
-
-
-  // var lat = req.query.lat;
-  // var long = req.query.long;
+// app.get("/api/location/realtime" , (req, res) => {
 
 
 
-  const locations = [];
-  Socketio.on("connection", socket => {
-    console.log(socket)
-    // return res.send({data: socket})
-    console.log("connections here", socket)
-    res.send(socket)
-              for(let i = 0 ; i < locations.length; i ++){
-                  socket.emit("location", locations[i]);
-              }
-              socket.on("location", data=>{
-                  locations.push(data);
-                  Socketio.emit("location", data)
-                    res.send({message: " " })
-        })
-  })
-}
-)
+
+//   // var lat = req.query.lat;
+//   // var long = req.query.long;
+
+
+
+//   const locations = [];
+//   Socketio.on("connection", socket => {
+//     console.log(socket)
+//     // return res.send({data: socket})
+//     console.log("connections here", socket)
+//     res.send(socket)
+//               for(let i = 0 ; i < locations.length; i ++){
+//                   socket.emit("location", locations[i]);
+//               }
+//               socket.on("location", data=>{
+//                   locations.push(data);
+//                   Socketio.emit("location", data)
+//                     res.send({message: " " })
+//         })
+//   })
+// }
+// )
 
 /********************************
  ***** Server Configuration *****
