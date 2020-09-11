@@ -78,6 +78,9 @@ const schedulePick = new Schema({
     comment: {
         type: String
     },
+    organisationCollection:{  //Organisation ID
+        type: String
+    },
     lat: {
         type: Number,
         required: true

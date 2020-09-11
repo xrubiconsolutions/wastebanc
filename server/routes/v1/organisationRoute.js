@@ -20,5 +20,30 @@ module.exports = (APP) => {
     
     APP.route('/api/decline/organisation')
         .post(CONTROLLER.organisationController.agentDecline);
+    
+    APP.route('/api/schedule/organisation')
+        .get(CONTROLLER.organisationController.organisationSchedules);
+
+    APP.route('/api/recyclers/organisation')
+        .get(CONTROLLER.organisationController.approvedAgents);
+      
+    APP.route('/api/coins/organisation')
+        .get(CONTROLLER.organisationController.coinBank);
+
+    APP.route('/api/weight/organisation')
+        .get(CONTROLLER.organisationController.wasteCounter);
+
+    APP.route('/api/transactions/organisation')
+        .get(CONTROLLER.organisationController.numberTransaction);
+
+    APP.route('/api/totalSchedules/organisation')
+        .get(CONTROLLER.organisationController.totalSchedules);
+
+    APP.route('/api/transaction/history/organisation')
+        .get(CONTROLLER.organisationController.totalSchedules);
+      
+      
+      
+           
            
 };

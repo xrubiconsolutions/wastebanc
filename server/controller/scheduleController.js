@@ -198,7 +198,7 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
 
   MODEL.collectorModel
     .findOne({ email: REQUEST.body.client }, {}, { lean: true })
-    .then((result) => {
+    .then((results) => {
       // if (result.roles != "collector") {
       //   errors.message = "Only a collector can accept or decline an offer";
       //   return RESPONSE.status(400).jsonp(errors);
@@ -207,7 +207,7 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
 
       // CHeck for multiple accept
 
-      if(result) {
+      if(results) {
 
         MODEL.scheduleModel.findOne({"_id": REQUEST.body._id }).then((result,err)=>{
           if(err) return RESPONSE.status(400).json(err)
@@ -215,11 +215,13 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
             return RESPONSE.status(400).json({message: "This schedule had been accepted by another collector"})
           }
         
+          console.log("Is this a collector", results)
         MODEL.scheduleModel
         .updateOne(
           { "_id": REQUEST.body._id , "collectorStatus": "decline" },
           { $set: { "collectorStatus": "accept",
-                    collectedBy: result._id
+                    collectedBy: results._id,
+                    organisationCollection: results.approvedBy
           }}
         )
         .then((SUCCESS) => {
@@ -266,6 +268,8 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
   };
   var errors = {};
   var updates = [];
+  var data = REQUEST.body.schedules;
+  var len = data.length;
 
   try{
 
@@ -274,39 +278,36 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
       if(error) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(error));
       
      
-
       else {
 
-        REQUEST.body.schedules.every(picks => {
-          MODEL.scheduleModel
-          .updateOne(
-            { "_id" : picks._id},
-            {$set: { "collectorStatus" : "accept",
-          
-            collectedBy: result._id
 
-          }}, 
 
-            (err,res)=>{
-              if(!res.nModified) {
-                 RESPONSE.status(400).jsonp({message: "This schedule has already been accepted by another recycler"})
-                 return false;
-              }
+        for (var i = 0 ; i < len ; i++){
+            MODEL.scheduleModel
+            .updateOne(
+              { "_id" : data[i]._id},
+              {$set: { "collectorStatus" : "accept",
+            
+              collectedBy: result._id,
+              organisationCollection: result.approvedBy
+            }}, 
+  
+              (err,res)=>{
+                if(!res.nModified) {
+                    console.log("Index here is", i)
+                   return RESPONSE.status(400).jsonp({message: "This schedule has already been accepted by another recycler"})
+                   return false;
+                }
 
-              
-              RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
-              return true
-              console.log(res)
-            }
-          )
+                }
+            )
+
         }
-    );
-    
-    
-      }
 
-    
-      
+        return RESPONSE.status(200).jsonp({message: "All schedules accepted successfully"});           
+
+
+      } 
     })
   }
   catch(err){
@@ -477,25 +478,38 @@ scheduleController.rewardSystem = (req, resp) => {
                                   
                         } }, (err,res)=>{
                           console.log("Was this actually updated", res)
-                          var dataToSave = {
 
-                            "weight": quantity,
-                          
-                            "coin": response.body.content.data.point,
-                          
-                            "cardID": result.cardID,
+                          MODEL.collectorModel.findOne({"_id": collectorID}).then((recycler, err)=>{
+                            console.log("All i need here", recycler)
+                            console.log("Whatsyo", err)
 
-                            "scheduleId": schedule[0]._id,
-                          
-                            "completedBy": collectorID,
+                            var dataToSave = {
 
-                            "Category": schedule[0].Category
-                          }
+                              "weight": quantity,
+                            
+                              "coin": response.body.content.data.point,
+                            
+                              "cardID": result.cardID,
+  
+                              "scheduleId": schedule[0]._id,
+                            
+                              "completedBy": collectorID,
+  
+                              "Category": schedule[0].Category,
+
+                              "fullname": recycler.fullname,
+  
+                              "organisationID" : recycler.approvedBy
+                            }
+                                
                           MODEL.transactionModel(dataToSave).save({}, (ERR, RESULT) => {
                             
                             if(ERR) return resp.status(400).jsonp(ERR)
                               console.log("Transaction saved on database", RESULT)
                            })
+
+                          })
+                     
                         }
                       );
                     } 

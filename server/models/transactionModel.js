@@ -10,6 +10,10 @@ const transaction_Schema = {
     required: true,
   },
 
+  fullname: {
+    type: String,
+    required: true
+  },
   coin: {
     type: Number,
     required: true,
@@ -32,6 +36,9 @@ const transaction_Schema = {
   Category: {
     type: String,
     required: true,
+  },
+  organisationID : {
+    type: String
   },
   createdAt: {
     type: Date,
