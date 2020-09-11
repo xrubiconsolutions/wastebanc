@@ -71,12 +71,12 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                       let card_id = res.body.content.data.cardID;
                       need = { cardID: card_id, ...RESULT };
 
-                      const accountSid = "AC0e54e99aff7296ab5c7bf52d86eee9d8";
-                      const authToken = "549de52669fc3ecc350232c978f52bb0";
+                      const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
+                      const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
                       const client = require("twilio")(accountSid, authToken);
 
                       client.verify
-                        .services("VAd381ebb546a1c58a240474d1a16ee26b")
+                        .services("VA703183e103532fd4fe69da94ef2c12c1")
                         .verifications.create({
                           to: `+234${dataToSave.phone}`,
                           channel: "sms",
@@ -379,6 +379,7 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
   var error = {};
   var token = REQUEST.body.token;
   var phone = REQUEST.body.phone;
+
   const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
   const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
   const client = require("twilio")(accountSid, authToken);
@@ -396,18 +397,22 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
           { phone: phone },
           { verified: true },
           (res) => {
-            MODEL.collectorModel.findOne({ phone: phone }, (err, USER) => {
-              var test = JSON.parse(JSON.stringify(USER));
 
-              if (err) return RESPONSE.status(400).jsonp(error);
-              console.log("user here at all", USER);
-              var jwtToken = COMMON_FUN.createToken(
-                test
-              ); /** creating jwt token */
-              console.log("user token here at all", USER);
-              test.token = jwtToken;
-              return RESPONSE.jsonp(test);
-            });
+            MODEL.collectorModel
+              .findOne({ "phone": phone }, (err,USER) => {
+
+                var test = JSON.parse(JSON.stringify(USER))
+
+                if (err) return RESPONSE.status(400).jsonp(error)
+                console.log("user here at all", USER)
+                var jwtToken = COMMON_FUN.createToken(
+                  test
+                ); /** creating jwt token */
+                console.log("user token here at all", USER)
+                test.token = jwtToken;
+                return RESPONSE.jsonp(test);
+                  
+              })
           }
         );
       }
