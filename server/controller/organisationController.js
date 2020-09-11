@@ -159,7 +159,7 @@ organisationController.numberTransaction = (req, res) => {
     .catch((err) => res.status(500).json(err));
 };
 
-organisationController.totalSchedules = (req, res) => {
+organisationController.historyTransaction = (req, res) => {
   const organisationID = req.query.organisationID;
 
   MODEL.transactionModel

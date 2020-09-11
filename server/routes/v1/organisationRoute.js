@@ -40,7 +40,7 @@ module.exports = (APP) => {
         .get(CONTROLLER.organisationController.totalSchedules);
 
     APP.route('/api/transaction/history/organisation')
-        .get(CONTROLLER.organisationController.totalSchedules);
+        .get(CONTROLLER.organisationController.historyTransaction);
       
       
       
