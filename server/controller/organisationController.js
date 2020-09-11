@@ -175,5 +175,21 @@ organisationController.historyTransaction = (req, res) => {
 };
 
 
+organisationController.totalSchedules = (req, res) => {
+  const organisationID = req.query.organisationID;
+
+  MODEL.transactionModel
+    .find({ organisationID : organisationID })
+    .sort({ _id: -1 })
+    .then((result, err) => {
+      var len = result.length
+      if (err) return res.status(400).json(err);
+      return res.status(200).json({
+        data : len
+      });
+    })
+    .catch((err) => res.status(500).json(err));
+};
+
 /* export organisationControllers */
 module.exports = organisationController;
