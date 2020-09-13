@@ -43,7 +43,7 @@ reportController.report = (req, res) => {
             return;
           }
           var tokenOptions = {};
-          tokenOptions.expireTime = 2592000
+          tokenOptions.expireTime = (Date.now() / 1000 ) +  2592000
 
           // generate token
           token = opentok.generateToken(session.sessionId, tokenOptions);
