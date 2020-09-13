@@ -42,11 +42,11 @@ reportController.report = (req, res) => {
             res.status(500).send({ error: "createSession error:" + err });
             return;
           }
-
-          // roomToSessionIdDictionary[roomName] = session.sessionId;
+          var tokenOptions = {};
+          tokenOptions.expireTime = 2592000
 
           // generate token
-          token = opentok.generateToken(session.sessionId);
+          token = opentok.generateToken(session.sessionId, tokenOptions);
           MODEL.reportModel({
             apiKey: apiKey,
             sessionID: session.sessionId,
