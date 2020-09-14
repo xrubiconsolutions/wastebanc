@@ -65,7 +65,7 @@ reportController.report = (req, res) => {
           res.setHeader("Content-Type", "application/json");
           return res.json({
             apiKey: apiKey,
-            sessionId: session.sessionId,
+            sessionID: session.sessionId,
             token: token,
           });
         });
