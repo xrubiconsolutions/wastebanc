@@ -41,8 +41,14 @@ module.exports = (APP) => {
 
     APP.route('/api/transaction/history/organisation')
         .get(CONTROLLER.organisationController.historyTransaction);
+
+     APP.route('/api/all/recyclers')
+        .get(CONTROLLER.organisationController.allRecyclers);
+
+    APP.route('/api/all/users')
+        .get(CONTROLLER.organisationController.allUsers);
       
-      
+    
       
            
            

@@ -191,5 +191,46 @@ organisationController.totalSchedules = (req, res) => {
     .catch((err) => res.status(500).json(err));
 };
 
+
+
+organisationController.allRecyclers = (req, res) => {
+
+  try {
+    const page = parseInt(req.query.page)
+
+    const PAGE_SIZE = 10;                      
+    const skip = (page - 1) * PAGE_SIZE;     // For page 1, the skip is: (1 - 1) 
+
+    MODEL.collectorModel.find({}).skip(skip).limit(PAGE_SIZE).then((result , err)=>{
+            if(err) return res.status(400).json(err)
+            return res.status(200).json(result)
+    })
+
+  } catch(e){
+    return res.status(500).json(e)
+  }
+
+}
+
+
+
+organisationController.allUsers = (req,res)=>{
+  try{
+
+    const page = parseInt(req.query.page)
+
+    const PAGE_SIZE = 10;                      
+    const skip = (page - 1) * PAGE_SIZE;     // For page 1, the skip is: (1 - 1) 
+
+    MODEL.userModel.find({}).skip(skip).limit(PAGE_SIZE).then((result , err)=>{
+            if(err) return res.status(400).json(err)
+            return res.status(200).json(result)
+    })
+  }
+  catch(e){
+      return res.status(500).json(e)
+  }
+}
+
 /* export organisationControllers */
 module.exports = organisationController;

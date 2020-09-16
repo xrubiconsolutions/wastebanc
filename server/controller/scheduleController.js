@@ -794,7 +794,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
       .sort({ _id: -1 })
       .then((schedules) => {
         schedules.forEach((schedule, index) => {
-          var test = schedule.address.split(",");
+          var test = schedule.address.split(", ");
           (function route() {
             for (let i = 0; i < accessArea.length; i++) {
               for (let j = 0; j < test.length; j++) {
