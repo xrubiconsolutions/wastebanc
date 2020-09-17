@@ -47,9 +47,16 @@ module.exports = (APP) => {
 
     APP.route('/api/all/users')
         .get(CONTROLLER.organisationController.allUsers);
+
+    APP.route('/api/recycler/payment/receipt')
+        .post(CONTROLLER.organisationController.payRecyclers);
       
-    
+    APP.route('/api/recycler/payment/log')
+        .post(CONTROLLER.organisationController.paymentLog);
       
+    APP.route('/api/recycler/payment/history')
+        .get(CONTROLLER.organisationController.getAllTransactions);
+       
            
            
 };

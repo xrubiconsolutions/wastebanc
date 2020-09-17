@@ -70,6 +70,12 @@ const collector_Schema = new Schema({
   },
   approvedBy: {
     type: String
+  },
+  lat : {
+    type: String
+  },
+  long : {
+    type :String
   }
 });
 

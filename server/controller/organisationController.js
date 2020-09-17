@@ -232,5 +232,86 @@ organisationController.allUsers = (req,res)=>{
   }
 }
 
+
+
+organisationController.payRecyclers = (req,res)=>{
+
+  const receipt = { ... req.body }
+
+    try {
+
+        MODEL.companyReceiptModel.findOne({transaction_id: receipt.transaction_id}).then((result, err)=>{
+          if(result) return res.status(400).json({message: "This transaction had already been saved on the database"})
+
+          MODEL.companyReceiptModel(receipt).save({}, (ERR, RESULT) => {
+
+            if(ERR) return res.status(400).json(ERR)
+    
+            return res.status(200).json(RESULT)
+    
+        })
+
+        })
+       
+
+    }
+
+    catch (err){
+        return res.status(500).json(err)
+    }
+
+
+}
+
+
+organisationController.paymentLog = (req,res)=>{
+
+
+  const log = { ... req.body }
+
+    try {
+
+        MODEL.paymentLogModel.findOne({receiptId: log.receiptId}).then((result, err)=>{
+          console.log("opoor ye ye",result)
+          if(result) return res.status(400).json({message: "This log had already been saved on the database"})
+
+          MODEL.paymentLogModel(log).save({}, (ERR, RESULT) => {
+
+            if(ERR) return res.status(400).json(ERR)
+    
+            return res.status(200).json(RESULT)
+    
+        })
+
+        })
+       
+
+    }
+
+    catch (err){
+        return res.status(500).json(err)
+    }
+
+
+}
+
+
+
+organisationController.getAllTransactions = (req,res)=>{
+  
+  const organisationID = req.query.organisationID;
+
+  MODEL.paymentLogModel
+  .find({ companyId : organisationID })
+  .sort({ _id: -1 })
+  .then((result, err) => {
+    if (err) return res.status(400).json(err);
+    return res.status(200).json({
+      data : result
+    });
+  })
+  .catch((err) => res.status(500).json(err));
+}
+
 /* export organisationControllers */
 module.exports = organisationController;

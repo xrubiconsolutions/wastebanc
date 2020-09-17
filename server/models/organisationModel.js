@@ -42,6 +42,9 @@ const organisation_Schema = new Schema({
   canEquivalent:{
     type: Number
   },
+  cartonEquivalent : {
+    type : Number
+  },
   petBottleEquivalent :{
     type: Number
   },
