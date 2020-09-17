@@ -56,7 +56,18 @@ module.exports = (APP) => {
       
     APP.route('/api/recycler/payment/history')
         .get(CONTROLLER.organisationController.getAllTransactions);
+    
+    APP.route('/api/organisation/month/chart')
+        .get(CONTROLLER.organisationController.monthChartData);
+    
+    APP.route('/api/organisation/third/chart')
+        .get(CONTROLLER.organisationController.thirdChartData);
        
-           
-           
+    APP.route('/api/organisation/forth/chart')
+        .get(CONTROLLER.organisationController.forthChartData);
+       
+    APP.route('/api/organisation/week/chart')
+        .get(CONTROLLER.organisationController.weekChartData);
+       
+                   
 };
