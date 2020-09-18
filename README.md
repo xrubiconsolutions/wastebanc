@@ -1,9 +1,5 @@
-# Run Node JS Back-End with Dockerfile [ Express Framework and Swagger Documentation ]
 
 
-
-`NodeJS v8+`
-+ *`Ref:`* http://nodejs.org
 
 ## Run Locally with Node
 + Go to project working directory / Project folder
