@@ -12,7 +12,6 @@ let FS = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
 
-var authy = require("authy")("YHRjYqZNqXhIIUJ8oC7MIYKUZ6BN2pee");
 
 collectorController.registerCollector = (REQUEST, RESPONSE) => {
   // RESPONSE.jsonp(REQUEST.body);
@@ -24,7 +23,16 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
     else {
       dataToSave.password = PASSWORD;
       var errors = {};
-      MODEL.collectorModel.findOne({ email: dataToSave.email , fullname : dataToSave.fullname }).then((user) => {
+      MODEL.collectorModel.findOne({
+        
+        
+       "$or": [{
+          "email": dataToSave.email
+      }, {
+          "fullname": dataToSave.fullname
+      }]
+        
+      }).then((user) => {
         if (user) {
           errors.email = "Email already exists";
           RESPONSE.status(400).jsonp(errors);

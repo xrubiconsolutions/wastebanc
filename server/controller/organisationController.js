@@ -13,24 +13,104 @@ let FS = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
 
-organisationController.createOrganisation = (req, res) => {
+organisationController.createOrganisation = (req, RESPONSE) => {
   const organisation_data = { ...req.body };
   const errors = {};
-  MODEL.organisationModel
-    .findOne({ companyName: organisation_data.companyName })
-    .then((user) => {
-      if (user) {
-        errors.email = "Company already exists";
-        RESPONSE.status(400).jsonp(errors);
-      } else {
-        MODEL.organisationModel(organisation_data).save({}, (ERR, RESULT) => {
-          if (ERR) return res.status(400).json(ERR);
-          return res.status(200).json(RESULT);
+  const password =   organisation_data.companyName + "-" +COMMON_FUN.generateRandomString()
+  console.log("Password generate", password)
+
+  try {
+
+    COMMON_FUN.encryptPswrd(password, (ERR, PASSWORD) => {
+      if (ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+      else {
+         organisation_data.password = PASSWORD;
+        var errors = {};
+        MODEL.organisationModel.findOne({ 
+          
+          "$or": [{
+            "email": organisation_data.email
+        }, {
+            "companyName": organisation_data.companyName
+        }]
+           }).then((user) => {
+          if (user) {
+            errors.email = "Company already exists";
+            RESPONSE.status(400).jsonp(errors);
+          } else {
+            MODEL.organisationModel(organisation_data).save({}, (ERR, RESULT) => {
+              if (ERR) RESPONSE.status(400).jsonp(ERR);
+              else {
+                        return RESPONSE.status(200).json(RESULT)
+              }
+            });
+          }
         });
       }
-    })
-    .catch((err) => res.status(500).json(err));
+    });
+  
+  }
+
+  catch (err) {
+
+    return RESPONSE.status(500).json(err)
+  }
+  
+
+  // MODEL.organisationModel
+  //   .findOne({ companyName: organisation_data.companyName })
+  //   .then((user) => {
+  //     if (user) {
+  //       errors.email = "Company already exists";
+  //       RESPONSE.status(400).jsonp(errors);
+  //     } else {
+  //       MODEL.organisationModel(organisation_data).save({}, (ERR, RESULT) => {
+  //         if (ERR) return res.status(400).json(ERR);
+  //         return res.status(200).json(RESULT);
+  //       });
+  //     }
+  //   })
+  //   .catch((err) => res.status(500).json(err));
 };
+
+organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
+
+  var PROJECTION = { __v: 0, createAt: 0 };
+
+/** find user is exists or not */
+MODEL.organisationModel
+  .findOne({ email: REQUEST.body.email }, PROJECTION, { lean: true })
+  .then((USER) => {
+    USER /** matching password */
+      ? COMMON_FUN.decryptPswrd(
+          REQUEST.body.password,
+          USER.password,
+          (ERR, MATCHED) => {
+            if (ERR)
+              return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+            else if (!MATCHED)
+              return RESPONSE.status(400).jsonp(
+                COMMON_FUN.sendSuccess(
+                  CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
+                )
+              );
+            else {
+              var jwtToken = COMMON_FUN.createToken(
+                USER
+              ); /** creating jwt token */
+              USER.token = jwtToken;
+              return RESPONSE.jsonp(USER);
+            }
+          }
+        )
+      : RESPONSE.status(400).jsonp(
+          COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+        );
+  })
+  .catch((err) => {
+    return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err));
+  });
+}
 
 organisationController.listOrganisation = (req, res) => {
   let errors = {};

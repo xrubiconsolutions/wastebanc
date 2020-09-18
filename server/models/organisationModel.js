@@ -18,6 +18,10 @@ const organisation_Schema = new Schema({
     required: true,
     unique: true,
   },
+  password: {
+    type: String,
+    required: true
+  },
   rcNo: {
     type: String,
     required: true,

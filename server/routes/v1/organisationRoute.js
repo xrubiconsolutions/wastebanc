@@ -11,7 +11,11 @@ module.exports = (APP) => {
 
     APP.route('/api/create/organisation')
         .post(CONTROLLER.organisationController.createOrganisation);
+    
+    APP.route('/api/login/organisation')
+        .post(CONTROLLER.organisationController.loginOrganisation);
         
+
     APP.route('/api/check/organisation')
         .get(CONTROLLER.organisationController.listOrganisation);
 
