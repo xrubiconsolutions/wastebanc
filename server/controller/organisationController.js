@@ -530,7 +530,7 @@ organisationController.weekChartData = (req, res) => {
 organisationController.raffleTicket = (req, res) => {
   try {
     MODEL.userModel
-      .aggregate([{ $sample: { size: 1 } }])
+      .aggregate([{ $sample: { size: 1 } }, { $match : { roles : "client" } }])
       .then((result, err) => {
         if (err) return res.status(400).json(err);
         return res.status(200).json( { winner : result[0]} );
