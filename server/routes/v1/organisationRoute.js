@@ -68,6 +68,9 @@ module.exports = (APP) => {
        
     APP.route('/api/organisation/week/chart')
         .get(CONTROLLER.organisationController.weekChartData);
+    
+    APP.route('/api/organisation/raffle')
+        .get(CONTROLLER.organisationController.raffleTicket);
        
                    
 };
