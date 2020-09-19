@@ -218,7 +218,7 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
           console.log("Is this a collector", results)
         MODEL.scheduleModel
         .updateOne(
-          { "_id": REQUEST.body._id , "collectorStatus": "decline" },
+          { "_id": REQUEST.body._id },
           { $set: { "collectorStatus": "accept",
                     collectedBy: results._id,
                     organisationCollection: results.approvedBy
@@ -822,7 +822,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
 
 
         });
-        var geoSchedules = geofencedSchedules.filter(x=>x.completionStatus !== "completed")
+        var geoSchedules = geofencedSchedules.filter(x=>(x.completionStatus !== "completed" && x.completionStatus !== "cancelled" && x.completionStatus !== "missed"))
         RESPONSE.jsonp(
           COMMON_FUN.sendSuccess(
             CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
