@@ -105,17 +105,20 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                 }
               );
               console.log("Card details here", need);
-              MODEL.organisationModel.findOne({companyName: REQUEST.body.organisation}).then(organisation=>{
 
-                MODEL.collectorModel.updateOne(
-                  { email: RESULT.email },
-                  { $set: { areaOfAccess : organisation.areaOfAccess } },
-                  (res) => {
-                    console.log(res);
-                  }
-                );
+                /*  revamped to setup */
 
-              }).catch(err=>RESPONSE.status(500).json(err))
+              // MODEL.organisationModel.findOne({companyName: REQUEST.body.organisation}).then(organisation=>{
+
+              //   MODEL.collectorModel.updateOne(
+              //     { email: RESULT.email },
+              //     { $set: { areaOfAccess : organisation.areaOfAccess } },
+              //     (res) => {
+              //       console.log(res);
+              //     }
+              //   );
+
+              // }).catch(err=>RESPONSE.status(500).json(err))
 
               let UserData = {
                 email: RESULT.email,

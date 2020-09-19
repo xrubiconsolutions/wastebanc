@@ -293,11 +293,11 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
             }}, 
   
               (err,res)=>{
-                if(!res.nModified) {
-                    console.log("Index here is", i)
-                   return RESPONSE.status(400).jsonp({message: "This schedule has already been accepted by another recycler"})
-                   return false;
-                }
+                // if(!res.nModified) {
+                //     console.log("Index here is", i)
+                //    return RESPONSE.status(400).jsonp({message: "This schedule has already been accepted by another recycler"})
+                //    return false;
+                // }
 
                 }
             )
