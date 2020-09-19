@@ -414,9 +414,12 @@ scheduleController.rewardSystem = (req, resp) => {
     // ]
   };
 
+  try {
+
 
   MODEL.scheduleModel.find({ _id: req.body._id }).then((schedule) => {
     // console.log("Whats going on here", schedule )
+    if(!schedule[0]) return resp.status(400).json({message: "This schedule is invalid"})
     MODEL.userModel.findOne({ email: schedule[0].client }).then((result) => {
       if(result.cardID == null) return res.status(400).jsonp({message: "you don't have a valid card ID"})
   MODEL.transactionModel.findOne({ scheduleId: req.body._id }).then((transaction) => {
@@ -532,6 +535,14 @@ scheduleController.rewardSystem = (req, resp) => {
     });
   }).catch(err=>resp.status(500).jsonp(err))
   });
+
+
+
+  }
+  catch(err){
+    return resp.status(500).json(err)
+  }
+
 };
 
 scheduleController.allAgentTransaction = (req, res) => {
