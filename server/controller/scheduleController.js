@@ -404,6 +404,7 @@ scheduleController.rewardSystem = (req, resp) => {
   //   if(err) return  res.status(400).jsonp(err)
   // }).catch(err=>res.status(500).jsonp(err))
 
+  if(!quantity) return resp.status(400).json({message: "Enter a valid input for the quantity"})
   const notification = {
     contents: {
       'en': `You got credited with coins from packam`,
