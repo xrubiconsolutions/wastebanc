@@ -210,7 +210,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
  **************************************************/
 userController.loginUser = (REQUEST, RESPONSE) => {
   let CRITERIA = {
-      $or: [{ username: REQUEST.body.username }, { email: REQUEST.body.email }],
+      $or: [{ username: REQUEST.body.username }],
     },
     PROJECTION = { __v: 0, createAt: 0 };
 

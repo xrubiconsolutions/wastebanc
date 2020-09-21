@@ -220,7 +220,6 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
       if(results) {
 
         MODEL.scheduleModel.findOne({"_id": REQUEST.body._id }).then((result,err)=>{
-          console.log("another one bites the dust", result)
 
           if(err) return RESPONSE.status(400).json(err)
           if(result.collectorStatus == "accept"){
@@ -238,18 +237,24 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
         )
         .then((SUCCESS) => {
 
-          MODEL.scheduleModel.find({"_id": REQUEST.body._id}).then((result, err)=>{
+          MODEL.scheduleModel.findOne({"_id": REQUEST.body._id}).then((result, err)=>{
           if(err) return RESPONSE.status(400).json(err)
 
-          // MODEL.userModel.findOne({ "email": result. })
+          MODEL.userModel.findOne({ "email": result.client }).then((result,err)=>{
+
+              console.log("Opoor yeye", result)
+            var message = { 
+              app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+              contents: {"en": "A collector just accepted your schedule"},
+              include_player_ids: [`${result.onesignal_id}`]
+            };
             
-          var message = { 
-            app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-            contents: {"en": "A collector just accepted your schedule"},
-            include_player_ids: ["6392d91a-b206-4b7b-a620-cd68e32c3a76","76ece62b-bcfe-468c-8a78-839aeaa8c5fa"]
-          };
-          
-          sendNotification(message);
+            sendNotification(message);
+
+
+          })
+            
+       
           
 
 
@@ -278,35 +283,27 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
 };
 
 scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
-  const notification = {
-    contents: {
-      'en': `A collector just accepted your schedule pick up`,
-    },
-    included_segments: ['Subscribed Users'],
-    // filters: [
-    //   { field: 'tag', key: 'level', relation: '>', value: 10 }
-    // ]
-  };
-  var errors = {};
-  var updates = [];
+
+
   var data = REQUEST.body.schedules;
   var len = data.length;
 
   try{
 
-    MODEL.collectorModel
+    MODEL.collectorModel  
     .findOne({ email: REQUEST.body.client }, {}, { lean: true }, (error, result) => {
       if(error) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(error));
       
      
       else {
 
+        var test = JSON.parse(JSON.stringify(data))
 
 
-        for (var i = 0 ; i < len ; i++){
+        for (var i = 0 ; i < test.length ; i++){
             MODEL.scheduleModel
             .updateOne(
-              { "_id" : data[i]._id},
+              { "_id" : test[i]._id},
               {$set: { "collectorStatus" : "accept",
             
               collectedBy: result._id,
@@ -314,6 +311,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
             }}, 
   
               (err,res)=>{
+
                 // if(!res.nModified) {
                 //     console.log("Index here is", i)
                 //    return RESPONSE.status(400).jsonp({message: "This schedule has already been accepted by another recycler"})
@@ -321,16 +319,36 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
                 // }
 
 
-                var message = { 
-                  app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-                  contents: {"en": "A collector just accepted your schedule"},
-                  include_player_ids: ["6392d91a-b206-4b7b-a620-cd68e32c3a76","76ece62b-bcfe-468c-8a78-839aeaa8c5fa"]
-                };
-                
-                sendNotification(message);
+                console.log("data is real", test[0]);
+
+
+
+             
+
+
+    
 
                 }
             )
+
+
+               MODEL.scheduleModel.findOne({"_id" : test[i]._id}).then(credential => {
+
+                  MODEL.userModel.findOne({ "email": credential.client }).then((result,err)=>{
+
+                  var message = { 
+                    app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+                    contents: {"en": "A collector just accepted your schedule"},
+                    include_player_ids: [`${result.onesignal_id}`]
+                  };
+                  
+                  sendNotification(message);
+      
+      
+                })
+
+
+                })
 
         }
 
@@ -424,6 +442,9 @@ scheduleController.dashboardCompleted = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(200).jsonp(COMMON_FUN.sendError(err)));
 };
 
+
+
+
 scheduleController.rewardSystem = (req, resp) => {
 
   const collectorID = req.body.collectorID;
@@ -435,15 +456,7 @@ scheduleController.rewardSystem = (req, resp) => {
   // }).catch(err=>res.status(500).jsonp(err))
 
   if(!quantity) return resp.status(400).json({message: "Enter a valid input for the quantity"})
-  const notification = {
-    contents: {
-      'en': `You got credited with coins from packam`,
-    },
-    included_segments: ['Subscribed Users'],
-    // filters: [
-    //   { field: 'tag', key: 'level', relation: '>', value: 10 }
-    // ]
-  };
+  
 
   try {
 
@@ -452,7 +465,7 @@ scheduleController.rewardSystem = (req, resp) => {
     // console.log("Whats going on here", schedule )
     if(!schedule[0]) return resp.status(400).json({message: "This schedule is invalid"})
     MODEL.userModel.findOne({ email: schedule[0].client }).then((result) => {
-      if(result.cardID == null) return res.status(400).jsonp({message: "you don't have a valid card ID"})
+      if(result.cardID == null) return resp.status(400).jsonp({message: "you don't have a valid card ID"})
   MODEL.transactionModel.findOne({ scheduleId: req.body._id }).then((transaction) => {
 
     // console.log("transaction here at all ? ", transaction)
@@ -492,7 +505,7 @@ scheduleController.rewardSystem = (req, resp) => {
               },
             },
             function (err, response) {
-              // console.log("IS this even an error", response.body.content.data)
+              console.log("IS this even an error", response.body.content.data)
               //Coin reward system
               if (err) return res.status(400).jsonp(err);
               if (response.body.content.data) {
@@ -573,7 +586,7 @@ scheduleController.rewardSystem = (req, resp) => {
         }
       );
     });
-  }).catch(err=>resp.status(500).jsonp(err))
+  }).catch(err=>{  console.log(err);   return resp.status(500).jsonp(err) })
   });
 
 
