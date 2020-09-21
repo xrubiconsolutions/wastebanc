@@ -125,7 +125,7 @@ organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
                       );
                     else {
                       MODEL.organisationModel
-                        .update(
+                        .updateOne(
                           { email: BODY.username },
                           { $set: { password: HASH } },
                           {}
