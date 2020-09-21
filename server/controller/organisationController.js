@@ -13,104 +13,161 @@ let FS = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
 
+
+let auth            =   require("../util/auth");
+
+
+var nodemailer = require('nodemailer');
+
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'pakambusiness@gmail.com',
+    pass: 'pakambusiness-2000'
+  }
+});
+
+
 organisationController.createOrganisation = (req, RESPONSE) => {
   const organisation_data = { ...req.body };
   const errors = {};
-  const password =   organisation_data.companyName + "-" +COMMON_FUN.generateRandomString()
-  console.log("Password generate", password)
+  const password =
+    organisation_data.companyName + "-" + COMMON_FUN.generateRandomString();
+  console.log("Password generate", password);
+
 
   try {
-
     COMMON_FUN.encryptPswrd(password, (ERR, PASSWORD) => {
       if (ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
       else {
-         organisation_data.password = PASSWORD;
+        organisation_data.password = PASSWORD;
         var errors = {};
-        MODEL.organisationModel.findOne({ 
-          
-          "$or": [{
-            "email": organisation_data.email
-        }, {
-            "companyName": organisation_data.companyName
-        }]
-           }).then((user) => {
-          if (user) {
-            errors.email = "Company already exists";
-            RESPONSE.status(400).jsonp(errors);
-          } else {
-            MODEL.organisationModel(organisation_data).save({}, (ERR, RESULT) => {
-              if (ERR) RESPONSE.status(400).jsonp(ERR);
-              else {
-                        return RESPONSE.status(200).json(RESULT)
-              }
-            });
-          }
-        });
+        MODEL.organisationModel
+          .findOne({
+            $or: [
+              {
+                email: organisation_data.email,
+              },
+              {
+                companyName: organisation_data.companyName,
+              },
+            ],
+          })
+          .then((user) => {
+            if (user) {
+              errors.email = "Company already exists";
+              RESPONSE.status(400).jsonp(errors);
+            } else {
+              MODEL.organisationModel(organisation_data).save(
+                {},
+                (ERR, RESULT) => {
+                  if (ERR) RESPONSE.status(400).jsonp(ERR);
+                  else {
+                        
+                    var mailOptions = {
+                      from: 'pakambusiness@gmail.com',
+                      to: `${organisation_data.email}`,
+                      subject: 'WELCOME TO PAKAM ORGANISATION ACCOUNT',
+                      text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`
+                    }
+                  
+                    transporter.sendMail(mailOptions, function(error, info){
+                      if (error) {
+                        console.log(error);
+                      } else {
+                        console.log('Email sent: ' + info.response);
+                      }
+                    });
+                    return RESPONSE.status(200).json(RESULT);
+                  }
+                }
+              );
+            }
+          });
       }
     });
-  
+  } catch (err) {
+    return RESPONSE.status(500).json(err);
   }
-
-  catch (err) {
-
-    return RESPONSE.status(500).json(err)
-  }
-  
-
-  // MODEL.organisationModel
-  //   .findOne({ companyName: organisation_data.companyName })
-  //   .then((user) => {
-  //     if (user) {
-  //       errors.email = "Company already exists";
-  //       RESPONSE.status(400).jsonp(errors);
-  //     } else {
-  //       MODEL.organisationModel(organisation_data).save({}, (ERR, RESULT) => {
-  //         if (ERR) return res.status(400).json(ERR);
-  //         return res.status(200).json(RESULT);
-  //       });
-  //     }
-  //   })
-  //   .catch((err) => res.status(500).json(err));
 };
 
-organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
 
+organisationController.changePassword = async (REQUEST, RESPONSE) => {
+  try {
+    /* check user exist or not*/
+    let checkUserExist = await MODEL.userModel.findOne(
+      { email: REQUEST.body.email },
+      {},
+      { lean: true }
+    );
+
+    if (checkUserExist) {
+      /********** encrypt password ********/
+      COMMON_FUN.encryptPswrd(REQUEST.body.password, (ERR, HASH) => {
+        /********** update password in organisationModel ********/
+        MODEL.organisationModel
+          .update({ email: REQUEST.body.email }, { $set: { password: HASH } })
+          .then((SUCCESS) => {
+            return RESPONSE.jsonp(
+              COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
+            );
+          })
+          .catch((ERR) => {
+            return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+          });
+      });
+    } else {
+      return RESPONSE.jsonp(
+        COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+      );
+    }
+  } catch (ERR) {
+    return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+  }
+};
+
+
+
+
+
+organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
   var PROJECTION = { __v: 0, createAt: 0 };
 
-/** find user is exists or not */
-MODEL.organisationModel
-  .findOne({ email: REQUEST.body.email }, PROJECTION, { lean: true })
-  .then((USER) => {
-    USER /** matching password */
-      ? COMMON_FUN.decryptPswrd(
-          REQUEST.body.password,
-          USER.password,
-          (ERR, MATCHED) => {
-            if (ERR)
-              return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-            else if (!MATCHED)
-              return RESPONSE.status(400).jsonp(
-                COMMON_FUN.sendSuccess(
-                  CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
-                )
-              );
-            else {
-              var jwtToken = COMMON_FUN.createToken(
-                USER
-              ); /** creating jwt token */
-              USER.token = jwtToken;
-              return RESPONSE.jsonp(USER);
+  /** find user is exists or not */
+  MODEL.organisationModel
+    .findOne({ email: REQUEST.body.email }, PROJECTION, { lean: true })
+    .then((USER) => {
+      USER /** matching password */
+        ? COMMON_FUN.decryptPswrd(
+            REQUEST.body.password,
+            USER.password,
+            (ERR, MATCHED) => {
+              if (ERR)
+                return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+              else if (!MATCHED)
+                return RESPONSE.status(400).jsonp(
+                  COMMON_FUN.sendSuccess(
+                    CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
+                  )
+                );
+              else {
+                var jwtToken = COMMON_FUN.createToken(
+                  USER
+                ); /** creating jwt token */
+                USER.token = jwtToken;
+                return RESPONSE.jsonp(USER);
+              }
             }
-          }
-        )
-      : RESPONSE.status(400).jsonp(
-          COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
-        );
-  })
-  .catch((err) => {
-    return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err));
-  });
-}
+          )
+        : RESPONSE.status(400).jsonp(
+            COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+          );
+    })
+    .catch((err) => {
+      return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err));
+    });
+};
 
 organisationController.listOrganisation = (req, res) => {
   let errors = {};
@@ -318,12 +375,9 @@ organisationController.payRecyclers = (req, res) => {
       .findOne({ transaction_id: receipt.transaction_id })
       .then((result, err) => {
         if (result)
-          return res
-            .status(400)
-            .json({
-              message:
-                "This transaction had already been saved on the database",
-            });
+          return res.status(400).json({
+            message: "This transaction had already been saved on the database",
+          });
 
         MODEL.companyReceiptModel(receipt).save({}, (ERR, RESULT) => {
           if (ERR) return res.status(400).json(ERR);
@@ -345,11 +399,9 @@ organisationController.paymentLog = (req, res) => {
       .then((result, err) => {
         console.log("opoor ye ye", result);
         if (result)
-          return res
-            .status(400)
-            .json({
-              message: "This log had already been saved on the database",
-            });
+          return res.status(400).json({
+            message: "This log had already been saved on the database",
+          });
 
         MODEL.paymentLogModel(log).save({}, (ERR, RESULT) => {
           if (ERR) return res.status(400).json(ERR);
@@ -610,10 +662,10 @@ organisationController.weekChartData = (req, res) => {
 organisationController.raffleTicket = (req, res) => {
   try {
     MODEL.userModel
-      .aggregate([{ $sample: { size: 1 } }, { $match : { roles : "client" } }])
+      .aggregate([{ $sample: { size: 1 } }, { $match: { roles: "client" } }])
       .then((result, err) => {
         if (err) return res.status(400).json(err);
-        return res.status(200).json( { winner : result[0]} );
+        return res.status(200).json({ winner: result[0] });
       });
   } catch (err) {
     return res.status(500).json(err);

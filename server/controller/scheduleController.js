@@ -9,23 +9,46 @@ var request = require("request");
 
 const OneSignal = require("onesignal-node");
 
-const client = new OneSignal.Client(
-  "9ca54830-96be-4c58-9c8a-a024a0960acd",
-  "NzJhMmMwYjctZjA0My00NzMyLWExMTQtZGZkZTBjZmFmOTY0",
-  { apiRoot: "https://onesignal.com/api/v2" }
-);
+var sendNotification = function(data) {
+  var headers = {
+    "Content-Type": "application/json; charset=utf-8"
+  };
+  
+  var options = {
+    host: "onesignal.com",
+    port: 443,
+    path: "/api/v1/notifications",
+    method: "POST",
+    headers: headers
+  };
+  
+  var https = require('https');
+  var req = https.request(options, function(res) {  
+    res.on('data', function(data) {
+      console.log("Response:");
+      console.log(JSON.parse(data));
+    });
+  });
+  
+  req.on('error', function(e) {
+    console.log("ERROR:");
+    console.log(e);
+  });
+  
+  req.write(JSON.stringify(data));
+  req.end();
+};
+
+var message = { 
+  app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+  contents: {"en": "English Message"},
+  include_player_ids: ["6392d91a-b206-4b7b-a620-cd68e32c3a76","76ece62b-bcfe-468c-8a78-839aeaa8c5fa","8e0f21fa-9a5a-4ae7-a9a6-ca1f24294b86"]
+};
+
+sendNotification(message);
+
 
 scheduleController.schedule = (REQUEST, RESPONSE) => {
-
-  const notification = {
-    contents: {
-      'en': `A new schedule was made by ${REQUEST.body.client}`,
-    },
-    included_segments: ['Subscribed Users'],
-    // filters: [
-    //   { field: 'tag', key: 'level', relation: '>', value: 10 }
-    // ]
-  };
 
 
 
@@ -48,11 +71,6 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
       if (!RESULT.lat || !RESULT.long) {
         return RESPONSE.status(400).jsonp(RESPONSE);
       }
-
-      client
-        .createNotification(notification)
-        .then((response) => { console.log (response)})
-        .catch((e) => {console.error(e)});
 
       return RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData)
