@@ -35,6 +35,10 @@ const organisation_Schema = new Schema({
     required: true,
     unique: true
   },
+  role : {
+    type: String,
+    default : "company"
+  },
   location: {
     type: String,
     required: true
