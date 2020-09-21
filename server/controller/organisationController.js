@@ -93,41 +93,72 @@ organisationController.createOrganisation = (req, RESPONSE) => {
 };
 
 
-organisationController.changePassword = async (REQUEST, RESPONSE) => {
-  try {
-    /* check user exist or not*/
-    let checkUserExist = await MODEL.userModel.findOne(
-      { email: REQUEST.body.email },
-      {},
-      { lean: true }
-    );
-
-    if (checkUserExist) {
-      /********** encrypt password ********/
-      COMMON_FUN.encryptPswrd(REQUEST.body.password, (ERR, HASH) => {
-        /********** update password in organisationModel ********/
-        MODEL.organisationModel
-          .update({ email: REQUEST.body.email }, { $set: { password: HASH } })
-          .then((SUCCESS) => {
-            return RESPONSE.jsonp(
-              COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
-            );
-          })
-          .catch((ERR) => {
-            return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
-          });
-      });
+organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
+  let BODY = REQUEST.body;
+  COMMON_FUN.objProperties(REQUEST.body, (ERR, RESULT) => {
+    if (ERR) {
+      return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
     } else {
-      return RESPONSE.jsonp(
-        COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
-      );
+      MODEL.organisationModel
+        .findOne({ email: REQUEST.body.username }, {}, { lean: true })
+        .then((RESULT) => {
+          if (!RESULT) {
+          console.log(RESULT)
+            return RESPONSE.jsonp(
+              COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.NOT_FOUND)
+            );
+          }
+          else {
+            COMMON_FUN.decryptPswrd(
+              BODY.currentPassword,
+              RESULT.password,
+              (ERR, isMatched) => {
+                if (ERR) {
+                  return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+                } else if (isMatched) {
+                  COMMON_FUN.encryptPswrd(BODY.newPassword, (ERR, HASH) => {
+                    if (ERR)
+                      return RESPONSE.jsonp(
+                        COMMON_FUN.sendError(
+                          CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
+                        )
+                      );
+                    else {
+                      MODEL.organisationModel
+                        .update(
+                          { email: BODY.username },
+                          { $set: { password: HASH } },
+                          {}
+                        )
+                        .then((SUCCESS) => {
+                          return RESPONSE.jsonp(
+                            COMMON_FUN.sendSuccess(
+                              CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT
+                            )
+                          );
+                        })
+                        .catch((ERR) => {
+                          return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+                        });
+                    }
+                  });
+                } else {
+                  return RESPONSE.jsonp(
+                    COMMON_FUN.sendError(
+                      CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
+                    )
+                  );
+                }
+              }
+            );
+          }
+        })
+        .catch((ERR) => {
+          return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+        });
     }
-  } catch (ERR) {
-    return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
-  }
+  });
 };
-
-
 
 
 
