@@ -39,13 +39,13 @@ var sendNotification = function(data) {
   req.end();
 };
 
-var message = { 
-  app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-  contents: {"en": "English Message"},
-  include_player_ids: ["6392d91a-b206-4b7b-a620-cd68e32c3a76","76ece62b-bcfe-468c-8a78-839aeaa8c5fa","8e0f21fa-9a5a-4ae7-a9a6-ca1f24294b86"]
-};
+// var message = { 
+//   app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+//   contents: {"en": "English Message"},
+//   include_player_ids: ["6392d91a-b206-4b7b-a620-cd68e32c3a76","76ece62b-bcfe-468c-8a78-839aeaa8c5fa"]
+// };
 
-sendNotification(message);
+// sendNotification(message);
 
 
 scheduleController.schedule = (REQUEST, RESPONSE) => {
@@ -203,15 +203,7 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE) => {
 };
 
 scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
-  const notification = {
-    contents: {
-      'en': `A collector just accepted your schedule pick up`,
-    },
-    included_segments: ['Subscribed Users'],
-    // filters: [
-    //   { field: 'tag', key: 'level', relation: '>', value: 10 }
-    // ]
-  };
+
   var errors = {};
 
   MODEL.collectorModel
@@ -228,6 +220,8 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
       if(results) {
 
         MODEL.scheduleModel.findOne({"_id": REQUEST.body._id }).then((result,err)=>{
+          console.log("another one bites the dust", result)
+
           if(err) return RESPONSE.status(400).json(err)
           if(result.collectorStatus == "accept"){
             return RESPONSE.status(400).json({message: "This schedule had been accepted by another collector"})
@@ -243,13 +237,22 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
           }}
         )
         .then((SUCCESS) => {
-          // clients
-          // .createNotification(notification)
-          // .then((response) => { console.log (response)})
-          // .catch((e) => {console.error(e)});
 
           MODEL.scheduleModel.find({"_id": REQUEST.body._id}).then((result, err)=>{
           if(err) return RESPONSE.status(400).json(err)
+
+          // MODEL.userModel.findOne({ "email": result. })
+            
+          var message = { 
+            app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+            contents: {"en": "A collector just accepted your schedule"},
+            include_player_ids: ["6392d91a-b206-4b7b-a620-cd68e32c3a76","76ece62b-bcfe-468c-8a78-839aeaa8c5fa"]
+          };
+          
+          sendNotification(message);
+          
+
+
           return RESPONSE.status(200).jsonp(
             COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED, result)
           );
@@ -316,6 +319,15 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
                 //    return RESPONSE.status(400).jsonp({message: "This schedule has already been accepted by another recycler"})
                 //    return false;
                 // }
+
+
+                var message = { 
+                  app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+                  contents: {"en": "A collector just accepted your schedule"},
+                  include_player_ids: ["6392d91a-b206-4b7b-a620-cd68e32c3a76","76ece62b-bcfe-468c-8a78-839aeaa8c5fa"]
+                };
+                
+                sendNotification(message);
 
                 }
             )
@@ -525,6 +537,15 @@ scheduleController.rewardSystem = (req, resp) => {
                             }
                                 
                           MODEL.transactionModel(dataToSave).save({}, (ERR, RESULT) => {
+
+
+                            var message = { 
+                              app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+                              contents: {"en": "You just received a payout for your schedule"},
+                              include_player_ids: [`${result.onesignal_id}`]
+                            };
+                            
+                            sendNotification(message);
                             
                             if(ERR) return resp.status(400).jsonp(ERR)
                               console.log("Transaction saved on database", RESULT)
