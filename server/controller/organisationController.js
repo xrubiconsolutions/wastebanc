@@ -716,5 +716,19 @@ organisationController.wasteHistory = (req, res)=>{
 
 }
 
+
+organisationController.logHistory = (req, res)=>{
+  const organisationID = req.query.organisationID
+
+
+    MODEL.paymentLogModel.find({companyId: organisationID}).then((result,err)=>{
+      if(err) return res.status(400).json(err);
+      return res.status(200).json(result)
+    })
+
+
+
+}
+
 /* export organisationControllers */
 module.exports = organisationController;
