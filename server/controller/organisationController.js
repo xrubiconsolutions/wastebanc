@@ -703,5 +703,18 @@ organisationController.raffleTicket = (req, res) => {
   }
 };
 
+organisationController.wasteHistory = (req, res)=>{
+  const organisationID = req.query.organisationID
+
+
+    MODEL.scheduleModel.find({organisationCollection: organisationID}).then((result,err)=>{
+      if(err) return res.status(400).json(err);
+      return res.status(200).json(result)
+    })
+
+
+
+}
+
 /* export organisationControllers */
 module.exports = organisationController;

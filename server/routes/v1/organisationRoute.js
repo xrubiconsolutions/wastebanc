@@ -78,6 +78,9 @@ module.exports = (APP) => {
     
     APP.route('/api/organisation/raffle')
         .get(CONTROLLER.organisationController.raffleTicket);
+    
+    APP.route('/api/organisation/waste/history')
+        .get(CONTROLLER.organisationController.wasteHistory);
        
                    
 };
