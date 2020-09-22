@@ -544,7 +544,7 @@ scheduleController.rewardSystem = (req, resp) => {
   
                               "Category": schedule[0].Category,
 
-                              "fullname": recycler.fullname,
+                              "fullname": result.fullname,
   
                               "organisationID" : recycler.approvedBy
                             }

@@ -60,7 +60,10 @@ module.exports = (APP) => {
       
     APP.route('/api/recycler/payment/log')
         .post(CONTROLLER.organisationController.paymentLog);
-      
+
+    APP.route('/api/company/log/history')
+        .get(CONTROLLER.organisationController.logHistory);
+
     APP.route('/api/recycler/payment/history')
         .get(CONTROLLER.organisationController.getAllTransactions);
     
@@ -78,6 +81,12 @@ module.exports = (APP) => {
     
     APP.route('/api/organisation/raffle')
         .get(CONTROLLER.organisationController.raffleTicket);
+    
+    APP.route('/api/organisation/waste/history')
+        .get(CONTROLLER.organisationController.wasteHistory);
+    
+    APP.route('/api/lawma/transaction/history')
+        .get(CONTROLLER.organisationController.lawmaTransaction);
        
                    
 };
