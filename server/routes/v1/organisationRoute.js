@@ -84,6 +84,9 @@ module.exports = (APP) => {
     
     APP.route('/api/organisation/waste/history')
         .get(CONTROLLER.organisationController.wasteHistory);
+    
+    APP.route('/api/lawma/transaction/history')
+        .get(CONTROLLER.organisationController.lawmaTransaction);
        
                    
 };

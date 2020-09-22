@@ -730,5 +730,21 @@ organisationController.logHistory = (req, res)=>{
 
 }
 
+
+organisationController.lawmaTransaction = (REQUEST, RESPONSE)=>{
+  const lawmaID = REQUEST.query.lawmaID
+
+  MODEL.userModel.findOne({"_id": lawmaID , roles: "admin"}).then(admin=>{
+   if(!admin) return RESPONSE.status(400).json({message: "Not a valid lawma admin"})
+    MODEL.transactionModel.find({}).then((result,err)=>{
+      if(err) return RESPONSE.status(400).status(err)
+      return RESPONSE.status(200).json(result)
+    })
+
+  })
+
+ 
+}
+
 /* export organisationControllers */
 module.exports = organisationController;
