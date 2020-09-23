@@ -708,7 +708,9 @@ scheduleController.allCoins = (req, res)=>{
         function (error, response, body) {
           if(error) return res.status(400).jsonp(error)
           var rubicon = JSON.parse(JSON.stringify(response.body.content.data));
-          var needed = rubicon.filter(x=>x.deviceID == "xrubicon")
+          var needed = rubicon.filter(x=>x.deviceID == "xrubicon") || []
+
+          console.log("Error just here", needed)
 
           const test = JSON.parse(JSON.stringify(needed));
           
