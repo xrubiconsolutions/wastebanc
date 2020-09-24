@@ -589,12 +589,6 @@ userController.resetMobile = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
   const token = REQUEST.body.token;
   
-  if (password !== confirmPassword) {
-    return RESPONSE.status(400).json({
-      message: "Ensure your password matches",
-    });
-  }
-
   const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
   const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
   const client = require("twilio")(accountSid, authToken);
