@@ -703,5 +703,48 @@ organisationController.raffleTicket = (req, res) => {
   }
 };
 
+organisationController.wasteHistory = (req, res)=>{
+  const organisationID = req.query.organisationID
+
+
+    MODEL.scheduleModel.find({organisationCollection: organisationID, completionStatus: "completed"}).then((result,err)=>{
+      if(err) return res.status(400).json(err);
+      return res.status(200).json(result)
+    })
+
+
+
+}
+
+
+organisationController.logHistory = (req, res)=>{
+  const organisationID = req.query.organisationID
+
+
+    MODEL.paymentLogModel.find({companyId: organisationID}).then((result,err)=>{
+      if(err) return res.status(400).json(err);
+      return res.status(200).json(result)
+    })
+
+
+
+}
+
+
+organisationController.lawmaTransaction = (REQUEST, RESPONSE)=>{
+  const lawmaID = REQUEST.query.lawmaID
+
+  MODEL.userModel.findOne({"_id": lawmaID , roles: "admin"}).then(admin=>{
+   if(!admin) return RESPONSE.status(400).json({message: "Not a valid lawma admin"})
+    MODEL.transactionModel.find({}).then((result,err)=>{
+      if(err) return RESPONSE.status(400).status(err)
+      return RESPONSE.status(200).json(result)
+    })
+
+  })
+
+ 
+}
+
 /* export organisationControllers */
 module.exports = organisationController;
