@@ -17,7 +17,7 @@ var twilio = require("twilio");
  ****** Upload image or media (under process) *****
  **************************************************/
 
-var nodemailer = require('nodemailer');
+var nodemailer = require("nodemailer");
 
 const io = require("socket.io")();
 
@@ -33,15 +33,13 @@ io.on("connection", (client) => {
 const tax_url =
   "https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer";
 
-
-
-  var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'pakambusiness@gmail.com',
-      pass: 'pakambusiness-2000'
-    }
-  });
+var transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "pakambusiness@gmail.com",
+    pass: "pakambusiness-2000",
+  },
+});
 
 userController.upload = (REQUEST, RESPONSE) => {
   /** Stream
@@ -135,18 +133,18 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                           console.log(verification.status)
                         );
 
-                     /*Bypass verification for testing purposes*/
+                      /*Bypass verification for testing purposes*/
 
                       // MODEL.userModel.updateOne(
                       //   { phone: phone },
                       //   { verified: true },
                       //   (res) => {
-              
+
                       //     MODEL.userModel
                       //       .findOne({ "phone": phone }, (err,USER) => {
-              
+
                       //         var test = JSON.parse(JSON.stringify(USER))
-              
+
                       //         if (err) return RESPONSE.status(400).jsonp(error)
                       //         console.log("user here at all", USER)
                       //         var jwtToken = COMMON_FUN.createToken(
@@ -155,40 +153,36 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                       //         console.log("user token here at all", USER)
                       //         test.token = jwtToken;
                       //         return RESPONSE.jsonp(test);
-                                
+
                       //       })
                       //   }
                       // );
 
-
-                      MODEL.userModel.updateOne(  
+                      MODEL.userModel.updateOne(
                         { email: RESULT.email },
                         { $set: { cardID: card_id } },
                         (res) => {
-
                           //BYPASS FOR TESTING PURPOSE
-                          MODEL.userModel
-                          .findOne({ cardID: card_id }, (err,USER) => {
-            
-                            var test = JSON.parse(JSON.stringify(USER))
-            
-                            if (err) return RESPONSE.status(400).jsonp(error)
-                            console.log("user here at all", USER)
-                            var jwtToken = COMMON_FUN.createToken(
-                              test
-                            ); /** creating jwt token */
-                            console.log("user token here at all", USER)
-                            test.token = jwtToken;
-                            return RESPONSE.status(200).jsonp(
-                              COMMON_FUN.sendSuccess(
-                                CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                          MODEL.userModel.findOne(
+                            { cardID: card_id },
+                            (err, USER) => {
+                              var test = JSON.parse(JSON.stringify(USER));
+
+                              if (err) return RESPONSE.status(400).jsonp(error);
+                              console.log("user here at all", USER);
+                              var jwtToken = COMMON_FUN.createToken(
                                 test
-                              )
-                            );
-                              
-                          })
-
-
+                              ); /** creating jwt token */
+                              console.log("user token here at all", USER);
+                              test.token = jwtToken;
+                              return RESPONSE.status(200).jsonp(
+                                COMMON_FUN.sendSuccess(
+                                  CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                                  test
+                                )
+                              );
+                            }
+                          );
 
                           console.log(res);
                         }
@@ -196,7 +190,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                     }
                   );
                 }
-              );         
+              );
             }
           });
         }
@@ -261,21 +255,21 @@ userController.forgotPassword = (REQUEST, RESPONSE) => {
     PROJECTION = { __v: 0, createAt: 0 };
   /** check if user exists or not */
   var mailOptions = {
-    from: 'pakambusiness@gmail.com',
+    from: "pakambusiness@gmail.com",
     // to: `${REQUEST.body.email}`,
     to: `sobowalebukola@gmail.com`,
-    subject: 'FORGOT PASSWORD MAIL',
-    text: 'Forgot password?'
-  }
+    subject: "FORGOT PASSWORD MAIL",
+    text: "Forgot password?",
+  };
 
-  transporter.sendMail(mailOptions, function(error, info){
+  transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
     } else {
-      console.log('Email sent: ' + info.response);
+      console.log("Email sent: " + info.response);
     }
   });
-  
+
   MODEL.userModel
     .findOne(CRITERIA, PROJECTION, { lean: true })
     .then((USER) => {
@@ -379,20 +373,22 @@ userController.updateUser = async (REQUEST, RESPONSE) => {
           }
         )
         .then((SUCCESS) => {
-
-            MODEL.userModel.find({ email: REQUEST.body.email }).then(user=>{
-              if(!user){
+          MODEL.userModel
+            .find({ email: REQUEST.body.email })
+            .then((user) => {
+              if (!user) {
                 return RESPONSE.status(400).json({
-                  message: "User not found"
-                })
+                  message: "User not found",
+                });
               }
               return RESPONSE.jsonp(
-                COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED, user)
+                COMMON_FUN.sendSuccess(
+                  CONSTANTS.STATUS_MSG.SUCCESS.UPDATED,
+                  user
+                )
               );
-
-            }).catch(err=>RESPONSE.status(500).json(err))
-
-       
+            })
+            .catch((err) => RESPONSE.status(500).json(err));
         })
         .catch((ERR) => {
           return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
@@ -520,22 +516,18 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
           { phone: phone },
           { verified: true },
           (res) => {
+            MODEL.userModel.findOne({ phone: phone }, (err, USER) => {
+              var test = JSON.parse(JSON.stringify(USER));
 
-            MODEL.userModel
-              .findOne({ "phone": phone }, (err,USER) => {
-
-                var test = JSON.parse(JSON.stringify(USER))
-
-                if (err) return RESPONSE.status(400).jsonp(error)
-                console.log("user here at all", USER)
-                var jwtToken = COMMON_FUN.createToken(
-                  test
-                ); /** creating jwt token */
-                console.log("user token here at all", USER)
-                test.token = jwtToken;
-                return RESPONSE.jsonp(test);
-                  
-              })
+              if (err) return RESPONSE.status(400).jsonp(error);
+              console.log("user here at all", USER);
+              var jwtToken = COMMON_FUN.createToken(
+                test
+              ); /** creating jwt token */
+              console.log("user token here at all", USER);
+              test.token = jwtToken;
+              return RESPONSE.jsonp(test);
+            });
           }
         );
       }
@@ -590,23 +582,18 @@ userController.getAllCollectors = async (REQUEST, RESPONSE) => {
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);
-    RESPONSE.redirect("/api/login")
   }
 };
 
-
-
-
-userController.resetMobile = (REQUEST, RESPONSE)=>{
+userController.resetMobile = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
   const password = REQUEST.body.password;
   const confirmPassword = REQUEST.body.confirmPassword;
 
-
-  if(password !== confirmPassword ){
+  if (password !== confirmPassword) {
     return RESPONSE.status(400).json({
-      message: "Ensure your password matches"
-    })
+      message: "Ensure your password matches",
+    });
   }
 
   const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
@@ -621,28 +608,38 @@ userController.resetMobile = (REQUEST, RESPONSE)=>{
     })
     .then((verification_check) => {
       if (verification_check.status == "approved") {
-        console.log(verification_check.status);
-
-            COMMON_FUN.encryptPswrd(REQUEST.body.password, (ERR, HASH) => {
-              /********** update password in usermodel ********/
-              MODEL.userModel
-                .update({ phone: phone }, { $set: { password: HASH } })
-                .then((SUCCESS) => {
-                  return RESPONSE.jsonp(
-                    COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
-                  );
-                })
-                .catch((ERR) => {
-                  return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
-                });
-            });
-
-       
+        RESPONSE.status(200).json({
+          message: " Verification successful ",
+        });
       }
     })
     .catch((err) => RESPONSE.status(404).jsonp(err));
+};
 
-}
+userController.resetMobilePassword = (REQUEST, RESPONSE) => {
+  const phone = REQUEST.body.phone;
+  MODEL.userModel.findOne({ phone: phone }).then((result) => {
+    if (!result) {
+      return RESPONSE.status(400).json({
+        message: " This account is not verified ",
+      });
+    }
+
+    COMMON_FUN.encryptPswrd(REQUEST.body.password, (ERR, HASH) => {
+      /********** update password in usermodel ********/
+      MODEL.userModel
+        .updateOne({ phone: phone }, { $set: { password: HASH } })
+        .then((SUCCESS) => {
+          return RESPONSE.jsonp(
+            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
+          );
+        })
+        .catch((ERR) => {
+          return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+        });
+    });
+  });
+};
 
 /* export userControllers */
 module.exports = userController;
