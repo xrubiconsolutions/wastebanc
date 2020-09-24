@@ -892,12 +892,12 @@ scheduleController.afterCompletion = (REQUEST,RESPONSE) => {
   const collectorID = REQUEST.query.collectorID;
 
   MODEL.collectorModel.findOne({ _id : collectorID }).then((collector)=>{
-    console.log("COllecrot here", collector)
     if(!collector) {
       return RESPONSE.status(400).json({message: "Not a valid collector ID"})
     }
 
     MODEL.scheduleModel.find({ collectedBy : collectorID , completionStatus: "pending" }).then((result,err)=>{
+      
 
       if(err) return RESPONSE.status(400).json(err)
 
