@@ -587,9 +587,8 @@ userController.getAllCollectors = async (REQUEST, RESPONSE) => {
 
 userController.resetMobile = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
-  const password = REQUEST.body.password;
-  const confirmPassword = REQUEST.body.confirmPassword;
-
+  const token = REQUEST.body.token;
+  
   if (password !== confirmPassword) {
     return RESPONSE.status(400).json({
       message: "Ensure your password matches",
