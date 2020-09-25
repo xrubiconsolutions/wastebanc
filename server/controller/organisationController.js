@@ -13,21 +13,17 @@ let FS = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
 
+let auth = require("../util/auth");
 
-let auth            =   require("../util/auth");
-
-
-var nodemailer = require('nodemailer');
-
+var nodemailer = require("nodemailer");
 
 var transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-    user: 'pakambusiness@gmail.com',
-    pass: 'pakambusiness-2000'
-  }
+    user: "pakambusiness@gmail.com",
+    pass: "pakambusiness-2000",
+  },
 });
-
 
 organisationController.createOrganisation = (req, RESPONSE) => {
   const organisation_data = { ...req.body };
@@ -35,7 +31,6 @@ organisationController.createOrganisation = (req, RESPONSE) => {
   const password =
     organisation_data.companyName + "-" + COMMON_FUN.generateRandomString();
   console.log("Password generate", password);
-
 
   try {
     COMMON_FUN.encryptPswrd(password, (ERR, PASSWORD) => {
@@ -64,19 +59,18 @@ organisationController.createOrganisation = (req, RESPONSE) => {
                 (ERR, RESULT) => {
                   if (ERR) RESPONSE.status(400).jsonp(ERR);
                   else {
-                        
                     var mailOptions = {
-                      from: 'pakambusiness@gmail.com',
+                      from: "pakambusiness@gmail.com",
                       to: `${organisation_data.email}`,
-                      subject: 'WELCOME TO PAKAM ORGANISATION ACCOUNT',
-                      text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`
-                    }
-                  
-                    transporter.sendMail(mailOptions, function(error, info){
+                      subject: "WELCOME TO PAKAM ORGANISATION ACCOUNT",
+                      text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`,
+                    };
+
+                    transporter.sendMail(mailOptions, function (error, info) {
                       if (error) {
                         console.log(error);
                       } else {
-                        console.log('Email sent: ' + info.response);
+                        console.log("Email sent: " + info.response);
                       }
                     });
                     return RESPONSE.status(200).json(RESULT);
@@ -92,7 +86,6 @@ organisationController.createOrganisation = (req, RESPONSE) => {
   }
 };
 
-
 organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
   let BODY = REQUEST.body;
   COMMON_FUN.objProperties(REQUEST.body, (ERR, RESULT) => {
@@ -103,12 +96,11 @@ organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
         .findOne({ email: REQUEST.body.username }, {}, { lean: true })
         .then((RESULT) => {
           if (!RESULT) {
-          console.log(RESULT)
+            console.log(RESULT);
             return RESPONSE.jsonp(
               COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.NOT_FOUND)
             );
-          }
-          else {
+          } else {
             COMMON_FUN.decryptPswrd(
               BODY.currentPassword,
               RESULT.password,
@@ -159,8 +151,6 @@ organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
     }
   });
 };
-
-
 
 organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
   var PROJECTION = { __v: 0, createAt: 0 };
@@ -492,19 +482,19 @@ organisationController.monthChartData = (req, res) => {
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
         .filter((x) => x.Category == "Pet Bottle")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
         .filter((x) => x.Category == "carton")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
         .filter((x) => x.Category == "Rubber")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
         .filter((x) => x.Category == "Plastics")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
@@ -548,19 +538,19 @@ organisationController.thirdChartData = (req, res) => {
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
         .filter((x) => x.Category == "Pet Bottle")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
         .filter((x) => x.Category == "Cartoon")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
         .filter((x) => x.Category == "Rubber")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
         .filter((x) => x.Category == "Plastics")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
@@ -606,19 +596,19 @@ organisationController.forthChartData = (req, res) => {
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
         .filter((x) => x.Category == "Pet Bottle")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
         .filter((x) => x.Category == "carton")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
         .filter((x) => x.Category == "Rubber")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
         .filter((x) => x.Category == "Plastics")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
@@ -664,19 +654,19 @@ organisationController.weekChartData = (req, res) => {
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
         .filter((x) => x.Category == "Pet Bottle")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
         .filter((x) => x.Category == "carton")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
         .filter((x) => x.Category == "Rubber")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
         .filter((x) => x.Category == "Plastics")
-        .map((x) => ({ quantity: x.quantity }))
+        .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
@@ -703,48 +693,43 @@ organisationController.raffleTicket = (req, res) => {
   }
 };
 
-organisationController.wasteHistory = (req, res)=>{
-  const organisationID = req.query.organisationID
+organisationController.wasteHistory = (req, res) => {
+  const organisationID = req.query.organisationID;
 
-
-    MODEL.scheduleModel.find({organisationCollection: organisationID, completionStatus: "completed"}).then((result,err)=>{
-      if(err) return res.status(400).json(err);
-      return res.status(200).json(result)
+  MODEL.scheduleModel
+    .find({
+      organisationCollection: organisationID,
+      completionStatus: "completed",
     })
+    .then((result, err) => {
+      if (err) return res.status(400).json(err);
+      return res.status(200).json(result);
+    });
+};
 
+organisationController.logHistory = (req, res) => {
+  const organisationID = req.query.organisationID;
 
+  MODEL.paymentLogModel
+    .find({ companyId: organisationID })
+    .then((result, err) => {
+      if (err) return res.status(400).json(err);
+      return res.status(200).json(result);
+    });
+};
 
-}
+organisationController.lawmaTransaction = (REQUEST, RESPONSE) => {
+  const lawmaID = REQUEST.query.lawmaID;
 
-
-organisationController.logHistory = (req, res)=>{
-  const organisationID = req.query.organisationID
-
-
-    MODEL.paymentLogModel.find({companyId: organisationID}).then((result,err)=>{
-      if(err) return res.status(400).json(err);
-      return res.status(200).json(result)
-    })
-
-
-
-}
-
-
-organisationController.lawmaTransaction = (REQUEST, RESPONSE)=>{
-  const lawmaID = REQUEST.query.lawmaID
-
-  MODEL.userModel.findOne({"_id": lawmaID , roles: "admin"}).then(admin=>{
-   if(!admin) return RESPONSE.status(400).json({message: "Not a valid lawma admin"})
-    MODEL.transactionModel.find({}).then((result,err)=>{
-      if(err) return RESPONSE.status(400).status(err)
-      return RESPONSE.status(200).json(result)
-    })
-
-  })
-
- 
-}
+  MODEL.userModel.findOne({ _id: lawmaID, roles: "admin" }).then((admin) => {
+    if (!admin)
+      return RESPONSE.status(400).json({ message: "Not a valid lawma admin" });
+    MODEL.transactionModel.find({}).then((result, err) => {
+      if (err) return RESPONSE.status(400).status(err);
+      return RESPONSE.status(200).json(result);
+    });
+  });
+};
 
 /* export organisationControllers */
 module.exports = organisationController;
