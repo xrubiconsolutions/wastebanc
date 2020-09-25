@@ -712,6 +712,12 @@ scheduleController.allCoins = (req, res)=>{
 
           console.log("Error just here", needed)
 
+          if(!needed) {
+            return RESPONSE.status(400).json({
+              message  : "No coin data"
+            })
+          }
+
           const test = JSON.parse(JSON.stringify(needed));
           
           const allCoins = test.map(x=>x.point).reduce((acc,curr) => {
