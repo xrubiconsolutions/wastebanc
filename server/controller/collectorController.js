@@ -344,7 +344,7 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
 
     if (checkUserExist) {
       MODEL.collectorModel
-        .update(
+        .updateOne(
           { email: REQUEST.body.email },
           {
             $set: {
@@ -361,16 +361,37 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
           }
         )
         .then((SUCCESS) => {
-          MODEL.collectorModel.find({ email: REQUEST.body.email }).then(user=>{
+          MODEL.collectorModel.findOne({ email: REQUEST.body.email }).then(user=>{
             if(!user){
               return RESPONSE.status(400).json({
                 message: "User not found"
               })
             }
-            return RESPONSE.jsonp(
-              COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED, user)
-            );
 
+             MODEL.organisationModel.findOne({companyName: REQUEST.body.organisation}).then(organisation=>{
+
+              console.log(organisation)
+
+
+              console.log("--->",user)
+
+                MODEL.collectorModel.updateOne(
+                  { email: user.email },
+                  { $set: { areaOfAccess : organisation.areaOfAccess } },
+                  (res) => {
+                    console.log(res);
+                    return RESPONSE.status(200).json({
+                      message: "Collector's profile successfully updated"
+                    })
+        
+                  }
+                );
+
+              })
+
+
+
+          
           }).catch(err=>RESPONSE.status(500).json(err))
         })
         .catch((ERR) => {
