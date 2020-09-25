@@ -731,5 +731,20 @@ organisationController.lawmaTransaction = (REQUEST, RESPONSE) => {
   });
 };
 
+
+organisationController.adminTransaction = (req, res) => {
+
+  MODEL.transactionModel
+    .find({})
+    .sort({ _id: -1 })
+    .then((result, err) => {
+      if (err) return res.status(400).json(err);
+      return res.status(200).json({
+        data: result,
+      });
+    })
+    .catch((err) => res.status(500).json(err));
+};
+
 /* export organisationControllers */
 module.exports = organisationController;

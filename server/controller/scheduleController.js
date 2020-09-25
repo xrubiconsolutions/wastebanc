@@ -545,6 +545,8 @@ scheduleController.rewardSystem = (req, resp) => {
                               "Category": schedule[0].Category,
 
                               "fullname": result.fullname,
+
+                              "recycler" : recycler.fullname,
   
                               "organisationID" : recycler.approvedBy
                             }
@@ -710,7 +712,7 @@ scheduleController.allCoins = (req, res)=>{
           var rubicon = JSON.parse(JSON.stringify(response.body.content.data));
           var needed = rubicon.filter(x=>x.deviceID == "xrubicon") || []
 
-          console.log("Error just here", needed)
+          console.log("Error just here",needed)
 
           if(!needed) {
             return RESPONSE.status(400).json({

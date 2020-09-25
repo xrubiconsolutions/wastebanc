@@ -44,6 +44,10 @@ const transaction_Schema = {
     type: Date,
     default: Date.now,
   },
+  recycler : {
+    type: String,
+    required: true
+  }
 };
 
 module.exports = MONGOOSE.model("transaction", transaction_Schema);

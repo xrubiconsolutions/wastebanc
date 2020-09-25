@@ -87,6 +87,9 @@ module.exports = (APP) => {
     
     APP.route('/api/lawma/transaction/history')
         .get(CONTROLLER.organisationController.lawmaTransaction);
+    
+    APP.route('/api/all/transaction/history')
+        .get(CONTROLLER.organisationController.adminTransaction);
        
                    
 };
