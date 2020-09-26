@@ -767,5 +767,231 @@ organisationController.adminCompanyTransaction = (req, res) => {
     .catch((err) => res.status(500).json(err));
 };
 
+
+
+organisationController.lawmaMonthChartData = (req, res) => {
+  const today = new Date();
+  const lastWeek = new Date();
+  const forthWeek = new Date();
+  const thirdWeek = new Date();
+  const lastMonth = new Date();
+
+  lastWeek.setDate(today.getDate() - 7);
+  forthWeek.setDate(today.getDate() - 14);
+  thirdWeek.setDate(today.getDate() - 21);
+  lastMonth.setDate(today.getDate() - 28);
+
+  MODEL.scheduleModel
+    .find({
+      completionStatus: "completed",
+      pickUpDate: {
+        $gte: lastWeek,
+        $lt: today,
+      },
+    })
+    .sort({ _id: -1 })
+    .then((result, err) => {
+      if (err) return res.status(400).json(err);
+
+      var can = result
+        .filter((x) => x.Category == "Can")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var petBottle = result
+        .filter((x) => x.Category == "Pet Bottle")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var carton = result
+        .filter((x) => x.Category == "carton")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var rubber = result
+        .filter((x) => x.Category == "Rubber")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var plastics = result
+        .filter((x) => x.Category == "Plastics")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      return res.status(200).json({
+        can: can,
+        petBottle: petBottle,
+        carton: carton,
+        rubber: rubber,
+        plastics: plastics,
+      });
+    })
+    .catch((err) => res.status(500).json(err));
+};
+
+organisationController.lawmaThirdChartData = (req, res) => {
+  const today = new Date();
+  const lastWeek = new Date();
+  const forthWeek = new Date();
+  const thirdWeek = new Date();
+  const lastMonth = new Date();
+
+  lastWeek.setDate(today.getDate() - 7);
+  forthWeek.setDate(today.getDate() - 14);
+  thirdWeek.setDate(today.getDate() - 21);
+  lastMonth.setDate(today.getDate() - 28);
+  MODEL.scheduleModel
+    .find({
+      completionStatus: "completed",
+      pickUpDate: {
+        $gte: forthWeek,
+        $lt: lastWeek,
+      },
+    })
+    .sort({ _id: -1 })
+    .then((result, err) => {
+      if (err) return res.status(400).json(err);
+      var can = result
+        .filter((x) => x.Category == "Can")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var petBottle = result
+        .filter((x) => x.Category == "Pet Bottle")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var carton = result
+        .filter((x) => x.Category == "Cartoon")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var rubber = result
+        .filter((x) => x.Category == "Rubber")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var plastics = result
+        .filter((x) => x.Category == "Plastics")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      return res.status(200).json({
+        can: can,
+        petBottle: petBottle,
+        carton: carton,
+        rubber: rubber,
+        plastics: plastics,
+      });
+    })
+    .catch((err) => res.status(500).json(err));
+};
+
+organisationController.lawmaForthChartData = (req, res) => {
+  const today = new Date();
+  const lastWeek = new Date();
+  const forthWeek = new Date();
+  const thirdWeek = new Date();
+  const lastMonth = new Date();
+
+  lastWeek.setDate(today.getDate() - 7);
+  forthWeek.setDate(today.getDate() - 14);
+  thirdWeek.setDate(today.getDate() - 21);
+  lastMonth.setDate(today.getDate() - 28);
+
+  MODEL.scheduleModel
+    .find({
+      completionStatus: "completed",
+      pickUpDate: {
+        $gte: thirdWeek,
+        $lt: forthWeek,
+      },
+    })
+    .sort({ _id: -1 })
+    .then((result, err) => {
+      if (err) return res.status(400).json(err);
+
+      var can = result
+        .filter((x) => x.Category == "Can")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var petBottle = result
+        .filter((x) => x.Category == "Pet Bottle")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var carton = result
+        .filter((x) => x.Category == "carton")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var rubber = result
+        .filter((x) => x.Category == "Rubber")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var plastics = result
+        .filter((x) => x.Category == "Plastics")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      return res.status(200).json({
+        can: can,
+        petBottle: petBottle,
+        carton: carton,
+        rubber: rubber,
+        plastics: plastics,
+      });
+    })
+    .catch((err) => res.status(500).json(err));
+};
+
+organisationController.lawmaWeekChartData = (req, res) => {
+  const today = new Date();
+  const lastWeek = new Date();
+  const forthWeek = new Date();
+  const thirdWeek = new Date();
+  const lastMonth = new Date();
+
+  lastWeek.setDate(today.getDate() - 7);
+  forthWeek.setDate(today.getDate() - 14);
+  thirdWeek.setDate(today.getDate() - 21);
+  lastMonth.setDate(today.getDate() - 28);
+
+  MODEL.scheduleModel
+    .find({
+      completionStatus: "completed",
+      pickUpDate: {
+        $gte: lastMonth,
+        $lt: thirdWeek,
+      },
+    })
+    .sort({ _id: -1 })
+    .then((result, err) => {
+      if (err) return res.status(400).json(err);
+      console.log("result here", result);
+
+      var can = result
+        .filter((x) => x.Category == "Can")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var petBottle = result
+        .filter((x) => x.Category == "Pet Bottle")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var carton = result
+        .filter((x) => x.Category == "carton")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var rubber = result
+        .filter((x) => x.Category == "Rubber")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      var plastics = result
+        .filter((x) => x.Category == "Plastics")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      return res.status(200).json({
+        can: can,
+        petBottle: petBottle,
+        carton: carton,
+        rubber: rubber,
+        plastics: plastics,
+      });
+    })
+    .catch((err) => res.status(500).json(err));
+};
+
+
 /* export organisationControllers */
 module.exports = organisationController;

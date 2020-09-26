@@ -93,6 +93,19 @@ module.exports = (APP) => {
     
     APP.route('/api/all/transaction/recycler/history')
         .get(CONTROLLER.organisationController.adminCompanyTransaction);
+
+    APP.route('/api/organisation/lawma/month/chart')
+        .get(CONTROLLER.organisationController.lawmaMonthChartData);
+    
+    APP.route('/api/organisation/lawma/third/chart')
+        .get(CONTROLLER.organisationController.lawmaThirdChartData);
+       
+    APP.route('/api/organisation/lawma/forth/chart')
+        .get(CONTROLLER.organisationController.lawmaForthChartData);
+       
+    APP.route('/api/organisation/lawma/week/chart')
+        .get(CONTROLLER.organisationController.lawmaWeekChartData);
+    
        
                    
 };
