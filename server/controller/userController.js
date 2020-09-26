@@ -578,7 +578,7 @@ userController.getWalletBalance = (req, res) => {
 userController.getAllCollectors = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
-    let users = await MODEL.userModel.find({ roles: "collector" });
+    let users = await MODEL.collectorModel.find({});
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);
