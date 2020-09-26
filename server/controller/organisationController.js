@@ -734,8 +734,29 @@ organisationController.lawmaTransaction = (REQUEST, RESPONSE) => {
 
 organisationController.adminTransaction = (req, res) => {
 
+  var PROJECTION = { recycler :0, organisationID: 0 , completedBy: 0, scheduleId: 0}
+
+
   MODEL.transactionModel
-    .find({})
+    .find({}, PROJECTION)
+    .sort({ _id: -1 })
+    .then((result, err) => {
+      if (err) return res.status(400).json(err);
+      return res.status(200).json({
+        data: result,
+      });
+    })
+    .catch((err) => res.status(500).json(err));
+};
+
+
+organisationController.adminCompanyTransaction = (req, res) => {
+
+
+ var PROJECTION = { fullname:0, organisationID: 0 , completedBy: 0, scheduleId: 0}
+
+  MODEL.transactionModel
+    .find({}, PROJECTION)
     .sort({ _id: -1 })
     .then((result, err) => {
       if (err) return res.status(400).json(err);

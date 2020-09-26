@@ -90,6 +90,9 @@ module.exports = (APP) => {
     
     APP.route('/api/all/transaction/history')
         .get(CONTROLLER.organisationController.adminTransaction);
+    
+    APP.route('/api/all/transaction/recycler/history')
+        .get(CONTROLLER.organisationController.adminCompanyTransaction);
        
                    
 };
