@@ -52,6 +52,9 @@ module.exports = (APP) => {
      APP.route('/api/all/recyclers')
         .get(CONTROLLER.organisationController.allRecyclers);
 
+    APP.route('/api/all/pending/recyclers')
+        .get(CONTROLLER.organisationController.allPendingRecycler);
+
     APP.route('/api/all/users')
         .get(CONTROLLER.organisationController.allUsers);
 

@@ -388,6 +388,36 @@ organisationController.allUsers = (req, res) => {
   }
 };
 
+
+organisationController.allPendingRecycler = (req,res)=>{
+
+    const organisation = req.query.organisation
+
+
+    if(!organisation) return res.status(400).json({
+      message : "Enter your organisation name !"
+    })
+      try {
+
+          MODEL.collectorModel.find({
+            organisation : organisation,
+            "approvedBy": { $exists: false, $eq: null }
+          }).then((result, err)=>{
+            if(err) return res.status(400).json({
+              message : "No recycler found"
+            })
+            return res.status(200).json(result)
+          })
+      }
+      catch(err){
+            return res.status(500).json(err)
+      }
+
+
+}
+
+
+
 organisationController.payRecyclers = (req, res) => {
   const receipt = { ...req.body };
 
