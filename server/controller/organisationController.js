@@ -1023,5 +1023,33 @@ organisationController.lawmaWeekChartData = (req, res) => {
 };
 
 
+
+organisationController.organisationPayout = (req,res)=>{
+  const organisationID = req.body.organisationID;
+
+  MODEL.organisationModel.findOne({_id: organisationID}).then(result=>{
+    if(!result) return res.status(400).json({
+      message: "This is not a valid organisation"
+    })
+  })
+
+  try {
+
+    MODEL.transactionModel.find({organisationID: organisationID}).then((result,err)=>{
+          if(err) return res.status(400).json(err);
+
+          console.log("Debts here===>", result)
+
+    })
+
+
+  }
+  catch(err){
+
+    return res.status(500).json(err)
+
+  }
+}
+
 /* export organisationControllers */
 module.exports = organisationController;

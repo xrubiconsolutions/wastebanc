@@ -917,6 +917,47 @@ scheduleController.afterCompletion = (REQUEST,RESPONSE) => {
     
 
   })
+}
+
+
+
+scheduleController.collectorMissed = (req,res)=>{
+  const scheduleID = req.body.scheduleID;
+  const collectorID = req.body.collectorID
+
+
+    try {
+
+        MODEL.scheduleModel.findOne({_id: scheduleID}).then(result=>{
+          if(!result) return res.status(400).json({
+            message: "This schedule is invalid"
+          })
+
+          if(result.collectedBy !== collectorID) return res.status(400).json({
+            message : "You didn't accept this schedule"
+          })
+
+          MODEL.scheduleModel.updateOne(
+            { "_id" : result._id},
+            {$set: { "completionStatus" : "missed",
+                    }}
+                    ).then((resp,err)=>{
+
+                            return res.status(200).json({
+                              message: "You missed this schedule"
+                            })
+
+                      console.log(err)
+
+                    })
+
+
+        })
+
+    } catch(err){
+        return res.status(500).json(err)
+
+    }
 
 
 

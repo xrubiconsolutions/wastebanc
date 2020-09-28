@@ -12,7 +12,7 @@ const transaction_Schema = {
 
   fullname: {
     type: String,
-    required: true
+    required: true,
   },
   coin: {
     type: Number,
@@ -20,9 +20,8 @@ const transaction_Schema = {
   },
 
   scheduleId: {
-      type: String,
-      required: true
-
+    type: String,
+    required: true,
   },
   cardID: {
     type: String,
@@ -33,21 +32,25 @@ const transaction_Schema = {
     type: String,
     required: true,
   },
+  paid: {
+    type: Boolean,
+    default: false,
+  },
   Category: {
     type: String,
     required: true,
   },
-  organisationID : {
-    type: String
+  organisationID: {
+    type: String,
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-  recycler : {
+  recycler: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 };
 
 module.exports = MONGOOSE.model("transaction", transaction_Schema);
