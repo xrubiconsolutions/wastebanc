@@ -37,6 +37,9 @@ module.exports = (APP) => {
     APP.route('/api/coins/organisation')
         .get(CONTROLLER.organisationController.coinBank);
 
+    APP.route('/api/recycler/organisation/coin')
+        .get(CONTROLLER.organisationController.recyclerPay);
+
     APP.route('/api/weight/organisation')
         .get(CONTROLLER.organisationController.wasteCounter);
 
@@ -112,6 +115,7 @@ module.exports = (APP) => {
        
     APP.route('/api/organisation/lawma/week/chart')
         .get(CONTROLLER.organisationController.lawmaWeekChartData);
+    
     
        
                    

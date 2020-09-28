@@ -1051,5 +1051,46 @@ organisationController.organisationPayout = (req,res)=>{
   }
 }
 
+organisationController.recyclerPay = (req,res)=>{
+  const recyclerID = req.query.recyclerID;
+
+  MODEL.transactionModel.find({completedBy : recyclerID }).then((transaction,err)=>{
+
+    MODEL.collectorModel.findOne({ _id : recyclerID }).then(result=>{
+        if(!result) return res.status(400).json({
+          message : "Your collector ID is invalid"
+        })
+
+
+        const totalCoin = transaction
+          .map((x) => x.coin)
+          .reduce((acc, curr) => acc + curr, 0);
+        const data = {
+          name: transaction[0].fullname,
+          totalCoin: totalCoin,
+          transactions : transaction
+        };
+
+
+        return res.status(200).json(data)
+
+
+
+
+    })
+
+
+
+
+
+  })
+
+
+
+}
+
+
+
+
 /* export organisationControllers */
 module.exports = organisationController;
