@@ -39,6 +39,14 @@ const organisation_Schema = new Schema({
     type: String,
     default : "company"
   },
+  totalAvailable :{
+    type: Number,
+    default: 0
+  },
+  totalSpent: {
+    type: Number,
+    default: 0
+  },
   location: {
     type: String,
     required: true

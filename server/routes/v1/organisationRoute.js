@@ -40,6 +40,9 @@ module.exports = (APP) => {
     APP.route('/api/recycler/organisation/coin')
         .get(CONTROLLER.organisationController.recyclerPay);
 
+    APP.route('/api/recyclers/organisation/coin')
+        .get(CONTROLLER.organisationController.recyclerActions);
+
     APP.route('/api/weight/organisation')
         .get(CONTROLLER.organisationController.wasteCounter);
 

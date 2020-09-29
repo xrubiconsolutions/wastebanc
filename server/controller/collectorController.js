@@ -148,7 +148,7 @@ collectorController.loginCollector = (REQUEST, RESPONSE) => {
 
   /** find user is exists or not */
   MODEL.collectorModel
-    .findOne({ fullname: REQUEST.body.fullname }, PROJECTION, { lean: true })
+    .findOne({ fullname: REQUEST.body.fullname }, PROJECTION , { lean: true })
     .then((USER) => {
       USER /** matching password */
         ? COMMON_FUN.decryptPswrd(

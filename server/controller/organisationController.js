@@ -1091,6 +1091,46 @@ organisationController.recyclerPay = (req,res)=>{
 
 
 
+organisationController.recyclerActions = (req, res) => {
+  const IDs = [];
+
+  MODEL.transactionModel.find({}).then((transaction, err) => {
+    const len = transaction.length;
+
+    for (let i = 0; i < transaction.length; i++) {
+      if (IDs.includes(transaction[i].completedBy)) {
+        console.log("already present");
+      } else {
+        IDs.push(transaction[i].completedBy);
+      }
+      console.log("Opooor from here", IDs)
+
+      return IDs
+      console.log("transaction here====>>", transaction[i].completedBy , IDs);
+
+      // MODEL.collectorModel
+      //   .findOne({ _id: transaction[i].completedBy })
+      //   .then((result) => {
+      //     if (!result.organisation)
+      //       return res.status(400).json({
+      //         message: "Your collector ID is invalid",
+      //       });
+
+      //     // const totalCoin = transaction[i]
+      //     //   .map((x) => x.coin)
+      //     //   .reduce((acc, curr) => acc + curr, 0);
+      //     const data = {
+      //       name: transaction[i].fullname,
+      //       // totalCoin: totalCoin,
+      //       transactions: transaction[i],
+      //     };
+      //   });
+    }
+    // return res.status(200).json(data)
+  });
+};
+
+
 
 /* export organisationControllers */
 module.exports = organisationController;

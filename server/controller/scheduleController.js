@@ -722,11 +722,13 @@ scheduleController.allCoins = (req, res)=>{
 
           const test = JSON.parse(JSON.stringify(needed));
           
-          const allCoins = test.map(x=>x.point).reduce((acc,curr) => {
-            return Number(acc) + Number(curr)
-          })
+          // const allCoins = test.map(x=>x.point).reduce((acc,curr) => {
+          //   return Number(acc) + Number(curr)
+          // })
+
+        const totalCoin = 5;
          return res.status(200).jsonp(
-            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, allCoins)
+            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, totalCoin)
           );
 
         }
@@ -958,9 +960,9 @@ scheduleController.collectorMissed = (req,res)=>{
         return res.status(500).json(err)
 
     }
-
-
-
 }
+
+
+
 
 module.exports = scheduleController;
