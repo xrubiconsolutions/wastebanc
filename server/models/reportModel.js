@@ -32,6 +32,15 @@ const report_Schema = new Schema({
     required: true,
     default: true
   },
+  name: {
+    type: String
+  },
+  email:{
+    type: String
+  },
+  phone: {
+    type: String
+  },
   lat: {
         type: String
   },

@@ -28,9 +28,7 @@ var transporter = nodemailer.createTransport({
 organisationController.createOrganisation = (req, RESPONSE) => {
   const organisation_data = { ...req.body };
   const errors = {};
-  const password =
-    organisation_data.companyName + "-" + COMMON_FUN.generateRandomString();
-  console.log("Password generate", password);
+  const password = COMMON_FUN.generateRandomString();
 
   try {
     COMMON_FUN.encryptPswrd(password, (ERR, PASSWORD) => {

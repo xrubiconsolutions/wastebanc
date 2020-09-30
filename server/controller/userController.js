@@ -374,7 +374,7 @@ userController.updateUser = async (REQUEST, RESPONSE) => {
         )
         .then((SUCCESS) => {
           MODEL.userModel
-            .find({ email: REQUEST.body.email })
+            .findOne({ email: REQUEST.body.email })
             .then((user) => {
               if (!user) {
                 return RESPONSE.status(400).json({

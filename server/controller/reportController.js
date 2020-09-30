@@ -47,7 +47,12 @@ reportController.report = (req, res) => {
 
           // generate token
           token = opentok.generateToken(session.sessionId, tokenOptions);
+
+          MODEL.userModel.findOne({_id: userID}).then(userDetail=>{
           MODEL.reportModel({
+            name: userDetail.firstname,
+            email: userDetail.email,
+            phone: userDetail.phone,
             apiKey: apiKey,
             sessionID: session.sessionId,
             token: token,
@@ -62,12 +67,14 @@ reportController.report = (req, res) => {
                 .json({ message: "Could not save report incidence" });
             console.log(result);
           });
+
           res.setHeader("Content-Type", "application/json");
           return res.json({
             apiKey: apiKey,
             sessionID: session.sessionId,
             token: token,
           });
+        })
         });
       }
     });
@@ -77,12 +84,20 @@ reportController.getReport = (req, res) => {
   var ID = req.body.userID;
 
   MODEL.reportModel
-    .findOne({ userReportID: ID })
-    .then((user) => {
-      return res.status(200).json(user);
+    .updateOne({ userReportID: ID }, { active : true })
+    .then((result) => {
+      if(!!result){
+        MODEL.reportModel.findOne({
+          userReportID: ID
+        }).then((user)=>{
+          return res.status(200).json(user);
+        })
+      }
     })
     .catch((err) => res.status(500).json(err));
 };
+
+
 
 reportController.allReport = (req, res) => {
   MODEL.reportModel
