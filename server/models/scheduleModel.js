@@ -36,7 +36,7 @@ const schedulePick = new Schema({
     },
     details: {
         type: String,
-        required: true,
+        //required: true,
     },
     address:{
         type: String,

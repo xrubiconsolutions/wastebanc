@@ -711,9 +711,6 @@ scheduleController.allCoins = (req, res)=>{
           if(error) return res.status(400).jsonp(error)
           var rubicon = JSON.parse(JSON.stringify(response.body.content.data));
           var needed = rubicon.filter(x=>x.deviceID == "xrubicon") || []
-
-          console.log("Error just here",needed)
-
           if(!needed) {
             return RESPONSE.status(400).json({
               message  : "No coin data"
@@ -722,13 +719,13 @@ scheduleController.allCoins = (req, res)=>{
 
           const test = JSON.parse(JSON.stringify(needed));
           
-          // const allCoins = test.map(x=>x.point).reduce((acc,curr) => {
-          //   return Number(acc) + Number(curr)
-          // })
+          const allCoins = test.map(x=>x.point).reduce((acc,curr) => {
+            return acc + curr
+          })
 
-        const totalCoin = 5;
+
          return res.status(200).jsonp(
-            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, totalCoin)
+            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, allCoins)
           );
 
         }
