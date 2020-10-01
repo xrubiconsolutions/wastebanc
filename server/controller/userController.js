@@ -1,29 +1,29 @@
-"use strict";
+'use strict';
 
 /**************************************************
  ***** User controller for user business logic ****
  **************************************************/
 let userController = {};
-let MODEL = require("../models");
-let COMMON_FUN = require("../util/commonFunction");
-let SERVICE = require("../services/commonService");
-let CONSTANTS = require("../util/constants");
-let FS = require("fs");
-const { Response } = require("aws-sdk");
-var request = require("request");
-var twilio = require("twilio");
+let MODEL = require('../models');
+let COMMON_FUN = require('../util/commonFunction');
+let SERVICE = require('../services/commonService');
+let CONSTANTS = require('../util/constants');
+let FS = require('fs');
+const { Response } = require('aws-sdk');
+var request = require('request');
+var twilio = require('twilio');
 
 /**************************************************
  ****** Upload image or media (under process) *****
  **************************************************/
 
-var nodemailer = require("nodemailer");
+var nodemailer = require('nodemailer');
 
-const io = require("socket.io")();
+const io = require('socket.io')();
 
-io.on("connection", (client) => {
-  client.on("subscribeToTimer", (interval) => {
-    console.log("client is subscribing to event ", interval);
+io.on('connection', (client) => {
+  client.on('subscribeToTimer', (interval) => {
+    console.log('client is subscribing to event ', interval);
     // setInterval(() => {
     //   client.emit('timer', new Date());
     // }, interval);
@@ -31,13 +31,13 @@ io.on("connection", (client) => {
 });
 
 const tax_url =
-  "https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer";
+  'https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer';
 
 var transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: 'gmail',
   auth: {
-    user: "pakambusiness@gmail.com",
-    pass: "pakambusiness-2000",
+    user: 'pakambusiness@gmail.com',
+    pass: 'pakambusiness-2000',
   },
 });
 
@@ -74,7 +74,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
       var errors = {};
       MODEL.userModel.findOne({ email: dataToSave.email }).then((user) => {
         if (user) {
-          errors.email = "Email already exists";
+          errors.email = 'Email already exists';
           RESPONSE.status(400).jsonp(errors);
         } else {
           MODEL.userModel(dataToSave).save({}, (ERR, RESULT) => {
@@ -83,11 +83,11 @@ userController.registerUser = (REQUEST, RESPONSE) => {
               request(
                 {
                   url:
-                    "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
-                  method: "POST",
+                    'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
+                  method: 'POST',
                   json: true,
                   body: {
-                    data: { username: "xrubicon", password: "xrubicon1234" },
+                    data: { username: 'xrubicon', password: 'xrubicon1234' },
                   },
                 },
                 function (error, response, body) {
@@ -95,11 +95,11 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                   request(
                     {
                       url:
-                        "https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer",
-                      method: "POST",
+                        'https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer',
+                      method: 'POST',
                       headers: {
-                        Accept: "application/json",
-                        "Accept-Charset": "utf-8",
+                        Accept: 'application/json',
+                        'Accept-Charset': 'utf-8',
                         Token: response.headers.token,
                       },
                       json: true,
@@ -119,15 +119,15 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                       let card_id = res.body.content.data.cardID;
                       need = { cardID: card_id, ...RESULT };
 
-                      const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
-                      const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
-                      const client = require("twilio")(accountSid, authToken);
+                      const accountSid = 'ACa71d7c2a125fe67b309b691e0424bc66';
+                      const authToken = '47db7eac4e2e1c56b01de8152d0adc8d';
+                      const client = require('twilio')(accountSid, authToken);
 
                       client.verify
-                        .services("VA703183e103532fd4fe69da94ef2c12c1")
+                        .services('VA703183e103532fd4fe69da94ef2c12c1')
                         .verifications.create({
                           to: `+234${dataToSave.phone}`,
-                          channel: "sms",
+                          channel: 'sms',
                         })
                         .then((verification) =>
                           console.log(verification.status)
@@ -169,11 +169,11 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                               var test = JSON.parse(JSON.stringify(USER));
 
                               if (err) return RESPONSE.status(400).jsonp(error);
-                              console.log("user here at all", USER);
+                              console.log('user here at all', USER);
                               var jwtToken = COMMON_FUN.createToken(
                                 test
                               ); /** creating jwt token */
-                              console.log("user token here at all", USER);
+                              console.log('user token here at all', USER);
                               test.token = jwtToken;
                               return RESPONSE.status(200).jsonp(
                                 COMMON_FUN.sendSuccess(
@@ -255,18 +255,18 @@ userController.forgotPassword = (REQUEST, RESPONSE) => {
     PROJECTION = { __v: 0, createAt: 0 };
   /** check if user exists or not */
   var mailOptions = {
-    from: "pakambusiness@gmail.com",
+    from: 'pakambusiness@gmail.com',
     // to: `${REQUEST.body.email}`,
     to: `sobowalebukola@gmail.com`,
-    subject: "FORGOT PASSWORD MAIL",
-    text: "Forgot password?",
+    subject: 'FORGOT PASSWORD MAIL',
+    text: 'Forgot password?',
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
     } else {
-      console.log("Email sent: " + info.response);
+      console.log('Email sent: ' + info.response);
     }
   });
 
@@ -378,7 +378,7 @@ userController.updateUser = async (REQUEST, RESPONSE) => {
             .then((user) => {
               if (!user) {
                 return RESPONSE.status(400).json({
-                  message: "User not found",
+                  message: 'User not found',
                 });
               }
               return RESPONSE.jsonp(
@@ -474,20 +474,20 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
   var error = {};
   var phone = REQUEST.body.phone;
 
-  const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
-  const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
-  const client = require("twilio")(accountSid, authToken);
+  const accountSid = 'ACa71d7c2a125fe67b309b691e0424bc66';
+  const authToken = '47db7eac4e2e1c56b01de8152d0adc8d';
+  const client = require('twilio')(accountSid, authToken);
 
   try {
     client.verify
-      .services("VA703183e103532fd4fe69da94ef2c12c1")
+      .services('VA703183e103532fd4fe69da94ef2c12c1')
       .verifications.create({
         to: `+234${phone}`,
-        channel: "sms",
+        channel: 'sms',
       })
       .then((verification) => {
         console.log(verification.status);
-        RESPONSE.status(200).jsonp({ message: "Verification code sent" });
+        RESPONSE.status(200).jsonp({ message: 'Verification code sent' });
       })
       .catch((err) => RESPONSE.status(404).jsonp(err));
   } catch (err) {
@@ -499,18 +499,18 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
   var error = {};
   var token = REQUEST.body.token;
   var phone = REQUEST.body.phone;
-  const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
-  const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
-  const client = require("twilio")(accountSid, authToken);
+  const accountSid = 'ACa71d7c2a125fe67b309b691e0424bc66';
+  const authToken = '47db7eac4e2e1c56b01de8152d0adc8d';
+  const client = require('twilio')(accountSid, authToken);
 
   client.verify
-    .services("VA703183e103532fd4fe69da94ef2c12c1")
+    .services('VA703183e103532fd4fe69da94ef2c12c1')
     .verificationChecks.create({
       to: `+234${phone}`,
       code: `${token}`,
     })
     .then((verification_check) => {
-      if (verification_check.status == "approved") {
+      if (verification_check.status == 'approved') {
         console.log(verification_check.status);
         MODEL.userModel.updateOne(
           { phone: phone },
@@ -520,11 +520,11 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
               var test = JSON.parse(JSON.stringify(USER));
 
               if (err) return RESPONSE.status(400).jsonp(error);
-              console.log("user here at all", USER);
+              console.log('user here at all', USER);
               var jwtToken = COMMON_FUN.createToken(
                 test
               ); /** creating jwt token */
-              console.log("user token here at all", USER);
+              console.log('user token here at all', USER);
               test.token = jwtToken;
               return RESPONSE.jsonp(test);
             });
@@ -538,7 +538,7 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
 userController.getAllClients = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
-    let users = await MODEL.userModel.find({ roles: "client" });
+    let users = await MODEL.userModel.find({ roles: 'client' });
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);
@@ -548,10 +548,10 @@ userController.getAllClients = async (REQUEST, RESPONSE) => {
 userController.getWalletBalance = (req, res) => {
   request(
     {
-      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
-      method: "POST",
+      url: 'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
+      method: 'POST',
       json: true,
-      body: { data: { username: "xrubicon", password: "xrubicon1234" } },
+      body: { data: { username: 'xrubicon', password: 'xrubicon1234' } },
     },
     function (error, response, body) {
       response.headers.token;
@@ -559,10 +559,10 @@ userController.getWalletBalance = (req, res) => {
       request(
         {
           url: `https://apis.touchandpay.me/lawma-backend/v1/agent/get/customer/card/${req.query.cardID}`,
-          method: "GET",
+          method: 'GET',
           headers: {
-            Accept: "application/json",
-            "Accept-Charset": "utf-8",
+            Accept: 'application/json',
+            'Accept-Charset': 'utf-8',
             Token: response.headers.token,
           },
           json: true,
@@ -588,21 +588,21 @@ userController.getAllCollectors = async (REQUEST, RESPONSE) => {
 userController.resetMobile = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
   const token = REQUEST.body.token;
-  
-  const accountSid = "ACa71d7c2a125fe67b309b691e0424bc66";
-  const authToken = "47db7eac4e2e1c56b01de8152d0adc8d";
-  const client = require("twilio")(accountSid, authToken);
+
+  const accountSid = 'ACa71d7c2a125fe67b309b691e0424bc66';
+  const authToken = '47db7eac4e2e1c56b01de8152d0adc8d';
+  const client = require('twilio')(accountSid, authToken);
 
   client.verify
-    .services("VA703183e103532fd4fe69da94ef2c12c1")
+    .services('VA703183e103532fd4fe69da94ef2c12c1')
     .verificationChecks.create({
       to: `+234${phone}`,
       code: `${token}`,
     })
     .then((verification_check) => {
-      if (verification_check.status == "approved") {
+      if (verification_check.status == 'approved') {
         RESPONSE.status(200).json({
-          message: " Verification successful ",
+          message: ' Verification successful ',
         });
       }
     })
@@ -614,7 +614,7 @@ userController.resetMobilePassword = (REQUEST, RESPONSE) => {
   MODEL.userModel.findOne({ phone: phone }).then((result) => {
     if (!result) {
       return RESPONSE.status(400).json({
-        message: " This account is not verified ",
+        message: ' This account is not verified ',
       });
     }
 
@@ -633,6 +633,48 @@ userController.resetMobilePassword = (REQUEST, RESPONSE) => {
     });
   });
 };
+
+// userController.getTransactions = (req, res) => {
+//   MODEL.transactionModel.find({}).then((result, err) => {
+//     var need = result.map((x) => x.cardID);
+//     var uniq = [...new Set(need)];
+//     console.log('--->', uniq);
+//     var responseData = []
+
+//     for(var i = 0 ; i < uniq.length -1 ; i++){
+//      request(
+//         {
+//           url: `https://apis.touchandpay.me/lawma-backend/v1/customer/get/customer/card/${uniq[i]}/transactions`,
+//           method: 'GET',
+//           headers: {
+//             Accept: 'application/json',
+//             'Accept-Charset': 'utf-8',
+//             Token: `eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NywidXNlcm5hbWUiOiJ4cnViaWNvbi1yZWN5Y2xlciIsIm5hbWUiOiJYcnViaWNvbiIsInBob25lIjoiMDcwMzA2NzQwMzUiLCJlbWFpbCI6ImFkbWluQHhydWJpY29uLmNvbSIsImFkZHJlc3MiOiJMYWdvcywgTmlnZXJpYS4iLCJ1c2VydHlwZSI6MSwicHVibGljS2V5IjoicHJmMWg2Z3NZMWdGIiwiaXNzIjoicGF5cm9sbG1uZ3IiLCJhdWQiOiJwYXlyb2xsbW5nciIsImlhdCI6MTYwMDA3NDU5MCwibmJmIjoxNjAwMDc0NTkwfQ.L4vI-DH5pKQ5u5ROt5KU78trv2nW51luTaYnrdt2szg`,
+//           },
+//           json: true,
+//         },
+//         function (error, response, body) {
+//           responseData.push(response.body.content.data);
+
+//           if(i == uniq.length-1){
+//             console.log('--->', responseData)
+//             return res.status(200).json(responseData)
+
+//           }
+//           console.log('--->', responseData.length)
+//         });
+//       }
+
+//   });
+// };
+
+userController.getUserTransactions = (req,res)=>{
+  const cardID = req.query.cardID;
+  const PROJECTION =  {paid: 0 , cardID: 0 ,  scheduleId: 0 , __V: 0, weight: 0, fullname: 0 , completedBy: 0, organisationID: 0}
+  MODEL.transactionModel.find({cardID: cardID }, PROJECTION).then((result)=>{
+      return res.status(200).json(result)
+  })
+}
 
 /* export userControllers */
 module.exports = userController;

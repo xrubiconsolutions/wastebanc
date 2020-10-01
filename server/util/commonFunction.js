@@ -153,7 +153,7 @@ let checkDuplicateValuesInArray =  (array)=> {
  */
 let generateRandomString = ()=> {
   return randomstring.generate({
-    length: 5,
+    length: 7,
     charset: 'numeric'
   });
 };

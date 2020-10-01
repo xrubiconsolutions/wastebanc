@@ -45,6 +45,11 @@ module.exports = (APP) => {
 
   APP.route("/api/getBalance").get(CONTROLLER.userController.getWalletBalance);
 
+  APP.route("/api/user/transactions").get(CONTROLLER.userController.getUserTransactions);
+
+
+  // APP.route("/api/lawma/get/transaction").get(CONTROLLER.userController.getTransactions);
+
   APP.route("/getUser").get((req, res) => {
     res.jsonp("cool");
   });
