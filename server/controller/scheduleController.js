@@ -721,7 +721,7 @@ scheduleController.allCoins = (req, res)=>{
           
           const allCoins = test.map(x=>x.point).reduce((acc,curr) => {
             return acc + curr
-          })
+          }, 0)
 
 
          return res.status(200).jsonp(

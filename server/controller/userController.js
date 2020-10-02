@@ -568,7 +568,7 @@ userController.getWalletBalance = (req, res) => {
           json: true,
         },
         function (error, response, body) {
-          res.jsonp(response.body.content.data);
+          return res.jsonp(response.body.content.data);
         }
       );
     }
