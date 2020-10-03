@@ -72,9 +72,18 @@ userController.registerUser = (REQUEST, RESPONSE) => {
     else {
       dataToSave.password = PASSWORD;
       var errors = {};
-      MODEL.userModel.findOne({ email: dataToSave.email }).then((user) => {
+      MODEL.userModel.findOne({
+        
+        
+        "$or": [{
+           "email": dataToSave.email
+       }, {
+           "phone": dataToSave.phone
+       }]
+         
+       }).then((user) => {
         if (user) {
-          errors.email = 'User already exists';
+          errors.message = 'User already exists';
           RESPONSE.status(400).jsonp(errors);
         } else {
           MODEL.userModel(dataToSave).save({}, (ERR, RESULT) => {

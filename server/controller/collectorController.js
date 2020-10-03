@@ -29,12 +29,12 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
        "$or": [{
           "email": dataToSave.email
       }, {
-          "fullname": dataToSave.fullname
+          "phone": dataToSave.phone
       }]
         
       }).then((user) => {
         if (user) {
-          errors.email = "Email already exists";
+          errors.message = "User already exists";
           RESPONSE.status(400).jsonp(errors);
         } else {
           MODEL.collectorModel(dataToSave).save({}, (ERR, RESULT) => {
