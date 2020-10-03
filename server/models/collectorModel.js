@@ -11,7 +11,6 @@ const collector_Schema = new Schema({
   fullname: {
     type: String,
     required: true,
-    unique: true,
   },
   address: {
     type: String,
