@@ -74,7 +74,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
       var errors = {};
       MODEL.userModel.findOne({ email: dataToSave.email }).then((user) => {
         if (user) {
-          errors.email = 'Email already exists';
+          errors.email = 'User already exists';
           RESPONSE.status(400).jsonp(errors);
         } else {
           MODEL.userModel(dataToSave).save({}, (ERR, RESULT) => {
@@ -204,7 +204,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
  **************************************************/
 userController.loginUser = (REQUEST, RESPONSE) => {
   let CRITERIA = {
-      $or: [{ username: REQUEST.body.username }],
+      $or: [{ phone: REQUEST.body.phone }],
     },
     PROJECTION = { __v: 0, createAt: 0 };
 
@@ -239,7 +239,9 @@ userController.loginUser = (REQUEST, RESPONSE) => {
             }
           )
         : RESPONSE.status(400).jsonp(
-            COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+            {
+              message : "Invalid phone number"
+            }
           );
     })
     .catch((err) => {
@@ -256,8 +258,7 @@ userController.forgotPassword = (REQUEST, RESPONSE) => {
   /** check if user exists or not */
   var mailOptions = {
     from: 'pakambusiness@gmail.com',
-    // to: `${REQUEST.body.email}`,
-    to: `sobowalebukola@gmail.com`,
+    to: `${REQUEST.body.email}`,
     subject: 'FORGOT PASSWORD MAIL',
     text: 'Forgot password?',
   };

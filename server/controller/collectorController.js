@@ -148,7 +148,7 @@ collectorController.loginCollector = (REQUEST, RESPONSE) => {
 
   /** find user is exists or not */
   MODEL.collectorModel
-    .findOne({ fullname: REQUEST.body.fullname }, PROJECTION , { lean: true })
+    .findOne({ phone: REQUEST.body.phone }, PROJECTION , { lean: true })
     .then((USER) => {
       USER /** matching password */
         ? COMMON_FUN.decryptPswrd(
@@ -173,7 +173,9 @@ collectorController.loginCollector = (REQUEST, RESPONSE) => {
             }
           )
         : RESPONSE.status(400).jsonp(
-            COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+          {
+            message: " Invalid phone number"
+          }
           );
     })
     .catch((err) => {
