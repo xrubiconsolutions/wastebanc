@@ -517,8 +517,14 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
           }
         );
       }
+      // return RESPONSE.status(404).json({
+      //   message: "Wrong OTP !"
+      // })
+    
     })
-    .catch((err) => RESPONSE.status(404).jsonp(err));
+    .catch((err) => RESPONSE.status(404).json({
+      message: "Wrong OTP !"
+    }));
 };
 
 userController.getAllClients = async (REQUEST, RESPONSE) => {
