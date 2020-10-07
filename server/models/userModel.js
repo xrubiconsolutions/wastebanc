@@ -88,7 +88,7 @@ const user_Schema = new Schema({
   gender: {
     type: String,
   },
-  localGovernment: {
+  lcd: {
     type: String,
   },
   dateOfBirth: {
