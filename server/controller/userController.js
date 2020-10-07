@@ -143,38 +143,13 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                           console.log(verification.status)
                         );
 
-                      /*Bypass verification for testing purposes*/
-
-                      // MODEL.userModel.updateOne(
-                      //   { phone:  dataToSave.phone },
-                      //   { verified: true },
-                      //   (res) => {
-
-                      //     MODEL.userModel
-                      //       .findOne({ "phone": dataToSave.phone }, (err,USER) => {
-
-                      //         var test = JSON.parse(JSON.stringify(USER))
-
-                      //         if (err) return RESPONSE.status(400).jsonp(error)
-                      //         console.log("user here at all", USER)
-                      //         var jwtToken = COMMON_FUN.createToken(
-                      //           test
-                      //         ); /** creating jwt token */
-                      //         console.log("user token here at all", USER)
-                      //         test.token = jwtToken;
-                      //         // return RESPONSE.jsonp(test);
-
-                      //       })
-                      //   }
-                      // );
-
                       MODEL.userModel.updateOne(
                         { email: RESULT.email },
                         { $set: { cardID: card_id } },
                         (res) => {
                           //BYPASS FOR TESTING PURPOSE
                           MODEL.userModel.findOne(
-                            { cardID: card_id },
+                            { email: RESULT.email},
                             (err, USER) => {
                               var test = JSON.parse(JSON.stringify(USER));
 

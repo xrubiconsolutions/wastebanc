@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 /************* Modules ***********/
-const MONGOOSE = require("mongoose");
+const MONGOOSE = require('mongoose');
 const Schema = MONGOOSE.Schema;
-const Constants = require("../util/constants");
+const Constants = require('../util/constants');
 
 /**************************************************
  ************* User Model or collection ***********
@@ -15,22 +15,22 @@ const user_Schema = new Schema({
   firstname: {
     type: String,
     required: true,
-    default: "First",
+    default: 'First',
   },
   lastname: {
     type: String,
     required: true,
-    default: "Last",
+    default: 'Last',
   },
   othernames: {
     type: String,
     required: true,
-    default: "Other_names",
+    default: 'Other_names',
   },
   address: {
     type: String,
     required: true,
-    default: "Lagos",
+    default: 'Lagos',
   },
   cardID: {
     type: Number,
@@ -61,13 +61,13 @@ const user_Schema = new Schema({
 
   roles: {
     type: String,
-    enum: ["client", "collector", "admin"],
+    enum: ['client', 'collector', 'admin'],
     required: true,
-    default: "client",
+    default: 'client',
   },
   countryCode: {
     type: String,
-    default: "+234",
+    default: '+234',
   },
   verified: {
     type: Boolean,
@@ -88,12 +88,15 @@ const user_Schema = new Schema({
   gender: {
     type: String,
   },
+  localGovernment: {
+    type: String,
+  },
   dateOfBirth: {
     type: String,
   },
-  onesignal_id:{
-      type: String
-  }
+  onesignal_id: {
+    type: String,
+  },
 });
 
-module.exports = MONGOOSE.model("User", user_Schema);
+module.exports = MONGOOSE.model('User', user_Schema);
