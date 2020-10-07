@@ -144,28 +144,28 @@ userController.registerUser = (REQUEST, RESPONSE) => {
 
                       /*Bypass verification for testing purposes*/
 
-                      // MODEL.userModel.updateOne(
-                      //   { phone: phone },
-                      //   { verified: true },
-                      //   (res) => {
+                      MODEL.userModel.updateOne(
+                        { phone: phone },
+                        { verified: true },
+                        (res) => {
 
-                      //     MODEL.userModel
-                      //       .findOne({ "phone": phone }, (err,USER) => {
+                          MODEL.userModel
+                            .findOne({ "phone": phone }, (err,USER) => {
 
-                      //         var test = JSON.parse(JSON.stringify(USER))
+                              var test = JSON.parse(JSON.stringify(USER))
 
-                      //         if (err) return RESPONSE.status(400).jsonp(error)
-                      //         console.log("user here at all", USER)
-                      //         var jwtToken = COMMON_FUN.createToken(
-                      //           test
-                      //         ); /** creating jwt token */
-                      //         console.log("user token here at all", USER)
-                      //         test.token = jwtToken;
-                      //         return RESPONSE.jsonp(test);
+                              if (err) return RESPONSE.status(400).jsonp(error)
+                              console.log("user here at all", USER)
+                              var jwtToken = COMMON_FUN.createToken(
+                                test
+                              ); /** creating jwt token */
+                              console.log("user token here at all", USER)
+                              test.token = jwtToken;
+                              return RESPONSE.jsonp(test);
 
-                      //       })
-                      //   }
-                      // );
+                            })
+                        }
+                      );
 
                       MODEL.userModel.updateOne(
                         { email: RESULT.email },
@@ -213,7 +213,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
  **************************************************/
 userController.loginUser = (REQUEST, RESPONSE) => {
   let CRITERIA = {
-      $or: [{ phone: REQUEST.body.phone }],
+      $or: [{ phone: REQUEST.body.phone }, {email: REQUEST.body.email} ],
     },
     PROJECTION = { __v: 0, createAt: 0 };
 
