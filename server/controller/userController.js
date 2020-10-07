@@ -489,6 +489,9 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
   const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
   const client = require('twilio')(accountSid, authToken);
 
+
+  try {
+
   client.verify
     .services('VAeaa492de9598c3dcce55fd9243461ab3')
     .verificationChecks.create({
@@ -517,14 +520,22 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
           }
         );
       }
-      // return RESPONSE.status(404).json({
-      //   message: "Wrong OTP !"
-      // })
+      return RESPONSE.status(404).json({
+        message: "Wrong OTP !"
+      })
     
     })
     .catch((err) => RESPONSE.status(404).json({
       message: "Wrong OTP !"
     }));
+
+  }
+  catch(err) {
+        return  RESPONSE.status(404).json({
+          message: "Wrong OTP !"
+        });
+    
+  }
 };
 
 userController.getAllClients = async (REQUEST, RESPONSE) => {
