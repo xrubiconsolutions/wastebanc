@@ -128,15 +128,16 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                       let card_id = res.body.content.data.cardID;
                       need = { cardID: card_id, ...RESULT };
 
-                      const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
-                      const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
-                      const client = require('twilio')(accountSid, authToken);
+
+                      const accountSid = "AC21bbc8152a9b9d981d6c86995d0bb806";
+                      const authToken = "3c53aeab8e3420f00e7b05777e7413a9";
+                      const client = require("twilio")(accountSid, authToken);
 
                       client.verify
-                        .services('VAeaa492de9598c3dcce55fd9243461ab3	')
+                        .services("VAeaa492de9598c3dcce55fd9243461ab3")
                         .verifications.create({
                           to: `+234${dataToSave.phone}`,
-                          channel: 'sms',
+                          channel: "sms",
                         })
                         .then((verification) =>
                           console.log(verification.status)
@@ -144,28 +145,28 @@ userController.registerUser = (REQUEST, RESPONSE) => {
 
                       /*Bypass verification for testing purposes*/
 
-                      MODEL.userModel.updateOne(
-                        { phone: phone },
-                        { verified: true },
-                        (res) => {
+                      // MODEL.userModel.updateOne(
+                      //   { phone:  dataToSave.phone },
+                      //   { verified: true },
+                      //   (res) => {
 
-                          MODEL.userModel
-                            .findOne({ "phone": phone }, (err,USER) => {
+                      //     MODEL.userModel
+                      //       .findOne({ "phone": dataToSave.phone }, (err,USER) => {
 
-                              var test = JSON.parse(JSON.stringify(USER))
+                      //         var test = JSON.parse(JSON.stringify(USER))
 
-                              if (err) return RESPONSE.status(400).jsonp(error)
-                              console.log("user here at all", USER)
-                              var jwtToken = COMMON_FUN.createToken(
-                                test
-                              ); /** creating jwt token */
-                              console.log("user token here at all", USER)
-                              test.token = jwtToken;
-                              return RESPONSE.jsonp(test);
+                      //         if (err) return RESPONSE.status(400).jsonp(error)
+                      //         console.log("user here at all", USER)
+                      //         var jwtToken = COMMON_FUN.createToken(
+                      //           test
+                      //         ); /** creating jwt token */
+                      //         console.log("user token here at all", USER)
+                      //         test.token = jwtToken;
+                      //         // return RESPONSE.jsonp(test);
 
-                            })
-                        }
-                      );
+                      //       })
+                      //   }
+                      // );
 
                       MODEL.userModel.updateOne(
                         { email: RESULT.email },
