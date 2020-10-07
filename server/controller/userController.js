@@ -145,7 +145,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
 
                       MODEL.userModel.updateOne(
                         { email: RESULT.email },
-                        { $set: { cardID: card_id } },
+                        { $set: { cardID: card_id , firstname: RESULT.username.split(' ')[0],lastname: RESULT.username.split(' ')[1]} },
                         (res) => {
                           //BYPASS FOR TESTING PURPOSE
                           MODEL.userModel.findOne(
