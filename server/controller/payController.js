@@ -106,8 +106,17 @@ payController.afterPayment = (req,res)=>{
 
   try {
     MODEL.userModel.findOne({_id: userID}).then(result=>{
-
-      return res.status(200).json(result)
+      var test = JSON.parse(JSON.stringify(result));
+      var jwtToken = COMMON_FUN.createToken(
+        test
+      ); /** creating jwt token */
+      test.token = jwtToken;
+      return RESPONSE.status(200).jsonp(
+        COMMON_FUN.sendSuccess(
+          CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+          test
+        )
+      );
 
     })
   }
