@@ -27,6 +27,7 @@ reportController.report = (req, res) => {
   var token;
   var roomToSessionIdDictionary = {};
 
+  MODEL.reportModel.updateOne({ userReportID: userID }, { active : true }).then(test=>
   MODEL.reportModel
     .findOne({
       userReportID: userID,
@@ -77,7 +78,8 @@ reportController.report = (req, res) => {
         })
         });
       }
-    });
+    })
+  );
 };
 
 reportController.getReport = (req, res) => {

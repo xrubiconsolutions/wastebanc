@@ -709,11 +709,15 @@ organisationController.weekChartData = (req, res) => {
 };
 
 organisationController.raffleTicket = (req, res) => {
+
+  // const lcd = req.body.lcd
+
   try {
     MODEL.userModel
-      .aggregate([{ $sample: { size: 1 } }, { $match: { roles: "client" } }])
+      .aggregate([{ $sample: { size: 2 } }, { $match: { roles: "client" } },  { $match: { cardID: null } }])
       .then((result, err) => {
         if (err) return res.status(400).json(err);
+        console.table(result)
         return res.status(200).json({ winner: result[0] });
       });
   } catch (err) {
