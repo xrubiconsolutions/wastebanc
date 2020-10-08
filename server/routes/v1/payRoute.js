@@ -16,4 +16,7 @@ module.exports = (APP) => {
 
     APP.route('/api/payment/receipt')
         .post(CONTROLLER.payController.saveReceipt);
+
+    APP.route('/api/payment/user/current')
+        .get(CONTROLLER.payController.afterPayment);
 }
