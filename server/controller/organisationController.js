@@ -710,11 +710,11 @@ organisationController.weekChartData = (req, res) => {
 
 organisationController.raffleTicket = (req, res) => {
 
-  // const lcd = req.body.lcd
+  const lcd = req.body.lcd
 
   try {
     MODEL.userModel
-      .aggregate([{ $sample: { size: 2 } }, { $match: { roles: "client" } },  { $match: { cardID: null } }])
+      .aggregate([{ $sample: { size: 10 } }, { $match: { lcd: lcd} }])
       .then((result, err) => {
         if (err) return res.status(400).json(err);
         console.table(result)
