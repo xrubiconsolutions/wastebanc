@@ -473,7 +473,7 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
       })
       .then((verification) => {
         console.log(verification.status);
-        RESPONSE.status(200).jsonp({ message: 'Verification code sent' });
+        return RESPONSE.status(200).jsonp({ message: 'Verification code sent' });
       })
       .catch((err) => RESPONSE.status(404).jsonp(err));
   } catch (err) {
@@ -513,16 +513,21 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
               var jwtToken = COMMON_FUN.createToken(
                 test
               ); /** creating jwt token */
-              console.log('user token here at all', USER);
+              console.log('user token here at all', test , jwtToken);
               test.token = jwtToken;
-              return RESPONSE.jsonp(test);
+              return RESPONSE.status(200).json(test);
             });
           }
         );
       }
-      return RESPONSE.status(404).json({
-        message: "Wrong OTP !"
-      })
+      else {
+
+        return RESPONSE.status(404).json({
+          message: "Wrong OTP !"
+        })
+
+      }
+     
     
     })
     .catch((err) => RESPONSE.status(404).json({
@@ -532,7 +537,7 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
   }
   catch(err) {
         return  RESPONSE.status(404).json({
-          message: "Wrong OTP !"
+       err
         });
     
   }
