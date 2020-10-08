@@ -111,7 +111,7 @@ payController.afterPayment = (req,res)=>{
         test
       ); /** creating jwt token */
       test.token = jwtToken;
-      return RESPONSE.status(200).jsonp(
+      return res.status(200).jsonp(
         COMMON_FUN.sendSuccess(
           CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
           test
