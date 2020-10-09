@@ -719,7 +719,10 @@ organisationController.raffleTicket = (req, res) => {
         const number = checks.length
         console.log("<<>>", number)
 
-      MODEL.userModel.find({lcd: lcd}).skip(Math.random()*number).then((winners,err)=>{
+      MODEL.userModel.aggregate(  [
+        { $match: { lcd: lcd } },
+        { $sample: { size: Number(winner_count) } }
+       ]).then((winners,err)=>{
           console.log("winner", winners)
           if (err) return res.status(400).json(err);
         return res.status(200).json({ winners: winners});
