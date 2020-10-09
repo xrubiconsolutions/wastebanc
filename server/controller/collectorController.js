@@ -215,6 +215,7 @@ collectorController.checkCompleted = (REQUEST, RESPONSE) => {
 
   MODEL.scheduleModel
     .find({ completionStatus: "completed", collectedBy: collectorID })
+    .sort({ _id: -1 })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -233,6 +234,7 @@ collectorController.collectorAnalysis = (REQUEST, RESPONSE) => {
 
   MODEL.scheduleModel
     .find({ completionStatus: "completed", collectedBy: collectorID })
+    .sort({ _id: -1 })
     .then((schedules) => {
       completed = schedules.length;
       MODEL.scheduleModel
@@ -285,6 +287,7 @@ collectorController.checkTotalCompleted = (REQUEST, RESPONSE) => {
 
   MODEL.scheduleModel
     .find({ completionStatus: "completed", collectedBy: collectorID })
+    .sort({ _id: -1 })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(
@@ -301,6 +304,7 @@ collectorController.checkMissed = (REQUEST, RESPONSE) => {
 
   MODEL.scheduleModel
     .find({ completionStatus: "missed", collectedBy: collectorID })
+    .sort({ _id: -1 })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -484,6 +488,7 @@ collectorController.getTransactions = (req, res) => {
 
   MODEL.transactionModel
     .find({ completedBy: collectorID })
+    .sort({ _id: -1 })
     .then((transaction) => res.status(200).jsonp(transaction))
     .catch((err) => res.status(500).jsonp(err));
 };

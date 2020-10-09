@@ -118,8 +118,22 @@ module.exports = (APP) => {
        
     APP.route('/api/organisation/lawma/week/chart')
         .get(CONTROLLER.organisationController.lawmaWeekChartData);
-    
-    
-       
+
+    APP.route('/api/analytics/missed/schedule')
+        .get(CONTROLLER.organisationController.allMissedSchedules);
+
+    APP.route('/api/analytics/pending/schedule')
+        .get(CONTROLLER.organisationController.allPendingSchedules);
+
+    APP.route('/api/analytics/completed/schedule')
+        .get(CONTROLLER.organisationController.allCompletedSchedules);
+
+    APP.route('/api/analytics/cancelled/schedule')
+        .get(CONTROLLER.organisationController.allCancelledchedules);
+
+    APP.route('/api/analytics/all/schedule')
+        .get(CONTROLLER.organisationController.viewAllSchedules);
+
+
                    
 };

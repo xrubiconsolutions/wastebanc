@@ -104,6 +104,7 @@ reportController.getReport = (req, res) => {
 reportController.allReport = (req, res) => {
   MODEL.reportModel
     .find({})
+    .sort({ _id: -1 })
     .then((user) => {
       return res.status(200).json(user);
     })

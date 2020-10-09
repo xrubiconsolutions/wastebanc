@@ -193,6 +193,7 @@ organisationController.listOrganisation = (req, res) => {
 
   MODEL.organisationModel
     .find({})
+    .sort({ _id: -1 })
     .then((result) => {
       //  if (err) {
       //   errors.message = "There was an issue fetching the organisations"
@@ -1143,6 +1144,78 @@ organisationController.recyclerActions = (req, res) => {
     }
     // return res.status(200).json(data)
   });
+};
+
+
+
+
+organisationController.allMissedSchedules = (REQUEST, RESPONSE) => {
+  MODEL.scheduleModel
+    .find({ completionStatus: "missed" })
+    .sort( { _id : -1})
+    .then((schedules) => {
+      RESPONSE.status(200).jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
+
+
+
+organisationController.viewAllSchedules = (REQUEST, RESPONSE) => {
+  // let CRITERIA = {$or: [{client: REQUEST.query.username}]},
+  // PROJECTION = {__v : 0, createAt: 0};
+
+  MODEL.scheduleModel
+    .find({})
+    .sort({ _id: -1 })
+    .then((schedules) => {
+      RESPONSE.jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
+
+
+organisationController.allPendingSchedules = (REQUEST, RESPONSE) => {
+  MODEL.scheduleModel
+    .find({ completionStatus: "pending" })
+    .sort({ _id: -1 })
+    .then((schedules) => {
+      RESPONSE.status(200).jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
+
+organisationController.allCompletedSchedules = (REQUEST, RESPONSE) => {
+  MODEL.scheduleModel
+    .find({ completionStatus: "completed"})
+    .sort({ _id: -1 })
+    .then((schedules) => {
+      console.log("Completed schedules here", schedules)
+      RESPONSE.status(200).jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(200).jsonp(COMMON_FUN.sendError(err)));
+};
+
+
+organisationController.allCancelledchedules = (REQUEST, RESPONSE) => {
+  MODEL.scheduleModel
+    .find({ completionStatus: "cancelled"})
+    .sort({ _id: -1 })
+    .then((schedules) => {
+      console.log("Completed schedules here", schedules)
+      RESPONSE.status(200).jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(200).jsonp(COMMON_FUN.sendError(err)));
 };
 
 
