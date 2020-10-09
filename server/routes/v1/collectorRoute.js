@@ -46,6 +46,10 @@ module.exports = (APP) => {
 
     APP.route('/api/collector/analytics')
         .get(CONTROLLER.collectorController.collectorAnalysis);
+    
+    APP.route('/api/collector/location')
+        .post(CONTROLLER.collectorController.updatePosition);
+
 
 
 

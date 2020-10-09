@@ -488,4 +488,25 @@ collectorController.getTransactions = (req, res) => {
     .catch((err) => res.status(500).jsonp(err));
 };
 
+collectorController.updatePosition = (req,resp) => {
+  const userID  = req.body.userID;
+  const lat = req.body.lat;
+  const long = req.body.long;
+  try{
+    MODEL.collectorModel.updateOne(
+      { _id: userID },
+      { $set: { lat: lat, long: long } },
+      (res) => {
+        return resp.status(200).json({
+          message: "Position Updated Successfully"
+        })
+      }
+    );
+
+  }catch(err){
+    return res.status(500).json(err)
+  }
+
+}
+
 module.exports = collectorController;

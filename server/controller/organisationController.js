@@ -711,15 +711,25 @@ organisationController.weekChartData = (req, res) => {
 organisationController.raffleTicket = (req, res) => {
 
   const lcd = req.body.lcd
+  const winner_count = req.body.winner_count
 
   try {
     MODEL.userModel
-      .aggregate([{ $sample: { size: 10 } }, { $match: { lcd: lcd} }])
-      .then((result, err) => {
-        if (err) return res.status(400).json(err);
-        console.table(result)
-        return res.status(200).json({ winner: result[0] });
-      });
+      .find({lcd:lcd}).then((checks,err)=>{
+        const number = checks.length
+        console.log("<<>>", number)
+
+      MODEL.userModel.find({lcd: lcd}).skip(Math.random()*number).then((winners,err)=>{
+          console.log("winner", winners)
+          if (err) return res.status(400).json(err);
+        return res.status(200).json({ winners: winners});
+        
+      }
+      )
+      })
+
+
+
   } catch (err) {
     return res.status(500).json(err);
   }
