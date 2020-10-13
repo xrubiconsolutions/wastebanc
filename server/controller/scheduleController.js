@@ -49,10 +49,15 @@ var sendNotification = function(data) {
 
 
 scheduleController.schedule = (REQUEST, RESPONSE) => {
-
-
-
   var data = { ...REQUEST.body };
+
+  MODEL.userModel.findOne({ email : REQUEST.body.client }).then((result)=>{
+    if(result.cardID == null) {
+      return RESPONSE.status(400).json({
+        message: "You don't have a valid card ID, contact support for help"
+      })
+    }
+
   MODEL.scheduleModel(data).save({}, (ERR, RESULT) => {
     try {
       if (ERR) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
@@ -69,7 +74,9 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
         completionStatus: RESULT.completionStatus,
       };
       if (!RESULT.lat || !RESULT.long) {
-        return RESPONSE.status(400).jsonp(RESPONSE);
+        return RESPONSE.status(400).jsonp({
+          message: "Location Invalid"
+        });
       }
 
       return RESPONSE.status(200).jsonp(
@@ -79,6 +86,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
       return RESPONSE.status(400).json(err);
     }
   });
+})
 };
 
 scheduleController.getSchedule = (REQUEST, RESPONSE) => {

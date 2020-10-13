@@ -355,6 +355,7 @@ userController.updateUser = async (REQUEST, RESPONSE) => {
               dateOfBirth: REQUEST.body.dateOfBirth,
               address: REQUEST.body.address,
               fullname: REQUEST.body.fullname,
+              lcd: REQUEST.body.lcd
             },
           }
         )
