@@ -968,6 +968,42 @@ scheduleController.collectorMissed = (req,res)=>{
 }
 
 
+scheduleController.getScheduleCollector = (req,res)=>{
+  const recyclerID = req.query.recyclerID;
+  var PROJECTION = {
+    recycler: 0,
+    organisationID: 0,
+    completedBy: 0,
+    password: 0,
+    _id: 0,
+    password: 0,
+    dateOfBirth: 0,
+    localGovernment: 0,
+    place: 0,
+    state: 0,
+    approvedBy: 0,
+    areaOfAccess:0,
+    address: 0,
+    createdAt:0,
+    __v: 0,
+    countryCode: 0
+  };
+
+  MODEL.collectorModel.findOne({_id: recyclerID}, PROJECTION).then((result)=>{
+        if(!result){
+          return res.status(400).json({
+            message: "No recycler data available"
+          })
+        }
+        return res.status(200).json(result)
+
+  })
+
+
+
+}
+
+
 
 
 module.exports = scheduleController;

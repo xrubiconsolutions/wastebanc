@@ -24,6 +24,9 @@ const schedulePick = new Schema({
         type:String,
         required: true,
     },
+    phone : {
+        type: String
+    },
     Category: {
         type: String,
         // enum : ["plastic bottles", "cans", "rubber", "paper materials"],

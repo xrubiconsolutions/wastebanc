@@ -120,6 +120,9 @@ module.exports = (APP) => {
 
   APP.route("/api/getBalance").get(CONTROLLER.scheduleController.getBalance);
 
+  APP.route("/api/schedule/recycler").get(CONTROLLER.scheduleController.getScheduleCollector);
+
+
   APP.route("/api/allCoins").get(CONTROLLER.scheduleController.allCoins);
 
   APP.route("/api/allAccepted").get(CONTROLLER.scheduleController.allAccepted);
