@@ -329,6 +329,7 @@ userController.updateUser = async (REQUEST, RESPONSE) => {
       { lean: true }
     );
 
+    console.log("<<<<<>>>>", checkUserExist)
     if (checkUserExist) {
       /********** encrypt password ********/
       // COMMON_FUN.encryptPswrd(REQUEST.body.password, (ERR, HASH) => {
