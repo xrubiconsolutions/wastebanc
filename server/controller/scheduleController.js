@@ -989,6 +989,12 @@ scheduleController.getScheduleCollector = (req,res)=>{
     countryCode: 0
   };
 
+  if(!recyclerID){
+    return res.status(400).json({
+      message: "You need a valid recycler ID"
+    })
+  }
+
   MODEL.collectorModel.findOne({_id: recyclerID}, PROJECTION).then((result)=>{
         if(!result){
           return res.status(400).json({
