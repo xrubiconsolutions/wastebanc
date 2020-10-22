@@ -51,6 +51,10 @@ module.exports = (APP) => {
         .post(CONTROLLER.collectorController.updatePosition);
 
 
+    APP.route('/api/collector/update/phone/specifications')
+        .post(CONTROLLER.collectorController.updatePhoneSpecifications);
+
+
 
 
 

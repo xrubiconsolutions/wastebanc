@@ -92,14 +92,19 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                         .then((verification) =>
                           console.log(verification.status)
                         );
-
+                        client.lookups
+                        .phoneNumbers(`+234${RESULT.phone}`)
+                        .fetch({ type: ['carrier'] })
+                        .then((phone_number) =>
                       MODEL.collectorModel.updateOne(
                         { email: RESULT.email },
-                        { $set: { cardID: card_id } },
+                        { $set: { cardID: card_id, mobile_carrier: phone_number.carrier.name
+                        } },
                         (res) => {
                           console.log(res);
                         }
-                      );
+                      )
+                        )
                     }
                   );
                 }
@@ -514,5 +519,59 @@ collectorController.updatePosition = (req,resp) => {
   }
 
 }
+
+
+collectorController.updatePhoneSpecifications = async (REQUEST,RESPONSE)=>{
+  
+  try {
+   
+        let checkUserExist = await MODEL.collectorModel.findOne(
+          { email: REQUEST.body.email },
+          {},
+          { lean: true }
+        );
+      
+    if (checkUserExist) {
+      MODEL.collectorModel
+        .update(
+          { email: REQUEST.body.email },
+          {
+            $set: {
+              phone_type: REQUEST.body.phone_type,
+              phone_OS: REQUEST.body.phone_OS
+            },
+          }
+        )
+        .then((SUCCESS) => {
+          MODEL.collectorModel
+            .findOne({ email: REQUEST.body.email })
+            .then((user) => {
+              if (!user) {
+                return RESPONSE.status(400).json({
+                  message: 'User not found',
+                });
+              }
+              return RESPONSE.jsonp(
+                COMMON_FUN.sendSuccess(
+                  CONSTANTS.STATUS_MSG.SUCCESS.UPDATED,
+                  user
+                )
+              );
+            })
+            .catch((err) => RESPONSE.status(500).json(err));
+        })
+        .catch((ERR) => {
+          return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+        });
+    } else {
+      return RESPONSE.status(400).jsonp(
+        COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+      );
+    }
+  } catch (ERR) {
+    return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(ERR));
+  }
+}
+
 
 module.exports = collectorController;
