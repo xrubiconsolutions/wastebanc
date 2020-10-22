@@ -75,6 +75,9 @@ const collector_Schema = new Schema({
   },
   long : {
     type :String
+  },
+  profile_picture:{
+    type: String
   }
 });
 

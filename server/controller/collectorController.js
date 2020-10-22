@@ -363,6 +363,7 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
               place: REQUEST.body.place,
               organisation: REQUEST.body.organisation,
               localGovernment: REQUEST.body.localGovernment,
+              profile_picture: REQUEST.body.profile_picture
             },
           }
         )
