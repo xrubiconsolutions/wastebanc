@@ -729,12 +729,9 @@ userController.getUserTransactions = (req, res) => {
 userController.uploadProfile = (req, res) => {
   parser.single('image');
 
-  const url_image = req.body.url;
-  if (!url_image) {
-    return res.status(400).json({
-      message: 'Include a valid image path',
-    });
-  }
+  const url_image = req.body.url_image;
+
+
   try {
     cloudinary.uploader.upload(url_image, function (error, result) {
       if (error) {
