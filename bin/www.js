@@ -19,6 +19,7 @@ const cors = require("cors");
 
 
 
+var fileUpload = require('express-fileupload');
 
 
 
@@ -106,13 +107,15 @@ const app  = EXPRESS();
     app.set('view engine', 'jade');
     app.use(EXPRESS.static("client"));
     app.use(BODY_PARSER.json({limit: '50mb'}));
-    app.use(BODY_PARSER.urlencoded({ limit: '50mb', extended: true }));
+    app.use(BODY_PARSER.urlencoded({ limit: '50mb', extended: false }));
 
     /** middleware for api's logging with deployment mode */
     let apiLooger = (req, res, next)=>{
             ALLFILES.COMMON_FUN.messageLogs(null, `api hitted ${req.url} ${ process.env.NODE_ENV}`);
             next();
     };
+
+    app.use(fileUpload());
 
     /** Used logger middleware for each api call **/
     app.use(apiLooger);

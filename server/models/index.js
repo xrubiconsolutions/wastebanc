@@ -15,5 +15,6 @@ module.exports = {
     payModel: require("./payModel"),
     companyReceiptModel: require("./companyReceipt"),
     paymentLogModel : require("./paymentLogModel"),
+    advertModel: require("./advertModel"),
 };
 

@@ -7,6 +7,11 @@ const Constants = require('../util/constants');
 /**************************************************
  ************* User Model or collection ***********
  **************************************************/
+
+var expiry = new Date()
+expiry.setDate(new Date().getDate() + 365 );
+
+
 const user_Schema = new Schema({
   username: {
     type: String,
@@ -97,6 +102,22 @@ const user_Schema = new Schema({
   onesignal_id: {
     type: String,
   },
+  last_logged_in:{
+    type: Date
+  },
+  mobile_carrier:{
+    type:String
+  },
+  phone_type:{
+    type:String
+  },
+  expiry_licence:{
+    type: Date,
+    default: expiry
+  },
+  profile_picture:{
+    type: String
+  }
 });
 
 module.exports = MONGOOSE.model('User', user_Schema);
