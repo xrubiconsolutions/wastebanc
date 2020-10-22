@@ -11,6 +11,7 @@ const multer = require("multer");
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
+const fileUpload = multer();
 
 cloudinary.config({
   cloud_name: 'pakam',
@@ -76,16 +77,19 @@ module.exports = (APP) => {
 
   APP.route("/api/user/transactions").get(CONTROLLER.userController.getUserTransactions);
 
-  APP.route("/api/upload/image"
+  APP.route("/api/upload/image",fileUpload.single('image')
+
   ).post(CONTROLLER.userController.uploadProfile);
 
   APP.route("/api/daily/user").get(CONTROLLER.userController.dailyActive);
+
+  APP.route("/api/update/phone/specifications").post(CONTROLLER.userController.updatePhoneSpecifications)
 
   APP.route("/api/new/user").get(CONTROLLER.userController.newActiveUser);
 
   APP.route("/api/user/expiry").get(CONTROLLER.userController.expiryDateFilter);
 
-  APP.route("/api/ads/upload").post(CONTROLLER.userController.advertControl);
+  APP.route("/api/ads/upload", fileUpload.single('video')).post(CONTROLLER.userController.advertControl);
 
   APP.route("/api/view/ads").get(CONTROLLER.userController.adsLook);
 

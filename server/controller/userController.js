@@ -10,10 +10,14 @@ let SERVICE = require('../services/commonService');
 let CONSTANTS = require('../util/constants');
 // const { Response } = require('aws-sdk');
 var request = require('request');
+const streamifier = require('streamifier')
+
 
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+const fileUpload = multer();
 
 cloudinary.config({
   cloud_name: 'pakam',
@@ -727,21 +731,29 @@ userController.getUserTransactions = (req, res) => {
 };
 
 userController.uploadProfile = (req, res) => {
-  parser.single('image');
+  let streamUpload = (req) => {
+    return new Promise((resolve, reject) => {
+        let stream = cloudinary.uploader.upload_stream(
+          (error, result) => {
+            if (result) {
+              resolve(result);
+            } else {
+              reject(error);
+            }
+          }
+        );
 
-  const url_image = req.body.url_image;
-
-
-  try {
-    cloudinary.uploader.upload(url_image, function (error, result) {
-      if (error) {
-        return res.status(400).json(error);
-      }
-      res.status(200).json(result);
+       streamifier.createReadStream(req.files.image.data).pipe(stream);
     });
-  } catch (err) {
-    return res.status(500).json(err);
-  }
+};
+
+async function upload(req) {
+    let result = await streamUpload(req);
+    return res.status(200).json(result)
+    console.log(result);
+}
+
+upload(req);
 };
 
 userController.dailyActive = (req, res) => {
@@ -810,24 +822,43 @@ userController.expiryDateFilter = (req, res) => {
 };
 
 userController.advertControl = (req, res) => {
-  const video_url = req.body.video_url;
+//   const video_url = req.body.video_url;
+
+
+//   let streamUpload = (req) => {
+//     return new Promise((resolve, reject) => {
+//         let stream = cloudinary.uploader.upload_stream(
+//           (error, result) => {
+//             if (result) {
+//               resolve(result);
+//             } else {
+//               reject(error);
+//             }
+//           }
+//         );
+
+//        streamifier.createReadStream(req.files.video.data).pipe(stream);
+//     });
+// };
+
+// async function upload(req) {
+//     let result = await streamUpload(req);
+//     return res.status(200).json(result)
+//     console.log(result);
+// }
+
+// upload(req);
+
+
+
   try {
-    cloudinary.uploader.upload(
-      video_url,
-      { resource_type: 'video', public_id: 'advert', chunk_size: 6000000 },
-      function (error, result) {
-        if (error) {
-          return res.status(400).json(error);
-        }
-        const advert = {
-          advert_url: result.secure_url,
-        };
+        
         MODEL.advertModel.findOne({}).then((adverts) => {
           if (adverts) {
             MODEL.advertModel
               .updateOne(
                 { _id: adverts._id },
-                { $set: { advert_url: advert.advert_url } }
+                // { $set: { advert_url: adverts.advert_url } }
               )
               .then((success) => {
                 return res.status(200).json({
@@ -835,14 +866,42 @@ userController.advertControl = (req, res) => {
                 });
               });
           } else {
-            MODEL.advertModel(advert).save({}, (err, response) => {
-              if (err) return res.status(400).json(err);
-              return res.status(200).json({
-                message: 'Advert posted successfully',
+            let streamUpload = (req) => {
+              return new Promise((resolve, reject) => {
+                  let stream = cloudinary.uploader.upload_stream(
+                    (error, result) => {
+                      if (result) {
+                        resolve(result);
+                      } else {
+                        reject(error);
+                      }
+                    }
+                  );
+          
+                 streamifier.createReadStream(req.files.image.data).pipe(stream);
               });
-            });
+          };
+          
+          async function upload(req) {
+              let result = await streamUpload(req);
+              // return res.status(200).json(result)
+              // console.log(result);
+              const advert = {
+                advert_url: result.secure_url,
+              };
+              MODEL.advertModel(advert).save({}, (err, response) => {
+                if (err) return res.status(400).json(err);
+                return res.status(200).json({
+                  message: 'Advert posted successfully',
+                });
+              });
           }
-        });
+          
+          upload(req);
+          
+
+        
+          }
 
         // res.status(200).json(result)
       }
@@ -857,6 +916,60 @@ userController.adsLook = (req,res)=>{
     return res.status(200).json(advert);
   })
 }
+
+
+userController.updatePhoneSpecifications = async (REQUEST,RESPONSE)=>{
+  
+    try {
+     
+          let checkUserExist = await MODEL.userModel.findOne(
+            { email: REQUEST.body.email },
+            {},
+            { lean: true }
+          );
+        
+      if (checkUserExist) {
+        MODEL.userModel
+          .update(
+            { email: REQUEST.body.email },
+            {
+              $set: {
+                phone_type: REQUEST.body.phone_type,
+                phone_OS: REQUEST.body.phone_OS
+              },
+            }
+          )
+          .then((SUCCESS) => {
+            MODEL.userModel
+              .findOne({ email: REQUEST.body.email })
+              .then((user) => {
+                if (!user) {
+                  return RESPONSE.status(400).json({
+                    message: 'User not found',
+                  });
+                }
+                return RESPONSE.jsonp(
+                  COMMON_FUN.sendSuccess(
+                    CONSTANTS.STATUS_MSG.SUCCESS.UPDATED,
+                    user
+                  )
+                );
+              })
+              .catch((err) => RESPONSE.status(500).json(err));
+          })
+          .catch((ERR) => {
+            return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+          });
+      } else {
+        return RESPONSE.status(400).jsonp(
+          COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+        );
+      }
+    } catch (ERR) {
+      return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(ERR));
+    }
+  }
+
 
 /* export userControllers */
 module.exports = userController;
