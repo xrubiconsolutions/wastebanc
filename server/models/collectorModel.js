@@ -78,7 +78,16 @@ const collector_Schema = new Schema({
   },
   profile_picture:{
     type: String
-  }
+  },
+  mobile_carrier:{
+    type:String
+  },
+  phone_type:{
+    type:String
+  },
+  phone_OS:{
+    type: String
+  },
 });
 
 module.exports = MONGOOSE.model("Collector", collector_Schema);

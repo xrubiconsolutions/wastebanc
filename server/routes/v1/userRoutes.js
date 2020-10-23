@@ -77,9 +77,7 @@ module.exports = (APP) => {
 
   APP.route("/api/user/transactions").get(CONTROLLER.userController.getUserTransactions);
 
-  APP.route("/api/upload/image",fileUpload.single('image')
-
-  ).post(CONTROLLER.userController.uploadProfile);
+  APP.route("/api/upload/image",fileUpload.single('image')).post(CONTROLLER.userController.uploadProfile);
 
   APP.route("/api/daily/user").get(CONTROLLER.userController.dailyActive);
 

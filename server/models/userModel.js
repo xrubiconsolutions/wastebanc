@@ -111,6 +111,9 @@ const user_Schema = new Schema({
   phone_type:{
     type:String
   },
+  phone_OS:{
+    type: String
+  },
   expiry_licence:{
     type: Date,
     default: expiry
