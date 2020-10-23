@@ -750,7 +750,6 @@ userController.uploadProfile = (req, res) => {
 async function upload(req) {
     let result = await streamUpload(req);
     return res.status(200).json(result)
-    console.log(result);
 }
 
 upload(req);
@@ -822,50 +821,21 @@ userController.expiryDateFilter = (req, res) => {
 };
 
 userController.advertControl = (req, res) => {
-//   const video_url = req.body.video_url;
 
-
-//   let streamUpload = (req) => {
-//     return new Promise((resolve, reject) => {
-//         let stream = cloudinary.uploader.upload_stream(
-//           (error, result) => {
-//             if (result) {
-//               resolve(result);
-//             } else {
-//               reject(error);
-//             }
-//           }
-//         );
-
-//        streamifier.createReadStream(req.files.video.data).pipe(stream);
-//     });
-// };
-
-// async function upload(req) {
-//     let result = await streamUpload(req);
-//     return res.status(200).json(result)
-//     console.log(result);
-// }
-
-// upload(req);
-
-
-
-  try {
-        
-        MODEL.advertModel.findOne({}).then((adverts) => {
-          if (adverts) {
-            MODEL.advertModel
-              .updateOne(
-                { _id: adverts._id },
-                // { $set: { advert_url: adverts.advert_url } }
-              )
-              .then((success) => {
-                return res.status(200).json({
-                  message: 'Advert posted successfully',
-                });
-              });
-          } else {
+  try {   
+       
+          // if (adverts) {
+          //   MODEL.advertModel
+          //     .updateOne(
+          //       { _id: adverts._id },
+          //       // { $set: { advert_url: adverts.advert_url } }
+          //     )
+          //     .then((success) => {
+          //       return res.status(200).json({
+          //         message: 'Advert posted successfully',
+          //       });
+          //     });
+          // } else {
             let streamUpload = (req) => {
               return new Promise((resolve, reject) => {
                   let stream = cloudinary.uploader.upload_stream(
@@ -895,17 +865,9 @@ userController.advertControl = (req, res) => {
                   message: 'Advert posted successfully',
                 });
               });
-          }
-          
+          }     
           upload(req);
-          
-
-        
-          }
-
         // res.status(200).json(result)
-      }
-    );
   } catch (err) {
     return res.status(500).json(err);
   }
@@ -930,7 +892,7 @@ userController.updatePhoneSpecifications = async (REQUEST,RESPONSE)=>{
         
       if (checkUserExist) {
         MODEL.userModel
-          .update(
+          .updateOne(
             { email: REQUEST.body.email },
             {
               $set: {

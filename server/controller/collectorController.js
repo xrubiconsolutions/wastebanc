@@ -89,22 +89,24 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                           to: `+234${dataToSave.phone}`,
                           channel: "sms",
                         })
-                        .then((verification) =>
-                          console.log(verification.status)
-                        );
+                        .then((verification) => {
                         client.lookups
                         .phoneNumbers(`+234${RESULT.phone}`)
                         .fetch({ type: ['carrier'] })
                         .then((phone_number) =>
                       MODEL.collectorModel.updateOne(
                         { email: RESULT.email },
-                        { $set: { cardID: card_id, mobile_carrier: phone_number.carrier.name
+                        { $set: { mobile_carrier: phone_number.carrier.name
                         } },
                         (res) => {
                           console.log(res);
                         }
                       )
                         )
+                          console.log(verification.status)
+                      }
+                        );
+                     
                     }
                   );
                 }
@@ -533,7 +535,7 @@ collectorController.updatePhoneSpecifications = async (REQUEST,RESPONSE)=>{
       
     if (checkUserExist) {
       MODEL.collectorModel
-        .update(
+        .updateOne(
           { email: REQUEST.body.email },
           {
             $set: {
