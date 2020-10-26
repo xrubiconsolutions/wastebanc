@@ -38,6 +38,8 @@ reportController.report = (req, res) => {
     })
     .then((result, user) => {
 
+      if(result){
+        
       var Valid = result.createdAt;
      
 
@@ -45,7 +47,9 @@ reportController.report = (req, res) => {
 
       if (result && validity < 29) {
         return res.status(200).json(result);
-      } else {
+      } 
+      
+    }else {
         opentok.createSession({ mediaMode: "routed" }, function (err, session) {
           if (err) {
             console.log(err);
