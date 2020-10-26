@@ -91,6 +91,23 @@ module.exports = (APP) => {
 
   APP.route("/api/view/ads").get(CONTROLLER.userController.adsLook);
 
+  APP.route("/api/android/users").get(CONTROLLER.userController.androidUsers);
+
+  APP.route("/api/ios/users").get(CONTROLLER.userController.iosUsers);
+
+
+  APP.route("/api/desktop/users").get(CONTROLLER.userController.desktopUsers);
+
+
+  APP.route("/api/device/analytics").get(CONTROLLER.userController.deviceAnalytics);
+
+
+  APP.route("/api/delete/user").post(CONTROLLER.userController.deleteUser);
+
+
+
+
+
 
 
 

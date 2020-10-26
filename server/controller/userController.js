@@ -10,8 +10,7 @@ let SERVICE = require('../services/commonService');
 let CONSTANTS = require('../util/constants');
 // const { Response } = require('aws-sdk');
 var request = require('request');
-const streamifier = require('streamifier')
-
+const streamifier = require('streamifier');
 
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
@@ -733,26 +732,24 @@ userController.getUserTransactions = (req, res) => {
 userController.uploadProfile = (req, res) => {
   let streamUpload = (req) => {
     return new Promise((resolve, reject) => {
-        let stream = cloudinary.uploader.upload_stream(
-          (error, result) => {
-            if (result) {
-              resolve(result);
-            } else {
-              reject(error);
-            }
-          }
-        );
-
-       streamifier.createReadStream(req.files.image.data).pipe(stream);
+      let stream = cloudinary.uploader.upload_stream((error, result) => {
+        if (result) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+      streamifier.createReadStream(req.files.image.data).pipe(stream);
     });
-};
+  };
 
-async function upload(req) {
+  async function upload(req) {
     let result = await streamUpload(req);
-    return res.status(200).json(result)
-}
 
-upload(req);
+    return res.status(200).json(result);
+  }
+
+  upload(req);
 };
 
 userController.dailyActive = (req, res) => {
@@ -799,19 +796,6 @@ userController.newActiveUser = (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 userController.expiryDateFilter = (req, res) => {
   const page = parseInt(req.query.page);
 
@@ -834,117 +818,253 @@ userController.expiryDateFilter = (req, res) => {
 };
 
 userController.advertControl = (req, res) => {
+  // let streamUpload = (req) => {
+  //       return new Promise((resolve, reject) => {
+  //           let stream = cloudinary.uploader.upload_stream(
+  //             (error, result) => {
+  //               if (result) {
+  //                 resolve(result);
+  //               } else {
+  //                 reject(error);
+  //               }
+  //             }
+  //           );
+  //          streamifier.createReadStream(req.files.video.data).pipe(stream);
+  //       });
+  //   };
 
-  try {   
-       
-          // if (adverts) {
-          //   MODEL.advertModel
-          //     .updateOne(
-          //       { _id: adverts._id },
-          //       // { $set: { advert_url: adverts.advert_url } }
-          //     )
-          //     .then((success) => {
-          //       return res.status(200).json({
-          //         message: 'Advert posted successfully',
-          //       });
-          //     });
-          // } else {
-            let streamUpload = (req) => {
-              return new Promise((resolve, reject) => {
-                  let stream = cloudinary.uploader.upload_stream(
-                    (error, result) => {
-                      if (result) {
-                        resolve(result);
-                      } else {
-                        reject(error);
-                      }
-                    }
-                  );
-          
-                 streamifier.createReadStream(req.files.video.data).pipe(stream);
-              });
-          };
-          
-          async function upload(req) {
-              let result = await streamUpload(req);
-              // return res.status(200).json(result)
-              // console.log(result);
-              const advert = {
-                advert_url: result.secure_url,
-              };
-              MODEL.advertModel(advert).save({}, (err, response) => {
-                if (err) return res.status(400).json(err);
-                return res.status(200).json({
-                  message: 'Advert posted successfully',
+  //   async function upload(req) {
+  //       let result = await streamUpload(req);
+  //       // return res.status(200).json(result)
+  //       // console.log(result);
+  //       const advert = {
+  //         advert_url: result.secure_url,
+  //       };
+  //       MODEL.advertModel(advert).save({}, (err, response) => {
+  //         if (err) return res.status(400).json(err);
+  //         return res.status(200).json({
+  //           message: 'Advert posted successfully',
+  //         });
+  //       });
+  //   }
+  //   upload(req);
+  // // res.status(200).json(result)
+
+  //   console.log('<<>>>>', "here")
+  //   try{
+  //   let streamUpload = (req) => {
+  //     return new Promise((resolve, reject) => {
+  //         let stream = cloudinary.uploader.upload_stream(
+  //           (error, result) => {
+  //             if (result) {
+  //               console.log('<<>>>>', result)
+
+  //               resolve(result);
+  //             }
+  //             // } else {
+  //             //   reject(error);
+  //             // }
+  //           }
+  //         );
+
+  //         console.log("<<<DATA>>>",req.files.video.data)
+
+  //        streamifier.createReadStream(req.files.video.data).pipe(stream);
+  //     });
+  // };
+  // console.log('<<>>>>', streamUpload)
+  //   async function upload(req) {
+  //     let result = await streamUpload(req);
+  //     return res.status(200).json(result)
+  // }
+
+  // upload(req);
+
+  // }
+  // catch(err){
+  //   return res.status(500).json(err)
+  // }
+
+  console.log('<<REQ FILES>>>', req.files);
+
+  let streamUpload = (req) => {
+    return new Promise((resolve, reject) => {
+      let stream = cloudinary.uploader.upload_stream((error, result) => {
+        if (result) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+      streamifier.createReadStream(req.files.video.data).pipe(stream);
+    });
+  };
+
+  async function upload(req) {
+    let result = await streamUpload(req);
+    return res.status(200).json(result);
+  }
+
+  upload(req);
+};
+
+userController.adsLook = (req, res) => {
+  MODEL.advertModel.findOne({}).then((advert) => {
+    return res.status(200).json(advert);
+  });
+};
+
+userController.updatePhoneSpecifications = async (REQUEST, RESPONSE) => {
+  try {
+    let checkUserExist = await MODEL.userModel.findOne(
+      { email: REQUEST.body.email },
+      {},
+      { lean: true }
+    );
+
+    if (checkUserExist) {
+      MODEL.userModel
+        .updateOne(
+          { email: REQUEST.body.email },
+          {
+            $set: {
+              phone_type: REQUEST.body.phone_type,
+              phone_OS: REQUEST.body.phone_OS,
+            },
+          }
+        )
+        .then((SUCCESS) => {
+          MODEL.userModel
+            .findOne({ email: REQUEST.body.email })
+            .then((user) => {
+              if (!user) {
+                return RESPONSE.status(400).json({
+                  message: 'User not found',
                 });
-              });
-          }     
-          upload(req);
-        // res.status(200).json(result)
-  } catch (err) {
-    return res.status(500).json(err);
+              }
+              return RESPONSE.jsonp(
+                COMMON_FUN.sendSuccess(
+                  CONSTANTS.STATUS_MSG.SUCCESS.UPDATED,
+                  user
+                )
+              );
+            })
+            .catch((err) => RESPONSE.status(500).json(err));
+        })
+        .catch((ERR) => {
+          return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+        });
+    } else {
+      return RESPONSE.status(400).jsonp(
+        COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+      );
+    }
+  } catch (ERR) {
+    return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(ERR));
   }
 };
 
-userController.adsLook = (req,res)=>{
-  MODEL.advertModel.findOne({}).then((advert)=>{
-    return res.status(200).json(advert);
-  })
+userController.androidUsers = (req, res) => {
+  try {
+    MODEL.userModel
+      .find({
+        phone_OS: 'android',
+      })
+      .then((result) => {
+        return res.status(200).json(result);
+      });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+
+
+userController.iosUsers = (req, res) => {
+  try {
+    MODEL.userModel
+      .find({
+        phone_OS: 'ios',
+      })
+      .then((result) => {
+        return res.status(200).json(result);
+      });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+
+
+userController.desktopUsers = (req, res) => {
+  try {
+    MODEL.userModel
+      .find({
+        phone_OS: 'desktop',
+      })
+      .then((result) => {
+        return res.status(200).json(result);
+      });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+
+
+userController.deviceAnalytics  = (req,res)=>{
+
+  try {
+    MODEL.userModel
+    .find({
+      phone_OS: 'android',
+    })
+    .then((android) => {
+
+      MODEL.userModel.find({
+        phone_OS: "ios"
+      }).then((ios)=>{
+
+        MODEL.userModel.find({
+          phone_OS: "desktop"
+        }).then((desktop)=>{
+
+            return res.status(200).json({
+              android: android.length,
+              ios: ios.length,
+              desktop: desktop.length
+            })
+
+        })
+
+      })
+    });
+} catch (err) {
+  res.status(500).json(err);
+}
+  
 }
 
+userController.deleteUser = (req,res)=>{
 
-userController.updatePhoneSpecifications = async (REQUEST,RESPONSE)=>{
-  
-    try {
-     
-          let checkUserExist = await MODEL.userModel.findOne(
-            { email: REQUEST.body.email },
-            {},
-            { lean: true }
-          );
-        
-      if (checkUserExist) {
-        MODEL.userModel
-          .updateOne(
-            { email: REQUEST.body.email },
-            {
-              $set: {
-                phone_type: REQUEST.body.phone_type,
-                phone_OS: REQUEST.body.phone_OS
-              },
-            }
-          )
-          .then((SUCCESS) => {
-            MODEL.userModel
-              .findOne({ email: REQUEST.body.email })
-              .then((user) => {
-                if (!user) {
-                  return RESPONSE.status(400).json({
-                    message: 'User not found',
-                  });
-                }
-                return RESPONSE.jsonp(
-                  COMMON_FUN.sendSuccess(
-                    CONSTANTS.STATUS_MSG.SUCCESS.UPDATED,
-                    user
-                  )
-                );
-              })
-              .catch((err) => RESPONSE.status(500).json(err));
-          })
-          .catch((ERR) => {
-            return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-          });
-      } else {
-        return RESPONSE.status(400).jsonp(
-          COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
-        );
-      }
-    } catch (ERR) {
-      return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(ERR));
-    }
+  const userID = req.body.userID
+  try {
+
+    MODEL.userModel.deleteOne({
+      _id: userID
+    }).then((result)=>{
+      return res.status(200).json({
+        message: "User deleted successfully"
+      })
+    })
+
   }
+  catch(err){
+    return res.status(500).json(err)
+  }
+   
 
+}
 
 
 

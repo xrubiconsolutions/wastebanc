@@ -1220,5 +1220,91 @@ organisationController.allCancelledchedules = (REQUEST, RESPONSE) => {
 
 
 
+organisationController.totalCoinAnalytics = (req,res)=>{
+  try{
+
+        MODEL.transactionModel.find({}).then((transaction)=>{
+
+            MODEL.payModel.find({}).then((payment)=>{
+
+              var notRedeemed = transaction.length-payment.length
+
+                return res.status(200).json({
+                  totalTransactions: transaction.length,
+                  totalRedeemed: payment.length,
+                  totalNonRedeemed: notRedeemed
+                })
+
+            })
+
+
+        })
+
+  }
+  catch(err){
+
+  }
+}
+
+
+organisationController.deleteCompany = (req,res)=>{
+  const companyID = req.body.companyID
+  try {
+
+    MODEL.organisationModel.deleteOne({
+      _id: companyID
+    }).then((result)=>{
+      return res.status(200).json({
+        message: "Recycling company deleted successfully"
+      })
+    })
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
+   
+}
+
+
+organisationController.companyGrowth = (req,res)=>{
+
+  // var Jan
+  // var Feb
+  // var Mar
+
+  var year = new Date().getFullYear()
+  console.log("<<<Year>>>", year)
+
+
+
+  try{
+
+    MODEL.organisationModel.aggregate(
+      {
+        "$match": {
+            "year": year,
+            "month": 8
+        }
+    }
+    ).then((response,err) => {
+      console.log(err)
+      return res.status(200).json(response)
+    });
+  
+
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+
+  }
+
+}
+
+
+
+
+
 /* export organisationControllers */
 module.exports = organisationController;

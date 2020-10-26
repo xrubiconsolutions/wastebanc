@@ -577,4 +577,29 @@ collectorController.updatePhoneSpecifications = async (REQUEST,RESPONSE)=>{
 }
 
 
+
+collectorController.deleteRecycler = (req,res)=>{
+
+  const userID = req.body.userID
+  try {
+
+    MODEL.collectorModel.deleteOne({
+      _id: userID
+    }).then((result)=>{
+      return res.status(200).json({
+        message: "User deleted successfully"
+      })
+    })
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
+   
+
+}
+
+
+
+
 module.exports = collectorController;

@@ -55,6 +55,9 @@ module.exports = (APP) => {
         .post(CONTROLLER.collectorController.updatePhoneSpecifications);
 
 
+    APP.route("/api/delete/recycler").post(CONTROLLER.collectorController.deleteRecycler);
+
+
 
 
 

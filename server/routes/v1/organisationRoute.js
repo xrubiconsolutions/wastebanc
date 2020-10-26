@@ -135,5 +135,16 @@ module.exports = (APP) => {
         .get(CONTROLLER.organisationController.viewAllSchedules);
 
 
+    APP.route('/api/coin/analytics')
+        .get(CONTROLLER.organisationController.totalCoinAnalytics);
+
+
+
+    APP.route('/api/delete/company')
+        .post(CONTROLLER.organisationController.deleteCompany);
+
+    APP.route('/api/growth/company')
+        .get(CONTROLLER.organisationController.companyGrowth);
+
                    
 };
