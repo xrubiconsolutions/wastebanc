@@ -394,10 +394,11 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
                   { $set: { areaOfAccess : organisation.areaOfAccess } },
                   (res) => {
                     console.log(res);
-                    return RESPONSE.status(200).json({
-                      message: "Collector's profile successfully updated"
+                    MODEL.collectorModel.findOne({
+                      email: user.email
+                    }).then((recycler)=>{
+                      return RESPONSE.status(200).json(recycler)
                     })
-        
                   }
                 );
 

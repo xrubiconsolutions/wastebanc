@@ -558,8 +558,8 @@ scheduleController.rewardSystem = (req, resp) => {
 
                                           sendNotification(message);
 
-                                          if (ERR)
-                                            return resp.status(400).jsonp(ERR);
+                                          // if (ERR)
+                                          //   return resp.status(400).jsonp(ERR);
                                           console.log(
                                             'Transaction saved on database',
                                             RESULT
