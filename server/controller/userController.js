@@ -799,6 +799,19 @@ userController.newActiveUser = (req, res) => {
   }
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 userController.expiryDateFilter = (req, res) => {
   const page = parseInt(req.query.page);
 
@@ -848,7 +861,7 @@ userController.advertControl = (req, res) => {
                     }
                   );
           
-                 streamifier.createReadStream(req.files.image.data).pipe(stream);
+                 streamifier.createReadStream(req.files.video.data).pipe(stream);
               });
           };
           
@@ -931,6 +944,10 @@ userController.updatePhoneSpecifications = async (REQUEST,RESPONSE)=>{
       return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(ERR));
     }
   }
+
+
+
+
 
 
 /* export userControllers */
