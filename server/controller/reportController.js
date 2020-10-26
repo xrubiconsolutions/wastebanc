@@ -14,8 +14,8 @@ const { Response } = require("aws-sdk");
 var request = require("request");
 const OpenTok = require("opentok");
 
-const apiKey = "46903784";
-const secret = "7c433b3970838bffa4ec979d8337c19a8962fba8";
+const apiKey = "46966734";
+const secret = "756c6f3e6d09a3a96ac3ea3252237f0982512583";
 
 var opentok = new OpenTok(apiKey, secret);
 
@@ -164,6 +164,8 @@ reportController.endReport = (req,res)=>{
 
 }
 
+
+// reportController.
 
 /* export reportControllers */
 module.exports = reportController;
