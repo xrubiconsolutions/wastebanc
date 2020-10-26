@@ -1280,16 +1280,168 @@ organisationController.companyGrowth = (req,res)=>{
 
   try{
 
-    MODEL.organisationModel.aggregate(
-      {
-        "$match": {
-            "year": year,
-            "month": 8
+    MODEL.organisationModel.find({
+      "$expr": {
+        "$and": [
+          {"$eq": [{ "$year": "$createAt" }, year]},
+          {"$eq": [{ "$month": "$createAt" }, 1]}
+        ]
+      }
+    }).then((jan) => {
+      MODEL.organisationModel.find({
+        "$expr": {
+          "$and": [
+            {"$eq": [{ "$year": "$createAt" }, year]},
+            {"$eq": [{ "$month": "$createAt" }, 2]}
+          ]
         }
-    }
-    ).then((response,err) => {
-      console.log(err)
-      return res.status(200).json(response)
+      }).then((feb)=>{
+
+        MODEL.organisationModel.find({
+          "$expr": {
+            "$and": [
+              {"$eq": [{ "$year": "$createAt" }, year]},
+              {"$eq": [{ "$month": "$createAt" }, 3]}
+            ]
+          }
+        }).then((march)=>{
+
+          MODEL.organisationModel.find({
+            "$expr": {
+              "$and": [
+                {"$eq": [{ "$year": "$createAt" }, year]},
+                {"$eq": [{ "$month": "$createAt" }, 4]}
+              ]
+            }
+          }).then((april)=>{
+
+            MODEL.organisationModel.find({
+              "$expr": {
+                "$and": [
+                  {"$eq": [{ "$year": "$createAt" }, year]},
+                  {"$eq": [{ "$month": "$createAt" }, 5]}
+                ]
+              }
+            }).then((may)=>{
+
+              MODEL.organisationModel.find({
+                "$expr": {
+                  "$and": [
+                    {"$eq": [{ "$year": "$createAt" }, year]},
+                    {"$eq": [{ "$month": "$createAt" }, 6]}
+                  ]
+                }
+              }).then((june)=>{
+
+                MODEL.organisationModel.find({
+                  "$expr": {
+                    "$and": [
+                      {"$eq": [{ "$year": "$createAt" }, year]},
+                      {"$eq": [{ "$month": "$createAt" }, 7]}
+                    ]
+                  }
+                }).then((july)=>{
+
+                  MODEL.organisationModel.find({
+                    "$expr": {
+                      "$and": [
+                        {"$eq": [{ "$year": "$createAt" }, year]},
+                        {"$eq": [{ "$month": "$createAt" }, 8]}
+                      ]
+                    }
+                  }).then((Aug)=>{
+
+                    MODEL.organisationModel.find({
+                      "$expr": {
+                        "$and": [
+                          {"$eq": [{ "$year": "$createAt" }, year]},
+                          {"$eq": [{ "$month": "$createAt" }, 9]}
+                        ]
+                      }
+                    }).then((sept)=>{
+
+
+                      MODEL.organisationModel.find({
+                        "$expr": {
+                          "$and": [
+                            {"$eq": [{ "$year": "$createAt" }, year]},
+                            {"$eq": [{ "$month": "$createAt" }, 10]}
+                          ]
+                        }
+                      }).then((Oct)=>{
+
+                        MODEL.organisationModel.find({
+                          "$expr": {
+                            "$and": [
+                              {"$eq": [{ "$year": "$createAt" }, year]},
+                              {"$eq": [{ "$month": "$createAt" }, 11]}
+                            ]
+                          }
+                        }).then((Nov)=>{
+
+                          MODEL.organisationModel.find({
+                            "$expr": {
+                              "$and": [
+                                {"$eq": [{ "$year": "$createAt" }, year]},
+                                {"$eq": [{ "$month": "$createAt" }, 12]}
+                              ]
+                            }
+                          }).then((Dec)=>{
+
+                            MODEL.organisationModel.find({
+                              "$expr": {
+                                "$and": [
+                                  {"$eq": [{ "$year": "$createAt" }, year]},
+                                  {"$eq": [{ "$month": "$createAt" }, 11]}
+                                ]
+                              }
+                            }).then((Analytics)=>{
+                              res.status(200).json({
+                                JANUARY: jan.length,
+                                FEBRUARY: feb.length,
+                                MARCH: march.length,
+                                APRIL: april.length,
+                                MAY: may.length,
+                                JUNE: june.length,
+                                JULY: july.length,
+                                AUGUST: Aug.length,
+                                SEPTEMBER: sept.length,
+                                OCTOBER: Oct.length,
+                                NOVEMBER: Nov.length,
+                                DECEMBER: Dec.length
+                              })
+                               
+
+                            })
+
+
+                          })
+
+                        })
+
+                      })
+
+                    })
+
+                  })
+
+                })
+
+
+              })
+
+            })
+
+
+
+          })
+
+
+        })
+
+      })
+
+
     });
   
 
