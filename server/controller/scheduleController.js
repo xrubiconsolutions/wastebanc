@@ -415,6 +415,7 @@ scheduleController.dashboardCompleted = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(200).jsonp(COMMON_FUN.sendError(err)));
 };
 
+
 scheduleController.rewardSystem = (req, resp) => {
   const collectorID = req.body.collectorID;
   const quantity = req.body.quantity;
@@ -430,6 +431,7 @@ scheduleController.rewardSystem = (req, resp) => {
       MODEL.userModel
         .findOne({ email: schedule[0].client })
         .then((result) => {
+            console.log("<<debugger>>>", result)
           if (result.cardID == null)
             return resp
               .status(400)
@@ -528,13 +530,14 @@ scheduleController.rewardSystem = (req, resp) => {
 
                                         Category: schedule[0].Category,
 
-                                        fullname: result.fullname,
+                                        fullname: result.firstname + ' ' +  result.lastname,
 
                                         recycler: recycler.fullname,
 
                                         organisationID: recycler.approvedBy,
                                       };
 
+                                      console.log('<<TESTER>>', dataToSave)
                                       MODEL.transactionModel(dataToSave).save(
                                         {},
                                         (ERR, RESULT) => {
