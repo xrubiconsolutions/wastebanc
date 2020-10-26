@@ -31,97 +31,128 @@ reportController.report = (req, res) => {
   var token;
   var roomToSessionIdDictionary = {};
 
+  MODEL.reportModel.findOne({userReportID: userID}).then((reports)=>{
+
+    if(reports) {
   MODEL.reportModel.updateOne({ userReportID: userID }, { active : true }).then(test=>
-  MODEL.reportModel
-    .findOne({
-      userReportID: userID,
-    })
-    .then((result, user) => {
-
-      if(result){
-
-      var Valid = result.createdAt;
-     
-
-      var validity =  (today-Valid)/(3600*24*1000);
-
-      if (result && validity < 29) {
-        return res.status(200).json(result);
-      } 
-      
-    }else {
-        opentok.createSession({ mediaMode: "routed" }, function (err, session) {
-          if (err) {
-            console.log(err);
-            res.status(500).send({ error: "createSession error:" + err });
-            return;
-          }
-          var tokenOptions = {};
-          tokenOptions.expireTime = (Date.now() / 1000 ) +  2592000
-
-
-
-          // generate token
-          token = opentok.generateToken(session.sessionId, tokenOptions);
-
-
-
-          MODEL.userModel.findOne({_id: userID}).then(userDetail=>{
+    MODEL.reportModel
+      .findOne({
+        userReportID: userID,
+      })
+      .then((result, user) => {
+  
+        if(result){
+  
+        var Valid = result.createdAt;
+       
+  
+        var validity =  (today-Valid)/(3600*24*1000);
+  
+        if (result && validity < 29) {
+          return res.status(200).json(result);
+        } 
+        
+      }else {
+          opentok.createSession({ mediaMode: "routed" }, function (err, session) {
+            if (err) {
+              console.log(err);
+              res.status(500).send({ error: "createSession error:" + err });
+              return;
+            }
+            var tokenOptions = {};
+            tokenOptions.expireTime = (Date.now() / 1000 ) +  2592000
+  
+  
+  
+            // generate token
+            token = opentok.generateToken(session.sessionId, tokenOptions);
+  
+  
+  
+            MODEL.userModel.findOne({_id: userID}).then(userDetail=>{
+            
+            MODEL.reportModel.findOne({userReportID:userID}).then(result=>{
+              console.log('<<>>', result)
+              if(result && validity > 29 ) {
+  
+                MODEL.reportModel.updateOne({ userReportID: result.userReportID }, { active : true , name: userDetail.firstname,
+                  email: userDetail.email,
+                  phone: userDetail.phone,
+                  apiKey: apiKey,
+                  sessionID: session.sessionId,
+                  token: token,
+                  userReportID: userID,
+                  lat: lat,
+                  long: long,  }).then( test=> { MODEL.reportModel.findOne({userReportID:userID}).then(result=>{  
+                    return res.status(200).json(result)
+                  }) }
+                    )
+            }
           
-          MODEL.reportModel.findOne({userReportID:userID}).then(result=>{
-            console.log('<<>>', result)
-            if(result && validity > 29 ) {
-
-              MODEL.reportModel.updateOne({ userReportID: result.userReportID }, { active : true , name: userDetail.firstname,
-                email: userDetail.email,
-                phone: userDetail.phone,
-                apiKey: apiKey,
-                sessionID: session.sessionId,
-                token: token,
-                userReportID: userID,
-                lat: lat,
-                long: long,  }).then( test=> { MODEL.reportModel.findOne({userReportID:userID}).then(result=>{  
-                  return res.status(200).json(result)
-                }) }
-                  )
-            //   return res.status(400).json({
-            //   message: "User exists on our DB"
-            // })
-          }
-          // MODEL.reportModel({
-          //   name: userDetail.firstname,
-          //   email: userDetail.email,
-          //   phone: userDetail.phone,
-          //   apiKey: apiKey,
-          //   sessionID: session.sessionId,
-          //   token: token,
-          //   userReportID: userID,
-          //   lat: lat,
-          //   long: long,
-          // }).save({}, (err, result) => {
-          //   console.log("error here", err);
-          //   if (err)
-          //     return res
-          //       .status(400)
-          //       .json({ message: "Could not save report incidence" });
-          //   console.log(result);
-          // });
-
-          // res.setHeader("Content-Type", "application/json");
-          // return res.json({
-          //   apiKey: apiKey,
-          //   sessionID: session.sessionId,
-          //   token: token,
-          // });
-
+            })
+           
           })
-         
-        })
+          });
+        }
+      })
+    );
+    }
+    else {
+      
+      opentok.createSession({ mediaMode: "routed" }, function (err, session) {
+        if (err) {
+          console.log(err);
+          res.status(500).send({ error: "createSession error:" + err });
+          return;
+        }
+        var tokenOptions = {};
+        tokenOptions.expireTime = (Date.now() / 1000 ) +  2592000
+
+
+
+        // generate token
+        token = opentok.generateToken(session.sessionId, tokenOptions);
+
+
+
+
+
+      MODEL.userModel.findOne({
+        _id: userID
+      }).then((userDetail)=>{
+      MODEL.reportModel({
+          name: userDetail.firstname,
+          email: userDetail.email,
+          phone: userDetail.phone,
+          apiKey: apiKey,
+          sessionID: session.sessionId,
+          token: token,
+          userReportID: userID,
+          lat: lat,
+          long: long,
+        }).save({}, (err, result) => {
+          console.log("error here", err);
+          if (err){
+            return res
+              .status(400)
+              .json({ message: "Could not save report incidence" });
+          console.log(result);
+        }
         });
+
+        res.setHeader("Content-Type", "application/json");
+        return res.json({
+          apiKey: apiKey,
+          sessionID: session.sessionId,
+          token: token,
+        })
       }
+      )
     })
-  );
-};
+  }
+  }
+  )
+  }
 
 reportController.getReport = (req, res) => {
   var ID = req.body.userID;
