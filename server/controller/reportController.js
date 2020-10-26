@@ -39,7 +39,7 @@ reportController.report = (req, res) => {
     .then((result, user) => {
 
       if(result){
-        
+
       var Valid = result.createdAt;
      
 
@@ -70,7 +70,7 @@ reportController.report = (req, res) => {
           
           MODEL.reportModel.findOne({userReportID:userID}).then(result=>{
             console.log('<<>>', result)
-            if(result.apiKey && validity > 29 ) {
+            if(result && validity > 29 ) {
 
               MODEL.reportModel.updateOne({ userReportID: result.userReportID }, { active : true , name: userDetail.firstname,
                 email: userDetail.email,
