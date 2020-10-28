@@ -200,7 +200,21 @@ reportController.endReport = (req,res)=>{
 }
 
 
-// reportController.
+
+
+reportController.allReportAnalytics = (req, res) => {
+  MODEL.reportModel
+    .find({})
+    .sort({ _id: -1 })
+    .then((user) => {
+      return res.status(200).json({
+        Videos: user.length,
+        Pictures: user.length
+      });
+    })
+    .catch((err) => res.status(500).json(err));
+};
+
 
 /* export reportControllers */
 module.exports = reportController;

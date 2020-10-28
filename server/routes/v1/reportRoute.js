@@ -19,5 +19,8 @@ module.exports = (APP) => {
 
     APP.route('/api/all/report')
         .get(CONTROLLER.reportController.allReport);
+
+    APP.route('/api/report/analytics')
+        .get(CONTROLLER.reportController.allReportAnalytics);
         
 }
