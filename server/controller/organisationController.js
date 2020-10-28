@@ -1894,11 +1894,21 @@ organisationController.advertGrowth = (req,res)=>{
 }
 
 
+organisationController.getTotalCompany = (req,res)=>{
+  try{
 
+    MODEL.organisationModel.find({}).then((organisation)=>{
 
+        return res.status(200).json({
+          data: organisation.length
+        })
 
+    })
 
-
+  }catch(err){
+      return res.status(500).json(err)
+  }
+}
 
 
 

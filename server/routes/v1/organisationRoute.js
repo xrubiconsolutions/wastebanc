@@ -157,6 +157,9 @@ module.exports = (APP) => {
     APP.route('/api/advert/analytics')
         .get(CONTROLLER.organisationController.advertGrowth);
 
+    APP.route('/api/total/company')
+        .get(CONTROLLER.organisationController.getTotalCompany);
+
      
 
                    
