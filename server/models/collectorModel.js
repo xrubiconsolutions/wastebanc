@@ -88,6 +88,9 @@ const collector_Schema = new Schema({
   phone_OS:{
     type: String
   },
+  last_logged_in:{
+    type: Date
+  }
 });
 
 module.exports = MONGOOSE.model("Collector", collector_Schema);

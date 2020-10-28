@@ -174,6 +174,15 @@ collectorController.loginCollector = (REQUEST, RESPONSE) => {
                 var jwtToken = COMMON_FUN.createToken(
                   USER
                 ); /** creating jwt token */
+
+                MODEL.collectorModel.updateOne(
+                  { phone: REQUEST.body.phone },
+                  { last_logged_in: new Date() },
+                  (res) => {
+                    console.log('Logged date updated', new Date());
+                  }
+                );
+
                 USER.token = jwtToken;
                 return RESPONSE.jsonp(USER);
               }
@@ -598,6 +607,56 @@ collectorController.deleteRecycler = (req,res)=>{
    
 
 }
+
+
+collectorController.collectorAnalytics = (req,res)=>{
+  const today = new Date();
+  const active_today = new Date();
+
+  try {
+  MODEL.collectorModel.find({
+  }).then((allUser)=>{
+  active_today.setDate(today.getDate() - 1);
+    MODEL.collectorModel
+      .find({
+        createdAt: {
+          $gte: active_today,
+        },
+      })
+      .sort({ _id: -1 })
+      .then((newUser) => {
+
+          MODEL.collectorModel
+            .find({
+              last_logged_in: {
+                $gte: active_today,
+              },
+            })
+            .sort({ _id: -1 })
+            .then((activeTodayUser) => {
+
+                    return res.status(200).json({
+                      allUsers: allUser.length,
+                      newUsers: newUser.length,
+                      activeTodayUsers: activeTodayUser.length,
+                      inactiveUsers: allUser.length-activeTodayUser.length
+                    })
+
+
+            })
+  
+
+     
+      })
+
+
+
+  })
+} catch(err){
+  return res.status(500).json(err)
+}
+}
+
 
 
 

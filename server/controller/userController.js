@@ -1067,6 +1067,54 @@ userController.deleteUser = (req,res)=>{
 }
 
 
+userController.userAnalytics = (req,res)=>{
+  const today = new Date();
+  const active_today = new Date();
+
+  try {
+  MODEL.userModel.find({
+  }).then((allUser)=>{
+  active_today.setDate(today.getDate() - 1);
+    MODEL.userModel
+      .find({
+         createAt: {
+          $gte: active_today,
+        },
+      })
+      .sort({ _id: -1 })
+      .then((newUser) => {
+
+          MODEL.userModel
+            .find({
+              last_logged_in: {
+                $gte: active_today,
+              },
+            })
+            .sort({ _id: -1 })
+            .then((activeTodayUser) => {
+
+                    return res.status(200).json({
+                      allUsers: allUser.length,
+                      newUsers: newUser.length,
+                      activeTodayUsers: activeTodayUser.length,
+                      inactiveUsers: allUser.length-activeTodayUser.length
+                    })
+
+
+            })
+  
+
+     
+      })
+
+
+
+  })
+} catch(err){
+  return res.status(500).json(err)
+}
+}
+
 
 
 

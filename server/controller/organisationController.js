@@ -1454,6 +1454,258 @@ organisationController.companyGrowth = (req,res)=>{
 
 }
 
+organisationController.salesGrowth = (req,res)=>{
+
+  // var Jan
+  // var Feb
+  // var Mar
+
+  var year = new Date().getFullYear()
+  console.log("<<<Year>>>", year)
+
+
+
+  try{
+
+    MODEL.transactionModel.find({
+      "$expr": {
+        "$and": [
+          {"$eq": [{ "$year": "$createdAt" }, year]},
+          {"$eq": [{ "$month": "$createdAt" }, 1]}
+        ]
+      }
+    }).then((jan) => {
+      MODEL.transactionModel.find({
+        "$expr": {
+          "$and": [
+            {"$eq": [{ "$year": "$createdAt" }, year]},
+            {"$eq": [{ "$month": "$createdAt" }, 2]}
+          ]
+        }
+      }).then((feb)=>{
+
+        MODEL.transactionModel.find({
+          "$expr": {
+            "$and": [
+              {"$eq": [{ "$year": "$createdAt" }, year]},
+              {"$eq": [{ "$month": "$createdAt" }, 3]}
+            ]
+          }
+        }).then((march)=>{
+
+          MODEL.transactionModel.find({
+            "$expr": {
+              "$and": [
+                {"$eq": [{ "$year": "$createdAt" }, year]},
+                {"$eq": [{ "$month": "$createdAt" }, 4]}
+              ]
+            }
+          }).then((april)=>{
+
+            MODEL.transactionModel.find({
+              "$expr": {
+                "$and": [
+                  {"$eq": [{ "$year": "$createdAt" }, year]},
+                  {"$eq": [{ "$month": "$createdAt" }, 5]}
+                ]
+              }
+            }).then((may)=>{
+
+              MODEL.transactionModel.find({
+                "$expr": {
+                  "$and": [
+                    {"$eq": [{ "$year": "$createdAt" }, year]},
+                    {"$eq": [{ "$month": "$createdAt" }, 6]}
+                  ]
+                }
+              }).then((june)=>{
+
+                MODEL.transactionModel.find({
+                  "$expr": {
+                    "$and": [
+                      {"$eq": [{ "$year": "$createdAt" }, year]},
+                      {"$eq": [{ "$month": "$createdAt" }, 7]}
+                    ]
+                  }
+                }).then((july)=>{
+
+                  MODEL.transactionModel.find({
+                    "$expr": {
+                      "$and": [
+                        {"$eq": [{ "$year": "$createdAt" }, year]},
+                        {"$eq": [{ "$month": "$createdAt" }, 8]}
+                      ]
+                    }
+                  }).then((Aug)=>{
+
+                    MODEL.transactionModel.find({
+                      "$expr": {
+                        "$and": [
+                          {"$eq": [{ "$year": "$createdAt" }, year]},
+                          {"$eq": [{ "$month": "$createdAt" }, 9]}
+                        ]
+                      }
+                    }).then((sept)=>{
+
+
+                      MODEL.transactionModel.find({
+                        "$expr": {
+                          "$and": [
+                            {"$eq": [{ "$year": "$createdAt" }, year]},
+                            {"$eq": [{ "$month": "$createdAt" }, 10]}
+                          ]
+                        }
+                      }).then((Oct)=>{
+
+                        MODEL.transactionModel.find({
+                          "$expr": {
+                            "$and": [
+                              {"$eq": [{ "$year": "$createdAt" }, year]},
+                              {"$eq": [{ "$month": "$createdAt" }, 11]}
+                            ]
+                          }
+                        }).then((Nov)=>{
+
+                          MODEL.transactionModel.find({
+                            "$expr": {
+                              "$and": [
+                                {"$eq": [{ "$year": "$createdAt" }, year]},
+                                {"$eq": [{ "$month": "$createdAt" }, 12]}
+                              ]
+                            }
+                          }).then((Dec)=>{
+
+                            MODEL.transactionModel.find({
+                              "$expr": {
+                                "$and": [
+                                  {"$eq": [{ "$year": "$createdAt" }, year]},
+                                  {"$eq": [{ "$month": "$createdAt" }, 11]}
+                                ]
+                              }
+                            }).then((Analytics)=>{
+                              res.status(200).json({
+                                JANUARY: jan.length,
+                                FEBRUARY: feb.length,
+                                MARCH: march.length,
+                                APRIL: april.length,
+                                MAY: may.length,
+                                JUNE: june.length,
+                                JULY: july.length,
+                                AUGUST: Aug.length,
+                                SEPTEMBER: sept.length,
+                                OCTOBER: Oct.length,
+                                NOVEMBER: Nov.length,
+                                DECEMBER: Dec.length
+                              })
+                               
+
+                            })
+
+
+                          })
+
+                        })
+
+                      })
+
+                    })
+
+                  })
+
+                })
+
+
+              })
+
+            })
+
+
+
+          })
+
+
+        })
+
+      })
+
+
+    });
+  
+
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+
+  }
+
+}
+
+
+
+
+organisationController.scheduleAnalysis = (REQUEST, RESPONSE) => {
+  MODEL.scheduleModel
+    .find({ completionStatus: "completed" })
+    .sort({ _id: -1 })
+    .then((completed) => {
+      MODEL.scheduleModel
+        .find({ completionStatus: "missed"})
+        .then((missed) => {
+          MODEL.scheduleModel
+            .find({ completionStatus: "pending" })
+            .then((pending) => {
+              MODEL.scheduleModel
+                .find({ completionStatus:"cancelled" })
+                .then((cancelled) => {
+
+                  MODEL.scheduleModel.find({
+                    collectorStatus: "accept"
+                  }).then((
+                    accepted
+                  )=>{
+                    RESPONSE.status(200).jsonp(
+                      COMMON_FUN.sendSuccess(
+                        CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                        {
+                          completed: completed.length,
+                          missed: missed.length,
+                          pending: pending.length,
+                          cancelled: cancelled.length,
+                          accepted: accepted.length,
+                        }
+                      )
+                    );
+
+                  })
+
+
+                
+                })
+                .catch((err) =>
+                  RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err))
+                );
+            })
+            .catch((err) => res.status(500).jsonp(err));
+
+          // RESPONSE.status(200).jsonp(
+          //   COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+          // );
+        })
+        .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+
+      // RESPONSE.status(200).jsonp(
+      //   COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules.length)
+      // );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
+
+
+
+
+
+
 
 
 

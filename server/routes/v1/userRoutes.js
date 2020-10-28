@@ -105,6 +105,10 @@ module.exports = (APP) => {
   APP.route("/api/delete/user").post(CONTROLLER.userController.deleteUser);
 
 
+  APP.route("/api/users/analytics").get(CONTROLLER.userController.userAnalytics);
+
+
+
 
 
 
