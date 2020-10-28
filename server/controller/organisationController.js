@@ -1665,7 +1665,7 @@ organisationController.scheduleAnalysis = (REQUEST, RESPONSE) => {
                     accepted
                   )=>{
                     MODEL.scheduleModel.find({}).then(allSchedules=>{
-                RESPONSE.status(200).jsonp(
+              return  RESPONSE.status(200).jsonp(
                       COMMON_FUN.sendSuccess(
                         CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
                         {
