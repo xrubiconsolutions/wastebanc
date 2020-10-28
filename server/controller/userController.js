@@ -970,8 +970,13 @@ userController.androidUsers = (req, res) => {
       .find({
         phone_OS: 'android',
       })
-      .then((result) => {
-        return res.status(200).json(result);
+        .then((result) => {
+           MODEL.collectorModel.find({phone_OS:"android"}).then(reycler=>{
+           Var data = [...result, ...recycler]
+           return res.status(200).json({
+          data: data
+})
+})
       });
   } catch (err) {
     res.status(500).json(err);
@@ -987,7 +992,12 @@ userController.iosUsers = (req, res) => {
         phone_OS: 'ios',
       })
       .then((result) => {
-        return res.status(200).json(result);
+
+         MODEL.collectorModel.find({phone_OS:"ios"}).then(reycler=>{
+           Var data = [...result, ...recycler]
+           return res.status(200).json({
+          data: data
+})
       });
   } catch (err) {
     res.status(500).json(err);
@@ -1002,7 +1012,8 @@ userController.desktopUsers = (req, res) => {
       .find({
         phone_OS: 'desktop',
       })
-      .then((result) => {
+      .then((result) => {  
+        
         return res.status(200).json(result);
       });
   } catch (err) {
