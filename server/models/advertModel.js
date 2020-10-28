@@ -8,9 +8,19 @@ const Constants = require('../util/constants');
  ************* advert Model or collection ***********
  **************************************************/
 const advert_Schema = new Schema({
+  title:{
+    type: String
+  },
   advert_url: {
     type: String,
     required: true,
+  },
+  duration : {   //In seconds
+    type: Number
+  },
+  start_date:{
+    type: Date,
+    required:true
   },
   createdAt: {
     type: Date,

@@ -23,7 +23,7 @@ cloudinary.config({
     cloudinary: cloudinary,
     params: {
       folder: 'some-folder-name',
-      format: async (req, file) => 'jpg', // supports promises as well
+      format: async (req, file) => ['jpg', 'png', 'mp4'], // supports promises as well
       public_id: (req, file) => 'computed-filename-using-request',
     },
   });
@@ -87,7 +87,7 @@ module.exports = (APP) => {
 
   APP.route("/api/user/expiry").get(CONTROLLER.userController.expiryDateFilter);
 
-  APP.route("/api/ads/upload", fileUpload.single('video')).post(CONTROLLER.userController.advertControl);
+  APP.route("/api/ads/upload",fileUpload.single('video')).post(CONTROLLER.userController.advertControl);
 
   APP.route("/api/view/ads").get(CONTROLLER.userController.adsLook);
 

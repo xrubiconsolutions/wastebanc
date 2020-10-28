@@ -679,60 +679,78 @@ scheduleController.allWeight = (req, res) => {
 };
 
 scheduleController.allCoins = (req, res) => {
-  request(
-    {
-      url: 'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
-      method: 'POST',
-      json: true,
-      body: {
-        data: { username: 'xrubicon', password: 'xrubicon1234' },
-      },
-    },
-    function (error, response, body) {
-      response.headers.token;
+  // request(
+  //   {
+  //     url: 'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
+  //     method: 'POST',
+  //     json: true,
+  //     body: {
+  //       data: { username: 'xrubicon', password: 'xrubicon1234' },
+  //     },
+  //   },
+  //   function (error, response, body) {
+  //     response.headers.token;
 
-      request(
-        {
-          url:
-            'https://apis.touchandpay.me/lawma-backend/v1/agent/get/agent/transactions',
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            'Accept-Charset': 'utf-8',
-            Token: response.headers.token,
-          },
-          json: true,
-        },
-        function (error, response, body) {
-          if (error) return res.status(400).jsonp(error);
-          var rubicon = JSON.parse(JSON.stringify(response.body.content.data));
-          var needed = rubicon.filter((x) => x.deviceID == 'xrubicon') || [];
-          if (!needed) {
-            return RESPONSE.status(400).json({
-              message: 'No coin data',
-            });
-          }
+  //     request(
+  //       {
+  //         url:
+  //           'https://apis.touchandpay.me/lawma-backend/v1/agent/get/agent/transactions',
+  //         method: 'GET',
+  //         headers: {
+  //           Accept: 'application/json',
+  //           'Accept-Charset': 'utf-8',
+  //           Token: response.headers.token,
+  //         },
+  //         json: true,
+  //       },
+  //       function (error, response, body) {
+  //         if (error) return res.status(400).jsonp(error);
+  //         var rubicon = JSON.parse(JSON.stringify(response.body.content.data));
+  //         var needed = rubicon.filter((x) => x.deviceID == 'xrubicon') || [];
+  //         if (!needed) {
+  //           return RESPONSE.status(400).json({
+  //             message: 'No coin data',
+  //           });
+  //         }
 
-          const test = JSON.parse(JSON.stringify(needed));
+  //         const test = JSON.parse(JSON.stringify(needed));
 
-          const allCoins = test
-            .map((x) => x.point)
-            .reduce((acc, curr) => {
-              return acc + curr;
-            }, 0);
+  //         const allCoins = test
+  //           .map((x) => x.point)
+  //           .reduce((acc, curr) => {
+  //             return acc + curr;
+  //           }, 0);
+
+  //         return res
+  //           .status(200)
+  //           .jsonp(
+  //             COMMON_FUN.sendSuccess(
+  //               CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+  //               allCoins
+  //             )
+  //           );
+  //       }
+  //     );
+  //   }
+  // );
+  try{
+
+    MODEL.transactionModel.find({}).then((transactions)=>{
+      var coins = transactions.map((x)=>x.coin).reduce((acc,curr)=>acc+curr,0)
 
           return res
             .status(200)
-            .jsonp(
+            .json(
               COMMON_FUN.sendSuccess(
                 CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-                allCoins
+                coins
               )
-            );
-        }
-      );
-    }
-  );
+            )
+    })
+
+  }catch(err){
+    return res.status(500).json(err)
+  }
 };
 
 scheduleController.allAccepted = (REQUEST, RESPONSE) => {

@@ -28,8 +28,6 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'Pakam',
-    format: async (req, file) => ['jpg', 'png', 'mp4'],
-    public_id: (req, file) => 'computed-filename-using-request',
   },
 });
 
@@ -818,101 +816,52 @@ userController.expiryDateFilter = (req, res) => {
 };
 
 userController.advertControl = (req, res) => {
-  // let streamUpload = (req) => {
-  //       return new Promise((resolve, reject) => {
-  //           let stream = cloudinary.uploader.upload_stream(
-  //             (error, result) => {
-  //               if (result) {
-  //                 resolve(result);
-  //               } else {
-  //                 reject(error);
-  //               }
-  //             }
-  //           );
-  //          streamifier.createReadStream(req.files.video.data).pipe(stream);
-  //       });
-  //   };
+//   let streamUpload = (req) => {
+//     return new Promise((resolve, reject) => {
+//         let stream = cloudinary.uploader.upload_stream(
+//           (error, result) => {
+//             if (result) {
+//               resolve(result);
+//             } else {
+//               reject(error);
+//             }
+//           }
+//         );
 
-  //   async function upload(req) {
-  //       let result = await streamUpload(req);
-  //       // return res.status(200).json(result)
-  //       // console.log(result);
-  //       const advert = {
-  //         advert_url: result.secure_url,
-  //       };
-  //       MODEL.advertModel(advert).save({}, (err, response) => {
-  //         if (err) return res.status(400).json(err);
-  //         return res.status(200).json({
-  //           message: 'Advert posted successfully',
-  //         });
-  //       });
-  //   }
-  //   upload(req);
-  // // res.status(200).json(result)
+//         console.log("<<BUFFER>>", req.files.video)
 
-  //   console.log('<<>>>>', "here")
-  //   try{
-  //   let streamUpload = (req) => {
-  //     return new Promise((resolve, reject) => {
-  //         let stream = cloudinary.uploader.upload_stream(
-  //           (error, result) => {
-  //             if (result) {
-  //               console.log('<<>>>>', result)
+//        streamifier.createReadStream(req.files.video.data).pipe(stream);
+//       //  console.log("<<STREAM>>",stream)
+//     });
+// };
 
-  //               resolve(result);
-  //             }
-  //             // } else {
-  //             //   reject(error);
-  //             // }
-  //           }
-  //         );
+// (async function upload(req) {
+//   try{
+//     let result = await streamUpload(req);
+//     console.log("<<RESULT>>",result);
+//   }
+//   catch(err){
+//     console.log("<<<ERROR HERE>>>",err)
+//   }
+  
+// })(req)
+console.log("<>>", )
+cloudinary.uploader.upload(req.files.video.data, 
+  { resource_type: "video", 
+    chunk_size: 6000000                                 
+    },
+  function(error, result) {console.log("<<<?RESULT>>>",result, error)});
 
-  //         console.log("<<<DATA>>>",req.files.video.data)
 
-  //        streamifier.createReadStream(req.files.video.data).pipe(stream);
-  //     });
-  // };
-  // console.log('<<>>>>', streamUpload)
-  //   async function upload(req) {
-  //     let result = await streamUpload(req);
-  //     return res.status(200).json(result)
-  // }
+}
 
-  // upload(req);
-
-  // }
-  // catch(err){
-  //   return res.status(500).json(err)
-  // }
-
-  console.log('<<REQ FILES>>>', req.files);
-
-  let streamUpload = (req) => {
-    return new Promise((resolve, reject) => {
-      let stream = cloudinary.uploader.upload_stream((error, result) => {
-        if (result) {
-          resolve(result);
-        } else {
-          reject(error);
-        }
-      });
-      streamifier.createReadStream(req.files.video.data).pipe(stream);
-    });
-  };
-
-  async function upload(req) {
-    let result = await streamUpload(req);
-    return res.status(200).json(result);
-  }
-
-  upload(req);
-};
 
 userController.adsLook = (req, res) => {
   MODEL.advertModel.findOne({}).then((advert) => {
     return res.status(200).json(advert);
   });
 };
+
 
 userController.updatePhoneSpecifications = async (REQUEST, RESPONSE) => {
   try {
