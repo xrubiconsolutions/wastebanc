@@ -1664,10 +1664,12 @@ organisationController.scheduleAnalysis = (REQUEST, RESPONSE) => {
                   }).then((
                     accepted
                   )=>{
-                    RESPONSE.status(200).jsonp(
+                    MODEL.scheduleModel.find({}).then(allSchedules=>{
+                RESPONSE.status(200).jsonp(
                       COMMON_FUN.sendSuccess(
                         CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
                         {
+                          allSchedules: allSchedules.length,
                           completed: completed.length,
                           missed: missed.length,
                           pending: pending.length,
@@ -1676,6 +1678,9 @@ organisationController.scheduleAnalysis = (REQUEST, RESPONSE) => {
                         }
                       )
                     );
+
+})
+                    
 
                   })
 
