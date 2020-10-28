@@ -971,10 +971,10 @@ userController.androidUsers = (req, res) => {
         phone_OS: 'android',
       })
         .then((result) => {
-           MODEL.collectorModel.find({phone_OS:"android"}).then(reycler=>{
+           MODEL.collectorModel.find({phone_OS:"android"}).then(recycler=>{
            Var data = [...result, ...recycler]
            return res.status(200).json({
-          data: data
+          data: data 
 })
 })
       });
@@ -993,7 +993,7 @@ userController.iosUsers = (req, res) => {
       })
       .then((result) => {
 
-         MODEL.collectorModel.find({phone_OS:"ios"}).then(reycler=>{
+         MODEL.collectorModel.find({phone_OS:"ios"}).then(recycler=>{
            Var data = [...result, ...recycler]
            return res.status(200).json({
           data: data
