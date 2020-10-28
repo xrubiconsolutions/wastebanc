@@ -743,7 +743,7 @@ scheduleController.allCoins = (req, res) => {
             .json(
               COMMON_FUN.sendSuccess(
                 CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-                coins
+                coins.toFixed(2)
               )
             )
     })
