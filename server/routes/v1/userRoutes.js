@@ -107,8 +107,10 @@ module.exports = (APP) => {
 
   APP.route("/api/users/analytics").get(CONTROLLER.userController.userAnalytics);
 
+  APP.route("/api/total/sales/advert").get(CONTROLLER.userController.totalSalesAdvert);
 
 
+  APP.route("/api/user/usage").get(CONTROLLER.userController.usageGrowth);
 
 
 

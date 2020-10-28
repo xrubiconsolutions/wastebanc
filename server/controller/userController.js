@@ -1116,6 +1116,210 @@ userController.userAnalytics = (req,res)=>{
 }
 
 
+userController.totalSalesAdvert = (req,res)=>{
+  try{
+
+    MODEL.advertModel.find({}).then((adverts)=>{
+      return res.status(200).json({
+        totalSalesAdvert: adverts.length
+      })
+    })
+
+  }catch(err){
+
+    return res.status(200).json(err)
+
+  }
+}
+
+
+userController.usageGrowth = (req,res)=>{
+
+  var year = new Date().getFullYear()
+  console.log("<<<Year>>>", year)
+
+
+
+  try{
+
+    MODEL.userModel.find({
+      "$expr": {
+        "$and": [
+          {"$eq": [{ "$year": "$createAt" }, year]},
+          {"$eq": [{ "$month": "$createAt" }, 1]}
+        ]
+      }
+    }).then((jan) => {
+      MODEL.userModel.find({
+        "$expr": {
+          "$and": [
+            {"$eq": [{ "$year": "$createAt" }, year]},
+            {"$eq": [{ "$month": "$createAt" }, 2]}
+          ]
+        }
+      }).then((feb)=>{
+
+        MODEL.userModel.find({
+          "$expr": {
+            "$and": [
+              {"$eq": [{ "$year": "$createAt" }, year]},
+              {"$eq": [{ "$month": "$createAt" }, 3]}
+            ]
+          }
+        }).then((march)=>{
+
+          MODEL.userModel.find({
+            "$expr": {
+              "$and": [
+                {"$eq": [{ "$year": "$createAt" }, year]},
+                {"$eq": [{ "$month": "$createAt" }, 4]}
+              ]
+            }
+          }).then((april)=>{
+
+            MODEL.userModel.find({
+              "$expr": {
+                "$and": [
+                  {"$eq": [{ "$year": "$createAt" }, year]},
+                  {"$eq": [{ "$month": "$createAt" }, 5]}
+                ]
+              }
+            }).then((may)=>{
+
+              MODEL.userModel.find({
+                "$expr": {
+                  "$and": [
+                    {"$eq": [{ "$year": "$createAt" }, year]},
+                    {"$eq": [{ "$month": "$createAt" }, 6]}
+                  ]
+                }
+              }).then((june)=>{
+
+                MODEL.userModel.find({
+                  "$expr": {
+                    "$and": [
+                      {"$eq": [{ "$year": "$createAt" }, year]},
+                      {"$eq": [{ "$month": "$createAt" }, 7]}
+                    ]
+                  }
+                }).then((july)=>{
+
+                  MODEL.userModel.find({
+                    "$expr": {
+                      "$and": [
+                        {"$eq": [{ "$year": "$createAt" }, year]},
+                        {"$eq": [{ "$month": "$createAt" }, 8]}
+                      ]
+                    }
+                  }).then((Aug)=>{
+
+                    MODEL.userModel.find({
+                      "$expr": {
+                        "$and": [
+                          {"$eq": [{ "$year": "$createAt" }, year]},
+                          {"$eq": [{ "$month": "$createAt" }, 9]}
+                        ]
+                      }
+                    }).then((sept)=>{
+
+
+                      MODEL.userModel.find({
+                        "$expr": {
+                          "$and": [
+                            {"$eq": [{ "$year": "$createAt" }, year]},
+                            {"$eq": [{ "$month": "$createAt" }, 10]}
+                          ]
+                        }
+                      }).then((Oct)=>{
+
+                        MODEL.userModel.find({
+                          "$expr": {
+                            "$and": [
+                              {"$eq": [{ "$year": "$createAt" }, year]},
+                              {"$eq": [{ "$month": "$createAt" }, 11]}
+                            ]
+                          }
+                        }).then((Nov)=>{
+
+                          MODEL.userModel.find({
+                            "$expr": {
+                              "$and": [
+                                {"$eq": [{ "$year": "$createAt" }, year]},
+                                {"$eq": [{ "$month": "$createAt" }, 12]}
+                              ]
+                            }
+                          }).then((Dec)=>{
+
+                            MODEL.userModel.find({
+                              "$expr": {
+                                "$and": [
+                                  {"$eq": [{ "$year": "$createAt" }, year]},
+                                  {"$eq": [{ "$month": "$createAt" }, 11]}
+                                ]
+                              }
+                            }).then((Analytics)=>{
+                              res.status(200).json({
+                                JANUARY: jan.length,
+                                FEBRUARY: feb.length,
+                                MARCH: march.length,
+                                APRIL: april.length,
+                                MAY: may.length,
+                                JUNE: june.length,
+                                JULY: july.length,
+                                AUGUST: Aug.length,
+                                SEPTEMBER: sept.length,
+                                OCTOBER: Oct.length,
+                                NOVEMBER: Nov.length,
+                                DECEMBER: Dec.length
+                              })
+                               
+
+                            })
+
+
+                          })
+
+                        })
+
+                      })
+
+                    })
+
+                  })
+
+                })
+
+
+              })
+
+            })
+
+
+
+          })
+
+
+        })
+
+      })
+
+
+    });
+  
+
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+
+  }
+
+}
+
+
+
+
+
 
 
 /* export userControllers */

@@ -154,5 +154,10 @@ module.exports = (APP) => {
     APP.route('/api/schedule/analytics')
         .get(CONTROLLER.organisationController.scheduleAnalysis);
 
+    APP.route('/api/advert/analytics')
+        .get(CONTROLLER.organisationController.advertGrowth);
+
+     
+
                    
 };
