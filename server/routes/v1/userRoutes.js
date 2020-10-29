@@ -112,6 +112,9 @@ module.exports = (APP) => {
 
   APP.route("/api/user/usage").get(CONTROLLER.userController.usageGrowth);
 
+  APP.route("/api/user/analytics/month").get(CONTROLLER.userController.monthFiltering);
+
+
   APP.route("/api/user/mobile_carrier").get(CONTROLLER.userController.mobileCarrierAnalytics);
 
 

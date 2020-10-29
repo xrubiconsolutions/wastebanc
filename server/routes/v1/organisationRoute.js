@@ -173,5 +173,8 @@ module.exports = (APP) => {
     APP.route('/api/company/receipts/analytics')
         .get(CONTROLLER.organisationController.companyReceiptTransactions);
 
+    APP.route('/api/company/growth/analytics')
+        .get(CONTROLLER.organisationController.companyGrowthAnalytics);
+
                
 };
