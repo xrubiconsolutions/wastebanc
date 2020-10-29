@@ -1312,10 +1312,10 @@ userController.mobileCarrierAnalytics = (req,res)=>{
                                     }).then((recycler_etisalat)=>{
                                         var etisalat_users = [...etisalat, ...recycler_etisalat];
                                          return res.status(200).json({
-                                           MTN: mtn_users.length,
-                                           AIRTEL: airtel_users.length,
-                                           GLO: glo_users.length,
-                                           ETISALAT: etisalat_users.length
+                                           MTN: { amount: mtn_users.length, data : mtn_users },
+                                           AIRTEL: { amount:  airtel_users.length, data : airtel_users  },
+                                           GLO: { amount: glo_users.length, data: glo_users },
+                                           ETISALAT:{amount: etisalat_users.length , data: etisalat_users }
                                          })
                                     })
                                 })
