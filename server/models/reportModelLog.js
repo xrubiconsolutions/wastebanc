@@ -11,7 +11,6 @@ const reportLog_Schema = new Schema({
   userReportID: {
       type: String,
       required: true,
-      unique: true
   },
   active:{
     type: Boolean,
@@ -28,7 +27,7 @@ const reportLog_Schema = new Schema({
     type: String
   },
   lat: {
-        type: String
+    type: String
   },
   long: {
     type: String
