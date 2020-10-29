@@ -1512,5 +1512,18 @@ userController.monthFiltering = (req,res)=>{
 }
 
 
+userController.userReportLog = (req,res)=>{
+  try{
+
+    MODEL.reportLogModel.find({}).then((logs)=>{
+      return res.status(200).json(logs)
+    })
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+
+  }
+}
 /* export userControllers */
 module.exports = userController;
