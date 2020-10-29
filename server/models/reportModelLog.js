@@ -7,7 +7,7 @@ const Constants = require("../util/constants");
 /**************************************************
  ************* Report Model or collection ***********
  **************************************************/
-const report_Schema = new Schema({
+const reportLog_Schema = new Schema({
   apiKey: {
     type: String,
     required: true,
@@ -45,7 +45,7 @@ const report_Schema = new Schema({
         type: String
   },
   long: {
-        type: String
+    type: String
   },
   createdAt: {
       type: Date,
@@ -53,7 +53,10 @@ const report_Schema = new Schema({
   },
   addressArea:{
     type: String
+  },
+  address:{
+      type:String
   }
 });
 
-module.exports = MONGOOSE.model("report", report_Schema);
+module.exports = MONGOOSE.model("reportLog", reportLog_Schema);

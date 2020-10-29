@@ -12,6 +12,7 @@ module.exports = {
     collectorModel: require("./collectorModel"),
     transactionModel: require("./transactionModel"),
     reportModel: require("./reportModel"),
+    reportLogModel: require("./reportModelLog"),
     payModel: require("./payModel"),
     companyReceiptModel: require("./companyReceipt"),
     paymentLogModel : require("./paymentLogModel"),

@@ -428,7 +428,6 @@ organisationController.payRecyclers = (req, res) => {
           return res.status(400).json({
             message: "This transaction had already been saved on the database",
           });
-
         MODEL.companyReceiptModel(receipt).save({}, (ERR, RESULT) => {
           if (ERR) return res.status(400).json(ERR);
 
@@ -447,7 +446,6 @@ organisationController.paymentLog = (req, res) => {
     MODEL.paymentLogModel
       .findOne({ receiptId: log.receiptId })
       .then((result, err) => {
-        console.log("opoor ye ye", result);
         if (result)
           return res.status(400).json({
             message: "This log had already been saved on the database",
@@ -1911,6 +1909,454 @@ organisationController.getTotalCompany = (req,res)=>{
 }
 
 
+organisationController.totalWeightAnalytics = (req,res)=>{
+  try{
+
+    MODEL.transactionModel.find({}).then((schedules)=>{
+        var weights = schedules.map(schedule=>schedule.weight).reduce((acc,curr)=>acc+curr, 0)
+        return res.status(200).json({
+          Weight : weights
+        })
+    })
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+
+  }
+}
+
+
+
+
+
+
+organisationController.categoryAnalytics = (req, res) => {
+   MODEL.scheduleModel
+    .find({})
+    .sort({ _id: -1 })
+    .then((result, err) => {
+      if (err) return res.status(400).json(err);
+
+      var can = result
+        .filter((x) => x.Category == "Can")
+       
+      var petBottle = result
+        .filter((x) => x.Category == "Pet Bottle")
+      var carton = result
+        .filter((x) => x.Category == "carton")
+       
+      var rubber = result
+        .filter((x) => x.Category == "Rubber")
+        
+      var plastics = result
+        .filter((x) => x.Category == "Plastics")
+
+      return res.status(200).json({
+        can: can,
+        petBottle: petBottle,
+        carton: carton,
+        rubber: rubber,
+        plastics: plastics,
+      });
+    })
+    .catch((err) => res.status(500).json(err));
+};
+
+
+
+
+organisationController.licencePaymentGrowth = (req,res)=>{
+
+  var year = new Date().getFullYear();
+
+
+  try{
+
+    MODEL.companyReceiptModel.find({
+      paymentType: "licence",
+      "$expr": {
+        "$and": [
+          {"$eq": [{ "$year": "$createdAt" }, year]},
+          {"$eq": [{ "$month": "$createdAt" }, 1]}
+        ]
+      }
+    }).then((jan) => {
+      MODEL.companyReceiptModel.find({
+        paymentType: "licence",
+        "$expr": {
+          "$and": [
+            {"$eq": [{ "$year": "$createdAt" }, year]},
+            {"$eq": [{ "$month": "$createdAt" }, 2]}
+          ]
+        }
+      }).then((feb)=>{
+
+        MODEL.companyReceiptModel.find({
+          paymentType: "licence",
+          "$expr": {
+            "$and": [
+              {"$eq": [{ "$year": "$createdAt" }, year]},
+              {"$eq": [{ "$month": "$createdAt" }, 3]}
+            ]
+          }
+        }).then((march)=>{
+
+          MODEL.companyReceiptModel.find({
+            paymentType: "licence",
+            "$expr": {
+              "$and": [
+                {"$eq": [{ "$year": "$createdAt" }, year]},
+                {"$eq": [{ "$month": "$createdAt" }, 4]}
+              ]
+            }
+          }).then((april)=>{
+
+            MODEL.companyReceiptModel.find({
+              paymentType: "licence",
+              "$expr": {
+                "$and": [
+                  {"$eq": [{ "$year": "$createdAt" }, year]},
+                  {"$eq": [{ "$month": "$createdAt" }, 5]}
+                ]
+              }
+            }).then((may)=>{
+
+              MODEL.companyReceiptModel.find({
+                paymentType: "licence",
+                "$expr": {
+                  "$and": [
+                    {"$eq": [{ "$year": "$createdAt" }, year]},
+                    {"$eq": [{ "$month": "$createdAt" }, 6]}
+                  ]
+                }
+              }).then((june)=>{
+
+                MODEL.companyReceiptModel.find({
+                  paymentType: "licence",
+                  "$expr": {
+                    "$and": [
+                      {"$eq": [{ "$year": "$createdAt" }, year]},
+                      {"$eq": [{ "$month": "$createdAt" }, 7]}
+                    ]
+                  }
+                }).then((july)=>{
+
+                  MODEL.companyReceiptModel.find({
+                    paymentType: "licence",
+                    "$expr": {
+                      "$and": [
+                        {"$eq": [{ "$year": "$createdAt" }, year]},
+                        {"$eq": [{ "$month": "$createdAt" }, 8]}
+                      ]
+                    }
+                  }).then((Aug)=>{
+
+                    MODEL.companyReceiptModel.find({
+                      paymentType: "licence",
+                      "$expr": {
+                        "$and": [
+                          {"$eq": [{ "$year": "$createdAt" }, year]},
+                          {"$eq": [{ "$month": "$createdAt" }, 9]}
+                        ]
+                      }
+                    }).then((sept)=>{
+
+
+                      MODEL.companyReceiptModel.find({
+                        paymentType: "licence",
+                        "$expr": {
+                          "$and": [
+                            {"$eq": [{ "$year": "$createdAt" }, year]},
+                            {"$eq": [{ "$month": "$createdAt" }, 10]}
+                          ]
+                        }
+                      }).then((Oct)=>{
+
+                        MODEL.companyReceiptModel.find({
+                          paymentType: "licence",
+                          "$expr": {
+                            "$and": [
+                              {"$eq": [{ "$year": "$createdAt" }, year]},
+                              {"$eq": [{ "$month": "$createdAt" }, 11]}
+                            ]
+                          }
+                        }).then((Nov)=>{
+
+                          MODEL.companyReceiptModel.find({
+                            paymentType: "licence",
+                            "$expr": {
+                              "$and": [
+                                {"$eq": [{ "$year": "$createdAt" }, year]},
+                                {"$eq": [{ "$month": "$createdAt" }, 12]}
+                              ]
+                            }
+                          }).then((Dec)=>{
+
+                            MODEL.companyReceiptModel.find({
+                              paymentType: "licence",
+                              "$expr": {
+                                "$and": [
+                                  {"$eq": [{ "$year": "$createdAt" }, year]},
+                                  {"$eq": [{ "$month": "$createdAt" }, 11]}
+                                ]
+                              }
+                            }).then((Analytics)=>{
+                              res.status(200).json({
+                                JANUARY: jan,
+                                FEBRUARY: feb,
+                                MARCH: march,
+                                APRIL: april,
+                                MAY: may,
+                                JUNE: june,
+                                JULY: july,
+                                AUGUST: Aug,
+                                SEPTEMBER: sept,
+                                OCTOBER: Oct,
+                                NOVEMBER: Nov,
+                                DECEMBER: Dec
+                              })
+                               
+
+                            })
+
+
+                          })
+
+                        })
+
+                      })
+
+                    })
+
+                  })
+
+                })
+
+
+              })
+
+            })
+
+
+
+          })
+
+
+        })
+
+      })
+
+
+    });
+  
+
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+
+  }
+
+}
+
+organisationController.companyReceiptTransactions = (req,res)=>{
+  try{
+
+    MODEL.companyReceiptModel.find({
+    }).then((receipts)=>{
+      var business = receipts.filter(x=>x.paymentType!=="licence")
+      return res.status(200).json(business)
+    })
+  }
+  catch(err){
+    return res.status(500).json(err)
+
+  }
+}
+
+
+organisationController.companyGrowthAnalytics = (req,res)=>{
+
+  var year = new Date().getFullYear();
+
+  try{
+
+    MODEL.organisationModel.find({
+      "$expr": {
+        "$and": [
+          {"$eq": [{ "$year": "$createAt" }, year]},
+          {"$eq": [{ "$month": "$createAt" }, 1]}
+        ]
+      }
+    }).then((jan) => {
+      MODEL.organisationModel.find({
+        "$expr": {
+          "$and": [
+            {"$eq": [{ "$year": "$createAt" }, year]},
+            {"$eq": [{ "$month": "$createAt" }, 2]}
+          ]
+        }
+      }).then((feb)=>{
+        MODEL.organisationModel.find({
+          "$expr": {
+            "$and": [
+              {"$eq": [{ "$year": "$createAt" }, year]},
+              {"$eq": [{ "$month": "$createAt" }, 3]}
+            ]
+          }
+        }).then((march)=>{
+
+          MODEL.organisationModel.find({
+            "$expr": {
+              "$and": [
+                {"$eq": [{ "$year": "$createAt" }, year]},
+                {"$eq": [{ "$month": "$createAt" }, 4]}
+              ]
+            }
+          }).then((april)=>{
+
+            MODEL.organisationModel.find({
+              "$expr": {
+                "$and": [
+                  {"$eq": [{ "$year": "$createAt" }, year]},
+                  {"$eq": [{ "$month": "$createAt" }, 5]}
+                ]
+              }
+            }).then((may)=>{
+
+              MODEL.organisationModel.find({
+                "$expr": {
+                  "$and": [
+                    {"$eq": [{ "$year": "$createAt" }, year]},
+                    {"$eq": [{ "$month": "$createAt" }, 6]}
+                  ]
+                }
+              }).then((june)=>{
+
+                MODEL.organisationModel.find({
+                  "$expr": {
+                    "$and": [
+                      {"$eq": [{ "$year": "$createAt" }, year]},
+                      {"$eq": [{ "$month": "$createAt" }, 7]}
+                    ]
+                  }
+                }).then((july)=>{
+
+                  MODEL.organisationModel.find({
+                    "$expr": {
+                      "$and": [
+                        {"$eq": [{ "$year": "$createAt" }, year]},
+                        {"$eq": [{ "$month": "$createAt" }, 8]}
+                      ]
+                    }
+                  }).then((Aug)=>{
+
+                    MODEL.organisationModel.find({
+                      "$expr": {
+                        "$and": [
+                          {"$eq": [{ "$year": "$createAt" }, year]},
+                          {"$eq": [{ "$month": "$createAt" }, 9]}
+                        ]
+                      }
+                    }).then((sept)=>{
+
+
+                      MODEL.organisationModel.find({
+                        "$expr": {
+                          "$and": [
+                            {"$eq": [{ "$year": "$createAt" }, year]},
+                            {"$eq": [{ "$month": "$createAt" }, 10]}
+                          ]
+                        }
+                      }).then((Oct)=>{
+
+                        MODEL.organisationModel.find({
+                          "$expr": {
+                            "$and": [
+                              {"$eq": [{ "$year": "$createAt" }, year]},
+                              {"$eq": [{ "$month": "$createAt" }, 11]}
+                            ]
+                          }
+                        }).then((Nov)=>{
+
+                          MODEL.organisationModel.find({
+                            "$expr": {
+                              "$and": [
+                                {"$eq": [{ "$year": "$createAt" }, year]},
+                                {"$eq": [{ "$month": "$createAt" }, 12]}
+                              ]
+                            }
+                          }).then((Dec)=>{
+
+                            MODEL.organisationModel.find({
+                              "$expr": {
+                                "$and": [
+                                  {"$eq": [{ "$year": "$createAt" }, year]},
+                                  {"$eq": [{ "$month": "$createAt" }, 11]}
+                                ]
+                              }
+                            }).then((Analytics)=>{
+                              res.status(200).json({
+                                JANUARY:  {
+                                  amount : jan.length,
+                                  companies: jan
+                                },
+                                FEBRUARY: { amount:feb.length, companies:feb},
+                                MARCH: { amount: march.length, companies: march},
+                                APRIL: { amount:april.length, companies : april},
+                                MAY: { amount: may.length, companies: may},
+                                JUNE: { amount: june.length, companies : june },
+                                JULY: { amount : july.length, companies : july },
+                                AUGUST:{amount: Aug.length, companies : Aug},
+                                SEPTEMBER:{ amount: sept.length, companies : sept},
+                                OCTOBER:{ amount: Oct.length, companies : Oct },
+                                NOVEMBER: { amount :  Nov.length, companies : Nov },
+                                DECEMBER: { amount: Dec.length, companies : Dec }
+                              })
+                               
+
+                            })
+
+
+                          })
+
+                        })
+
+                      })
+
+                    })
+
+                  })
+
+                })
+
+
+              })
+
+            })
+
+
+
+          })
+
+
+        })
+
+      })
+
+
+    });
+  
+
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+
+  }
+
+}
 
 
 /* export organisationControllers */

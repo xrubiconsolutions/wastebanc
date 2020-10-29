@@ -1281,7 +1281,54 @@ userController.usageGrowth = (req,res)=>{
 }
 
 
-
+userController.mobileCarrierAnalytics = (req,res)=>{
+  try{
+      MODEL.userModel.find({
+        mobile_carrier: "MTN"
+      }).then((mtn)=>{
+          MODEL.collectorModel.find({
+            mobile_carrier:"MTN"
+          }).then((recycler_mtn)=>{
+            var mtn_users = [...mtn, ...recycler_mtn];
+              MODEL.userModel.find({
+                mobile_carrier:"Airtel Nigeria"
+              }).then((airtel)=>{
+                  MODEL.collectorModel.find({
+                    mobile_carrier:"Airtel Nigeria"
+                  }).then((recycler_airtel)=>{
+                    var airtel_users = [...airtel, ...recycler_airtel];
+                      MODEL.userModel.find({
+                        mobile_carrier:"Globacom (GLO)"
+                      }).then((glo)=>{
+                          MODEL.collectorModel.find({
+                            mobile_carrier: "Globacom (GLO)"
+                          }).then((recycler_glo)=>{
+                              var glo_users = [...glo, ...recycler_glo];
+                                MODEL.userModel.find({
+                                  mobile_carrier:"9Mobile Nigeria (Etisalat)"
+                                }).then((etisalat)=>{
+                                    MODEL.collectorModel.find({
+                                      mobile_carrier:"9Mobile Nigeria (Etisalat)"
+                                    }).then((recycler_etisalat)=>{
+                                        var etisalat_users = [...etisalat, ...recycler_etisalat];
+                                         return res.status(200).json({
+                                           MTN: mtn_users.length,
+                                           AIRTEL: airtel_users.length,
+                                           GLO: glo_users.length,
+                                           ETISALAT: etisalat_users.length
+                                         })
+                                    })
+                                })
+                          })
+                      })
+                  })
+              })
+          })
+      })
+  } catch(err){
+    return res.status(500).json(err);
+  }
+}
 
 
 

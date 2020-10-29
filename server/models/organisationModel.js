@@ -7,6 +7,10 @@ const Constants = require("../util/constants");
 /**************************************************
  ************* Organisation Model or collection ***********
  **************************************************/
+
+var expiry = new Date()
+expiry.setDate(new Date().getDate() + 365 );
+
 const organisation_Schema = new Schema({
   companyName: {
     type: String,
@@ -38,6 +42,14 @@ const organisation_Schema = new Schema({
   role : {
     type: String,
     default : "company"
+  },
+  licence_active: { // Licence field
+    type: Boolean,
+    default:false,
+  },
+  expiry_date :{
+      type: Date,
+      default: expiry
   },
   totalAvailable :{
     type: Number,

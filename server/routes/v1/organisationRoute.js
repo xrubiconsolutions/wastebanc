@@ -160,7 +160,18 @@ module.exports = (APP) => {
     APP.route('/api/total/company')
         .get(CONTROLLER.organisationController.getTotalCompany);
 
-     
+    
+    APP.route('/api/total/weight')
+        .get(CONTROLLER.organisationController.totalWeightAnalytics);
 
-                   
+    APP.route('/api/category/analytics')
+        .get(CONTROLLER.organisationController.categoryAnalytics);
+
+    APP.route('/api/licence/analytics')
+        .get(CONTROLLER.organisationController.licencePaymentGrowth);
+
+    APP.route('/api/company/receipts/analytics')
+        .get(CONTROLLER.organisationController.companyReceiptTransactions);
+
+               
 };

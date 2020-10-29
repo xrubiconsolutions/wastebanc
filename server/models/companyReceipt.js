@@ -9,6 +9,10 @@ const companyReceipt_Schema = {
         type: Number,
         required: true
     },
+    paymentType: {  // licence for licence fee 
+        type: String,
+        default: "business_schedule"
+    },
     currency :{
         type:String,
         required: true
@@ -35,9 +39,12 @@ const companyReceipt_Schema = {
         required: true
     },
     transaction_id :{
-        type: String,
-        
-    }  
+        type: String,     
+    },
+    createdAt:{
+        type: Date,
+        default: Date.now()
+    }
 };
 
 module.exports = MONGOOSE.model("companyReceipt", companyReceipt_Schema);

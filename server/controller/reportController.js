@@ -186,13 +186,33 @@ reportController.allReport = (req, res) => {
 
 reportController.endReport = (req,res)=>{
   var ID = req.body.userID;
+  var addressArea = req.body.addressArea;
+  var address = req.body.addressArea;
 
   MODEL.reportModel
   .findOne({ userReportID: ID })
   .then((user) => {
     MODEL.reportModel.updateOne({ userReportID: ID }, { $set: { "active" : false } }, (err, resp)=>{
-      if(err) return res.status(400).json(err)
-      return res.status(200).json({message: "Session successfully ended"})
+      if(err) { return res.status(400).json(err) }
+
+      else {
+        var log =  { 
+
+          userReportID: user.userReportID,
+          name: user.name,
+          email:user.email,
+          phone: user.phone,
+          lat: user.lat,
+          long: user.long,
+          addressArea: req.body.addressArea,
+          address: req.body.address
+         }
+            MODEL.reportLogModel(log).save( {} , (ERR, RESULT) => {
+              if(ERR) return res.status(400).json(ERR)
+              return res.status(200).json({message: "Session successfully ended"})
+            })
+      }
+      
     })
   })
   .catch((err) => res.status(500).json(err));
