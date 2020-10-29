@@ -658,6 +658,187 @@ collectorController.collectorAnalytics = (req,res)=>{
 }
 
 
+collectorController.monthFiltering = (req,res)=>{
+
+  var year = new Date().getFullYear()
+
+  try{
+
+    MODEL.collectorModel.find({
+      "$expr": {
+        "$and": [
+          {"$eq": [{ "$year": "$createdAt" }, year]},
+          {"$eq": [{ "$month": "$createdAt" }, 1]}
+        ]
+      }
+    }).then((jan) => {
+      MODEL.collectorModel.find({
+        "$expr": {
+          "$and": [
+            {"$eq": [{ "$year": "$createdAt" }, year]},
+            {"$eq": [{ "$month": "$createdAt" }, 2]}
+          ]
+        }
+      }).then((feb)=>{
+
+        MODEL.collectorModel.find({
+          "$expr": {
+            "$and": [
+              {"$eq": [{ "$year": "$createdAt" }, year]},
+              {"$eq": [{ "$month": "$createdAt" }, 3]}
+            ]
+          }
+        }).then((march)=>{
+
+          MODEL.collectorModel.find({
+            "$expr": {
+              "$and": [
+                {"$eq": [{ "$year": "$createdAt" }, year]},
+                {"$eq": [{ "$month": "$createdAt" }, 4]}
+              ]
+            }
+          }).then((april)=>{
+
+            MODEL.collectorModel.find({
+              "$expr": {
+                "$and": [
+                  {"$eq": [{ "$year": "$createdAt" }, year]},
+                  {"$eq": [{ "$month": "$createdAt" }, 5]}
+                ]
+              }
+            }).then((may)=>{
+
+              MODEL.collectorModel.find({
+                "$expr": {
+                  "$and": [
+                    {"$eq": [{ "$year": "$createdAt" }, year]},
+                    {"$eq": [{ "$month": "$createdAt" }, 6]}
+                  ]
+                }
+              }).then((june)=>{
+
+                MODEL.collectorModel.find({
+                  "$expr": {
+                    "$and": [
+                      {"$eq": [{ "$year": "$createdAt" }, year]},
+                      {"$eq": [{ "$month": "$createdAt" }, 7]}
+                    ]
+                  }
+                }).then((july)=>{
+
+                  MODEL.collectorModel.find({
+                    "$expr": {
+                      "$and": [
+                        {"$eq": [{ "$year": "$createdAt" }, year]},
+                        {"$eq": [{ "$month": "$createdAt" }, 8]}
+                      ]
+                    }
+                  }).then((Aug)=>{
+
+                    MODEL.collectorModel.find({
+                      "$expr": {
+                        "$and": [
+                          {"$eq": [{ "$year": "$createdAt" }, year]},
+                          {"$eq": [{ "$month": "$createdAt" }, 9]}
+                        ]
+                      }
+                    }).then((sept)=>{
+
+
+                      MODEL.collectorModel.find({
+                        "$expr": {
+                          "$and": [
+                            {"$eq": [{ "$year": "$createdAt" }, year]},
+                            {"$eq": [{ "$month": "$createdAt" }, 10]}
+                          ]
+                        }
+                      }).then((Oct)=>{
+
+                        MODEL.collectorModel.find({
+                          "$expr": {
+                            "$and": [
+                              {"$eq": [{ "$year": "$createdAt" }, year]},
+                              {"$eq": [{ "$month": "$createdAt" }, 11]}
+                            ]
+                          }
+                        }).then((Nov)=>{
+
+                          MODEL.collectorModel.find({
+                            "$expr": {
+                              "$and": [
+                                {"$eq": [{ "$year": "$createdAt" }, year]},
+                                {"$eq": [{ "$month": "$createdAt" }, 12]}
+                              ]
+                            }
+                          }).then((Dec)=>{
+
+                            MODEL.collectorModel.find({
+                              "$expr": {
+                                "$and": [
+                                  {"$eq": [{ "$year": "$createdAt" }, year]},
+                                  {"$eq": [{ "$month": "$createdAt" }, 11]}
+                                ]
+                              }
+                            }).then((Analytics)=>{
+                              res.status(200).json({
+                                JANUARY:{ amount: jan.length, data : jan },
+                                FEBRUARY: { amount:feb.length, data:feb },
+                                MARCH: { amount: march.length, data : march},
+                                APRIL: { amount: april.length, data : april},
+                                MAY: { amount: may.length, data: may },
+                                JUNE: { amount:june.length, data: june },
+                                JULY: { amount: july.length, data: july },
+                                AUGUST: {amount: Aug.length, data: Aug },
+                                SEPTEMBER: { amount: sept.length, data: sept},
+                                OCTOBER:{amount: Oct.length, data: Oct},
+                                NOVEMBER:{ amount: Nov.length, data: Nov},
+                                DECEMBER: { amount: Dec.length, data : Dec}
+                              })
+                               
+
+                            })
+
+
+                          })
+
+                        })
+
+                      })
+
+                    })
+
+                  })
+
+                })
+
+
+              })
+
+            })
+
+
+
+          })
+
+
+        })
+
+      })
+
+
+    });
+  
+
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+
+  }
+
+}
+
+
 
 
 

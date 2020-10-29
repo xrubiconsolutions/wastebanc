@@ -58,6 +58,8 @@ module.exports = (APP) => {
     APP.route("/api/delete/recycler").post(CONTROLLER.collectorController.deleteRecycler);
 
 
+    APP.route("/api/recycler/analytics/month").get(CONTROLLER.collectorController.monthFiltering);
+
 
     APP.route('/api/collector/activity')
     .get(CONTROLLER.collectorController.collectorAnalytics);
