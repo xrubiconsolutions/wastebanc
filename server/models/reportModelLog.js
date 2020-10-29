@@ -8,20 +8,6 @@ const Constants = require("../util/constants");
  ************* Report Model or collection ***********
  **************************************************/
 const reportLog_Schema = new Schema({
-  apiKey: {
-    type: String,
-    required: true,
-  },
-  sessionID: {
-      type: String,
-      required: true,
-      unique: true
-  },
-  token: {
-      type: String,
-      required: true,
-      unique: true
-  },
   userReportID: {
       type: String,
       required: true,

@@ -197,7 +197,6 @@ reportController.endReport = (req,res)=>{
 
       else {
         var log =  { 
-
           userReportID: user.userReportID,
           name: user.name,
           email:user.email,
