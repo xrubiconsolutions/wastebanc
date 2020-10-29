@@ -198,6 +198,7 @@ reportController.endReport = (req,res)=>{
       else {
         var log =  { 
           userReportID: user.userReportID,
+          active: false,
           name: user.name,
           email:user.email,
           phone: user.phone,
