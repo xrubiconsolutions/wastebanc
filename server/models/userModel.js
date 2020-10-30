@@ -120,6 +120,9 @@ const user_Schema = new Schema({
   },
   profile_picture:{
     type: String
+  },
+  internet_provider:{
+    type: String
   }
 });
 

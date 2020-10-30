@@ -879,6 +879,7 @@ userController.updatePhoneSpecifications = async (REQUEST, RESPONSE) => {
             $set: {
               phone_type: REQUEST.body.phone_type,
               phone_OS: REQUEST.body.phone_OS,
+              internet_provider: REQUEST.body.internet_provider
             },
           }
         )

@@ -90,6 +90,9 @@ const collector_Schema = new Schema({
   },
   last_logged_in:{
     type: Date
+  },
+  internet_provider:{
+    type: String
   }
 });
 
