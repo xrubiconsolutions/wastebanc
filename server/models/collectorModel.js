@@ -68,7 +68,8 @@ const collector_Schema = new Schema({
     type : Array
   },
   approvedBy: {
-    type: String
+    type: String,
+    default: null 
   },
   lat : {
     type: String
