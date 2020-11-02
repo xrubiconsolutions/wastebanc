@@ -171,6 +171,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                                   cardID: card_id,
                                   firstname: RESULT.username.split(' ')[0],
                                   lastname: RESULT.username.split(' ')[1],
+                                  fullname: RESULT.username.split(' ')[0]+RESULT.username.split(' ')[1],
                                   mobile_carrier: phone_number.carrier.name,
                                 },
                               },
