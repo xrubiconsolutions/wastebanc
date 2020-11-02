@@ -171,7 +171,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                                   cardID: card_id,
                                   firstname: RESULT.username.split(' ')[0],
                                   lastname: RESULT.username.split(' ')[1],
-                                  fullname: RESULT.username.split(' ')[0]+RESULT.username.split(' ')[1],
+                                  fullname: RESULT.username.split(' ')[0] + " " + RESULT.username.split(' ')[1],
                                   mobile_carrier: phone_number.carrier.name,
                                 },
                               },
@@ -1527,5 +1527,55 @@ userController.userReportLog = (req,res)=>{
 
   }
 }
+
+userController.mobileCarrierAnalytics = (req,res)=>{
+  try{
+      MODEL.userModel.find({
+        internet_provider: "MTN"
+      }).then((mtn)=>{
+          MODEL.collectorModel.find({
+            internet_provider:"MTN"
+          }).then((recycler_mtn)=>{
+            var mtn_users = [...mtn, ...recycler_mtn];
+              MODEL.userModel.find({
+                internet_provider:"Airtel NG"
+              }).then((airtel)=>{
+                  MODEL.collectorModel.find({
+                    internet_provider:"Airtel NG"
+                  }).then((recycler_airtel)=>{
+                    var airtel_users = [...airtel, ...recycler_airtel];
+                      MODEL.userModel.find({
+                        internet_provider:"Globacom (GLO)"
+                      }).then((glo)=>{
+                          MODEL.collectorModel.find({
+                            internet_provider: "Globacom (GLO)"
+                          }).then((recycler_glo)=>{
+                              var glo_users = [...glo, ...recycler_glo];
+                                MODEL.userModel.find({
+                                  internet_provider:"9Mobile Nigeria (Etisalat)"
+                                }).then((etisalat)=>{
+                                    MODEL.collectorModel.find({
+                                      internet_provider:"9Mobile Nigeria (Etisalat)"
+                                    }).then((recycler_etisalat)=>{
+                                        var etisalat_users = [...etisalat, ...recycler_etisalat];
+                                         return res.status(200).json({
+                                           MTN: { amount: mtn_users.length, data : mtn_users },
+                                           AIRTEL: { amount:  airtel_users.length, data : airtel_users  },
+                                           GLO: { amount: glo_users.length, data: glo_users },
+                                           ETISALAT:{amount: etisalat_users.length , data: etisalat_users }
+                                         })
+                                    })
+                                })
+                          })
+                      })
+                  })
+              })
+          })
+      })
+  } catch(err){
+    return res.status(500).json(err);
+  }
+}
+
 /* export userControllers */
 module.exports = userController;

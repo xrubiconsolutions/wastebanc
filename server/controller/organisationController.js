@@ -400,7 +400,7 @@ organisationController.allPendingRecycler = (req,res)=>{
 
           MODEL.collectorModel.find({
             organisation : organisation,
-            "approvedBy": { $exists: false, $eq: null }
+            "approvedBy": { $eq: null }
           }).then((result, err)=>{
             if(err) return res.status(400).json({
               message : "No recycler found"
