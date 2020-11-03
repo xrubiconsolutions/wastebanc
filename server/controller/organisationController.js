@@ -2359,5 +2359,202 @@ organisationController.companyGrowthAnalytics = (req,res)=>{
 }
 
 
+organisationController.companyDeclineAnalytics = (req,res)=>{
+
+  var year = new Date().getFullYear();
+
+  try{
+
+    MODEL.organisationModel.find({
+      licence_active : false,
+      "$expr": {
+        "$and": [
+          {"$eq": [{ "$year": "$createAt" }, year]},
+          {"$eq": [{ "$month": "$createAt" }, 1]}
+        ]
+      }
+    }).then((jan) => {
+      MODEL.organisationModel.find({
+        licence_active : false,
+        "$expr": {
+          "$and": [
+            {"$eq": [{ "$year": "$createAt" }, year]},
+            {"$eq": [{ "$month": "$createAt" }, 2]}
+          ]
+        }
+      }).then((feb)=>{
+        MODEL.organisationModel.find({
+          licence_active : false,
+          "$expr": {
+            "$and": [
+              {"$eq": [{ "$year": "$createAt" }, year]},
+              {"$eq": [{ "$month": "$createAt" }, 3]}
+            ]
+          }
+        }).then((march)=>{
+
+          MODEL.organisationModel.find({
+            licence_active : false,
+            "$expr": {
+              "$and": [
+                {"$eq": [{ "$year": "$createAt" }, year]},
+                {"$eq": [{ "$month": "$createAt" }, 4]}
+              ]
+            }
+          }).then((april)=>{
+
+            MODEL.organisationModel.find({
+              licence_active : false,
+              "$expr": {
+                "$and": [
+                  {"$eq": [{ "$year": "$createAt" }, year]},
+                  {"$eq": [{ "$month": "$createAt" }, 5]}
+                ]
+              }
+            }).then((may)=>{
+
+              MODEL.organisationModel.find({
+                licence_active : false,
+                "$expr": {
+                  "$and": [
+                    {"$eq": [{ "$year": "$createAt" }, year]},
+                    {"$eq": [{ "$month": "$createAt" }, 6]}
+                  ]
+                }
+              }).then((june)=>{
+
+                MODEL.organisationModel.find({
+                  licence_active : false,
+                  "$expr": {
+                    "$and": [
+                      {"$eq": [{ "$year": "$createAt" }, year]},
+                      {"$eq": [{ "$month": "$createAt" }, 7]}
+                    ]
+                  }
+                }).then((july)=>{
+
+                  MODEL.organisationModel.find({
+                    licence_active : false,
+                    "$expr": {
+                      "$and": [
+                        {"$eq": [{ "$year": "$createAt" }, year]},
+                        {"$eq": [{ "$month": "$createAt" }, 8]}
+                      ]
+                    }
+                  }).then((Aug)=>{
+
+                    MODEL.organisationModel.find({
+                      licence_active : false,
+                      "$expr": {
+                        "$and": [
+                          {"$eq": [{ "$year": "$createAt" }, year]},
+                          {"$eq": [{ "$month": "$createAt" }, 9]}
+                        ]
+                      }
+                    }).then((sept)=>{
+
+
+                      MODEL.organisationModel.find({
+                        licence_active : false,
+                        "$expr": {
+                          "$and": [
+                            {"$eq": [{ "$year": "$createAt" }, year]},
+                            {"$eq": [{ "$month": "$createAt" }, 10]}
+                          ]
+                        }
+                      }).then((Oct)=>{
+
+                        MODEL.organisationModel.find({
+                          licence_active : false,
+                          "$expr": {
+                            "$and": [
+                              {"$eq": [{ "$year": "$createAt" }, year]},
+                              {"$eq": [{ "$month": "$createAt" }, 11]}
+                            ]
+                          }
+                        }).then((Nov)=>{
+
+                          MODEL.organisationModel.find({
+                            licence_active : false,
+                            "$expr": {
+                              "$and": [
+                                {"$eq": [{ "$year": "$createAt" }, year]},
+                                {"$eq": [{ "$month": "$createAt" }, 12]}
+                              ]
+                            }
+                          }).then((Dec)=>{
+
+                            MODEL.organisationModel.find({
+                              licence_active : false,
+                              "$expr": {
+                                "$and": [
+                                  {"$eq": [{ "$year": "$createAt" }, year]},
+                                  {"$eq": [{ "$month": "$createAt" }, 11]}
+                                ]
+                              }
+                            }).then((Analytics)=>{
+                              res.status(200).json({
+                                JANUARY:  {
+                                  amount : jan.length,
+                                  companies: jan
+                                },
+                                FEBRUARY: { amount:feb.length, companies:feb},
+                                MARCH: { amount: march.length, companies: march},
+                                APRIL: { amount:april.length, companies : april},
+                                MAY: { amount: may.length, companies: may},
+                                JUNE: { amount: june.length, companies : june },
+                                JULY: { amount : july.length, companies : july },
+                                AUGUST:{amount: Aug.length, companies : Aug},
+                                SEPTEMBER:{ amount: sept.length, companies : sept},
+                                OCTOBER:{ amount: Oct.length, companies : Oct },
+                                NOVEMBER: { amount :  Nov.length, companies : Nov },
+                                DECEMBER: { amount: Dec.length, companies : Dec }
+                              })
+                               
+
+                            })
+
+
+                          })
+
+                        })
+
+                      })
+
+                    })
+
+                  })
+
+                })
+
+
+              })
+
+            })
+
+
+
+          })
+
+
+        })
+
+      })
+
+
+    });
+  
+
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+
+  }
+
+}
+
+
+
 /* export organisationControllers */
 module.exports = organisationController;
