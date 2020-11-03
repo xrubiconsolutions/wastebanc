@@ -66,7 +66,7 @@ const user_Schema = new Schema({
 
   roles: {
     type: String,
-    enum: ['client', 'collector', 'admin'],
+    enum: ['client', 'collector', 'admin' , 'analytics-admin'],
     required: true,
     default: 'client',
   },

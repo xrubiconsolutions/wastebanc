@@ -817,44 +817,23 @@ userController.expiryDateFilter = (req, res) => {
 };
 
 userController.advertControl = (req, res) => {
-//   let streamUpload = (req) => {
-//     return new Promise((resolve, reject) => {
-//         let stream = cloudinary.uploader.upload_stream(
-//           (error, result) => {
-//             if (result) {
-//               resolve(result);
-//             } else {
-//               reject(error);
-//             }
-//           }
-//         );
-
-//         console.log("<<BUFFER>>", req.files.video)
-
-//        streamifier.createReadStream(req.files.video.data).pipe(stream);
-//       //  console.log("<<STREAM>>",stream)
-//     });
-// };
-
-// (async function upload(req) {
-//   try{
-//     let result = await streamUpload(req);
-//     console.log("<<RESULT>>",result);
-//   }
-//   catch(err){
-//     console.log("<<<ERROR HERE>>>",err)
-//   }
+  const advert = { ...req.body}
   
-// })(req)
-console.log("<>>", )
-cloudinary.uploader.upload(req.files.video.data, 
-  { resource_type: "video", 
-    chunk_size: 6000000                                 
-    },
-  function(error, result) {console.log("<<<?RESULT>>>",result, error)});
-
-
+  try{
+  
+    MODEL.advertModel(advert).save({}, (ERR, RESULT) => {
+  
+        return res.status(200).json({
+          message: "Advert Posted Successfully"
+        })
+  
+    })
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
 }
+
 
 
 userController.adsLook = (req, res) => {
@@ -1528,7 +1507,7 @@ userController.userReportLog = (req,res)=>{
   }
 }
 
-userController.mobileCarrierAnalytics = (req,res)=>{
+userController.internet_providerAnalytics = (req,res)=>{
   try{
       MODEL.userModel.find({
         internet_provider: "MTN"

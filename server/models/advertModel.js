@@ -22,10 +22,21 @@ const advert_Schema = new Schema({
     type: Date,
     required:true
   },
+  thumbnail_url:{
+    type: String
+  },
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  authenticated:{
+    type: Boolean,
+    default: false,
+    required: true
+  },
+  expired: {
+    type: Date
+  }
 });
 
 module.exports = MONGOOSE.model('Advert', advert_Schema);
