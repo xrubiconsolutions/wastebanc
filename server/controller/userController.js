@@ -834,6 +834,31 @@ userController.advertControl = (req, res) => {
   }
 }
 
+userController.updateAdvert = (req, res) => {
+  const advert = { ...req.body}
+  
+  try{
+
+    MODEL.advertModel.updateOne(
+      { _id: req.body._id },
+      {
+        $set: {
+          title: req.body.title,
+          advert_url: req.body.advert_url,
+          duration : req.body.duration,
+          start_date:req.body.start_date,
+          thumbnail_url:req.body.thumbnail_url
+      }
+        },
+      (res) => { return res.status(200).json({
+        message: "Advert Updated Successfully"
+      }) })
+  
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
+}
 
 
 userController.adsLook = (req, res) => {

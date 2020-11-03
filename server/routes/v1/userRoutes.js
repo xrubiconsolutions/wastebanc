@@ -87,7 +87,9 @@ module.exports = (APP) => {
 
   APP.route("/api/user/expiry").get(CONTROLLER.userController.expiryDateFilter);
 
-  APP.route("/api/ads/upload",fileUpload.single('video')).post(CONTROLLER.userController.advertControl);
+  APP.route("/api/ads/upload").post(CONTROLLER.userController.advertControl);
+
+  APP.route("/api/update/ads").post(CONTROLLER.userController.updateAdvert);
 
   APP.route("/api/view/ads").get(CONTROLLER.userController.adsLook);
 
