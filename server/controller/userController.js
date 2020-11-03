@@ -1541,10 +1541,10 @@ userController.userReportLog = (req,res)=>{
 userController.internet_providerAnalytics = (req,res)=>{
   try{
       MODEL.userModel.find({
-        internet_provider: "MTN"
+        internet_provider: "MTN NG"
       }).then((mtn)=>{
           MODEL.collectorModel.find({
-            internet_provider:"MTN"
+            internet_provider:"MTN NG"
           }).then((recycler_mtn)=>{
             var mtn_users = [...mtn, ...recycler_mtn];
               MODEL.userModel.find({
