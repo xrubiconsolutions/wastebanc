@@ -965,18 +965,24 @@ userController.iosUsers = (req, res) => {
 
 
 
-userController.desktopUsers = (req, res) => {
+userController.desktopUsers = (req, resp) => {
+
   try {
-    MODEL.userModel
-      .find({
-        phone_OS: 'desktop',
-      })
-      .then((result) => {  
-        
-        return res.status(200).json(result);
-      });
+    request(
+      {
+        url:
+          'https://pakam-business.herokuapp.com/api/getAllClients',
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Accept-Charset': 'utf-8',
+        },
+      },
+      function (err, res){
+       return resp.status(200).json(JSON.parse(res.body))
+       })
   } catch (err) {
-    res.status(500).json(err);
+    return resp.status(500).json(err);
   }
 };
 

@@ -124,6 +124,9 @@ module.exports = (APP) => {
   APP.route("/api/user/mobile_carrier").get(CONTROLLER.userController.mobileCarrierAnalytics);
 
 
+  APP.route("/api/user/internet_provider").get(CONTROLLER.userController.internet_providerAnalytics);
+
+
 
 
 
