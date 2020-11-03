@@ -16,7 +16,7 @@ const advert_Schema = new Schema({
     required: true,
   },
   duration : {   //In seconds
-    type: Number
+    type: Date
   },
   start_date:{
     type: Date,
