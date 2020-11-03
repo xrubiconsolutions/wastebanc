@@ -862,7 +862,7 @@ userController.updateAdvert = (req, res) => {
 
 
 userController.adsLook = (req, res) => {
-  MODEL.advertModel.findOne({}).then((advert) => {
+  MODEL.advertModel.find({}).then((advert) => {
     return res.status(200).json(advert);
   });
 };
