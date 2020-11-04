@@ -526,7 +526,7 @@ scheduleController.rewardSystem = (req, resp) => {
                                       console.log('All i need here', recycler);
                                       console.log('Whatsyo', err);
 
-                                      MODEL.userModel.updateOne(
+                                      MODEL.collectorModel.updateOne(
                                         { email: recycler.email },
                                         { last_logged_in: new Date() },
                                         (res) => {

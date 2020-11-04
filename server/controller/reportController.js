@@ -53,6 +53,13 @@ reportController.report = (req, res) => {
         } 
         
       }else {
+        MODEL.userModel.updateOne(
+          { _id: userID },
+          { last_logged_in: new Date() },
+          (res) => {
+            console.log('Logged date updated', new Date());
+          }
+        );
           opentok.createSession({ mediaMode: "routed" }, function (err, session) {
             if (err) {
               console.log(err);
@@ -164,6 +171,14 @@ reportController.getReport = (req, res) => {
         MODEL.reportModel.findOne({
           userReportID: ID
         }).then((user)=>{
+            
+    MODEL.userModel.updateOne(
+      { _id: req.body.userID },
+      { last_logged_in: new Date() },
+      (res) => {
+        console.log('Logged date updated', new Date());
+      }
+    );
           return res.status(200).json(user);
         })
       }
@@ -196,6 +211,13 @@ reportController.endReport = (req,res)=>{
       if(err) { return res.status(400).json(err) }
 
       else {
+        MODEL.userModel.updateOne(
+          { _id: req.body.userID },
+          { last_logged_in: new Date() },
+          (res) => {
+            console.log('Logged date updated', new Date());
+          }
+        );
         var log =  { 
           userReportID: user.userReportID,
           active: false,
