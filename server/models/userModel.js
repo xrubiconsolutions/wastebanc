@@ -116,7 +116,7 @@ const user_Schema = new Schema({
   },
   expiry_licence:{
     type: Date,
-    default: expiry
+    default: () => Date.now() + 365*24*60*60*1000
   },
   profile_picture:{
     type: String

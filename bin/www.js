@@ -13,6 +13,47 @@ const ALLFILES     = require("./../filebundle");
 const SWAGGER      = require('./swagger/swagger_lib/swagger-express');
 const PATH         = require("path");
 const BOOTSTRAPING = require("../server/util/Bootstraping/Bootstraping");
+const MODEL = require("../server/models")
+const cron = require('node-cron');
+
+var nodemailer = require("nodemailer");
+
+var transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "pakambusiness@gmail.com",
+    pass: "pakambusiness-2000",
+  },
+});
+
+
+cron.schedule('* * 1 * *', function() {
+    var today = new Date();
+    MODEL.organisationModel.find({}).then((organisations)=>{
+        for(let i = 0 ; i < organisations.length ; i++){
+            var diff = organisations[i].expiry_date - today;
+            var test = diff/(1000*24*60*60)
+            if(test < 31 ){
+                var mailOptions = {
+                    from: "pakambusiness@gmail.com",
+                    to: `${organisations[i].email}`,
+                    subject: "YOUR ORGANISATION ACCOUNT WILL EXPIRE IN 30 DAYS",
+                    text: `Your organisation's account will expire in 30 days. Kindly renew your licence or contact support if any issue arise.`,
+                  };
+                  transporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                      console.log(error);
+                    } else {
+                      console.log("Email sent: " + info.response);
+                    }
+                  });
+
+            }
+        }
+})
+
+});
+  
 
 
 const cors = require("cors");

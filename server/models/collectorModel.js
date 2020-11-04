@@ -94,7 +94,11 @@ const collector_Schema = new Schema({
   },
   internet_provider:{
     type: String
-  }
+  },
+   expiry_licence:{
+    type: Date,
+    default: () => Date.now() + 365*24*60*60*1000
+  },
 });
 
 module.exports = MONGOOSE.model("Collector", collector_Schema);

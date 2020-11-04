@@ -14,4 +14,5 @@ module.exports = function(app){
     require("./collectorRoute")(app);
     require("./reportRoute")(app);
     require("./payRoute")(app);
+    require("./notificationRoute")(app);
 };

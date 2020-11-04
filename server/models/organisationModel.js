@@ -8,8 +8,8 @@ const Constants = require("../util/constants");
  ************* Organisation Model or collection ***********
  **************************************************/
 
-var expiry = new Date()
-expiry.setDate(new Date().getDate() + 365 );
+var expiry = Date.now
+// expiry.setDate(expiry.getDate() + 365 );
 
 const organisation_Schema = new Schema({
   companyName: {
@@ -49,8 +49,8 @@ const organisation_Schema = new Schema({
   },
   expiry_date :{
       type: Date,
-      default: expiry
-  },
+      default: () => Date.now() + 365*24*60*60*1000
+    },
   totalAvailable :{
     type: Number,
     default: 0
@@ -87,5 +87,4 @@ const organisation_Schema = new Schema({
     default: Date.now,
   }
 });
-
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);
