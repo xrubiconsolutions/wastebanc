@@ -51,6 +51,15 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
   var data = { ...REQUEST.body };
 
   MODEL.userModel.findOne({ email: REQUEST.body.client }).then((result) => {
+    
+    MODEL.userModel.updateOne(
+      { email: REQUEST.body.client },
+      { last_logged_in: new Date() },
+      (res) => {
+        console.log('Logged date updated', new Date());
+      }
+    );
+
     if (result.cardID == null) {
       return RESPONSE.status(400).json({
         message: "You don't have a valid card ID, contact support for help",
@@ -517,6 +526,14 @@ scheduleController.rewardSystem = (req, resp) => {
                                       console.log('All i need here', recycler);
                                       console.log('Whatsyo', err);
 
+                                      MODEL.userModel.updateOne(
+                                        { email: recycler.email },
+                                        { last_logged_in: new Date() },
+                                        (res) => {
+                                          console.log('Logged date updated', new Date());
+                                        }
+                                      );
+
                                       var dataToSave = {
                                         weight: quantity,
 
@@ -772,7 +789,7 @@ scheduleController.userComplete = (req, resp) => {
 
   try {
     MODEL.scheduleModel.find({ _id: scheduleID }).then((schedule) => {
-      MODEL.userModel.find({ _id: userID }).then((result) => {
+      MODEL.userModel.findOne({ _id: userID }).then((result) => {
         MODEL.scheduleModel.updateOne(
           { _id: scheduleID },
           {
@@ -784,6 +801,13 @@ scheduleController.userComplete = (req, resp) => {
           },
           (err, res) => {
             if (err) return resp.status(400).jsonp(response.body.error);
+            MODEL.userModel.updateOne(
+              { email: result.email },
+              { last_logged_in: new Date() },
+              (res) => {
+                console.log('Logged date updated', new Date());
+              }
+            );
             return resp
               .status(200)
               .jsonp({ message: 'Your schedule update was successful' });
@@ -823,12 +847,19 @@ scheduleController.userCancel = (req, resp) => {
 
   try {
     MODEL.scheduleModel.find({ _id: scheduleID }).then((schedule) => {
-      MODEL.userModel.find({ _id: userID }).then((result) => {
+      MODEL.userModel.findOne({ _id: userID }).then((result) => {
         MODEL.scheduleModel.updateOne(
           { _id: scheduleID },
           { $set: { completionStatus: 'cancelled', cancelReason: reason } },
           (err, res) => {
             if (err) return resp.status(400).jsonp(response.body.error);
+            MODEL.userModel.updateOne(
+              { email: result.email },
+              { last_logged_in: new Date() },
+              (res) => {
+                console.log('Logged date updated', new Date());
+              }
+            );
             return resp
               .status(200)
               .jsonp({ message: 'Your schedule cancellation was successful' });

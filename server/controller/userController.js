@@ -876,6 +876,14 @@ userController.updatePhoneSpecifications = async (REQUEST, RESPONSE) => {
       { lean: true }
     );
 
+    MODEL.userModel.updateOne(
+      { email: REQUEST.body.email },
+      { last_logged_in: new Date() },
+      (res) => {
+        console.log('Logged date updated', new Date());
+      }
+    );
+
     if (checkUserExist) {
       MODEL.userModel
         .updateOne(

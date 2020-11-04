@@ -248,6 +248,14 @@ collectorController.collectorAnalysis = (REQUEST, RESPONSE) => {
 
   const collectorID = REQUEST.query.ID;
 
+  MODEL.userModel.updateOne(
+    { _id: REQUEST.query.ID },
+    { last_logged_in: new Date() },
+    (res) => {
+      console.log('Logged date updated', new Date());
+    }
+  );
+
   MODEL.scheduleModel
     .find({ completionStatus: "completed", collectedBy: collectorID })
     .sort({ _id: -1 })
@@ -541,6 +549,13 @@ collectorController.updatePhoneSpecifications = async (REQUEST,RESPONSE)=>{
           { email: REQUEST.body.email },
           {},
           { lean: true }
+        );
+        MODEL.userModel.updateOne(
+          { email: REQUEST.body.email },
+          { last_logged_in: new Date() },
+          (res) => {
+            console.log('Logged date updated', new Date());
+          }
         );
       
     if (checkUserExist) {
