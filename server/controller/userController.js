@@ -1563,10 +1563,10 @@ userController.internet_providerAnalytics = (req,res)=>{
                   }).then((recycler_airtel)=>{
                     var airtel_users = [...airtel, ...recycler_airtel];
                       MODEL.userModel.find({
-                        internet_provider:"Globacom (GLO)"
+                        internet_provider:"Glo LTE"
                       }).then((glo)=>{
                           MODEL.collectorModel.find({
-                            internet_provider: "Globacom (GLO)"
+                            internet_provider: "Glo LTE"
                           }).then((recycler_glo)=>{
                               var glo_users = [...glo, ...recycler_glo];
                                 MODEL.userModel.find({
