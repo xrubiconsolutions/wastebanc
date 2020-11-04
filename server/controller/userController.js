@@ -1595,5 +1595,28 @@ userController.internet_providerAnalytics = (req,res)=>{
   }
 }
 
+
+userController.triggerActivity = (req,res)=>{
+
+  const user =  req.body.email 
+
+  try {
+    MODEL.userModel.updateOne(
+      { email: user },
+      { last_logged_in: new Date() },
+      (resp) => {
+        return res.status(200).json({
+          message : "Activity triggered"
+        })
+      }
+    );
+    
+
+  } catch(err){
+    return res.status(500).json(err)
+  }
+ 
+
+}
 /* export userControllers */
 module.exports = userController;

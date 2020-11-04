@@ -857,5 +857,29 @@ collectorController.monthFiltering = (req,res)=>{
 
 
 
+collectorController.triggerActivity = (req,res)=>{
+
+  const user =  req.body.email 
+
+  try {
+
+    MODEL.collectorModel.updateOne(
+      { email: user },
+      { last_logged_in: new Date() },
+      (resp) => {
+        return res.status(200).json({
+          message : "Activity triggered"
+        })
+      }
+    );
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
+
+  
+
+}
 
 module.exports = collectorController;

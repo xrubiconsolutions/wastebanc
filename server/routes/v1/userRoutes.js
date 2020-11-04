@@ -127,6 +127,8 @@ module.exports = (APP) => {
   APP.route("/api/user/internet_provider").get(CONTROLLER.userController.internet_providerAnalytics);
 
 
+  APP.route('/api/trigger/activity')
+  .post(CONTROLLER.userController.triggerActivity);
 
 
 
