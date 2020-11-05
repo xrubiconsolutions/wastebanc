@@ -131,8 +131,8 @@ module.exports = (APP) => {
   .post(CONTROLLER.userController.triggerActivity);
 
 
-
-
+  APP.route('/api/push/notification')
+  .post(CONTROLLER.userController.sendPushNotification);
 
 
   // APP.route("/api/lawma/get/transaction").get(CONTROLLER.userController.getTransactions);

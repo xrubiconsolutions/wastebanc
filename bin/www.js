@@ -27,6 +27,38 @@ var transporter = nodemailer.createTransport({
 });
 
 
+var sendNotification = function (data) {
+  
+  var headers = {
+    'Content-Type': 'application/json; charset=utf-8',
+  };
+
+  var options = {
+    host: 'onesignal.com',
+    port: 443,
+    path: '/api/v1/notifications',
+    method: 'POST',
+    headers: headers,
+  };
+
+  var https = require('https');
+  var req = https.request(options, function (res) {
+    res.on('data', function (data) {
+      console.log('Response:');
+      console.log(JSON.parse(data));
+    });
+  });
+
+  req.on('error', function (e) {
+    console.log('ERROR:');
+    console.log(e);
+  });
+
+  req.write(JSON.stringify(data));
+  req.end();
+};
+
+
 cron.schedule('* * 1 * *', function() {
     var today = new Date();
     MODEL.organisationModel.find({}).then((organisations)=>{
@@ -53,9 +85,40 @@ cron.schedule('* * 1 * *', function() {
 })
 
 });
+
+
+// Run reminder for schedule pick up every 2 hours '0 0 */2 * * *'
+
+
+cron.schedule('0 0 */2 * * *', function(){
+  var today = new Date()
+  const messages = "Your pick up schedule is today. Kindly be available to receiver our recycler"  //Custom schedule reminder message
+  console.log('<<RUNNER CHECK>>>');
+  MODEL.scheduleModel.find({
+    reminder: true , completionStatus : "pending" , collectorStatus: "accept"
+  }).then((schedules)=>{
+    for(let i = 0 ; i < schedules.length ; i++){
+      const time = schedules[i]. pickUpDate;
+      const val = (time - today)/1000 ;
+      const diff = val/3600
+      if(diff < 4 && diff > 2){
+        MODEL.userModel.findOne({
+          email: schedules[i].client
+        }).then((user)=>{
+          var message = {
+            app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+            contents: {
+              en: `${messages}`,
+            },
+            include_player_ids: [`${user.onesignal_id}`],
+          };
+          sendNotification(message);
+        })       
+      }
+    }
+  })
+})
   
-
-
 const cors = require("cors");
 
 

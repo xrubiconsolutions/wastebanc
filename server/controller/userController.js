@@ -31,6 +31,7 @@ const storage = new CloudinaryStorage({
   },
 });
 
+
 const parser = multer({ storage: storage });
 
 var nodemailer = require('nodemailer');
@@ -56,6 +57,39 @@ var transporter = nodemailer.createTransport({
     pass: 'pakambusiness-2000',
   },
 });
+
+
+var sendNotification = function (data) {
+  
+  var headers = {
+    'Content-Type': 'application/json; charset=utf-8',
+  };
+
+  var options = {
+    host: 'onesignal.com',
+    port: 443,
+    path: '/api/v1/notifications',
+    method: 'POST',
+    headers: headers,
+  };
+
+  var https = require('https');
+  var req = https.request(options, function (res) {
+    res.on('data', function (data) {
+      console.log('Response:');
+      console.log(JSON.parse(data));
+    });
+  });
+
+  req.on('error', function (e) {
+    console.log('ERROR:');
+    console.log(e);
+  });
+
+  req.write(JSON.stringify(data));
+  req.end();
+};
+
 
 userController.upload = (REQUEST, RESPONSE) => {
   /** Stream
@@ -1624,7 +1658,92 @@ userController.triggerActivity = (req,res)=>{
     return res.status(500).json(err)
   }
  
+}
 
+
+
+userController.sendPushNotification = (req,res)=>{
+  const lga = req.body.lga;
+  const messages = req.body.messages;
+  const category = req.body.category || "";
+  const phone = req.body.phone || "";
+
+  //users , recyclers , companies , phone specific
+  try{
+
+    if(phone){
+      MODEL.userModel.findOne({
+        phone : phone
+      }).then((user)=>{
+        console.log("<<USer>>", user)
+        var message = {
+          app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+          contents: {
+            en: `${messages}`,
+          },
+          include_player_ids: [`${user.onesignal_id}`],
+        };
+        sendNotification(message);
+        return res.status(200).json({
+          message: "Notification sent!"
+        })
+      })
+    }
+    if(category === "users"){
+      MODEL.userModel.find({
+          lcd : lga
+      }).then((users)=>{
+        console.log(users)
+        for(let i = 0 ; i < users.length ; i++){
+          var message = {
+            app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+            contents: {
+              en: `${messages}`,
+            },
+            include_player_ids: [`${users[i].onesignal_id}`],
+          };
+          sendNotification(message);    
+        }
+        return res.status(200).json({
+          message: "Notification sent!"
+        })
+      })
+    }
+    else if(category === "recyclers"){
+        MODEL.collectorModel.find({
+          lcd : lga
+        }).then((recyclers)=>{
+          for(let i = 0 ; i < recyclers.length ; i++){
+            var message = {
+              app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+              contents: {
+                en: `${messages}`,
+              },
+              include_player_ids: [`${recyclers[i].onesignal_id}`],
+            };
+            sendNotification(message);
+          }
+          return res.status(200).json({
+            message: "Notification sent!"
+          })
+        })
+    }
+
+    else if (category === "companies"){
+      MODEL.organisationModel.find({
+        lcd: lga
+      }).then((companies)=>{
+        // Companies don't have one signal ids yet
+          return res.status(200).json({
+            message: "Notification sent!"
+          })
+      })
+
+    }
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
 }
 /* export userControllers */
 module.exports = userController;
