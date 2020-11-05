@@ -10,6 +10,5 @@ module.exports = (APP) => {
 
     APP.route('/api/notify/organisations')
         .get(CONTROLLER.notificationController.notifyOrganisations);
-
 }
 

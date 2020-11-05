@@ -28,15 +28,27 @@ notificationController.notifyOrganisations =  (req,res)=>{
 var today = new Date();
 
     try{
-
         MODEL.organisationModel.find({}).then((organisations)=>{
-
                     for(let i = 0 ; i < organisations.length ; i++){
                         var diff = organisations[i].expiry_date - today;
                         var test = diff/(1000*24*60*60)
                         console.log(diff, "<<<ORG>>>",test); 
-                                // if(organis)
-                        console.log()
+                        if(test < 31 ){
+                            var mailOptions = {
+                                from: "pakambusiness@gmail.com",
+                                to: `${organisations[i].email}`,
+                                subject: "YOUR ORGANISATION ACCOUNT WILL EXPIRE IN 30 DAYS",
+                                text: `Your organisation's account will expire in 30 days. Kindly renew your licence or contact support if any issue arise.`,
+                              };
+                              transporter.sendMail(mailOptions, function (error, info) {
+                                if (error) {
+                                  console.log(error);
+                                } else {
+                                  console.log("Email sent: " + info.response);
+                                }
+                              });
+
+                        }
                     }
 
                         return res.json({
@@ -49,23 +61,6 @@ var today = new Date();
         return res.status(500).json(err)
 
     }
-
-    // var mailOptions = {
-    //     from: "pakambusiness@gmail.com",
-    //     to: `${organisation_data.email}`,
-    //     subject: "WELCOME TO PAKAM ORGANISATION ACCOUNT",
-    //     text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`,
-    //   };
-
-    //   transporter.sendMail(mailOptions, function (error, info) {
-    //     if (error) {
-    //       console.log(error);
-    //     } else {
-    //       console.log("Email sent: " + info.response);
-    //     }
-    //   });
-
-
 
 
 }

@@ -1009,10 +1009,18 @@ userController.deviceAnalytics  = (req,res)=>{
         phone_OS: "ios"
       }).then((ios)=>{
 
-        MODEL.userModel.find({
-          phone_OS: "desktop"
-        }).then((desktop)=>{
-
+        request(
+          {
+            url:
+              'https://pakam-business.herokuapp.com/api/getAllClients',
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+              'Accept-Charset': 'utf-8',
+            },
+          },
+          function (err, resp){
+            var desktop = JSON.parse(resp.body);
             return res.status(200).json({
               android: android.length,
               ios: ios.length,
