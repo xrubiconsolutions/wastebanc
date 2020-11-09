@@ -903,19 +903,14 @@ collectorController.collectorActivityAnalytics = (req,res)=>{
             })
             .sort({ _id: -1 })
             .then((activeTodayUser) => {
-                    MODEL.collectorModel.find({
-                      last_logged_in: {
-                        $lte: active_today,
-                      }
-                    }).sort({_id : -1}).then(inactiveCollectors=>{
-
+                    MODEL.collectorModel.find({ $or:[ { last_logged_in: { $exists: false } } , {last_logged_in: {
+                      $lte: active_today,
+                    } } ] }).sort({_id : -1}).then(inactiveCollectors=>{
                       return res.status(200).json({
                         allCollectors: { amount: allUser.length, allcollectors: allUser },
                         newCollectors: { amount: newUser.length, newCollectors : newUser },
                         activeTodayCollectors: { amount: activeTodayUser.length, activeTodayCollectors : activeTodayUser},
-                        inactive: { amount: allUser.length-activeTodayUser.length , inactiveCollectors : 
-                          
-  
+                        inactive: { amount: inactiveCollectors.length , inactiveCollectors :  
                         inactiveCollectors
                         }
                       })
