@@ -90,7 +90,7 @@ cron.schedule('* * 1 * *', function() {
 // Run reminder for schedule pick up every 2 hours '0 0 */2 * * *'
 
 
-cron.schedule('0 0 */2 * * *', function(){
+cron.schedule('01 7 * * *', function(){
   var today = new Date()
   const messages = "Your pick up schedule is today. Kindly be available to receiver our recycler"  //Custom schedule reminder message
   console.log('<<RUNNER CHECK>>>');
@@ -99,9 +99,8 @@ cron.schedule('0 0 */2 * * *', function(){
   }).then((schedules)=>{
     for(let i = 0 ; i < schedules.length ; i++){
       const time = schedules[i]. pickUpDate;
-      const val = (time - today)/1000 ;
+      const val = (time - today) / 1000 ;
       const diff = val/3600
-      if(diff < 4 && diff > 2){
         MODEL.userModel.findOne({
           email: schedules[i].client
         }).then((user)=>{
@@ -113,8 +112,7 @@ cron.schedule('0 0 */2 * * *', function(){
             include_player_ids: [`${user.onesignal_id}`],
           };
           sendNotification(message);
-        })       
-      }
+        })           
     }
   })
 })

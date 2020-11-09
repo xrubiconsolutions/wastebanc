@@ -615,7 +615,7 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
 userController.getAllClients = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
-    let users = await MODEL.userModel.find({ roles: 'client' });
+    let users = await MODEL.userModel.find({ roles: 'client' }).sort({ _id : -1});
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);
@@ -655,7 +655,7 @@ userController.getWalletBalance = (req, res) => {
 userController.getAllCollectors = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
-    let users = await MODEL.collectorModel.find({});
+    let users = await MODEL.collectorModel.find({}).sort({_id:-1});
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);
@@ -1119,12 +1119,21 @@ userController.userAnalytics = (req,res)=>{
             .sort({ _id: -1 })
             .then((activeTodayUser) => {
 
-                    return res.status(200).json({
-                      allUsers: allUser.length,
-                      newUsers: newUser.length,
-                      activeTodayUsers: activeTodayUser.length,
-                      inactiveUsers: allUser.length-activeTodayUser.length
-                    })
+              MODEL.userModel.find({
+                last_logged_in: {
+                  $lte: active_today,
+                }
+              }).sort({ _id : -1}).then((InactiveUser)=>{
+
+                return res.status(200).json({
+                  allUsers: {amount: allUser.length, allUsers: allUser },
+                  newUsers: { amount: newUser.length, newUsers: newUser },
+                  activeTodayUsers: { amount : activeTodayUser.length, activeTodayUsers : activeTodayUser},
+                  inactiveUsers: { amount: allUser.length-activeTodayUser.length , inactiveUsers : InactiveUser }
+                })
+             })
+
+                 
 
 
             })
@@ -1675,7 +1684,6 @@ userController.sendPushNotification = (req,res)=>{
       MODEL.userModel.findOne({
         phone : phone
       }).then((user)=>{
-        console.log("<<USer>>", user)
         var message = {
           app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
           contents: {
@@ -1693,16 +1701,19 @@ userController.sendPushNotification = (req,res)=>{
       MODEL.userModel.find({
           lcd : lga
       }).then((users)=>{
-        console.log(users)
         for(let i = 0 ; i < users.length ; i++){
-          var message = {
-            app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
-            contents: {
-              en: `${messages}`,
-            },
-            include_player_ids: [`${users[i].onesignal_id}`],
-          };
-          sendNotification(message);    
+         async function sender(){
+
+            var message = {
+              app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+              contents: {
+                en: `${messages}`,
+              },
+              include_player_ids: [`${users[i].onesignal_id}`],
+            };
+            return sendNotification(message);  
+          }
+          sender();   
         }
         return res.status(200).json({
           message: "Notification sent!"

@@ -10,6 +10,7 @@ var request = require('request');
 const OneSignal = require('onesignal-node');
 
 var sendNotification = function (data) {
+  
   var headers = {
     'Content-Type': 'application/json; charset=utf-8',
   };

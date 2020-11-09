@@ -855,8 +855,6 @@ collectorController.monthFiltering = (req,res)=>{
 }
 
 
-
-
 collectorController.triggerActivity = (req,res)=>{
 
   const user =  req.body.email 
@@ -877,9 +875,63 @@ collectorController.triggerActivity = (req,res)=>{
   catch(err){
     return res.status(500).json(err)
   }
-
-  
-
 }
+
+
+collectorController.collectorActivityAnalytics = (req,res)=>{
+  const today = new Date();
+  const active_today = new Date();
+
+  try {
+  MODEL.collectorModel.find({
+  }).then((allUser)=>{
+  active_today.setDate(today.getDate() - 1);
+    MODEL.collectorModel
+      .find({
+         createdAt: {
+          $gte: active_today,
+        },
+      })
+      .sort({ _id: -1 })
+      .then((newUser) => {
+
+          MODEL.collectorModel
+            .find({
+              last_logged_in: {
+                $gte: active_today,
+              },
+            })
+            .sort({ _id: -1 })
+            .then((activeTodayUser) => {
+                    MODEL.collectorModel.find({
+                      last_logged_in: {
+                        $lte: active_today,
+                      }
+                    }).sort({_id : -1}).then(inactiveCollectors=>{
+
+                      return res.status(200).json({
+                        allCollectors: { amount: allUser.length, allcollectors: allUser },
+                        newCollectors: { amount: newUser.length, newCollectors : newUser },
+                        activeTodayCollectors: { amount: activeTodayUser.length, activeTodayCollectors : activeTodayUser},
+                        inactive: { amount: allUser.length-activeTodayUser.length , inactiveCollectors : 
+                          
+  
+                        inactiveCollectors
+                        }
+                      })
+                      
+                    })
+                  
+            })     
+      })
+  })
+} catch(err){
+  return res.status(500).json(err)
+}
+}
+
+
+
+
 
 module.exports = collectorController;

@@ -64,6 +64,9 @@ module.exports = (APP) => {
     APP.route('/api/collector/activity')
     .get(CONTROLLER.collectorController.collectorAnalytics);
 
+    APP.route('/api/collector/time/activity')
+    .get(CONTROLLER.collectorController.collectorActivityAnalytics);
+
     APP.route('/api/collector/trigger/activity')
     .post(CONTROLLER.collectorController.triggerActivity);
 
