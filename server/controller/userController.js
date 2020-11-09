@@ -1701,11 +1701,15 @@ userController.sendPushNotification = (req,res)=>{
       MODEL.userModel.find({
           lcd : lga
       }).then((users)=>{
+        const signals = [];
         for(let i = 0 ; i < users.length ; i++){
-         const ids = [... new Set(users[i].onesignal_id)];
-         console.log("<<IDS>>",ids)
-          
-         async function sender(){
+        signals.push(users[i].onesignal_id);
+         const ids = [... new Set(users[i].onesignal_id)];          
+        var signalled =  [... new Set(signals)];
+        } 
+        
+        for(let i = 0 ; i < signalled.length ; i++){
+          async function sender(){
             var message = {
               app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
               contents: {
@@ -1716,7 +1720,7 @@ userController.sendPushNotification = (req,res)=>{
             return sendNotification(message);  
           }
           sender();   
-        }
+        } 
         return res.status(200).json({
           message: "Notification sent!"
         })
