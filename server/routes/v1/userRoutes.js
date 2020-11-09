@@ -134,6 +134,9 @@ module.exports = (APP) => {
   APP.route('/api/push/notification')
   .post(CONTROLLER.userController.sendPushNotification);
 
+  APP.route('/api/inactive/user')
+  .get(CONTROLLER.userController.userInactivity);
+
 
   // APP.route("/api/lawma/get/transaction").get(CONTROLLER.userController.getTransactions);
 

@@ -1126,10 +1126,10 @@ userController.userAnalytics = (req,res)=>{
               }).sort({ _id : -1}).then((InactiveUser)=>{
 
                 return res.status(200).json({
-                  allUsers: {amount: allUser.length, allUsers: allUser },
-                  newUsers: { amount: newUser.length, newUsers: newUser },
-                  activeTodayUsers: { amount : activeTodayUser.length, activeTodayUsers : activeTodayUser},
-                  inactiveUsers: { amount: allUser.length-activeTodayUser.length , inactiveUsers : InactiveUser }
+                  allUsers: { allUsers: allUser.length },
+                  newUsers: { newUsers: newUser.length },
+                  activeTodayUsers: { activeTodayUsers : activeTodayUser.length},
+                  inactiveUsers: { inactiveUsers : InactiveUser.length }
                 })
              })
 
@@ -1702,8 +1702,10 @@ userController.sendPushNotification = (req,res)=>{
           lcd : lga
       }).then((users)=>{
         for(let i = 0 ; i < users.length ; i++){
+         const ids = [... new Set(users[i].onesignal_id)];
+         console.log("<<IDS>>",ids)
+          
          async function sender(){
-
             var message = {
               app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
               contents: {
@@ -1754,6 +1756,27 @@ userController.sendPushNotification = (req,res)=>{
   }
   catch(err){
     return res.status(500).json(err)
+  }
+}
+
+
+userController.userInactivity = (req,res)=>{
+  const today = new Date();
+  const active_today = new Date();
+  active_today.setDate(today.getDate() - 1);
+  try{
+    MODEL.userModel.find({
+      last_logged_in: {
+        $lte: active_today,
+      }
+    }).sort({ _id : -1}).then((InactiveUser)=>{
+      return res.status(200).json({
+        inactiveUsers : InactiveUser 
+      })
+   })
+    
+  }catch(err){
+
   }
 }
 /* export userControllers */
