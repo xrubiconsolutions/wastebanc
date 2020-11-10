@@ -31,11 +31,23 @@ const advert_Schema = new Schema({
   },
   authenticated:{
     type: Boolean,
-    default: false,
+    default: true,
     required: true
   },
   expired: {
     type: Date
+  },
+  name : {
+    type : String
+  },
+  email: {
+    type: String
+  },
+  phone:{
+    type: String
+  },
+  address :{
+    type: String
   }
 });
 

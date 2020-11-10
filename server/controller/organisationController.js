@@ -2556,5 +2556,32 @@ organisationController.companyDeclineAnalytics = (req,res)=>{
 
 
 
+organisationController.advertControl = (req, res) => {
+  const advert = {
+    title: req.body.title,
+    advert_url: req.body.advert_url,
+    duration : req.body.duration,
+    start_date: req.body.start_date,
+    thumbnail_url: req.body.thumbnail_url,
+    authenticated: false,
+    name : req.body.name,
+    email: req.body.email,
+    phone: req.body.phone,
+    address: req.body.address
+  }
+  try{
+  
+    MODEL.advertModel(advert).save({}, (ERR, RESULT) => {
+        return res.status(200).json({
+          message: "Advert Posted Successfully"
+        })
+    })
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
+}
+
+
 /* export organisationControllers */
 module.exports = organisationController;

@@ -896,7 +896,9 @@ userController.updateAdvert = (req, res) => {
 
 
 userController.adsLook = (req, res) => {
-  MODEL.advertModel.find({}).then((advert) => {
+  MODEL.advertModel.find({
+    authenticated : true
+  }).then((advert) => {
     return res.status(200).json(advert);
   });
 };
