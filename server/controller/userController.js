@@ -966,10 +966,14 @@ userController.androidUsers = (req, res) => {
     MODEL.userModel
       .find({
         phone_OS: 'android',
+      }).sort({
+        _id : -1
       })
         .then((result) => {
       
-          MODEL.collectorModel.find({phone_OS:"android"}).then(recycler=>{
+          MODEL.collectorModel.find({phone_OS:"android"}).sort({
+            _id : -1
+          }).then(recycler=>{
             var data = [...result, ...recycler]
             return res.status(200).json({
            data: data
@@ -989,10 +993,14 @@ userController.iosUsers = (req, res) => {
     MODEL.userModel
       .find({
         phone_OS: 'ios',
+      }).sort({
+        _id : -1
       })
       .then((result) => {
 
-        MODEL.collectorModel.find({phone_OS:"ios"}).then(recycler=>{
+        MODEL.collectorModel.find({phone_OS:"ios"}).sort({
+          _id : -1
+        }).then(recycler=>{
           var data = [...result, ...recycler]
           return res.status(200).json({
          data: data
@@ -1021,7 +1029,9 @@ userController.desktopUsers = (req, resp) => {
         },
       },
       function (err, res){
-       return resp.status(200).json(JSON.parse(res.body))
+        let result = JSON.parse(res.body).reverse();
+
+       return resp.status(200).json(result)
        })
   } catch (err) {
     return resp.status(500).json(err);
@@ -1036,12 +1046,12 @@ userController.deviceAnalytics  = (req,res)=>{
     MODEL.userModel
     .find({
       phone_OS: 'android',
-    })
+    }).sort({ _id : -1})
     .then((android) => {
 
       MODEL.userModel.find({
         phone_OS: "ios"
-      }).then((ios)=>{
+      }).sort({ _id : -1}).then((ios)=>{
 
         request(
           {
