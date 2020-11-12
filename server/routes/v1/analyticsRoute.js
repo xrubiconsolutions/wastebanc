@@ -26,5 +26,7 @@ module.exports = (APP) => {
     APP.route('/api/filter/companies')
         .get(CONTROLLER.analyticsFilterController.monthlyCompanies);
 
+    APP.route('/api/filter/wastes')
+        .get(CONTROLLER.analyticsFilterController.monthlyWasteCollected);
 
 }
