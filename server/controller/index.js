@@ -13,5 +13,6 @@ module.exports = {
   reportController: require("./reportController"),
   realtimeController : require("./realtimeController"),
   payController : require("./payController"),
-  notificationController : require("./notificationController")
+  notificationController : require("./notificationController"),
+  analyticsFilterController : require("./analyticsFilterController"),
 };

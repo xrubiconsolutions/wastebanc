@@ -15,4 +15,5 @@ module.exports = function(app){
     require("./reportRoute")(app);
     require("./payRoute")(app);
     require("./notificationRoute")(app);
+    require("./analyticsRoute")(app);
 };
