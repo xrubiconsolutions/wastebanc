@@ -175,6 +175,11 @@ organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
                   USER
                 ); /** creating jwt token */
                 USER.token = jwtToken;
+                if(USER.licence_active == false){
+                  return RESPONSE.status(400).json({
+                    message: "Your licence expired. Kindly contact support for difficulty in renewal"
+                  })
+                }
                 return RESPONSE.jsonp(USER);
               }
             }

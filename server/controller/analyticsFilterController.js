@@ -225,50 +225,51 @@ analyticsFilterController.monthlyUsers = (req, res) => {
                                                             users: jan,
                                                           },
                                                           FEBRUARY: {
-                                                            amount: feb.length,
-                                                            users: feb,
+                                                            amount: feb.length + jan.length,
+                                                            users: [...feb, ...jan ],
                                                           },
                                                           MARCH: {
                                                             amount:
-                                                              march.length,
-                                                            users: march,
+                                                              march.length + feb.length + jan.length,
+                                                            users: [...march, ...feb , ...jan]
                                                           },
                                                           APRIL: {
                                                             amount:
-                                                              april.length,
-                                                            users: april,
+                                                              april.length  + march.length + feb.length + jan.length,
+                                                            users: [...april, ...march , ...feb , ...jan]
                                                           },
                                                           MAY: {
-                                                            amount: may.length,
-                                                            users: may,
+                                                            amount: may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...may, ...april , ...march , ...feb , ...jan] 
                                                           },
                                                           JUNE: {
-                                                            amount: june.length,
-                                                            users: june,
+                                                            amount: june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           JULY: {
-                                                            amount: july.length,
-                                                            users: july,
+                                                            amount: july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...july, ...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           AUGUST: {
-                                                            amount: Aug.length,
-                                                            users: Aug,
+                                                            amount: Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           SEPTEMBER: {
-                                                            amount: sept.length,
-                                                            users: sept,
+                                                            amount: sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           OCTOBER: {
-                                                            amount: Oct.length,
-                                                            users: Oct,
+                                                            amount: Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           NOVEMBER: {
-                                                            amount: Nov.length,
-                                                            users: Nov,
+                                                            amount: Nov.length+Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...Nov,...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           DECEMBER: {
-                                                            amount: Dec.length,
-                                                            users: Dec,
+                                                            amount: Dec.length+Nov.length+Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...Dec,...Nov,...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                          
                                                           },
                                                           ALL: {
                                                             amount:
@@ -512,50 +513,51 @@ analyticsFilterController.monthlyRecyclers = (req, res) => {
                                                             users: jan,
                                                           },
                                                           FEBRUARY: {
-                                                            amount: feb.length,
-                                                            users: feb,
+                                                            amount: feb.length + jan.length,
+                                                            users: [...feb, ...jan ],
                                                           },
                                                           MARCH: {
                                                             amount:
-                                                              march.length,
-                                                            users: march,
+                                                              march.length + feb.length + jan.length,
+                                                            users: [...march, ...feb , ...jan]
                                                           },
                                                           APRIL: {
                                                             amount:
-                                                              april.length,
-                                                            users: april,
+                                                              april.length  + march.length + feb.length + jan.length,
+                                                            users: [...april, ...march , ...feb , ...jan]
                                                           },
                                                           MAY: {
-                                                            amount: may.length,
-                                                            users: may,
+                                                            amount: may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...may, ...april , ...march , ...feb , ...jan] 
                                                           },
                                                           JUNE: {
-                                                            amount: june.length,
-                                                            users: june,
+                                                            amount: june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           JULY: {
-                                                            amount: july.length,
-                                                            users: july,
+                                                            amount: july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...july, ...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           AUGUST: {
-                                                            amount: Aug.length,
-                                                            users: Aug,
+                                                            amount: Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           SEPTEMBER: {
-                                                            amount: sept.length,
-                                                            users: sept,
+                                                            amount: sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           OCTOBER: {
-                                                            amount: Oct.length,
-                                                            users: Oct,
+                                                            amount: Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           NOVEMBER: {
-                                                            amount: Nov.length,
-                                                            users: Nov,
+                                                            amount: Nov.length+Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...Nov,...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
                                                           },
                                                           DECEMBER: {
-                                                            amount: Dec.length,
-                                                            users: Dec,
+                                                            amount: Dec.length+Nov.length+Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
+                                                            users: [...Dec,...Nov,...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                          
                                                           },
                                                           ALL: {
                                                             amount:
@@ -799,58 +801,58 @@ analyticsFilterController.monthlySchedules = (req, res) => {
                                                         res.status(200).json({
                                                           JANUARY: {
                                                             amount: jan.length,
-                                                            schedules: jan,
+                                                            // schedules: jan,
                                                           },
                                                           FEBRUARY: {
                                                             amount: feb.length,
-                                                            schedules: feb,
+                                                            // schedules: feb,
                                                           },
                                                           MARCH: {
                                                             amount:
                                                               march.length,
-                                                            schedules: march,
+                                                            // schedules: march,
                                                           },
                                                           APRIL: {
                                                             amount:
                                                               april.length,
-                                                            schedules: april,
+                                                            // schedules: april,
                                                           },
                                                           MAY: {
                                                             amount: may.length,
-                                                            schedules: may,
+                                                            // schedules: may,
                                                           },
                                                           JUNE: {
                                                             amount: june.length,
-                                                            schedules: june,
+                                                            // schedules: june,
                                                           },
                                                           JULY: {
                                                             amount: july.length,
-                                                            schedules: july,
+                                                            // schedules: july,
                                                           },
                                                           AUGUST: {
                                                             amount: Aug.length,
-                                                            schedules: Aug,
+                                                            // schedules: Aug,
                                                           },
                                                           SEPTEMBER: {
                                                             amount: sept.length,
-                                                            schedules: sept,
+                                                            // schedules: sept,
                                                           },
                                                           OCTOBER: {
                                                             amount: Oct.length,
-                                                            schedules: Oct,
+                                                            // schedules: Oct,
                                                           },
                                                           NOVEMBER: {
                                                             amount: Nov.length,
-                                                            schedules: Nov,
+                                                            // schedules: Nov,
                                                           },
                                                           DECEMBER: {
                                                             amount: Dec.length,
-                                                            schedules: Dec,
+                                                            // schedules: Dec,
                                                           },
                                                           ALL: {
                                                             amount:
                                                               Analytics.length,
-                                                            schedules: Analytics,
+                                                            // schedules: Analytics,
                                                           },
                                                         });
                                                       });
