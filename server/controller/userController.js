@@ -1141,7 +1141,7 @@ userController.userAnalytics = (req,res)=>{
                   allUsers: { allUsers: allUser.length },
                   newUsers: { newUsers: newUser.length },
                   activeTodayUsers: { activeTodayUsers : activeTodayUser.length},
-                  inactiveUsers: { inactiveUsers : InactiveUser.length }
+                  inactiveUsers: { inactiveUsers : allUser.length - activeTodayUsers.length }
                 })
              })
 

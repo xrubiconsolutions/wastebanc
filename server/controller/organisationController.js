@@ -431,6 +431,19 @@ organisationController.payRecyclers = (req, res) => {
         MODEL.companyReceiptModel(receipt).save({}, (ERR, RESULT) => {
           if (ERR) return res.status(400).json(ERR);
 
+
+          if(receipt.paymentType === "licence"){
+          MODEL.organisationModel.updateOne(
+            { email: receipt.customerMail },
+            {
+              $set: {
+                licence_active : true
+            }
+              },
+            (activated) =>
+             {  console.log("<<activated>>")  })
+          }
+
           return res.status(200).json(RESULT);
         });
       });
