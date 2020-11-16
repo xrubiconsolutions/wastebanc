@@ -2019,6 +2019,18 @@ analyticsFilterController.monthlyWasteCollected = (req, res) => {
 };
 
 
+analyticsFilterController.advertsRequest = (req,res)=>{
+  try{
+    MODEL.advertModel.find({
+      authenticated: false
+    }).then((adverts)=>{
+      return res.status(200).json(adverts)
+    })
+  }
+  catch(err){
+        return res.status(500).json(err)
+  }
+}
 
 
 
