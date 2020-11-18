@@ -897,10 +897,13 @@ userController.updateAdvert = (req, res) => {
 
 
 userController.adsLook = (req, res) => {
+  var today = new Date();
   MODEL.advertModel.find({
     authenticated : true
   }).then((advert) => {
-    return res.status(200).json(advert);
+
+    const test = advert.filter(x=>x.duration-today>0)
+    return res.status(200).json(test);
   });
 };
 
