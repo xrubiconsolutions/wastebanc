@@ -7,6 +7,8 @@ let auth            =   require("../../util/auth");
  ***** Managing User Routes here ********
  ***** @param APP (express instance)*****
  ****************************************/
+
+
 module.exports = (APP) => {
 
     APP.route('/api/create/organisation')
@@ -182,5 +184,7 @@ module.exports = (APP) => {
     APP.route('/api/advert/submission')
         .post(CONTROLLER.organisationController.advertControl);
 
+    APP.route('/api/delete/advert')
+        .post(auth.userValidation,CONTROLLER.organisationController.deleteAdvert);
                
 };

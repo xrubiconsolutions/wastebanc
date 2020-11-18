@@ -14,6 +14,8 @@ let validateUser = {};
  ********* validate user ********
  ********************************/
 validateUser.userValidation = ( REQUEST, RESPONSE, NEXT )=>{
+    console.log("<<Got Here>>", REQUEST)
+
     let status = JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY);
     (status && status.role === CONSTANTS.DATABASE.USER_ROLES.USER) ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };

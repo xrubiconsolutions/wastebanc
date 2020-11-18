@@ -884,7 +884,8 @@ userController.updateAdvert = (req, res) => {
           thumbnail_url:req.body.thumbnail_url
       }
         },
-      (res) => { return res.status(200).json({
+      (resp) => { 
+        return res.status(200).json({
         message: "Advert Updated Successfully"
       }) })
   
@@ -1087,7 +1088,6 @@ userController.deleteUser = (req,res)=>{
 
   const userID = req.body.userID
   try {
-
     MODEL.userModel.deleteOne({
       _id: userID
     }).then((result)=>{
@@ -1100,8 +1100,6 @@ userController.deleteUser = (req,res)=>{
   catch(err){
     return res.status(500).json(err)
   }
-   
-
 }
 
 
