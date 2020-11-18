@@ -185,6 +185,6 @@ module.exports = (APP) => {
         .post(CONTROLLER.organisationController.advertControl);
 
     APP.route('/api/delete/advert')
-        .post(auth.userValidation,CONTROLLER.organisationController.deleteAdvert);
+        .post(CONTROLLER.organisationController.deleteAdvert);
                
 };
