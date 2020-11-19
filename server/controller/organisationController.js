@@ -2608,7 +2608,7 @@ organisationController.deleteAdvert = (REQUEST,RESPONSE)=>{
       _id : advertID
     }).then((adverts)=>{
       console.log("<<>>>",adverts)
-        if(!adverts.title){
+        if(!adverts){
             return RESPONSE.status(200).json({
               message: "This advert doesn't exist"
             })
