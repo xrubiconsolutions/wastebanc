@@ -2604,7 +2604,7 @@ organisationController.advertControl = (req, res) => {
 organisationController.deleteAdvert = (REQUEST,RESPONSE)=>{
   const advertID = REQUEST.body.advertID
   try {
-    MODEL.advertModel.find({
+    MODEL.advertModel.findOne({
       _id : advertID
     }).then((adverts)=>{
       console.log("<<>>>",adverts)
