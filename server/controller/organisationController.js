@@ -2585,7 +2585,9 @@ organisationController.advertControl = (req, res) => {
     name : req.body.name,
     email: req.body.email,
     phone: req.body.phone,
-    address: req.body.address
+    address: req.body.address,
+    typeOfAdvert: req.body.typeOfAdvert,
+    price: req.body.price
   }
   try{
   

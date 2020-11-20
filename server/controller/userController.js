@@ -180,9 +180,12 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                         let card_id = res.body.content.data.cardID;
                         need = { cardID: card_id, ...RESULT };
 
+                        // TERMII IMPLEMENTATION 
+
                         const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
                         const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
                         const client = require('twilio')(accountSid, authToken);
+
 
                         client.verify
                           .services('VAeaa492de9598c3dcce55fd9243461ab3')
@@ -565,6 +568,30 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
   const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
   const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
   const client = require('twilio')(accountSid, authToken);
+
+
+  // TERMII VERIFICATION
+
+
+//   var data = {
+//     "api_key": "Your API key",
+//     "pin_id": "c8dcd048-5e7f-4347-8c89-4470c3af0b",
+//     "pin": "195558"
+// };
+// var options = {
+// 'method': 'POST',
+// 'url': 'https://termii.com/api/sms/otp/verify',
+// 'headers': {
+// 'Content-Type': ['application/json', 'application/json']
+// },
+// body: JSON.stringify(data)
+
+// };
+// request(options, function (error, response) { 
+// if (error) throw new Error(error);
+// console.log(response.body);
+// });
+
 
   try {
     client.verify
