@@ -2604,21 +2604,25 @@ organisationController.advertControl = (req, res) => {
 organisationController.deleteAdvert = (REQUEST,RESPONSE)=>{
   const advertID = REQUEST.body.advertID
   try {
-    MODEL.advertModel.find({
+    MODEL.advertModel.findOne({
       _id : advertID
     }).then((adverts)=>{
-        if(!adverts._id){
+      console.log("<<>>>",adverts)
+        if(!adverts){
             return RESPONSE.status(200).json({
               message: "This advert doesn't exist"
             })
         }
-        MODEL.advertModel.deleteOne({
-          _id: advertID
-        }).then((result)=>{
-          return RESPONSE.status(200).json({
-            message: "Advert deleted successfully"
+        else {
+          MODEL.advertModel.deleteOne({
+            _id: advertID
+          }).then((result)=>{
+            return RESPONSE.status(200).json({
+              message: "Advert deleted successfully"
+            })
           })
-        })
+        }
+     
     })
 
   }

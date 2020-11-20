@@ -48,6 +48,13 @@ const advert_Schema = new Schema({
   },
   address :{
     type: String
+  },
+  typeOfAdvert:{
+    type: String
+  },
+  price:{
+    type: Number
+    
   }
 });
 
