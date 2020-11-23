@@ -865,7 +865,7 @@ collectorController.triggerActivity = (req,res)=>{
   var today = new Date()
 
 
-  console.log(">>RESPONSE", req.body)
+  console.log(">>RESPONSE",req)
 
   try {
     MODEL.collectorModel.updateOne(
