@@ -855,6 +855,9 @@ collectorController.monthFiltering = (req,res)=>{
 
 }
 
+var ObjectID = require('mongodb').ObjectID;
+
+
 
 collectorController.triggerActivity = (req,res)=>{
 
@@ -863,11 +866,10 @@ collectorController.triggerActivity = (req,res)=>{
 
   try {
     MODEL.collectorModel.updateOne(
-      { "_id": userID },
-      { $set: { last_logged_in: today } },
+      { "_id": ObjectID(userID) },
+      { $set: { "last_logged_in": today } },
       (err,resp) => {
         console.log("<<<",resp)
-        console.log("wuick,kksksk")
         return res.status(200).json({
           message: "Activity"
         })
