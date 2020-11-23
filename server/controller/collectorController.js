@@ -864,6 +864,9 @@ collectorController.triggerActivity = (req,res)=>{
   const userID =  req.body.userID
   var today = new Date()
 
+
+  console.log(">>RESPONSE", req.body.userID)
+
   try {
     MODEL.collectorModel.updateOne(
       { "_id": ObjectID(userID) },
