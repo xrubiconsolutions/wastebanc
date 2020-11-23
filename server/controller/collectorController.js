@@ -863,7 +863,7 @@ collectorController.triggerActivity = (req,res)=>{
 
   try {
     MODEL.collectorModel.updateOne(
-      { _id: userID },
+      { "_id": userID },
       { $set: { last_logged_in: today } },
       (err,resp) => {
         console.log("<<<",resp)
