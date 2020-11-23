@@ -11,6 +11,7 @@ let CONSTANTS = require("../util/constants");
 let FS = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
+const userController = require("./userController");
 
 
 collectorController.registerCollector = (REQUEST, RESPONSE) => {
@@ -857,26 +858,27 @@ collectorController.monthFiltering = (req,res)=>{
 
 collectorController.triggerActivity = (req,res)=>{
 
-  const user =  req.body.email 
+  const userID =  req.body.userID
+  var today = new Date()
 
   try {
-
     MODEL.collectorModel.updateOne(
-      { email: user },
-      { last_logged_in: new Date() },
-      (resp) => {
+      { _id: userID },
+      { $set: { last_logged_in: today } },
+      (err,resp) => {
+        console.log("<<<",resp)
+        console.log("wuick,kksksk")
         return res.status(200).json({
-          message : "Activity triggered"
+          message: "Activity"
         })
       }
     );
 
-  }
-  catch(err){
+  } catch(err){
     return res.status(500).json(err)
   }
+ 
 }
-
 
 collectorController.collectorActivityAnalytics = (req,res)=>{
   const today = new Date();
