@@ -695,23 +695,83 @@ userController.resetMobile = (REQUEST, RESPONSE) => {
 
   const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
   const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
-  const client = require('twilio')(accountSid, authToken);
 
-  client.verify
-    .services('VAeaa492de9598c3dcce55fd9243461ab3	')
-    .verificationChecks.create({
-      to: `+234${phone}`,
-      code: `${token}`,
-    })
-    .then((verification_check) => {
-      if (verification_check.status == 'approved') {
-        RESPONSE.status(200).json({
-          message: ' Verification successful ',
-        });
-      }
-    })
-    .catch((err) => RESPONSE.status(404).jsonp(err));
+
+
+  var data = {
+    "api_key" : "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+    "message_type" : "NUMERIC",
+    "to" : `+234${phone}`,
+    "from" : "N-Alert",
+    "channel" : "dnd",
+    "pin_attempts" : 10,
+    "pin_time_to_live" :  5,
+    "pin_length" : 4,
+    "pin_placeholder" : "< 1234 >",
+    "message_text" : "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+    "pin_type" : "NUMERIC"
+ };
+var options = {
+'method': 'POST',
+'url': 'https://termii.com/api/sms/otp/send',
+'headers': {
+'Content-Type': ['application/json', 'application/json']
+},
+body: JSON.stringify(data)
+
 };
+request(options, function (error, response) { 
+if (error) throw new Error(error);
+
+var data = {
+  "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+  "pin_id": pin_id,
+  "pin": token
+};
+var options = {
+'method': 'POST',
+'url': 'https://termii.com/api/sms/otp/verify',
+'headers': {
+'Content-Type': ['application/json', 'application/json']
+},
+body: JSON.stringify(data)
+};
+request(options, function (error, response) { 
+if (error) throw new Error(error);
+
+if(response.body.verified === true){
+
+MODEL.collectorModel.updateOne(
+  { phone: phone },
+  { verified: true },
+  (res) => {
+
+    MODEL.collectorModel
+      .findOne({ "phone": phone }, (err,USER) => {
+
+        var test = JSON.parse(JSON.stringify(USER))
+
+        if (err) return RESPONSE.status(400).jsonp(error)
+        console.log("user here at all", USER)
+        var jwtToken = COMMON_FUN.createToken(
+          test
+        ); /** creating jwt token */
+        console.log("user token here at all", USER)
+        test.token = jwtToken;
+        return RESPONSE.jsonp(test);
+          
+      })
+  }
+);
+
+}
+// return RESPONSE.status(200).json(JSON.parse(response.body))
+
+})
+}
+)
+}
+
 
 userController.resetMobilePassword = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
@@ -923,14 +983,14 @@ userController.updateAdvert = (req, res) => {
 }
 
 
-userController.adsLook = (req, res) => {
+userController.adsLook = (REQUEST, RESPONSE) => {
   var today = new Date();
   MODEL.advertModel.find({
     authenticated : true
   }).then((advert) => {
 
     const test = advert.filter(x=>x.duration-today>0)
-    return res.status(200).json(test);
+    return RESPONSE.status(200).json(test);
   });
 };
 
@@ -1073,7 +1133,7 @@ userController.desktopUsers = (req, resp) => {
 
 
 
-userController.deviceAnalytics  = (req,res)=>{
+userController.deviceAnalytics  = (REQUEST,RESPONSE)=>{
 
   try {
     MODEL.userModel
@@ -1098,7 +1158,7 @@ userController.deviceAnalytics  = (req,res)=>{
           },
           function (err, resp){
             var desktop = JSON.parse(resp.body);
-            return res.status(200).json({
+            return RESPONSE.status(200).json({
               android: android.length,
               ios: ios.length,
               desktop: desktop.length
@@ -1109,7 +1169,7 @@ userController.deviceAnalytics  = (req,res)=>{
       })
     });
 } catch (err) {
-  res.status(500).json(err);
+  RESPONSE.status(500).json(err);
 }
   
 }
@@ -1392,7 +1452,7 @@ userController.usageGrowth = (req,res)=>{
 }
 
 
-userController.mobileCarrierAnalytics = (req,res)=>{
+userController.mobileCarrierAnalytics = (REQUEST,RESPONSE)=>{
   try{
       MODEL.userModel.find({
         mobile_carrier: "MTN"
@@ -1422,7 +1482,7 @@ userController.mobileCarrierAnalytics = (req,res)=>{
                                       mobile_carrier:"9Mobile Nigeria (Etisalat)"
                                     }).then((recycler_etisalat)=>{
                                         var etisalat_users = [...etisalat, ...recycler_etisalat];
-                                         return res.status(200).json({
+                                         return RESPONSE.status(200).json({
                                            MTN: { amount: mtn_users.length, data : mtn_users },
                                            AIRTEL: { amount:  airtel_users.length, data : airtel_users  },
                                            GLO: { amount: glo_users.length, data: glo_users },
@@ -1437,7 +1497,7 @@ userController.mobileCarrierAnalytics = (req,res)=>{
           })
       })
   } catch(err){
-    return res.status(500).json(err);
+    return RESPONSE.status(500).json(err);
   }
 }
 

@@ -101,7 +101,7 @@ module.exports = (APP) => {
   APP.route("/api/desktop/users").get(CONTROLLER.userController.desktopUsers);
 
 
-  APP.route("/api/device/analytics").get(CONTROLLER.userController.deviceAnalytics);
+  APP.route("/api/device/analytics").get(auth.adminValidation, CONTROLLER.userController.deviceAnalytics);
 
 
   APP.route("/api/delete/user").post(CONTROLLER.userController.deleteUser);
@@ -121,7 +121,7 @@ module.exports = (APP) => {
 
 
 
-  APP.route("/api/user/mobile_carrier").get(CONTROLLER.userController.mobileCarrierAnalytics);
+  APP.route("/api/user/mobile_carrier").get(auth.adminValidation,CONTROLLER.userController.mobileCarrierAnalytics);
 
 
   APP.route("/api/user/internet_provider").get(CONTROLLER.userController.internet_providerAnalytics);

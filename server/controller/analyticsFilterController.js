@@ -14,7 +14,7 @@ const { Response } = require('aws-sdk');
 var request = require('request');
 const https = require('https');
 
-analyticsFilterController.monthlyUsers = (req, res) => {
+analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
     MODEL.userModel
@@ -219,7 +219,7 @@ analyticsFilterController.monthlyUsers = (req, res) => {
                                                     MODEL.userModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                        res.status(200).json({
+                                                        RESPONSE.status(200).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                             users: jan,
@@ -291,11 +291,11 @@ analyticsFilterController.monthlyUsers = (req, res) => {
           });
       });
   } catch (err) {
-    return res.status(500).json(err);
+    return RESPONSE.status(500).json(err);
   }
 };
 
-analyticsFilterController.monthlyRecyclers = (req, res) => {
+analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
     MODEL.collectorModel
@@ -507,7 +507,7 @@ analyticsFilterController.monthlyRecyclers = (req, res) => {
                                                     MODEL.collectorModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                        res.status(200).json({
+                                                        RESPONSE.status(200).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                             users: jan,
@@ -579,14 +579,14 @@ analyticsFilterController.monthlyRecyclers = (req, res) => {
           });
       });
   } catch (err) {
-    return res.status(500).json(err);
+    return RESPONSE.status(500).json(err);
   }
 };
 
 
 
 
-analyticsFilterController.monthlySchedules = (req, res) => {
+analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
     MODEL.scheduleModel
@@ -798,7 +798,7 @@ analyticsFilterController.monthlySchedules = (req, res) => {
                                                     MODEL.scheduleModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                        res.status(200).json({
+                                                        RESPONSE.status(200).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                             // schedules: jan,
@@ -869,13 +869,13 @@ analyticsFilterController.monthlySchedules = (req, res) => {
           });
       });
   } catch (err) {
-    return res.status(500).json(err);
+    return RESPONSE.status(500).json(err);
   }
 };
 
 
 
-analyticsFilterController.monthlyAdverts = (req, res) => {
+analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
     MODEL.advertModel
@@ -1087,7 +1087,7 @@ analyticsFilterController.monthlyAdverts = (req, res) => {
                                                     MODEL.advertModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                        res.status(200).json({
+                                                        RESPONSE.status(200).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                            adverts: jan,
@@ -1158,14 +1158,14 @@ analyticsFilterController.monthlyAdverts = (req, res) => {
           });
       });
   } catch (err) {
-    return res.status(500).json(err);
+    return RESPONSE.status(500).json(err);
   }
 };
 
 
 
 
-analyticsFilterController.monthlyReports = (req, res) => {
+analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
     MODEL.reportLogModel
@@ -1377,7 +1377,7 @@ analyticsFilterController.monthlyReports = (req, res) => {
                                                     MODEL.reportLogModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                        res.status(200).json({
+                                                        RESPONSE.status(200).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                            reports: jan,
@@ -1448,12 +1448,12 @@ analyticsFilterController.monthlyReports = (req, res) => {
           });
       });
   } catch (err) {
-    return res.status(500).json(err);
+    return RESPONSE.status(500).json(err);
   }
 };
 
 
-analyticsFilterController.monthlyCompanies = (req, res) => {
+analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
     MODEL.organisationModel
@@ -1665,7 +1665,7 @@ analyticsFilterController.monthlyCompanies = (req, res) => {
                                                     MODEL.organisationModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                        res.status(200).json({
+                                                        RESPONSE.status(200).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                            companies: jan,
@@ -1736,13 +1736,13 @@ analyticsFilterController.monthlyCompanies = (req, res) => {
           });
       });
   } catch (err) {
-    return res.status(500).json(err);
+    return RESPONSE.status(500).json(err);
   }
 };
 
 
 
-analyticsFilterController.monthlyWasteCollected = (req, res) => {
+analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
     MODEL.transactionModel
@@ -1955,7 +1955,7 @@ analyticsFilterController.monthlyWasteCollected = (req, res) => {
                                                       .find({})
                                                       .then((Analytics) => {
                                                 
-                                                        res.status(200).json({
+                                                        RESPONSE.status(200).json({
                                                           JANUARY: {
                                                             amount: jan.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0)
                                                           
@@ -2014,21 +2014,21 @@ analyticsFilterController.monthlyWasteCollected = (req, res) => {
           });
       });
   } catch (err) {
-    return res.status(500).json(err);
+    return RESPONSE.status(500).json(err);
   }
 };
 
 
-analyticsFilterController.advertsRequest = (req,res)=>{
+analyticsFilterController.advertsRequest = (REQUEST,RESPONSE)=>{
   try{
     MODEL.advertModel.find({
       authenticated: false
     }).then((adverts)=>{
-      return res.status(200).json(adverts)
+      return RESPONSE.status(200).json(adverts)
     })
   }
   catch(err){
-        return res.status(500).json(err)
+        return RESPONSE.status(500).json(err)
   }
 }
 
