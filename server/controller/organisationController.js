@@ -1949,7 +1949,7 @@ organisationController.totalWeightAnalytics = (req,res)=>{
 
 
 
-organisationController.categoryAnalytics = (req, res) => {
+organisationController.categoryAnalytics = (REQUEST, RESPONSE) => {
    MODEL.scheduleModel
     .find({})
     .sort({ _id: -1 })
@@ -1970,7 +1970,7 @@ organisationController.categoryAnalytics = (req, res) => {
       var plastics = result
         .filter((x) => x.Category == "Plastics")
 
-      return res.status(200).json({
+      return RESPONSE.status(200).json({
         can: can,
         petBottle: petBottle,
         carton: carton,
@@ -1978,13 +1978,13 @@ organisationController.categoryAnalytics = (req, res) => {
         plastics: plastics,
       });
     })
-    .catch((err) => res.status(500).json(err));
+    .catch((err) => RESPONSE.status(500).json(err));
 };
 
 
 
 
-organisationController.licencePaymentGrowth = (req,res)=>{
+organisationController.licencePaymentGrowth = (REQUEST,RESPONSE)=>{
 
   var year = new Date().getFullYear();
 
@@ -2120,7 +2120,7 @@ organisationController.licencePaymentGrowth = (req,res)=>{
                                 ]
                               }
                             }).then((Analytics)=>{
-                              res.status(200).json({
+                              RESPONSE.status(200).json({
                                 JANUARY: jan,
                                 FEBRUARY: feb,
                                 MARCH: march,
@@ -2172,7 +2172,7 @@ organisationController.licencePaymentGrowth = (req,res)=>{
 
   }
   catch(err){
-    return res.status(500).json(err)
+    return RESPONSE.status(500).json(err)
 
   }
 
@@ -2377,7 +2377,7 @@ organisationController.companyGrowthAnalytics = (req,res)=>{
 }
 
 
-organisationController.companyDeclineAnalytics = (req,res)=>{
+organisationController.companyDeclineAnalytics = (REQUEST,RESPONSE)=>{
 
   var year = new Date().getFullYear();
 
@@ -2511,7 +2511,7 @@ organisationController.companyDeclineAnalytics = (req,res)=>{
                                 ]
                               }
                             }).then((Analytics)=>{
-                              res.status(200).json({
+                              RESPONSE.status(200).json({
                                 JANUARY:  {
                                   amount : jan.length,
                                   companies: jan
@@ -2566,7 +2566,7 @@ organisationController.companyDeclineAnalytics = (req,res)=>{
 
   }
   catch(err){
-    return res.status(500).json(err)
+    return RESPONSE.status(500).json(err)
 
   }
 

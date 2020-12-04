@@ -167,19 +167,19 @@ module.exports = (APP) => {
         .get(CONTROLLER.organisationController.totalWeightAnalytics);
 
     APP.route('/api/category/analytics')
-        .get(CONTROLLER.organisationController.categoryAnalytics);
+        .get(auth.adminValidation,CONTROLLER.organisationController.categoryAnalytics);
 
     APP.route('/api/licence/analytics')
-        .get(CONTROLLER.organisationController.licencePaymentGrowth);
+        .get(auth.adminValidation,CONTROLLER.organisationController.licencePaymentGrowth);
 
     APP.route('/api/company/receipts/analytics')
         .get(CONTROLLER.organisationController.companyReceiptTransactions);
 
     APP.route('/api/company/growth/analytics')
-        .get(CONTROLLER.organisationController.companyGrowthAnalytics);
+        .get( CONTROLLER.organisationController.companyGrowthAnalytics);
 
     APP.route('/api/company/decline/analytics')
-        .get(CONTROLLER.organisationController.companyDeclineAnalytics);
+        .get(auth.adminValidation,CONTROLLER.organisationController.companyDeclineAnalytics);
 
     APP.route('/api/advert/submission')
         .post(CONTROLLER.organisationController.advertControl);
