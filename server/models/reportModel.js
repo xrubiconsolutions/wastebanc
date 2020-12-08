@@ -15,17 +15,14 @@ const report_Schema = new Schema({
   sessionID: {
       type: String,
       required: true,
-      unique: true
   },
   token: {
       type: String,
       required: true,
-      unique: true
   },
   userReportID: {
       type: String,
       required: true,
-      unique: true
   },
   active:{
     type: Boolean,
