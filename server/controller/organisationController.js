@@ -737,7 +737,7 @@ organisationController.raffleTicket = (req, res) => {
         console.log("<<>>", number)
 
       MODEL.userModel.aggregate(  [
-        { $match: { lcd: lcd } },
+        { $match: { lcd: lcd ,  availablePoints : {$ne: 0 } } },
         { $sample: { size: Number(winner_count) } }
        ]).then((winners,err)=>{
           console.log("winner", winners)
