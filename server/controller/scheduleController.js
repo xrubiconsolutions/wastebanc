@@ -426,32 +426,32 @@ scheduleController.dashboardCompleted = (REQUEST, RESPONSE) => {
 };
 
 
-scheduleController.rewardSystem = (req, resp) => {
-  const collectorID = req.body.collectorID;
-  const quantity = req.body.quantity;
+scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
+  const collectorID = REQUEST.body.collectorID;
+  const quantity = REQUEST.body.quantity;
   if (!quantity)
-    return resp
+    return RESPONSE
       .status(400)
       .json({ message: 'Enter a valid input for the quantity' });
 
   try {
-    MODEL.scheduleModel.find({ _id: req.body._id }).then((schedule) => {
+    MODEL.scheduleModel.find({ _id: REQUEST.body._id }).then((schedule) => {
       if (!schedule[0])
-        return resp.status(400).json({ message: 'This schedule is invalid' });
+        return RESPONSE.status(400).json({ message: 'This schedule is invalid' });
       MODEL.userModel
         .findOne({ email: schedule[0].client })
         .then((result) => {
             console.log("<<debugger>>>", result)
           if (result.cardID == null)
-            return resp
+            return RESPONSE
               .status(400)
               .jsonp({ message: "you don't have a valid card ID" });
           MODEL.transactionModel
-            .findOne({ scheduleId: req.body._id })
+            .findOne({ scheduleId: REQUEST.body._id })
             .then((transaction) => {
 
               if (transaction) {
-                return resp
+                return RESPONSE
                   .status(400)
                   .jsonp({
                     message:
@@ -459,9 +459,12 @@ scheduleController.rewardSystem = (req, resp) => {
                   });
               }
               else {
+                   //100g is equivalent to 1 coin i.e 1kg is equivalent to 10 coins 
+                        // quantity in g
+                var equivalent = (quantity/1000) * 10;
                 MODEL.userModel.updateOne(
                   { email: result.email },
-                  { $set: { availablePoints: coin_reward } },
+                  { $set: { availablePoints: result.availablePoints+equivalent } },
                   (err, res) => {
                     console.log('Was this actually updated', res);
                     MODEL.collectorModel
@@ -477,10 +480,7 @@ scheduleController.rewardSystem = (req, resp) => {
                             console.log('Logged date updated', new Date());
                           }
                         );
-                        //100g is equivalent to 1 coin i.e 1kg is equivalent to 10 coins 
-                        // quantity in g
-                        var equivalent = (quantity/1000) * 10;
-
+                     
                         var dataToSave = {
                           weight: quantity,
 
@@ -526,11 +526,27 @@ scheduleController.rewardSystem = (req, resp) => {
                             sendNotification(message);
 
                             // if (ERR)
-                            //   return resp.status(400).jsonp(ERR);
+                            //   return RESPONSE.status(400).jsonp(ERR);
                             console.log(
                               'Transaction saved on database',
                               RESULT
                             );
+                            MODEL.scheduleModel.updateOne(
+                                            { _id: schedule[0]._id },
+                                            {
+                                              $set: {
+                                                completionStatus: 'completed',
+                                                collectedBy: collectorID,
+                                              },
+                                            },
+                                            (err, res) => {
+                                              if (err) return RESPONSE.status(200).json(err);
+                                              
+                            return RESPONSE.status(200).json({
+                              message: "Transaction Completed Successfully"
+                            
+                            })
+                          })
                           })
                       })       
                 })
@@ -540,7 +556,7 @@ scheduleController.rewardSystem = (req, resp) => {
 
   }
    catch (err) {
-    return resp.status(500).json(err);
+    return RESPONSE.status(500).json(err);
   }
 };
 
