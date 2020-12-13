@@ -458,160 +458,88 @@ scheduleController.rewardSystem = (req, resp) => {
                       'This transaction had been completed by another recycler',
                   });
               }
+              else {
+                MODEL.userModel.updateOne(
+                  { email: result.email },
+                  { $set: { availablePoints: coin_reward } },
+                  (err, res) => {
+                    console.log('Was this actually updated', res);
+                    MODEL.collectorModel
+                      .findOne({ _id: collectorID })
+                      .then((recycler, err) => {
+                        console.log('All i need here', recycler);
+                        console.log('Whatsyo', err);
 
-              request(
-                {
-                  url:
-                    'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
-                  method: 'POST',
-                  json: true,
-                  body: {
-                    data: { username: 'xrubicon', password: 'xrubicon1234' },
-                  },
-                },
-                function (error, response, body) {
-                  request(
-                    {
-                      url:
-                        'https://apis.touchandpay.me/lawma-backend/v1/agent/create/agent/transaction',
-                      method: 'POST',
-                      headers: {
-                        Accept: 'application/json',
-                        'Accept-Charset': 'utf-8',
-                        Token: response.headers.token,
-                      },
-                      json: true,
-                      body: {
-                        data: {
-                          deviceID: 'XRUBICON', //"DEVICE_ID"
-                          organizationID: '7', // 7
-                          // weight: schedule[0].quantity,
-                          weight: quantity,
-                          cardID: result.cardID,
-                        },
-                      },
-                    },
-                    function (err, response) {
-                      console.log(
-                        'IS this even an error',
-                        response.body.content.data
-                      );
-
-                      //Coin reward system
-                      if (err) return res.status(400).jsonp(err);
-                      if (response.body.content.data) {
-                        var coin_reward =
-                          response.body.content.data.customer.availablePoints;
-                        console.log('My coin reward is here guys', coin_reward);
-                        MODEL.scheduleModel.updateOne(
-                          { _id: schedule[0]._id },
-                          {
-                            $set: {
-                              completionStatus: 'completed',
-                              collectedBy: collectorID,
-                            },
-                          },
-                          (err, res) => {
-                            if (err)
-                              return res.status(400).jsonp(response.body.error);
-                            else {
-                              MODEL.userModel.updateOne(
-                                { email: result.email },
-                                { $set: { availablePoints: coin_reward } },
-                                (err, res) => {
-                                  console.log('Was this actually updated', res);
-
-                                  MODEL.collectorModel
-                                    .findOne({ _id: collectorID })
-                                    .then((recycler, err) => {
-                                      console.log('All i need here', recycler);
-                                      console.log('Whatsyo', err);
-
-                                      MODEL.collectorModel.updateOne(
-                                        { email: recycler.email },
-                                        { last_logged_in: new Date() },
-                                        (res) => {
-                                          console.log('Logged date updated', new Date());
-                                        }
-                                      );
-
-                                      var dataToSave = {
-                                        weight: quantity,
-
-                                        coin: response.body.content.data.point,
-
-                                        cardID: result.cardID,
-
-                                        scheduleId: schedule[0]._id,
-
-                                        completedBy: collectorID,
-
-                                        Category: schedule[0].Category,
-
-                                        fullname: result.firstname + ' ' +  result.lastname,
-
-                                        recycler: recycler.fullname,
-
-                                        organisationID: recycler.approvedBy,
-                                      };
-
-                                      console.log('<<TESTER>>', dataToSave)
-                                      MODEL.transactionModel(dataToSave).save(
-                                        {},
-                                        (ERR, RESULT) => {
-                                          console.log(
-                                            '<<<<<<>>>>>>',
-                                            result,
-                                            result.onesignal_id
-                                          );
-
-                                          var message = {
-                                            app_id:
-                                              '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
-                                            contents: {
-                                              en:
-                                                'You just received a payout for your schedule',
-                                            },
-                                            include_player_ids: [
-                                              `${result.onesignal_id}`,
-                                            ],
-                                          };
-
-                                          sendNotification(message);
-
-                                          // if (ERR)
-                                          //   return resp.status(400).jsonp(ERR);
-                                          console.log(
-                                            'Transaction saved on database',
-                                            RESULT
-                                          );
-                                        }
-                                      );
-                                    });
-                                }
-                              );
-                            }
+                        MODEL.collectorModel.updateOne(
+                          { email: recycler.email },
+                          { last_logged_in: new Date() },
+                          (res) => {
+                            console.log('Logged date updated', new Date());
                           }
                         );
-                      } else {
-                        var error = {};
-                        error.message =
-                          'Transaction incomplete, coin not credited';
-                        return resp.status(400).jsonp(error);
-                      }
-                      return resp.status(200).jsonp(response.body.content.data);
-                    }
-                  );
-                }
-              );
-            });
-        })
-        .catch((err) => {
-          console.log(err);
-          return resp.status(500).jsonp(err);
-        });
-    });
-  } catch (err) {
+                        //100g is equivalent to 1 coin i.e 1kg is equivalent to 10 coins 
+                        // quantity in g
+                        var equivalent = (quantity/1000) * 10;
+
+                        var dataToSave = {
+                          weight: quantity,
+
+                          coin: equivalent,
+
+                          cardID: result._id,
+
+                          scheduleId: schedule[0]._id,
+
+                          completedBy: collectorID,
+
+                          Category: schedule[0].Category,
+
+                          fullname: result.firstname + ' ' +  result.lastname,
+
+                          recycler: recycler.fullname,
+
+                          organisationID: recycler.approvedBy,
+                        };
+
+                        console.log('<<TESTER>>', dataToSave)
+                        MODEL.transactionModel(dataToSave).save(
+                          {},
+                          (ERR, RESULT) => {
+                            console.log(
+                              '<<<<<<>>>>>>',
+                              result,
+                              result.onesignal_id
+                            );
+
+                            var message = {
+                              app_id:
+                                '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+                              contents: {
+                                en:
+                                  'You just received a payout for your schedule',
+                              },
+                              include_player_ids: [
+                                `${result.onesignal_id}`,
+                              ],
+                            };
+
+                            sendNotification(message);
+
+                            // if (ERR)
+                            //   return resp.status(400).jsonp(ERR);
+                            console.log(
+                              'Transaction saved on database',
+                              RESULT
+                            );
+                          })
+                      })       
+                })
+              
+               
+        }})})})
+
+  }
+   catch (err) {
     return resp.status(500).json(err);
   }
 };

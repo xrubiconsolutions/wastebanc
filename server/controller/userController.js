@@ -38,17 +38,6 @@ var nodemailer = require('nodemailer');
 
 const io = require('socket.io')();
 
-io.on('connection', (client) => {
-  client.on('subscribeToTimer', (interval) => {
-    console.log('client is subscribing to event ', interval);
-    // setInterval(() => {
-    //   client.emit('timer', new Date());
-    // }, interval);
-  });
-});
-
-const tax_url =
-  'https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer';
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -141,91 +130,11 @@ userController.registerUser = (REQUEST, RESPONSE) => {
             MODEL.userModel(dataToSave).save({}, (ERR, RESULT) => {
               if (ERR) RESPONSE.status(400).jsonp(ERR);
               else {
-                request(
-                  {
-                    url:
-                      'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
-                    method: 'POST',
-                    json: true,
-                    body: {
-                      data: { username: 'xrubicon', password: 'xrubicon1234' },
-                    },
-                  },
-                  function (error, response, body) {
-                    //  return response.headers.token;
-                    request(
-                      {
-                        url:
-                          'https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer',
-                        method: 'POST',
-                        headers: {
-                          Accept: 'application/json',
-                          'Accept-Charset': 'utf-8',
-                          Token: response.headers.token,
-                        },
-                        json: true,
-                        body: {
-                          data: {
-                            username: RESULT.username,
-                            firstname: RESULT.firstname,
-                            lastname: RESULT.lastname,
-                            othernames: RESULT.othernames,
-                            email: RESULT.email,
-                            phone: RESULT.phone,
-                            address: RESULT.address,
-                          },
-                        },
-                      },
-                      function (err, res) {
-                        let card_id = res.body.content.data.cardID;
-                        need = { cardID: card_id, ...RESULT };
 
-                        // TERMII IMPLEMENTATION 
-
-                        const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
-                        const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
-                        const client = require('twilio')(accountSid, authToken);
-
-
-                        client.verify
-                          .services('VAeaa492de9598c3dcce55fd9243461ab3')
-                          .verifications.create({
-                            to: `+234${dataToSave.phone}`,
-                            channel: 'sms',
-                          })
-                          .then((verification) =>
-                            console.log(verification.status)
-                          );
-
-                        client.lookups
-                          .phoneNumbers(`+234${dataToSave.phone}`)
-                          .fetch({ type: ['carrier'] })
-                          .then((phone_number) =>
-                            MODEL.userModel.updateOne(
-                              { email: RESULT.email },
-                              {
-                                $set: {
-                                  cardID: card_id,
-                                  firstname: RESULT.username.split(' ')[0],
-                                  lastname: RESULT.username.split(' ')[1],
-                                  fullname: RESULT.username.split(' ')[0] + " " + RESULT.username.split(' ')[1],
-                                  mobile_carrier: phone_number.carrier.name,
-                                },
-                              },
-                              (res) => {
-                                //BYPASS FOR TESTING PURPOSE
-                                MODEL.userModel.findOne(
-                                  { email: RESULT.email },
-                                  (err, USER) => {
-                                    var test = JSON.parse(JSON.stringify(USER));
-
-                                    if (err)
-                                      return RESPONSE.status(400).jsonp(error);
-                                    console.log('user here at all', USER);
+                var test = JSON.parse(JSON.stringify(RESULT));
                                     var jwtToken = COMMON_FUN.createToken(
                                       test
                                     ); /** creating jwt token */
-                                    console.log('user token here at all', USER);
                                     test.token = jwtToken;
                                     return RESPONSE.status(200).jsonp(
                                       COMMON_FUN.sendSuccess(
@@ -233,17 +142,113 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                                         test
                                       )
                                     );
-                                  }
-                                );
 
-                                console.log(res);
-                              }
-                            )
-                          );
-                      }
-                    );
-                  }
-                );
+
+
+
+                // request(
+                //   {
+                //     url:
+                //       'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
+                //     method: 'POST',
+                //     json: true,
+                //     body: {
+                //       data: { username: 'xrubicon', password: 'xrubicon1234' },
+                //     },
+                //   },
+                //   function (error, response, body) {
+                //     //  return response.headers.token;
+                //     request(
+                //       {
+                //         url:
+                //           'https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer',
+                //         method: 'POST',
+                //         headers: {
+                //           Accept: 'application/json',
+                //           'Accept-Charset': 'utf-8',
+                //           Token: response.headers.token,
+                //         },
+                //         json: true,
+                //         body: {
+                //           data: {
+                //             username: RESULT.username,
+                //             firstname: RESULT.firstname,
+                //             lastname: RESULT.lastname,
+                //             othernames: RESULT.othernames,
+                //             email: RESULT.email,
+                //             phone: RESULT.phone,
+                //             address: RESULT.address,
+                //           },
+                //         },
+                //       },
+                //       function (err, res) {
+                //         let card_id = res.body.content.data.cardID;
+                //         need = { cardID: card_id, ...RESULT };
+
+                //         // TERMII IMPLEMENTATION 
+
+                //         const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
+                //         const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
+                //         const client = require('twilio')(accountSid, authToken);
+
+
+                //         client.verify
+                //           .services('VAeaa492de9598c3dcce55fd9243461ab3')
+                //           .verifications.create({
+                //             to: `+234${dataToSave.phone}`,
+                //             channel: 'sms',
+                //           })
+                //           .then((verification) =>
+                //             console.log(verification.status)
+                //           );
+
+                //         client.lookups
+                //           .phoneNumbers(`+234${dataToSave.phone}`)
+                //           .fetch({ type: ['carrier'] })
+                //           .then((phone_number) =>
+                //             MODEL.userModel.updateOne(
+                //               { email: RESULT.email },
+                //               {
+                //                 $set: {
+                //                   cardID: card_id,
+                //                   firstname: RESULT.username.split(' ')[0],
+                //                   lastname: RESULT.username.split(' ')[1],
+                //                   fullname: RESULT.username.split(' ')[0] + " " + RESULT.username.split(' ')[1],
+                //                   mobile_carrier: phone_number.carrier.name,
+                //                 },
+                //               },
+                //               (res) => {
+                //                 //BYPASS FOR TESTING PURPOSE
+                //                 MODEL.userModel.findOne(
+                //                   { email: RESULT.email },
+                //                   (err, USER) => {
+                //                     var test = JSON.parse(JSON.stringify(USER));
+
+                //                     if (err)
+                //                       return RESPONSE.status(400).jsonp(error);
+                //                     console.log('user here at all', USER);
+                //                     var jwtToken = COMMON_FUN.createToken(
+                //                       test
+                //                     ); /** creating jwt token */
+                //                     console.log('user token here at all', USER);
+                //                     test.token = jwtToken;
+                //                     return RESPONSE.status(200).jsonp(
+                //                       COMMON_FUN.sendSuccess(
+                //                         CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                //                         test
+                //                       )
+                //                     );
+                //                   }
+                //                 );
+
+                //                 console.log(res);
+                //               }
+                //             )
+                //           );
+                //       }
+                //     );
+                //   }
+                // );
               }
             });
           }
