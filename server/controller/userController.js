@@ -168,7 +168,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                                                         body: JSON.stringify(data),
                                                       };
                                                       request(options, function (error, response) {
-                                                        console.log("<<response>>", response);
+                                                        console.log("<<response>>", response.body.pin_id);
                                                         if (error) {
                                                           throw new Error(error);
                                                         } else {
