@@ -145,7 +145,6 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                                                       },
                                                     },
                                                     (res) => { 
-
                                                       var data = {
                                                         api_key:'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
                                                         message_type: 'NUMERIC',
@@ -168,7 +167,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                                                         body: JSON.stringify(data),
                                                       };
                                                       request(options, function (error, response) {
-                                                        console.log("<<response>>", response.body.pin_id);
+                                                        const iden = JSON.parse(response.body)
                                                         if (error) {
                                                           throw new Error(error);
                                                         } else {
@@ -180,14 +179,11 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                                                           //   pin_id: response.body.pin_id
                                                           // };
                                                           let UserData = {
-                                                            ...test , pin_id: response.body.pin_id
+                                                            ...test , pin_id: iden.pinId
                                                           }
                                                           console.log("><<>>userdata", UserData)
                                                           return RESPONSE.status(200).jsonp(
-                                                            COMMON_FUN.sendSuccess(
-                                                              CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-                                                              UserData
-                                                            )
+                                                           UserData
                                                           );
                                                         }
                                                       })

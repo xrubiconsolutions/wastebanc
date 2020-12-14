@@ -38,9 +38,7 @@ const user_Schema = new Schema({
     default: 'Lagos',
   },
   cardID: {
-    type: Number,
-    required: true,
-    default: 1200,
+    type: String
   },
   fullname: {
     type: String,

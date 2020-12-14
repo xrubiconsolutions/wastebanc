@@ -63,7 +63,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                   body: JSON.stringify(data),
                 };
                 request(options, function (error, response) {
-                  console.log("<<response>>", response);
+                  const iden = JSON.parse(response.body)
                   if (error) {
                     throw new Error(error);
                   } else {
@@ -72,7 +72,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                       phone: RESULT.phone,
                       username: RESULT.username,
                       roles: RESULT.roles,
-                      pin_id: response.body.pin_id
+                      pin_id: iden.pinId
                     };
                     return RESPONSE.status(200).jsonp(
                       COMMON_FUN.sendSuccess(
