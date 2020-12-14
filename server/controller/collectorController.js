@@ -42,8 +42,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
               if (ERR) RESPONSE.status(400).jsonp(ERR);
               else {
                 var data = {
-                  api_key:
-                    'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+                  api_key:'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
                   message_type: 'NUMERIC',
                   to: `+234${RESULT.phone}`,
                   from: 'N-Alert',
@@ -52,8 +51,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                   pin_time_to_live: 5,
                   pin_length: 4,
                   pin_placeholder: '< 1234 >',
-                  message_text:
-                    'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
+                  message_text: 'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
                   pin_type: 'NUMERIC',
                 };
                 var options = {
@@ -65,6 +63,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                   body: JSON.stringify(data),
                 };
                 request(options, function (error, response) {
+                  console.log("<<response>>", response);
                   if (error) {
                     throw new Error(error);
                   } else {
@@ -73,6 +72,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                       phone: RESULT.phone,
                       username: RESULT.username,
                       roles: RESULT.roles,
+                      pin_id: response.body.pin_id
                     };
                     return RESPONSE.status(200).jsonp(
                       COMMON_FUN.sendSuccess(
@@ -411,9 +411,7 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
   };
   request(options, function (error, response) {
     if (error) throw new Error(error);
-
-    if (response.body.verified === true) {
-      MODEL.collectorModel.updateOne(
+    MODEL.collectorModel.updateOne(
         { phone: phone },
         { verified: true },
         (res) => {
@@ -430,8 +428,7 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
             return RESPONSE.jsonp(test);
           });
         }
-      );
-    }
+      );  
     console.log(response.body);
   });
 };

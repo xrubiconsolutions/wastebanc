@@ -236,14 +236,14 @@ reportController.getReport = (req, res) => {
 
 
 
-reportController.allReport = (req, res) => {
+reportController.allReport = (REQUEST, RESPONSE) => {
   MODEL.reportModel
     .find({})
     .sort({ _id: -1 })
     .then((user) => {
-      return res.status(200).json(user);
+      return RESPONSE.status(200).json(user);
     })
-    .catch((err) => res.status(500).json(err));
+    .catch((err) => RESPONSE.status(500).json(err));
 };
 
 
