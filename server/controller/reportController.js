@@ -37,15 +37,8 @@ reportController.report = (req, res) => {
     var tokenOptions = {};
     tokenOptions.expireTime = (Date.now() / 1000 ) +  2592000
 
-
-
     // generate token
     token = opentok.generateToken(session.sessionId, tokenOptions);
-
-
-
-
-
   MODEL.userModel.findOne({
     _id: userID
   }).then((userDetail)=>{
@@ -286,6 +279,13 @@ reportController.endReport = (req,res)=>{
          }
             MODEL.reportLogModel(log).save( {} , (ERR, RESULT) => {
               if(ERR) return res.status(400).json(ERR)
+      MODEL.reportModel
+      .deleteOne({
+        userReportID: ID,
+      })
+      .then((result) => {
+         console.log('User deleted successfully');
+      });
               return res.status(200).json({message: "Session successfully ended"})
             })
       }
