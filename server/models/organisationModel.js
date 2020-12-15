@@ -45,7 +45,7 @@ const organisation_Schema = new Schema({
   },
   licence_active: { // Licence field
     type: Boolean,
-    default:false,
+    default:true,
   },
   expiry_date :{
       type: Date,
