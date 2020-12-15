@@ -41,10 +41,11 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
             MODEL.collectorModel(dataToSave).save({}, (ERR, RESULT) => {
               if (ERR) RESPONSE.status(400).jsonp(ERR);
               else {
+                var phoneNo = String(RESULT.phone).substring(1,11);
                 var data = {
                   api_key:'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
                   message_type: 'NUMERIC',
-                  to: `+234${RESULT.phone}`,
+                  to: `+234${phoneNo}`,
                   from: 'N-Alert',
                   channel: 'dnd',
                   pin_attempts: 10,
@@ -411,13 +412,14 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
   };
   request(options, function (error, response) {
     if (error) throw new Error(error);
-    MODEL.collectorModel.updateOne(
+    const verified = JSON.parse(response.body);
+    if(verified.verified == true){
+      MODEL.collectorModel.updateOne(
         { phone: phone },
         { verified: true },
         (res) => {
           MODEL.collectorModel.findOne({ phone: phone }, (err, USER) => {
             var test = JSON.parse(JSON.stringify(USER));
-
             if (err) return RESPONSE.status(400).jsonp(error);
             console.log('user here at all', USER);
             var jwtToken = COMMON_FUN.createToken(
@@ -429,6 +431,13 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
           });
         }
       );  
+    }
+    else {
+      return RESPONSE.status(200).json({
+        message: "Invalid token, retry"
+      })
+    }
+ 
     console.log(response.body);
   });
 };
@@ -477,10 +486,11 @@ collectorController.resendVerification = (REQUEST, RESPONSE) => {
   const client = require('twilio')(accountSid, authToken);
 
   try {
+    var phoneNo = String(phone).substring(1,11);
     var data = {
       api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
       message_type: 'NUMERIC',
-      to: `+234${phone}`,
+      to: `+234${phoneNo}`,
       from: 'N-Alert',
       channel: 'dnd',
       pin_attempts: 10,

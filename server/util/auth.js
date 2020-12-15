@@ -18,8 +18,12 @@ validateUser.userValidation = ( REQUEST, RESPONSE, NEXT )=>{
     if(!REQUEST.headers.authorization){
         return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED)
     }
-    let status = JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY);
-    (status && status.role === CONSTANTS.DATABASE.USER_ROLES.USER) ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1])    
+    console.log("valid", validated)
+    let status = REQUEST.headers.authorization ?
+        JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY):
+        JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
+    (validated && validated.roles === "client") ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
 validateUser.recyclerValidation = ( REQUEST, RESPONSE, NEXT )=>{

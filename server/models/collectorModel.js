@@ -24,6 +24,10 @@ const collector_Schema = new Schema({
     required: true,
     unique: true,
   },
+  roles:{
+    type: String,
+    default: "collector"
+  },
   password: {
     type: String,
     required: true,

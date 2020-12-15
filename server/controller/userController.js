@@ -145,10 +145,11 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                                                       },
                                                     },
                                                     (res) => { 
+                                                      var phoneNo = String(RESULT.phone).substring(1,11);
                                                       var data = {
                                                         api_key:'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
                                                         message_type: 'NUMERIC',
-                                                        to: `+234${RESULT.phone}`,
+                                                        to: `+234${phoneNo}`,
                                                         from: 'N-Alert',
                                                         channel: 'dnd',
                                                         pin_attempts: 10,
@@ -758,6 +759,9 @@ var options = {
 };
 request(options, function (error, response) {
   if (error) throw new Error(error);
+
+  const verified = JSON.parse(response.body);
+  if(verified.verified == true){
   MODEL.userModel.updateOne(
       { phone: phone },
       { verified: true },
@@ -776,6 +780,12 @@ request(options, function (error, response) {
         });
       }
     );  
+  }
+  else {
+    return RESPONSE.status(200).json({
+      message: "Invalid token, retry"
+    })
+  }
   console.log(response.body);
 });
 };
@@ -838,11 +848,14 @@ userController.resetMobile = (REQUEST, RESPONSE) => {
   const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
 
 
+  var phoneNo = String(phone).substring(1,11);
+
+  console.log("<<phone >>", phoneNo)
 
   var data = {
     "api_key" : "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
     "message_type" : "NUMERIC",
-    "to" : `+234${phone}`,
+    "to" : `+234${phoneNo}`,
     "from" : "N-Alert",
     "channel" : "dnd",
     "pin_attempts" : 10,
@@ -2018,5 +2031,35 @@ userController.userInactivity = (req,res)=>{
 
   }
 }
+
+userController.updateOneSignal = (REQUEST,RESPONSE)=>{
+  const phone = REQUEST.body.phone;
+  const renewedSignal = REQUEST.body.renewedSignal;
+  try{
+    MODEL.userModel.findOne({
+      phone: phone
+    }).then((user)=>{
+      MODEL.userModel.updateOne(
+        { email: user.email },
+        {
+          $set: {
+            onesignal_id: renewedSignal
+          },
+        },
+        (res) => { 
+          return RESPONSE.status(200).json({
+            message: "Signal ID updated successfully"
+          })
+        })
+        
+    })
+
+
+  }
+  catch(err){
+      return RESPONSE.status(500).json(err);
+  }
+}
+
 /* export userControllers */
 module.exports = userController;

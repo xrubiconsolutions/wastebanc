@@ -106,6 +106,9 @@ module.exports = (APP) => {
 
   APP.route("/api/delete/user").post(CONTROLLER.userController.deleteUser);
 
+  APP.route("/api/update/signal").post(auth.userValidation,CONTROLLER.userController.updateOneSignal);
+
+
 
   APP.route("/api/users/analytics").get(CONTROLLER.userController.userAnalytics);
 

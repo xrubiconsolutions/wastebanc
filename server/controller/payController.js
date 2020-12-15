@@ -56,24 +56,24 @@ payController.resolveAccount = (req, res) => {
   );
 };
 
-payController.saveReceipt = (req, res) => {
+payController.saveReceipt = (REQUEST, RESPONSE) => {
   let errors = {};
-  const receipt = { ...req.body };
-  // let userId = req.body.userId;
-  // let fullname = req.body.fullname;
-  // let bankAcNo = req.body.bankAcNo;
-  // let bankName = req.body.bankName;
-  let cardID = req.body.cardID;
-  let amount = req.body.amount;
+  const receipt = { ...REQUEST.body };
+  // let userId = REQUEST.body.userId;
+  // let fullname = REQUEST.body.fullname;
+  // let bankAcNo = REQUEST.body.bankAcNo;
+  // let bankName = REQUEST.body.bankName;
+  let cardID = REQUEST.body.cardID;
+  let amount = REQUEST.body.amount;
   var balance;
 
   MODEL.userModel.findOne({ cardID: cardID }).then((result, err) => {
     if (!result)
-      return res.status(400).json({ message: 'Enter a valid card ID' });
+      return RESPONSE.status(400).json({ message: 'Enter a valid card ID' });
     if (result) {
       balance = result.availablePoints - amount;
       if (balance <= 0) {
-        return res
+        return RESPONSE
           .status(406)
           .json({
             message:
@@ -87,11 +87,11 @@ payController.saveReceipt = (req, res) => {
           MODEL.payModel(receipt).save({}, (err, result) => {
             console.log('error here', err);
             if (err)
-              return res
+              return RESPONSE
                 .status(400)
                 .json({ message: 'Could not save receipt' });
             console.log(result);
-            return res.status(201).json(result);
+            return RESPONSE.status(201).json(result);
           });
         }
       );
