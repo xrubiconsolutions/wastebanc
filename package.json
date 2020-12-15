@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^7.4.0",
     "async": "^3.2.0",
     "authy": "^1.4.0",
     "aws-sdk": "^2.287.0",

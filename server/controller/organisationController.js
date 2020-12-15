@@ -12,6 +12,7 @@ let CONSTANTS = require("../util/constants");
 let FS = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
+const sgMail = require('@sendgrid/mail');
 
 let auth = require("../util/auth");
 
@@ -57,20 +58,40 @@ organisationController.createOrganisation = (req, RESPONSE) => {
                 (ERR, RESULT) => {
                   if (ERR) RESPONSE.status(400).jsonp(ERR);
                   else {
-                    var mailOptions = {
-                      from: "pakambusiness@gmail.com",
-                      to: `${organisation_data.email}`,
-                      subject: "WELCOME TO PAKAM ORGANISATION ACCOUNT",
-                      text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`,
-                    };
 
-                    transporter.sendMail(mailOptions, function (error, info) {
-                      if (error) {
-                        console.log(error);
-                      } else {
-                        console.log("Email sent: " + info.response);
-                      }
-                    });
+sgMail.setApiKey("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");
+const msg = {
+  to: `${organisation_data.email}`,
+  from: 'pakambusiness@gmail.com', // Use the email address or domain you verified above
+  subject: "WELCOME TO PAKAM ORGANISATION ACCOUNT",
+  text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`,
+};
+//ES6
+sgMail
+  .send(msg)
+  .then(() => {}, error => {
+    console.error(error);
+ 
+    if (error.response) {
+      console.error(error.response.body)
+    }
+  });
+
+
+                    // var mailOptions = {
+                    //   from: "pakambusiness@gmail.com",
+                    //   to: `${organisation_data.email}`,
+                    //   subject: "WELCOME TO PAKAM ORGANISATION ACCOUNT",
+                    //   text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`,
+                    // };
+
+                    // transporter.sendMail(mailOptions, function (error, info) {
+                    //   if (error) {
+                    //     console.log(error);
+                    //   } else {
+                    //     console.log("Email sent: " + info.response);
+                    //   }
+                    // });
                     return RESPONSE.status(200).json(RESULT);
                   }
                 }
@@ -86,6 +107,7 @@ organisationController.createOrganisation = (req, RESPONSE) => {
 
 organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
   let BODY = REQUEST.body;
+  COMMON_FUN.encryptPswrd(BODY.newPassword, (ERR, HASH) => { console.log(">>", HASH) });
   COMMON_FUN.objProperties(REQUEST.body, (ERR, RESULT) => {
     if (ERR) {
       return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
