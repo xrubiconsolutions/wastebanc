@@ -793,7 +793,7 @@ request(options, function (error, response) {
 userController.getAllClients = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
-    let users = await MODEL.userModel.find({ roles: 'client' }).sort({ _id : -1});
+    let users = await MODEL.userModel.find({ roles: 'client', verified: true }).sort({ _id : -1});
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);
@@ -833,7 +833,7 @@ userController.getWalletBalance = (req, res) => {
 userController.getAllCollectors = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
-    let users = await MODEL.collectorModel.find({}).sort({_id:-1});
+    let users = await MODEL.collectorModel.find({ verified : true}).sort({_id:-1});
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);

@@ -67,9 +67,9 @@ module.exports = (APP) => {
 
   APP.route("/api/updateUser").post(CONTROLLER.userController.updateUser);
 
-  APP.route("/api/getAllClients").get(CONTROLLER.userController.getAllClients);
+  APP.route("/api/getAllClients").get(auth.userCollectorData,CONTROLLER.userController.getAllClients);
 
-  APP.route("/api/getAllCollectors").get(
+  APP.route("/api/getAllCollectors").get(auth.userCollectorData,
     CONTROLLER.userController.getAllCollectors
   );
 
