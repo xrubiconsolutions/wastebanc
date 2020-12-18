@@ -1044,6 +1044,7 @@ collectorController.collectorActivityAnalytics = (req, res) => {
             .then((activeTodayUser) => {
               MODEL.collectorModel
                 .find({
+                  verified: true,
                   $or: [
                     { last_logged_in: { $exists: false } },
                     {
