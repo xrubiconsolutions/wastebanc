@@ -481,7 +481,7 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
       );  
     }
     else {
-      return RESPONSE.status(200).json({
+      return RESPONSE.status(400).json({
         message: "Invalid token, retry"
       })
     }
@@ -692,6 +692,7 @@ collectorController.collectorAnalytics = (req, res) => {
       active_today.setDate(today.getDate() - 1);
       MODEL.collectorModel
         .find({
+          verified: true,
           createdAt: {
             $gte: active_today,
           },
@@ -700,6 +701,7 @@ collectorController.collectorAnalytics = (req, res) => {
         .then((newUser) => {
           MODEL.collectorModel
             .find({
+              verified: true,
               last_logged_in: {
                 $gte: active_today,
               },
@@ -1023,6 +1025,7 @@ collectorController.collectorActivityAnalytics = (req, res) => {
       active_today.setDate(today.getDate() - 1);
       MODEL.collectorModel
         .find({
+          verified: true,
           createdAt: {
             $gte: active_today,
           },
@@ -1031,6 +1034,7 @@ collectorController.collectorActivityAnalytics = (req, res) => {
         .then((newUser) => {
           MODEL.collectorModel
             .find({
+              verified: true,
               last_logged_in: {
                 $gte: active_today,
               },

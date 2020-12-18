@@ -817,7 +817,7 @@ request(options, function (error, response) {
     );  
   }
   else {
-    return RESPONSE.status(200).json({
+    return RESPONSE.status(400).json({
       message: "Invalid token, retry"
     })
   }
@@ -1062,6 +1062,7 @@ userController.dailyActive = (req, res) => {
   try {
     MODEL.userModel
       .find({
+        verified: true,
         last_logged_in: {
           $gte: active_today,
         },
@@ -1386,6 +1387,7 @@ userController.userAnalytics = (req,res)=>{
   active_today.setDate(today.getDate() - 1);
     MODEL.userModel
       .find({
+        verified: true,
          createAt: {
           $gte: active_today,
         },
@@ -1395,6 +1397,7 @@ userController.userAnalytics = (req,res)=>{
 
           MODEL.userModel
             .find({
+              verified: true,
               last_logged_in: {
                 $gte: active_today,
               },
@@ -1403,6 +1406,7 @@ userController.userAnalytics = (req,res)=>{
             .then((activeTodayUser) => {
 
               MODEL.userModel.find({
+                verified: true,
                 last_logged_in: {
                   $lte: active_today,
                 }
@@ -2053,6 +2057,7 @@ userController.userInactivity = (req,res)=>{
   active_today.setDate(today.getDate() - 1);
   try{
     MODEL.userModel.find({
+      verified: true,
       last_logged_in: {
         $lte: active_today,
       }
