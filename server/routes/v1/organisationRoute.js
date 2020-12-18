@@ -185,6 +185,10 @@ module.exports = (APP) => {
         .post(CONTROLLER.organisationController.advertControl);
 
     APP.route('/api/delete/advert')
-        .post(CONTROLLER.organisationController.deleteAdvert);
+        .post(auth.adminValidation,CONTROLLER.organisationController.deleteAdvert);
+    
+    APP.route('/api/monify/payment').post(
+        CONTROLLER.organisationController.monifyHook
+    )
                
 };
