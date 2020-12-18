@@ -688,7 +688,7 @@ collectorController.collectorAnalytics = (req, res) => {
   const active_today = new Date();
 
   try {
-    MODEL.collectorModel.find({}).then((allUser) => {
+    MODEL.collectorModel.find({        verified: true    }).then((allUser) => {
       active_today.setDate(today.getDate() - 1);
       MODEL.collectorModel
         .find({
