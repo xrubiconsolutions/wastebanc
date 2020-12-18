@@ -1383,6 +1383,7 @@ userController.userAnalytics = (req,res)=>{
 
   try {
   MODEL.userModel.find({
+    verified: true
   }).then((allUser)=>{
   active_today.setDate(today.getDate() - 1);
     MODEL.userModel
