@@ -19,6 +19,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
   try {
     MODEL.userModel
       .find({
+        verified : true,
         $expr: {
           $and: [
             { $eq: [{ $year: '$createAt' }, year] },
@@ -32,6 +33,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
       .then((jan) => {
         MODEL.userModel
           .find({
+            verified : true,
             $expr: {
               $and: [
                 { $eq: [{ $year: '$createAt' }, year] },
@@ -45,6 +47,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
           .then((feb) => {
             MODEL.userModel
               .find({
+                verified : true,
                 $expr: {
                   $and: [
                     { $eq: [{ $year: '$createAt' }, year] },
@@ -58,6 +61,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
               .then((march) => {
                 MODEL.userModel
                   .find({
+                    verified : true,
                     $expr: {
                       $and: [
                         { $eq: [{ $year: '$createAt' }, year] },
@@ -71,6 +75,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                   .then((april) => {
                     MODEL.userModel
                       .find({
+                        verified : true,
                         $expr: {
                           $and: [
                             { $eq: [{ $year: '$createAt' }, year] },
@@ -84,6 +89,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                       .then((may) => {
                         MODEL.userModel
                           .find({
+                            verified : true,
                             $expr: {
                               $and: [
                                 { $eq: [{ $year: '$createAt' }, year] },
@@ -97,6 +103,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                           .then((june) => {
                             MODEL.userModel
                               .find({
+                                verified : true,
                                 $expr: {
                                   $and: [
                                     { $eq: [{ $year: '$createAt' }, year] },
@@ -110,6 +117,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                               .then((july) => {
                                 MODEL.userModel
                                   .find({
+                                    verified : true,
                                     $expr: {
                                       $and: [
                                         { $eq: [{ $year: '$createAt' }, year] },
@@ -123,6 +131,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                   .then((Aug) => {
                                     MODEL.userModel
                                       .find({
+                                        verified : true,
                                         $expr: {
                                           $and: [
                                             {
@@ -143,6 +152,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                       .then((sept) => {
                                         MODEL.userModel
                                           .find({
+                                            verified : true,
                                             $expr: {
                                               $and: [
                                                 {
@@ -166,6 +176,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                           .then((Oct) => {
                                             MODEL.userModel
                                               .find({
+                                                verified : true,
                                                 $expr: {
                                                   $and: [
                                                     {
@@ -189,6 +200,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                               .then((Nov) => {
                                                 MODEL.userModel
                                                   .find({
+                                                    verified : true,
                                                     $expr: {
                                                       $and: [
                                                         {
@@ -217,7 +229,8 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                                   })
                                                   .then((Dec) => {
                                                     MODEL.userModel
-                                                      .find({})
+                                                      .find({        verified : true,
+                                                      })
                                                       .then((Analytics) => {
                                                         RESPONSE.status(200).json({
                                                           JANUARY: {
@@ -300,6 +313,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
   try {
     MODEL.collectorModel
       .find({
+        verified : true,
         $expr: {
           $and: [
             { $eq: [{ $year: '$createdAt' }, year] },
@@ -313,6 +327,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
       .then((jan) => {
         MODEL.collectorModel
           .find({
+            verified : true,
             $expr: {
               $and: [
                 { $eq: [{ $year: '$createdAt' }, year] },
@@ -326,6 +341,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
           .then((feb) => {
             MODEL.collectorModel
               .find({
+                verified : true,
                 $expr: {
                   $and: [
                     { $eq: [{ $year: '$createdAt' }, year] },
@@ -339,6 +355,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
               .then((march) => {
                 MODEL.collectorModel
                   .find({
+                    verified : true,
                     $expr: {
                       $and: [
                         { $eq: [{ $year: '$createdAt' }, year] },
@@ -352,6 +369,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                   .then((april) => {
                     MODEL.collectorModel
                       .find({
+                        verified : true,
                         $expr: {
                           $and: [
                             { $eq: [{ $year: '$createdAt' }, year] },
@@ -365,6 +383,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                       .then((may) => {
                         MODEL.collectorModel
                           .find({
+                            verified : true,
                             $expr: {
                               $and: [
                                 { $eq: [{ $year: '$createdAt' }, year] },
@@ -378,6 +397,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                           .then((june) => {
                             MODEL.collectorModel
                               .find({
+                                verified : true,
                                 $expr: {
                                   $and: [
                                     { $eq: [{ $year: '$createdAt' }, year] },
@@ -391,6 +411,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                               .then((july) => {
                                 MODEL.collectorModel
                                   .find({
+                                    verified : true,
                                     $expr: {
                                       $and: [
                                         {
@@ -406,6 +427,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                   .then((Aug) => {
                                     MODEL.collectorModel
                                       .find({
+                                        verified : true,
                                         $expr: {
                                           $and: [
                                             {
@@ -429,6 +451,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                       .then((sept) => {
                                         MODEL.collectorModel
                                           .find({
+                                            verified : true,
                                             $expr: {
                                               $and: [
                                                 {
@@ -452,6 +475,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                           .then((Oct) => {
                                             MODEL.collectorModel
                                               .find({
+                                                verified : true,
                                                 $expr: {
                                                   $and: [
                                                     {
@@ -477,6 +501,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                               .then((Nov) => {
                                                 MODEL.collectorModel
                                                   .find({
+                                                    verified : true,
                                                     $expr: {
                                                       $and: [
                                                         {
@@ -505,7 +530,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                                   })
                                                   .then((Dec) => {
                                                     MODEL.collectorModel
-                                                      .find({})
+                                                      .find({ verified : true })
                                                       .then((Analytics) => {
                                                         RESPONSE.status(200).json({
                                                           JANUARY: {

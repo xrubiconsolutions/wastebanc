@@ -2658,5 +2658,23 @@ organisationController.deleteAdvert = (REQUEST,RESPONSE)=>{
 }
 
 
+organisationController.monifyHook = (REQUEST,RESPONSE)=>{
+  const data = {...REQUEST.body}
+  try{
+
+    MODEL.payOutModel(data).save({}, (ERR, RESULT) => {
+
+      return RESPONSE.status(200).json({
+        message: "Payment initiated successfully"
+      })
+
+  })
+
+  }
+  catch(err){
+    return RESPONSE.status(500).json(err);
+  }
+}
+
 /* export organisationControllers */
 module.exports = organisationController;

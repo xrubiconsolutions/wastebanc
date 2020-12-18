@@ -182,10 +182,45 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                                                           let UserData = {
                                                             ...test , pin_id: iden.pinId
                                                           }
-                                                          console.log("><<>>userdata", UserData)
+
+                                              var data = {
+                                                            "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+                                                            "phone_number": `+234${phoneNo}`,
+                                                            "country_code": "NG"
+                                                          };
+                                              var options = {
+                                                'method': 'GET',
+                                                'url': ' https://termii.com/api/insight/number/query',
+                                                'headers': {
+                                                  'Content-Type': ['application/json', 'application/json']
+                                                },
+                                                body: JSON.stringify(data)
+                                              
+                                              };
+                                              request(options, function (error, response) { 
+                                                if (error) throw new Error(error);
+                                                var mobileData = JSON.parse(response.body);
+                                                var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
+                                              MODEL.userModel.updateOne(
+                                                              { email: RESULT.email },
+                                                              {
+                                                                $set: {
+                                                                  fullname: RESULT.username.split(' ')[0] + " " + RESULT.username.split(' ')[1],
+                                                                  mobile_carrier: mobile_carrier,
+                                                                },
+                                                              },
+                                                              (res) => {
+
                                                           return RESPONSE.status(200).jsonp(
-                                                           UserData
-                                                          );
+                                                            UserData
+                                                           );
+
+                                                              })
+
+                                                            })
+
+
+
                                                         }
                                                       })
 
