@@ -1085,6 +1085,7 @@ userController.newActiveUser = (req, res) => {
   try {
     MODEL.userModel
       .find({
+        verified: true,
         createAt: {
           $gte: active_today,
         },
