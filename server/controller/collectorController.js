@@ -64,6 +64,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                   body: JSON.stringify(data),
                 };
                 request(options, function (error, response) {
+                  console.log("<<>>", response)
                   const iden = JSON.parse(response.body)
                   if (error) {
                     throw new Error(error);
@@ -98,7 +99,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                           { email: RESULT.email },
                           {
                             $set: {
-                              fullname: RESULT.username.split(' ')[0] + " " + RESULT.username.split(' ')[1],
+                              fullname: RESULT.fullname,
                               mobile_carrier: mobile_carrier,
                             },
                           },
