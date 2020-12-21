@@ -1063,6 +1063,7 @@ userController.dailyActive = (req, res) => {
     MODEL.userModel
       .find({
         verified: true,
+        roles: "client",
         last_logged_in: {
           $gte: active_today,
         },
@@ -1086,6 +1087,7 @@ userController.newActiveUser = (req, res) => {
     MODEL.userModel
       .find({
         verified: true,
+        roles: "client",
         createAt: {
           $gte: active_today,
         },
@@ -1379,46 +1381,65 @@ userController.deleteUser = (req,res)=>{
 
 
 userController.userAnalytics = (req,res)=>{
-  const today = new Date();
   const active_today = new Date();
+  active_today.setHours(0,0,0,0);
+
+  active_today.setHours(0,0,0,0)
+  active_today.setHours(active_today.getHours() + 1)
+
+  const yesterday = new Date();
+
+
+  yesterday.setDate(yesterday.getDate()-1);
+  yesterday.setHours(0,0,0,0)
+  yesterday.setHours(yesterday.getHours() + 1)
+
 
   try {
   MODEL.userModel.find({
-    verified: true
+    verified: true, 
+    roles: "client"
   }).then((allUser)=>{
-  active_today.setDate(today.getDate() - 1);
     MODEL.userModel
       .find({
         verified: true,
+        roles: "client",
          createAt: {
-          $gte: active_today,
+          $gte: yesterday
         },
       })
       .sort({ _id: -1 })
       .then((newUser) => {
-
           MODEL.userModel
             .find({
+              roles: "client",
               verified: true,
               last_logged_in: {
-                $gte: active_today,
+                $gte: yesterday,
               },
             })
             .sort({ _id: -1 })
             .then((activeTodayUser) => {
-
               MODEL.userModel.find({
                 verified: true,
+                roles: "client",
                 last_logged_in: {
                   $lte: active_today,
                 }
               }).sort({ _id : -1}).then((InactiveUser)=>{
 
+                console.log("<<>>", allUser.length);
+                console.log("<<>>", newUser.length);
+                console.log(">>>??", activeTodayUser.length);
+                console.log(">>>??", InactiveUser.length);
+                console.log("<<>>>", active_today);
+                console.log("<<users", allUser)
+
                 return res.status(200).json({
                   allUsers: { allUsers: allUser.length },
                   newUsers: { newUsers: newUser.length },
                   activeTodayUsers: { activeTodayUsers : activeTodayUser.length},
-                  inactiveUsers: { inactiveUsers : allUser.length - activeTodayUser.length }
+                  inactiveUsers: { inactiveUsers : InactiveUser.length }
                 })
              })
 
@@ -2119,16 +2140,38 @@ userController.sendPushNotification = (req,res)=>{
 
 
 userController.userInactivity = (req,res)=>{
-  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate()-1);
+  yesterday.setHours(0,0,0,0)
+  yesterday.setHours(yesterday.getHours() + 1);
+
   const active_today = new Date();
-  active_today.setDate(today.getDate() - 1);
+  active_today.setHours(0,0,0,0);
+
+  active_today.setHours(0,0,0,0)
+  active_today.setHours(active_today.getHours() + 1)
+
+  console.log(">><<", active_today)
+
+
+  $or: [
+    {
+      internet_provider: "Glo NG",
+    },
+    {
+      internet_provider: "glo ng",
+    }
+  ]
+
   try{
     MODEL.userModel.find({
       verified: true,
+      roles:"client",
       last_logged_in: {
         $lte: active_today,
       }
     }).sort({ _id : -1}).then((InactiveUser)=>{
+      console.log(InactiveUser.length);
       return res.status(200).json({
         inactiveUsers : InactiveUser 
       })
