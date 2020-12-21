@@ -1889,30 +1889,38 @@ userController.userReportLog = (req,res)=>{
 userController.internet_providerAnalytics = (req,res)=>{
   try{
       MODEL.userModel.find({
+        verified: true,
         internet_provider: "MTN NG"
       }).then((mtn)=>{
           MODEL.collectorModel.find({
+            verified: true,
             internet_provider:"MTN NG"
           }).then((recycler_mtn)=>{
             var mtn_users = [...mtn, ...recycler_mtn];
               MODEL.userModel.find({
+                verified: true,
                 internet_provider:"Airtel NG"
               }).then((airtel)=>{
                   MODEL.collectorModel.find({
+                    verified: true,
                     internet_provider:"Airtel NG"
                   }).then((recycler_airtel)=>{
                     var airtel_users = [...airtel, ...recycler_airtel];
                       MODEL.userModel.find({
+                        verified: true,
                         internet_provider:"Glo LTE"
                       }).then((glo)=>{
                           MODEL.collectorModel.find({
+                            verified: true,
                             internet_provider: "Glo LTE"
                           }).then((recycler_glo)=>{
                               var glo_users = [...glo, ...recycler_glo];
                                 MODEL.userModel.find({
+                                  verified: true,
                                   internet_provider:"9Mobile Nigeria (Etisalat)"
                                 }).then((etisalat)=>{
                                     MODEL.collectorModel.find({
+                                      verified: true,
                                       internet_provider:"9Mobile Nigeria (Etisalat)"
                                     }).then((recycler_etisalat)=>{
                                         var etisalat_users = [...etisalat, ...recycler_etisalat];
