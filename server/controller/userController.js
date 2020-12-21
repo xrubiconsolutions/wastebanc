@@ -1059,6 +1059,9 @@ userController.dailyActive = (req, res) => {
   const today = new Date();
   const active_today = new Date();
   active_today.setDate(today.getDate() - 1);
+  active_today.setHours(0,0,0,0)
+  active_today.setHours(active_today.getHours() + 1)
+
   try {
     MODEL.userModel
       .find({
