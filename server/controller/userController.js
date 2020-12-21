@@ -1898,7 +1898,14 @@ userController.internet_providerAnalytics = (req,res)=>{
   try{
       MODEL.userModel.find({
         verified: true,
-        internet_provider: "MTN NG"
+        $or: [
+          {
+            internet_provider: "MTN NG",
+          },
+          {
+            internet_provider: "MTN",
+          },
+        ]
       }).then((mtn)=>{
           MODEL.collectorModel.find({
             verified: true,
