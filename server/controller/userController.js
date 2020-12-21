@@ -1644,30 +1644,38 @@ userController.usageGrowth = (req,res)=>{
 userController.mobileCarrierAnalytics = (REQUEST,RESPONSE)=>{
   try{
       MODEL.userModel.find({
+        verified: true,
         mobile_carrier: "MTN Nigeria"
       }).then((mtn)=>{
           MODEL.collectorModel.find({
+            verified: true,
             mobile_carrier:"MTN Nigeria"
           }).then((recycler_mtn)=>{
             var mtn_users = [...mtn, ...recycler_mtn];
               MODEL.userModel.find({
+                verified: true,
                 mobile_carrier:"Airtel Nigeria"
               }).then((airtel)=>{
                   MODEL.collectorModel.find({
+                    verified: true,
                     mobile_carrier:"Airtel Nigeria"
                   }).then((recycler_airtel)=>{
                     var airtel_users = [...airtel, ...recycler_airtel];
                       MODEL.userModel.find({
+                        verified: true,
                         mobile_carrier:"Globacom (GLO)"
                       }).then((glo)=>{
                           MODEL.collectorModel.find({
+                            verified: true,
                             mobile_carrier: "Globacom (GLO)"
                           }).then((recycler_glo)=>{
                               var glo_users = [...glo, ...recycler_glo];
                                 MODEL.userModel.find({
+                                  verified: true,
                                   mobile_carrier:"9Mobile Nigeria (Etisalat)"
                                 }).then((etisalat)=>{
                                     MODEL.collectorModel.find({
+                                      verified: true,
                                       mobile_carrier:"9Mobile Nigeria (Etisalat)"
                                     }).then((recycler_etisalat)=>{
                                         var etisalat_users = [...etisalat, ...recycler_etisalat];
