@@ -1672,11 +1672,11 @@ userController.mobileCarrierAnalytics = (REQUEST,RESPONSE)=>{
                               var glo_users = [...glo, ...recycler_glo];
                                 MODEL.userModel.find({
                                   verified: true,
-                                  mobile_carrier:"9Mobile Nigeria (Etisalat)"
+                                  mobile_carrier:"9Mobile"
                                 }).then((etisalat)=>{
                                     MODEL.collectorModel.find({
                                       verified: true,
-                                      mobile_carrier:"9Mobile Nigeria (Etisalat)"
+                                      mobile_carrier:"9Mobile"
                                     }).then((recycler_etisalat)=>{
                                         var etisalat_users = [...etisalat, ...recycler_etisalat];
                                          return RESPONSE.status(200).json({
