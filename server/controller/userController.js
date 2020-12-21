@@ -1967,11 +1967,11 @@ userController.internet_providerAnalytics = (req,res)=>{
                               var glo_users = [...glo, ...recycler_glo];
                                 MODEL.userModel.find({
                                   verified: true,
-                                  internet_provider:"9Mobile"
+                                  internet_provider:"9mobile"
                                 }).then((etisalat)=>{
                                     MODEL.collectorModel.find({
                                       verified: true,
-                                      internet_provider:"9Mobile"
+                                      internet_provider:"9mobile"
                                     }).then((recycler_etisalat)=>{
                                         var etisalat_users = [...etisalat, ...recycler_etisalat];
                                          return res.status(200).json({
