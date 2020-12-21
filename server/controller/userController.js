@@ -1248,13 +1248,15 @@ userController.androidUsers = (req, res) => {
   try {
     MODEL.userModel
       .find({
+        verified: true,
         phone_OS: 'android',
       }).sort({
         _id : -1
       })
         .then((result) => {
       
-          MODEL.collectorModel.find({phone_OS:"android"}).sort({
+          MODEL.collectorModel.find({      verified: true,
+            phone_OS:"android"}).sort({
             _id : -1
           }).then(recycler=>{
             var data = [...result, ...recycler]
@@ -1328,11 +1330,13 @@ userController.deviceAnalytics  = (REQUEST,RESPONSE)=>{
   try {
     MODEL.userModel
     .find({
+      verified: true,
       phone_OS: 'android',
     }).sort({ _id : -1})
     .then((android) => {
 
       MODEL.userModel.find({
+        verified: true,
         phone_OS: "ios"
       }).sort({ _id : -1}).then((ios)=>{
 
@@ -1422,22 +1426,34 @@ userController.userAnalytics = (req,res)=>{
               $or: [
                 {
                 last_logged_in: {
-                  $gte: yesterday,
-                },
+                  $gte: active_today,
+                }
+              }, {
                 createAt: {
                   $gte: yesterday
                 }
               }
+              
               ],
             })
             .sort({ _id: -1 })
             .then((activeTodayUser) => {
               MODEL.userModel.find({
-                verified: true,
-                roles: "client",
-                last_logged_in: {
-                  $lte: active_today,
+                verified: true,                                   
+                roles: "client",  
+                $or: [
+                  {
+                    last_logged_in: {
+                      $lte: active_today,
+                    }
+                }, {
+                  last_logged_in: {
+                    $exists: false,
+                    $eq: null
+                   }
                 }
+                
+                ]
               }).sort({ _id : -1}).then((InactiveUser)=>{
 
                 console.log("<<>>", allUser.length);
@@ -1445,7 +1461,8 @@ userController.userAnalytics = (req,res)=>{
                 console.log(">>>??", activeTodayUser.length);
                 console.log(">>>??", InactiveUser.length);
                 console.log("<<>>>", active_today);
-                console.log("<<users", allUser)
+                console.log("<<users", InactiveUser
+                )
 
                 return res.status(200).json({
                   allUsers: { allUsers: allUser.length },
@@ -1500,6 +1517,7 @@ userController.usageGrowth = (req,res)=>{
   try{
 
     MODEL.userModel.find({
+      verified: true,
       "$expr": {
         "$and": [
           {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1508,6 +1526,7 @@ userController.usageGrowth = (req,res)=>{
       }
     }).then((jan) => {
       MODEL.userModel.find({
+        verified: true,
         "$expr": {
           "$and": [
             {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1517,6 +1536,7 @@ userController.usageGrowth = (req,res)=>{
       }).then((feb)=>{
 
         MODEL.userModel.find({
+          verified: true,
           "$expr": {
             "$and": [
               {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1526,6 +1546,7 @@ userController.usageGrowth = (req,res)=>{
         }).then((march)=>{
 
           MODEL.userModel.find({
+            verified: true,
             "$expr": {
               "$and": [
                 {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1535,6 +1556,7 @@ userController.usageGrowth = (req,res)=>{
           }).then((april)=>{
 
             MODEL.userModel.find({
+              verified: true,
               "$expr": {
                 "$and": [
                   {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1544,6 +1566,7 @@ userController.usageGrowth = (req,res)=>{
             }).then((may)=>{
 
               MODEL.userModel.find({
+                verified: true,
                 "$expr": {
                   "$and": [
                     {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1553,6 +1576,7 @@ userController.usageGrowth = (req,res)=>{
               }).then((june)=>{
 
                 MODEL.userModel.find({
+                  verified: true,
                   "$expr": {
                     "$and": [
                       {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1562,6 +1586,7 @@ userController.usageGrowth = (req,res)=>{
                 }).then((july)=>{
 
                   MODEL.userModel.find({
+                    verified: true,
                     "$expr": {
                       "$and": [
                         {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1571,6 +1596,7 @@ userController.usageGrowth = (req,res)=>{
                   }).then((Aug)=>{
 
                     MODEL.userModel.find({
+                      verified: true,
                       "$expr": {
                         "$and": [
                           {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1581,6 +1607,7 @@ userController.usageGrowth = (req,res)=>{
 
 
                       MODEL.userModel.find({
+                        verified: true,
                         "$expr": {
                           "$and": [
                             {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1590,6 +1617,7 @@ userController.usageGrowth = (req,res)=>{
                       }).then((Oct)=>{
 
                         MODEL.userModel.find({
+                          verified: true,
                           "$expr": {
                             "$and": [
                               {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1599,6 +1627,7 @@ userController.usageGrowth = (req,res)=>{
                         }).then((Nov)=>{
 
                           MODEL.userModel.find({
+                            verified: true,
                             "$expr": {
                               "$and": [
                                 {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1608,6 +1637,7 @@ userController.usageGrowth = (req,res)=>{
                           }).then((Dec)=>{
 
                             MODEL.userModel.find({
+                              verified: true,
                               "$expr": {
                                 "$and": [
                                   {"$eq": [{ "$year": "$createAt" }, year]},
