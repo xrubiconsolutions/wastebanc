@@ -1909,16 +1909,37 @@ userController.internet_providerAnalytics = (req,res)=>{
       }).then((mtn)=>{
           MODEL.collectorModel.find({
             verified: true,
-            internet_provider:"MTN NG"
+            $or: [
+              {
+                internet_provider: "MTN NG",
+              },
+              {
+                internet_provider: "MTN",
+              },
+            ]
           }).then((recycler_mtn)=>{
             var mtn_users = [...mtn, ...recycler_mtn];
               MODEL.userModel.find({
                 verified: true,
-                internet_provider:"Airtel NG"
+                $or: [
+                  {
+                    internet_provider: "Airtel NG",
+                  },
+                  {
+                    internet_provider: "BeSafe Airtel",
+                  },
+                ]
               }).then((airtel)=>{
                   MODEL.collectorModel.find({
                     verified: true,
-                    internet_provider:"Airtel NG"
+                    $or: [
+                      {
+                        internet_provider: "Airtel NG",
+                      },
+                      {
+                        internet_provider: "BeSafe Airtel",
+                      },
+                    ]
                   }).then((recycler_airtel)=>{
                     var airtel_users = [...airtel, ...recycler_airtel];
                       MODEL.userModel.find({
