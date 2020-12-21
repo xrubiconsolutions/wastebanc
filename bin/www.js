@@ -119,8 +119,24 @@ cron.schedule('01 7 * * *', function(){
 });
 
 
-// MODEL.collectorModel.find({verified: true}).then((organisations)=>{
+// MODEL.userModel.find({verified: true}).then((organisations)=>{
 //   for(let i = 0 ; i < organisations.length ; i++){
+
+
+//     MODEL.userrModel.updateOne(
+//       { email: organisations[i].email },
+//       {
+//         $set: {
+//           fullname: mobile_carrier,
+//         },
+//       },
+//       (res) => {
+//         console.log("success")
+
+//         return "Done"
+//       })
+
+
 
 //     var phoneNo = String(organisations[i].phone).substring(1,11);
 
@@ -158,6 +174,7 @@ cron.schedule('01 7 * * *', function(){
     
 //                   })
  
+//   }
 //   }
 // }
 // )
