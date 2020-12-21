@@ -15,6 +15,7 @@ const PATH         = require("path");
 const BOOTSTRAPING = require("../server/util/Bootstraping/Bootstraping");
 const MODEL = require("../server/models")
 const cron = require('node-cron');
+var request = require('request');
 
 var nodemailer = require("nodemailer");
 
@@ -115,7 +116,57 @@ cron.schedule('01 7 * * *', function(){
         })           
     }
   })
-})
+});
+
+
+// MODEL.collectorModel.find({verified: true}).then((organisations)=>{
+//   for(let i = 0 ; i < organisations.length ; i++){
+
+//     var phoneNo = String(organisations[i].phone).substring(1,11);
+
+//     var data = {
+//       "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+//       "phone_number": `+234${phoneNo}`,
+//       "country_code": "NG"
+//     };
+// var options = {
+// 'method': 'GET',
+// 'url': ' https://termii.com/api/insight/number/query',
+// 'headers': {
+// 'Content-Type': ['application/json', 'application/json']
+// },
+// body: JSON.stringify(data)
+
+// };
+
+//     request(options, function (error, response) { 
+//       if (error) throw new Error(error);
+//       var mobileData = JSON.parse(response.body);
+//       var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
+//     MODEL.collectorModel.updateOne(
+//                     { email: organisations[i].email },
+//                     {
+//                       $set: {
+//                         mobile_carrier: mobile_carrier,
+//                       },
+//                     },
+//                     (res) => {
+//                       console.log("success")
+    
+//                       return "Done"
+//                     })
+    
+//                   })
+ 
+//   }
+// }
+// )
+
+
+
+
+
+
   
 const cors = require("cors");
 

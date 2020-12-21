@@ -1951,6 +1951,9 @@ userController.internet_providerAnalytics = (req,res)=>{
                           {
                             internet_provider: "glo ng",
                           },
+                          {
+                            internet_provider: "STAY SAFE",
+                          }
                         ]
                       }).then((glo)=>{
                           MODEL.collectorModel.find({
@@ -1962,6 +1965,9 @@ userController.internet_providerAnalytics = (req,res)=>{
                               {
                                 internet_provider: "glo ng",
                               },
+                              {
+                                internet_provider: "STAY SAFE",
+                              }
                             ]
                           }).then((recycler_glo)=>{
                               var glo_users = [...glo, ...recycler_glo];
