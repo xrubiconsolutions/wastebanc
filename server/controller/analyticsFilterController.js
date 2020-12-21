@@ -20,6 +20,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
     MODEL.userModel
       .find({
         verified : true,
+        roles: "client",
         $expr: {
           $and: [
             { $eq: [{ $year: '$createAt' }, year] },
@@ -33,6 +34,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
       .then((jan) => {
         MODEL.userModel
           .find({
+            roles: "client",
             verified : true,
             $expr: {
               $and: [
@@ -47,6 +49,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
           .then((feb) => {
             MODEL.userModel
               .find({
+                roles: "client",
                 verified : true,
                 $expr: {
                   $and: [
@@ -61,6 +64,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
               .then((march) => {
                 MODEL.userModel
                   .find({
+                    roles: "client",
                     verified : true,
                     $expr: {
                       $and: [
@@ -75,6 +79,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                   .then((april) => {
                     MODEL.userModel
                       .find({
+                        roles: "client",
                         verified : true,
                         $expr: {
                           $and: [
@@ -89,6 +94,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                       .then((may) => {
                         MODEL.userModel
                           .find({
+                            roles: "client",
                             verified : true,
                             $expr: {
                               $and: [
@@ -103,6 +109,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                           .then((june) => {
                             MODEL.userModel
                               .find({
+                                roles: "client",
                                 verified : true,
                                 $expr: {
                                   $and: [
@@ -117,6 +124,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                               .then((july) => {
                                 MODEL.userModel
                                   .find({
+                                    roles: "client",
                                     verified : true,
                                     $expr: {
                                       $and: [
@@ -131,6 +139,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                   .then((Aug) => {
                                     MODEL.userModel
                                       .find({
+                                        roles: "client",
                                         verified : true,
                                         $expr: {
                                           $and: [
@@ -152,6 +161,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                       .then((sept) => {
                                         MODEL.userModel
                                           .find({
+                                            roles: "client",
                                             verified : true,
                                             $expr: {
                                               $and: [
@@ -176,6 +186,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                           .then((Oct) => {
                                             MODEL.userModel
                                               .find({
+                                                roles: "client",
                                                 verified : true,
                                                 $expr: {
                                                   $and: [
@@ -200,6 +211,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                               .then((Nov) => {
                                                 MODEL.userModel
                                                   .find({
+                                                    roles: "client",
                                                     verified : true,
                                                     $expr: {
                                                       $and: [
@@ -229,7 +241,9 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                                   })
                                                   .then((Dec) => {
                                                     MODEL.userModel
-                                                      .find({        verified : true,
+                                                      .find({ 
+                                                        roles: "client",
+                                                        verified : true,
                                                       })
                                                       .then((Analytics) => {
                                                         RESPONSE.status(200).json({
