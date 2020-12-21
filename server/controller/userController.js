@@ -1663,11 +1663,11 @@ userController.mobileCarrierAnalytics = (REQUEST,RESPONSE)=>{
                     var airtel_users = [...airtel, ...recycler_airtel];
                       MODEL.userModel.find({
                         verified: true,
-                        mobile_carrier:"Globacom (GLO)"
+                        mobile_carrier:"GLO Nigeria"
                       }).then((glo)=>{
                           MODEL.collectorModel.find({
                             verified: true,
-                            mobile_carrier: "Globacom (GLO)"
+                            mobile_carrier: "GLO Nigeria"
                           }).then((recycler_glo)=>{
                               var glo_users = [...glo, ...recycler_glo];
                                 MODEL.userModel.find({
