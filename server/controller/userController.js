@@ -1644,10 +1644,10 @@ userController.usageGrowth = (req,res)=>{
 userController.mobileCarrierAnalytics = (REQUEST,RESPONSE)=>{
   try{
       MODEL.userModel.find({
-        mobile_carrier: "MTN"
+        mobile_carrier: "MTN Nigeria"
       }).then((mtn)=>{
           MODEL.collectorModel.find({
-            mobile_carrier:"MTN"
+            mobile_carrier:"MTN Nigeria"
           }).then((recycler_mtn)=>{
             var mtn_users = [...mtn, ...recycler_mtn];
               MODEL.userModel.find({
