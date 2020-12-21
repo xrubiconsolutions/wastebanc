@@ -1905,7 +1905,6 @@ userController.internet_providerAnalytics = (req,res)=>{
           {
             internet_provider: "MTN",
           },
-          ,
                           {
                             internet_provider: "STAY SAFE",
                           }
@@ -1920,7 +1919,6 @@ userController.internet_providerAnalytics = (req,res)=>{
               {
                 internet_provider: "MTN",
               },
-              ,
                           {
                             internet_provider: "STAY SAFE",
                           }
