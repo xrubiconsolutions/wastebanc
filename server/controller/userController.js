@@ -1395,7 +1395,9 @@ userController.userAnalytics = (req,res)=>{
 
   yesterday.setDate(yesterday.getDate()-1);
   yesterday.setHours(0,0,0,0)
-  yesterday.setHours(yesterday.getHours() + 1)
+  yesterday.setHours(yesterday.getHours() + 1);
+
+ 
 
 
   try {
@@ -1417,9 +1419,16 @@ userController.userAnalytics = (req,res)=>{
             .find({
               roles: "client",
               verified: true,
-              last_logged_in: {
-                $gte: yesterday,
-              },
+              $or: [
+                {
+                last_logged_in: {
+                  $gte: yesterday,
+                },
+                createAt: {
+                  $gte: yesterday
+                }
+              }
+              ],
             })
             .sort({ _id: -1 })
             .then((activeTodayUser) => {
