@@ -1916,11 +1916,25 @@ userController.internet_providerAnalytics = (req,res)=>{
                     var airtel_users = [...airtel, ...recycler_airtel];
                       MODEL.userModel.find({
                         verified: true,
-                        internet_provider:"Glo LTE"
+                        $or: [
+                          {
+                            internet_provider: "Glo NG",
+                          },
+                          {
+                            internet_provider: "glo ng",
+                          },
+                        ]
                       }).then((glo)=>{
                           MODEL.collectorModel.find({
                             verified: true,
-                            internet_provider: "Glo LTE"
+                            $or: [
+                              {
+                                internet_provider: "Glo NG",
+                              },
+                              {
+                                internet_provider: "glo ng",
+                              },
+                            ]
                           }).then((recycler_glo)=>{
                               var glo_users = [...glo, ...recycler_glo];
                                 MODEL.userModel.find({
