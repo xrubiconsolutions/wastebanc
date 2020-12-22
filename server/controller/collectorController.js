@@ -530,9 +530,6 @@ collectorController.resendVerification = (REQUEST, RESPONSE) => {
   var error = {};
   var phone = REQUEST.body.phone;
 
-  const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
-  const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
-  const client = require('twilio')(accountSid, authToken);
 
   try {
     var phoneNo = String(phone).substring(1,11);
@@ -563,18 +560,6 @@ collectorController.resendVerification = (REQUEST, RESPONSE) => {
 
       return RESPONSE.status(200).json(JSON.parse(response.body));
     });
-
-    // client.verify
-    //   .services("VAeaa492de9598c3dcce55fd9243461ab3")
-    //   .verifications.create({
-    //     to: `+234${phone}`,
-    //     channel: "sms",
-    //   })
-    //   .then((verification) => {
-    //     console.log(verification.status);
-    //     RESPONSE.status(200).jsonp({ message: "Verification code sent" });
-    //   })
-    //   .catch((err) => RESPONSE.status(404).jsonp(err));
   } catch (err) {
     return RESPONSE.status(400).jsonp(err);
   }
@@ -1083,5 +1068,111 @@ collectorController.collectorActivityAnalytics = (req, res) => {
     return res.status(500).json(err);
   }
 };
+
+
+collectorController.resetMobile = (REQUEST, RESPONSE) => {
+  const phone = REQUEST.body.phone;
+  const token = REQUEST.body.token;
+
+
+  var phoneNo = String(phone).substring(1,11);
+
+  console.log("<<phone >>", phoneNo)
+
+  var data = {
+    "api_key" : "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+    "message_type" : "NUMERIC",
+    "to" : `+234${phoneNo}`,
+    "from" : "N-Alert",
+    "channel" : "dnd",
+    "pin_attempts" : 10,
+    "pin_time_to_live" :  5,
+    "pin_length" : 4,
+    "pin_placeholder" : "< 1234 >",
+    "message_text" : "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+    "pin_type" : "NUMERIC"
+ };
+var options = {
+'method': 'POST',
+'url': 'https://termii.com/api/sms/otp/send',
+'headers': {
+'Content-Type': ['application/json', 'application/json']
+},
+body: JSON.stringify(data)
+
+};
+request(options, function (error, response) { 
+if (error) throw new Error(error);
+
+var data = {
+  "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+  "pin_id": pin_id,
+  "pin": token
+};
+var options = {
+'method': 'POST',
+'url': 'https://termii.com/api/sms/otp/verify',
+'headers': {
+'Content-Type': ['application/json', 'application/json']
+},
+body: JSON.stringify(data)
+};
+request(options, function (error, response) { 
+if (error) throw new Error(error);
+
+MODEL.collectorModel.updateOne(
+  { phone: phone },
+  { verified: true },
+  (res) => {
+
+    MODEL.collectorModel
+      .findOne({ "phone": phone }, (err,USER) => {
+        var test = JSON.parse(JSON.stringify(USER))
+        if (err) return RESPONSE.status(400).jsonp(error)
+        console.log("user here at all", USER)
+        var jwtToken = COMMON_FUN.createToken(
+          test
+        ); /** creating jwt token */
+        console.log("user token here at all", USER)
+        test.token = jwtToken;
+        return RESPONSE.jsonp(test);
+          
+      })
+  }
+);
+
+})
+}
+)
+}
+
+
+collectorController.resetMobilePassword = (REQUEST, RESPONSE) => {
+  const phone = REQUEST.body.phone;
+  MODEL.collectorModel.findOne({ phone: phone }).then((result) => {
+    if (!result) {
+      return RESPONSE.status(400).json({
+        message: ' This account is not verified ',
+      });
+    }
+
+    COMMON_FUN.encryptPswrd(REQUEST.body.password, (ERR, HASH) => {
+      /********** update password in usermodel ********/
+      MODEL.collectorModel
+        .updateOne({ phone: phone }, { $set: { password: HASH } })
+        .then((SUCCESS) => {
+          return RESPONSE.jsonp(
+            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
+          );
+        })
+        .catch((ERR) => {
+          return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+        });
+    });
+  });
+};
+
+
+
 
 module.exports = collectorController;

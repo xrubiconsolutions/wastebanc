@@ -879,8 +879,6 @@ userController.resetMobile = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
   const token = REQUEST.body.token;
 
-  const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
-  const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
 
 
   var phoneNo = String(phone).substring(1,11);
@@ -928,12 +926,12 @@ body: JSON.stringify(data)
 request(options, function (error, response) { 
 if (error) throw new Error(error);
 
-MODEL.collectorModel.updateOne(
+MODEL.userModel.updateOne(
   { phone: phone },
   { verified: true },
   (res) => {
 
-    MODEL.collectorModel
+    MODEL.userModel
       .findOne({ "phone": phone }, (err,USER) => {
         var test = JSON.parse(JSON.stringify(USER))
         if (err) return RESPONSE.status(400).jsonp(error)
