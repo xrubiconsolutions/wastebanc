@@ -77,6 +77,9 @@ validateUser.adminPakamValidation = (REQUEST, RESPONSE ,NEXT )=>{
     (validated && validated.roles === "admin") ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 }
 
+
+
+
 validateUser.companyValidation = (REQUEST,RESPONSE,NEXT)=>{
     if(!REQUEST.headers.authorization){
         return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED)

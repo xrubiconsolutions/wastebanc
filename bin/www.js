@@ -59,6 +59,33 @@ var sendNotification = function (data) {
   req.end();
 };
 
+cron.schedule('* * * * *', function() {
+  console.log("<wallet check>")
+  MODEL.organisationModel.find({
+  }).then((val)=>{
+    for(let i = 0; i < val.length ; i++){
+      MODEL.transactionModel
+      .find({ organisationID: val[i]._id, paid : false  })
+      .sort({ _id: -1 })
+      .then((recycler, err) => {
+        let totalCoin = recycler
+          .map((val) => val.coin)
+          .reduce((acc, curr) => acc + curr,0);
+          MODEL.organisationModel.updateOne(
+            { "email": `${val[i].email}` },
+           { "$set": { "wallet" : totalCoin } },
+            (err, resp) => {
+              if (err) {
+                return RESPONSE.status(400).jsonp(err);
+              }             
+            }
+          );
+      })
+      .catch((err) => console.log(err));
+    }
+  })
+  })
+  
 
 cron.schedule('* * 1 * *', function() {
     var today = new Date();
@@ -178,7 +205,6 @@ cron.schedule('01 7 * * *', function(){
 //   }
 // }
 // )
-
 
 
 

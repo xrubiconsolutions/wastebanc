@@ -85,6 +85,10 @@ const organisation_Schema = new Schema({
   createAt: {
     type: Date,
     default: Date.now,
+  },
+  wallet : {
+    type: Number,
+    default: 0
   }
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);

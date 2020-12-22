@@ -303,7 +303,7 @@ organisationController.coinBank = (req, res) => {
       console.log(recycler.coin);
       let totalCoin = recycler
         .map((val) => val.coin)
-        .reduce((acc, curr) => acc + curr);
+        .reduce((acc, curr) => acc + curr,0);
       return res.status(200).json({
         totalCoinTransaction: totalCoin,
       });
@@ -2684,6 +2684,46 @@ organisationController.monifyReceipts = (REQUEST, RESPONSE)=>{
   }
   catch(err){
       return RESPONSE.status(500).json(err);
+  }
+}
+
+organisationController.payPortal = (REQUEST, RESPONSE)=>{
+  const organisation_id = REQUEST.body.organisation_id;
+  try{
+    MODEL.organisationModel.find({
+      _id : organisation_id
+    }).then((organisation)=>{  
+      MODEL.organisationModel.updateOne(
+        { _id: organisation._id },
+        { wallet : 0 },
+        (err, resp) => {
+          if (err) {
+            return RESPONSE.status(400).jsonp(err);
+          }
+          MODEL.transactionModel
+    .find({ organisationID: organisationID })
+    .sort({ _id: -1 })
+    .then((recycler) => { 
+      for(let i = 0 ; i < recycler.length ; i++){
+        MODEL.transactionModel.updateOne(
+          { "_id": `${recycler[i]._id}` },
+         { "$set": { "paid" : true } },
+          (err, resp) => {
+            if (err) {
+              return RESPONSE.status(400).jsonp(err);
+            }
+          }
+        );
+      }
+    })
+          return RESPONSE.status(200).json({ message: "Payout success!" });
+        }
+      );
+    })
+
+  }
+  catch(err){
+    return RESPONSE.status(500).json(err);
   }
 }
 

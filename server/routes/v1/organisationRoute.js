@@ -194,5 +194,10 @@ module.exports = (APP) => {
         auth.adminPakamValidation,
         CONTROLLER.organisationController.monifyReceipts
     )
+
+    APP.route('/api/pay/portal').post(
+        auth.companyValidation,
+        CONTROLLER.organisationController.payPortal
+    )
                
 };
