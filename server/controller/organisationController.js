@@ -2676,5 +2676,16 @@ organisationController.monifyHook = (REQUEST,RESPONSE)=>{
   }
 }
 
+organisation.monifyReceipts = (REQUEST, RESPONSE)=>{
+  try{
+    MODEL.payOutModel.find({}).sort({ _id: -1 }).then((receipts)=>{
+        return RESPONSE.status(200).json(receipts)
+    })
+  }
+  catch(err){
+      return RESPONSE.status(500).json(err);
+  }
+}
+
 /* export organisationControllers */
 module.exports = organisationController;

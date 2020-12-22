@@ -190,5 +190,9 @@ module.exports = (APP) => {
     APP.route('/api/monify/payment').post(
         CONTROLLER.organisationController.monifyHook
     )
+    APP.route('/api/monify/receipts').get(
+        auth.adminPakamValidation,
+        CONTROLLER.organisationController.monifyHook
+    )
                
 };

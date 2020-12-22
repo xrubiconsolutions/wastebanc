@@ -143,6 +143,7 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE) => {
 };
 
 scheduleController.updateSchedule = (REQUEST, RESPONSE) => {
+  try {
   MODEL.userModel
     .find({ cardID: REQUEST.cardID })
     .then((result) => {
@@ -155,64 +156,79 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE) => {
               { $set: { completionStatus: REQUEST.body.completionStatus } }
             )
             .then((SUCCESS) => {
-              request(
-                {
-                  url:
-                    'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
-                  method: 'POST',
-                  json: true,
-                  body: {
-                    data: { username: 'xrubicon', password: 'xrubicon1234' },
-                  },
-                },
-                function (error, response, body) {
-                  response.headers.token;
 
-                  request(
-                    {
-                      url:
-                        'https://apis.touchandpay.me/lawma-backend/v1/agent/create/agent/transaction',
-                      method: 'POST',
-                      headers: {
-                        Accept: 'application/json',
-                        'Accept-Charset': 'utf-8',
-                        Token: response.headers.token,
-                      },
-                      json: true,
-                      body: {
-                        data: {
-                          deviceID: 'DEVICE_ID', //"DEVICE_ID"
-                          organizationID: '7', // 7
-                          weight: REQUEST.body.weight,
-                          cardID: REQUEST.body.cardID,
-                        },
-                      },
-                    },
-                    function (error, response, body) {
-                      MODEL.scheduleModel.updateOne(
+              MODEL.scheduleModel.updateOne(
                         { _id: schedule._id },
                         { $set: { completionStatus: 'completed' } },
                         (res) => {
                           console.log(res);
+
+                          return RESPONSE.status(200).jsonp(
+                            COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
+                          );
+                        })
+              
                         }
                       );
                       console.log(response);
                     }
                   );
-                }
-              );
-              return RESPONSE.status(200).jsonp(
-                COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
-              );
-            })
-            .catch((ERR) => {
-              return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-            });
-        });
     })
-    .catch((err) => RESPONSE.status(500).jsonp(err));
+  }
+  catch(err){
+    return RESPONSE.status(500).json(err);
+  }
+  }
+              // request(
+              //   {
+              //     url:
+              //       'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
+              //     method: 'POST',
+              //     json: true,
+              //     body: {
+              //       data: { username: 'xrubicon', password: 'xrubicon1234' },
+              //     },
+              //   },
+              //   // function (error, response, body) {
+              //   //   response.headers.token;
 
-};
+              //   //   request(
+              //   //     {
+              //   //       url:
+              //   //         'https://apis.touchandpay.me/lawma-backend/v1/agent/create/agent/transaction',
+              //   //       method: 'POST',
+              //   //       headers: {
+              //   //         Accept: 'application/json',
+              //   //         'Accept-Charset': 'utf-8',
+              //   //         Token: response.headers.token,
+              //   //       },
+              //   //       json: true,
+              //   //       body: {
+              //   //         data: {
+              //   //           deviceID: 'DEVICE_ID', //"DEVICE_ID"
+              //   //           organizationID: '7', // 7
+              //   //           weight: REQUEST.body.weight,
+              //   //           cardID: REQUEST.body.cardID,
+              //   //         },
+              //   //       },
+              //   //     },
+              //   //     function (error, response, body) {
+              //   //       MODEL.scheduleModel.updateOne(
+              //   //         { _id: schedule._id },
+              //   //         { $set: { completionStatus: 'completed' } },
+              //   //         (res) => {
+              //   //           console.log(res);
+              //   //         }
+              //   //       );
+              //   //       console.log(response);
+              //   //     }
+              //   //   );
+              //   // }
+              // );
+            // .catch((ERR) => {
+            //   return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+            // });
+
 
 scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
   var errors = {};
