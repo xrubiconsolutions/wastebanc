@@ -71,7 +71,7 @@ module.exports = (APP) => {
     .post(CONTROLLER.collectorController.triggerActivity);
 
     APP.route('/api/collector/reset/password')
-    .post(auth.recyclerValidation,CONTROLLER.collectorController.resetMobile);
+    .post(auth.recyclerValidation, CONTROLLER.collectorController.resetMobile);
 
     APP.route('/api/collector/reset/change/password')
     .post(auth.recyclerValidation,CONTROLLER.collectorController.resetMobilePassword);
