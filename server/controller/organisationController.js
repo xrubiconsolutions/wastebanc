@@ -2676,7 +2676,7 @@ organisationController.monifyHook = (REQUEST,RESPONSE)=>{
   }
 }
 
-organisation.monifyReceipts = (REQUEST, RESPONSE)=>{
+organisationController.monifyReceipts = (REQUEST, RESPONSE)=>{
   try{
     MODEL.payOutModel.find({}).sort({ _id: -1 }).then((receipts)=>{
         return RESPONSE.status(200).json(receipts)
