@@ -1275,13 +1275,16 @@ userController.iosUsers = (req, res) => {
   try {
     MODEL.userModel
       .find({
+        verified: true,
         phone_OS: 'ios',
       }).sort({
         _id : -1
       })
       .then((result) => {
 
-        MODEL.collectorModel.find({phone_OS:"ios"}).sort({
+        MODEL.collectorModel.find({
+          verified: true,
+          phone_OS:"ios"}).sort({
           _id : -1
         }).then(recycler=>{
           var data = [...result, ...recycler]
@@ -1338,7 +1341,6 @@ userController.deviceAnalytics  = (REQUEST,RESPONSE)=>{
               verified: true,
               phone_OS: "ios"
             }).then((ios_re)=>{
-
       MODEL.userModel.find({
         verified: true,
         phone_OS: "ios"
@@ -1356,6 +1358,8 @@ userController.deviceAnalytics  = (REQUEST,RESPONSE)=>{
           },
           function (err, resp){
             var desktop = JSON.parse(resp.body);
+            console.log("<ios re>", ios_re.length);
+            console.log("<ios us>", ios.length)
             return RESPONSE.status(200).json({
               android: android.length + android_re.length,
               ios: ios.length + ios_re.length,
