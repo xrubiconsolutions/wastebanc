@@ -73,7 +73,7 @@ cron.schedule('* * * * *', function() {
           .reduce((acc, curr) => acc + curr,0);
           MODEL.organisationModel.updateOne(
             { "email": `${val[i].email}` },
-           { "$set": { "wallet" : totalCoin } },
+           { "$set": { "wallet" : totalCoin * 10 } },
             (err, resp) => {
               if (err) {
                 return RESPONSE.status(400).jsonp(err);
