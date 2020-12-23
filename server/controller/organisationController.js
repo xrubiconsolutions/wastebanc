@@ -2678,8 +2678,9 @@ organisationController.monifyHook = (REQUEST,RESPONSE)=>{
 }
 
 organisationController.monifyReceipts = (REQUEST, RESPONSE)=>{
+  const email = REQUEST.query.email;
   try{
-    MODEL.payOutModel.find({}).sort({ _id: -1 }).then((receipts)=>{
+    MODEL.payOutModel.find({ "customer.email" : email }).sort({ _id: -1 }).then((receipts)=>{
         return RESPONSE.status(200).json(receipts)
     })
   }
