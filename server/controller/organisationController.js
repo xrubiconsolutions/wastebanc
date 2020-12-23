@@ -2701,7 +2701,7 @@ organisationController.payPortal = (REQUEST, RESPONSE)=>{
             return RESPONSE.status(400).jsonp(err);
           }
           MODEL.transactionModel
-    .find({ organisationID: organisationID })
+    .find({ organisationID: organisation_id })
     .sort({ _id: -1 })
     .then((recycler) => { 
       for(let i = 0 ; i < recycler.length ; i++){
