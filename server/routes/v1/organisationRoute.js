@@ -191,7 +191,7 @@ module.exports = (APP) => {
         CONTROLLER.organisationController.monifyHook
     )
     APP.route('/api/monify/receipts').get(
-        auth.adminPakamValidation,
+        auth.companyValidation,
         CONTROLLER.organisationController.monifyReceipts
     )
 

@@ -1332,6 +1332,12 @@ userController.deviceAnalytics  = (REQUEST,RESPONSE)=>{
       phone_OS: 'android',
     }).sort({ _id : -1})
     .then((android) => {
+      MODEL.collectorModel.find({  verified: true,
+        phone_OS: 'android' }).then((android_re)=>{
+            MODEL.collectorModel.find({
+              verified: true,
+              phone_OS: "ios"
+            }).then((ios_re)=>{
 
       MODEL.userModel.find({
         verified: true,
@@ -1351,14 +1357,18 @@ userController.deviceAnalytics  = (REQUEST,RESPONSE)=>{
           function (err, resp){
             var desktop = JSON.parse(resp.body);
             return RESPONSE.status(200).json({
-              android: android.length,
-              ios: ios.length,
+              android: android.length + android_re.length,
+              ios: ios.length + ios_re.length,
               desktop: desktop.length
             })
 
         })
 
       })
+            })
+
+        })
+
     });
 } catch (err) {
   RESPONSE.status(500).json(err);
