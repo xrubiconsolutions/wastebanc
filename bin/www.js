@@ -28,6 +28,8 @@ var transporter = nodemailer.createTransport({
 });
 
 
+
+
 var sendNotification = function (data) {
   
   var headers = {
@@ -216,6 +218,8 @@ const cors = require("cors");
 
 
 var fileUpload = require('express-fileupload');
+const reportModel = require("../server/models/reportModel");
+const reportModelLog = require("../server/models/reportModelLog");
 
 
 
@@ -259,6 +263,23 @@ var fileUpload = require('express-fileupload');
 
 /**creating express server app for server */
 const app  = EXPRESS();
+
+const changeStream =  reportModelLog.watch();  
+
+
+changeStream.on('change', function(change) {
+  console.log('COLLECTION CHANGED');
+
+  reportModelLog.find({}, (err, data) => {
+      if (err) throw err;
+
+      if (data) {
+          // RESEND ALL USERS
+          console.log(data[data.length-1])
+          // socket.emit('users', data);
+      }
+  });
+});
 
 
 

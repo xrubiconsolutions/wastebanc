@@ -43,7 +43,7 @@ reportController.report = (req, res) => {
     _id: userID
   }).then((userDetail)=>{
   MODEL.reportModel({
-      name: userDetail.firstname,
+      name: userDetail.fullname,
       email: userDetail.email,
       phone: userDetail.phone,
       apiKey: apiKey,
