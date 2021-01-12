@@ -255,6 +255,12 @@ reportController.endReport = (req,res)=>{
   MODEL.reportModel
   .findOne({ userReportID: ID })
   .then((user) => {
+    if(!user){
+      console.log("user here", user)
+      return res.status(400).json({
+        message: "No user report here"
+      })
+    }
     MODEL.reportModel.updateOne({ userReportID: ID }, { $set: { "active" : false } }, (err, resp)=>{
       if(err) { return res.status(400).json(err) }
 
