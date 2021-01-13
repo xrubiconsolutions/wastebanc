@@ -68,7 +68,7 @@ const msg = {
   `
    Congratulations, you have been approved by LAWMA and you've been onboarded to the Pakam waste management ecosystem.
   
-   Kindly use the following login details to sign in into your Kóle Company Dashboard.
+   Kindly use the following login details to sign in into your Pakam Company Dashboard.
     
    Email : ${organisation_data.email}
     
