@@ -62,9 +62,28 @@ organisationController.createOrganisation = (req, RESPONSE) => {
 sgMail.setApiKey("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");
 const msg = {
   to: `${organisation_data.email}`,
-  from: 'pakambusiness@gmail.com', // Use the email address or domain you verified above
-  subject: "WELCOME TO PAKAM ORGANISATION ACCOUNT",
-  text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`,
+  from: 'pakam@xrubiconsolutions.com', // Use the email address or domain you verified above
+  subject: "WELCOME TO PAKAM!!!",
+  text: 
+  `
+   Congratulations, you have been approved by LAWMA and you've been onboarded to the Pakam waste management ecosystem.
+  
+   Kindly use the following login details to sign in into your Kóle Company Dashboard.
+    
+   Email : ${organisation_data.email}
+    
+   Password :  ${password}
+    
+   Please note you can reset the password after logging into the App.
+    
+   Best Regard
+    
+   Pakam Team  
+    
+  `,
+
+
+
 };
 //ES6
 sgMail
