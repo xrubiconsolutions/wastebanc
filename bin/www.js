@@ -267,7 +267,7 @@ const server = require('http').createServer(app);
 
 const io = require('socket.io').listen(server);
 
-io.on("connection", console.log("connected to socket"))
+io.on("connection", function(){return console.log("connected to socket")})
 
 const changeStream =  reportModelLog.watch();  
 
