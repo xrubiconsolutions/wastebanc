@@ -263,6 +263,10 @@ const reportModelLog = require("../server/models/reportModelLog");
 
 /**creating express server app for server */
 const app  = EXPRESS();
+const server = require('http').createServer(app);
+
+const io = require('socket.io').listen(server);
+
 
 const changeStream =  reportModelLog.watch();  
 
@@ -276,7 +280,7 @@ changeStream.on('change', function(change) {
       if (data) {
           // RESEND ALL USERS
           console.log(data[data.length-1])
-          // socket.emit('users', data);
+          io.emit('reports', data);
       }
   });
 });
