@@ -280,12 +280,7 @@ changeStream.on('change', function(change) {
 
 
       io.on("connection",(socket)=>{
-
-        if (data) {
-          // RESEND ALL USERS
-          console.log(data[data.length-1])
-          io.emit('reports', data);
-      } if (data) {
+         if (data) {
         // RESEND ALL USERS
         console.log(data[data.length-1])
         socket.emit('reports', data);
