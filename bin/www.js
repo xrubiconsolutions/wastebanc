@@ -265,7 +265,10 @@ const reportModelLog = require("../server/models/reportModelLog");
 const app  = EXPRESS();
 const server = require('http').createServer(app);
 
-const io = require('socket.io').listen(server);
+const io = require('socket.io').listen(server,{
+  cors: {
+    origin: '*',
+  } } );
 
 io.on("connection", function(){return console.log("connected to socket")})
 
