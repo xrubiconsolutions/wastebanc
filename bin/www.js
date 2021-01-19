@@ -278,11 +278,18 @@ changeStream.on('change', function(change) {
   reportModelLog.find({}, (err, data) => {
       if (err) throw err;
 
-      if (data) {
+
+      io.on("connection",()=>{
+
+        if (data) {
           // RESEND ALL USERS
           console.log(data[data.length-1])
           io.emit('reports', data);
       }
+      } )
+
+
+     
   });
 });
 
