@@ -263,18 +263,19 @@ const reportModelLog = require("../server/models/reportModelLog");
 
 /**creating express server app for server */
 const app  = EXPRESS();
-const server = require('http').createServer(app);
+const http = require('http').Server(app);
 
-const io = require('socket.io').listen(server, {
-  handlePreflightRequest: (req, res) => {
-      const headers = {
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
-          "Access-Control-Allow-Origin": "https://dashboard.pakam.ng/admin/live-monitor/",
-          "Access-Control-Allow-Credentials": true
-      };
-      res.writeHead(200, headers);
-      res.end();
-  } });
+const io = require('socket.io')(http);
+
+
+// const io = socket(app,  {
+//   cors: {
+//     origin: "https://dashboard.pakam.ng",
+//     methods: ["GET", "POST"],
+//     credentials: true
+//   }
+// }  );
+
 
 io.on("connection", function(){return console.log("connected to socket")})
 
