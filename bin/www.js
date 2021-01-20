@@ -265,7 +265,11 @@ const reportModelLog = require("../server/models/reportModelLog");
 const app  = EXPRESS();
 const http = require('http').Server(app);
 
-const io = require('socket.io')(http);
+const io = require('socket.io')(http,{
+  cors: {
+    origin: '*',
+  }
+});
 
 
 // const io = socket(app,  {
