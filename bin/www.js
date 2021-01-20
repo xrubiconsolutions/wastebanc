@@ -265,9 +265,17 @@ const reportModelLog = require("../server/models/reportModelLog");
 const app  = EXPRESS();
 const http = require('http').Server(app);
 
-const io = require('socket.io')(http,{
-  cors: {
-    origin: '*',
+const io = require('socket.io')(http,  {
+  origins: ["https://dashboard.pakam.ng"],
+
+  handlePreflightRequest: (req, res) => {
+    res.writeHead(200, {
+      "Access-Control-Allow-Origin": "https://dashboard.pakam.ng",
+      "Access-Control-Allow-Methods": "GET,POST",
+      "Access-Control-Allow-Headers": "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Credentials": true
+    });
+    res.end();
   }
 });
 
