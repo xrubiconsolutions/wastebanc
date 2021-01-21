@@ -239,7 +239,6 @@ changeStream.on('change', function(change) {
   console.log('COLLECTION CHANGED');
 
   reportModelLog.find({}, (err, data) => {
-    console.log("ooopor", data[data.length-1]);
       if (err) throw err;
       if(data){
         const publishConfig = {
@@ -254,41 +253,12 @@ changeStream.on('change', function(change) {
   });
 });
 
-
-
-
-const publishConfig = {
-  channel: "reports",
-  message: {"sender": uuid, "content": "Hello From Packam"}
-}
-
-// pubnub.addListener({
-//   message: function(message) {
-//     console.log(message);
-//   },
-//   presence: function(presenceEvent) {
-//     console.log(presenceEvent);
-//   }
-// })
-
 pubnub.subscribe({
   channels: ["reports"],
   withPresence: true,
 });
 
 
-
-
-
-
-pubnub.publish(publishConfig, function(status, response) {
-  console.log(status, response);
-});
-
-
-pubnub.publish(publishConfig, function(status, response) {
-    console.log(status, response);
-  });
 
 
 /**creating express server app for server */
