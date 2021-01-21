@@ -239,11 +239,12 @@ changeStream.on('change', function(change) {
   console.log('COLLECTION CHANGED');
 
   reportModelLog.find({}, (err, data) => {
+    console.log("ooopor", data[data.length-1]);
       if (err) throw err;
       if(data){
         const publishConfig = {
           channel: "reports",
-          message: {"sender": uuid, "content": data}
+          message: {"sender": uuid, "content": data[data.length-1]}
         }
         pubnub.publish(publishConfig, function(status, response) {
           console.log(status, response);
