@@ -238,7 +238,7 @@ const changeStream =  reportModel.watch();
 changeStream.on('change', function(change) {
   console.log('COLLECTION CHANGED');
 
-  reportModelLog.find({}, (err, data) => {
+  reportModel.find({}, (err, data) => {
       if (err) throw err;
       if(data){
         const publishConfig = {
