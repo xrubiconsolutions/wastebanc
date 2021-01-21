@@ -218,7 +218,7 @@ const cors = require("cors");
 
 
 var fileUpload = require('express-fileupload');
-const reportModelLog = require("../server/models/reportModelLog");
+const reportModel = require("../server/models/reportModel");
 
 
 
@@ -232,7 +232,7 @@ const pubnub = new PubNub({
 });
 
 
-const changeStream =  reportModelLog.watch();  
+const changeStream =  reportModel.watch();
 
 
 changeStream.on('change', function(change) {
