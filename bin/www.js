@@ -218,24 +218,48 @@ const cors = require("cors");
 
 
 var fileUpload = require('express-fileupload');
-const reportModel = require("../server/models/reportModel");
 const reportModelLog = require("../server/models/reportModelLog");
 
 
 
 
-// const PubNub = require('pubnub');
-// const uuid = PubNub.generateUUID();
-// const pubnub = new PubNub({
-//   publishKey: "pub-c-fc18a8e9-3662-4d35-89e9-e71e91cc4fd0",
-//   subscribeKey: "sub-c-169862d4-e21e-11ea-89a6-b2966c0cfe96",
-//   uuid: uuid
-// });
+const PubNub = require('pubnub');
+const uuid = PubNub.generateUUID();
+const pubnub = new PubNub({
+  publishKey: "pub-c-d3fa9420-395b-4a69-ab8d-c33b8ec61f37",
+  subscribeKey: "sub-c-04c282b2-5c10-11eb-aca9-6efe1c667573",
+  uuid: uuid
+});
 
-// const publishConfig = {
-//   channel: "pubnub_onboarding_channel",
-//   message: {"sender": uuid, "content": "Hello From Packam"}
-// }
+
+const changeStream =  reportModelLog.watch();  
+
+
+changeStream.on('change', function(change) {
+  console.log('COLLECTION CHANGED');
+
+  reportModelLog.find({}, (err, data) => {
+      if (err) throw err;
+      if(data){
+        const publishConfig = {
+          channel: "reports",
+          message: {"sender": uuid, "content": data}
+        }
+        pubnub.publish(publishConfig, function(status, response) {
+          console.log(status, response);
+        });
+      
+      }
+  });
+});
+
+
+
+
+const publishConfig = {
+  channel: "reports",
+  message: {"sender": uuid, "content": "Hello From Packam"}
+}
 
 // pubnub.addListener({
 //   message: function(message) {
@@ -246,19 +270,24 @@ const reportModelLog = require("../server/models/reportModelLog");
 //   }
 // })
 
-// pubnub.subscribe({
-//   channels: ["pubnub_onboarding_channel"],
-//   withPresence: true,
-// });
-
-// pubnub.publish(publishConfig, function(status, response) {
-//   console.log(status, response);
-// });
+pubnub.subscribe({
+  channels: ["reports"],
+  withPresence: true,
+});
 
 
-// pubnub.publish(publishConfig, function(status, response) {
-//     console.log(status, response);
-//   });
+
+
+
+
+pubnub.publish(publishConfig, function(status, response) {
+  console.log(status, response);
+});
+
+
+pubnub.publish(publishConfig, function(status, response) {
+    console.log(status, response);
+  });
 
 
 /**creating express server app for server */
@@ -289,30 +318,30 @@ const io = require('socket.io')(http,  {
 // }  );
 
 
-io.on("connection", function(){return console.log("connected to socket")})
+// io.on("connection", function(){return console.log("connected to socket")})
 
-const changeStream =  reportModelLog.watch();  
-
-
-changeStream.on('change', function(change) {
-  console.log('COLLECTION CHANGED');
-
-  reportModelLog.find({}, (err, data) => {
-      if (err) throw err;
+// const changeStream =  reportModelLog.watch();  
 
 
-      io.on("connection",(socket)=>{
-         if (data) {
-        // RESEND ALL USERS
-        console.log(data[data.length-1])
-        socket.emit('reports', data);
-    }
-      } )
+// changeStream.on('change', function(change) {
+//   console.log('COLLECTION CHANGED');
+
+//   reportModelLog.find({}, (err, data) => {
+//       if (err) throw err;
+
+
+//       io.on("connection",(socket)=>{
+//          if (data) {
+//         // RESEND ALL USERS
+//         console.log(data[data.length-1])
+//         socket.emit('reports', data);
+//     }
+//       } )
 
 
      
-  });
-});
+//   });
+// });
 
 
 
