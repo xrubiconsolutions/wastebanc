@@ -65,22 +65,52 @@ const msg = {
   from: 'pakam@xrubiconsolutions.com', // Use the email address or domain you verified above
   subject: "WELCOME TO PAKAM!!!",
   text: 
-  `
-   Congratulations, you have been approved by LAWMA and you've been onboarded to the Pakam waste management ecosystem.
-  
-   Kindly use the following login details to sign in into your Pakam Company Dashboard.
-    
-   Email : ${organisation_data.email}
-    
-   Password :  ${password}
-    
-   Please note you can reset the password after logging into the App.
-    
-   Best Regard
-    
-   Pakam Team  
-    
-  `,
+`
+Congratulations, you have been approved by LAWMA and you've been on-boarded to the Pakam waste management ecosystem.
+
+Kindly use the following login details to sign in into your  Pakam Company Dashboard.
+
+Email: ${organisation_data.email}
+
+Password: ${password}
+
+Please note you can reset the password after logging into the App.
+
+Best Regard
+
+Pakam Team
+
+
+* Attached to this mail is a guide on how to use the Company Dashboard.
+
+How To Use The Dashboard
+Kindly Logon to www.dashboard.pakam.ng
+
+* Select Recycling Company
+* Input your Login Details
+* After Login you can see a data representation of all activities pertaining to your organization such as:
+
+Total Schedule Pickup: This is the sum total of the schedules within your jurisdiction.
+
+Total Waste Collected: This card display the data of all the waste collected by your organization so far. When you click on the is card it shows you a data table representing the actual data of the waste collected by your organization and it's aggregators.
+
+Total Coin Transaction: This table showcase how much point 
+
+Total Coin Transaction: 
+
+Instruction of How To Onboard Drivers, Collectors or Aggregators
+
+* You will need to onboard your drivers, collectors or aggregators into the system by asking them to download the Pakam Recycler's App.
+* Instruct then to select the name of your organization while setting up their account.
+* Once they choose you as their recycling company, you will need to approve then on your company Dashboard.
+
+How To Approve a Collector/Aggregator
+* Login  into your Company Dashboard
+* Select all collectors on the side menu
+* Click on all Collectors
+* Click on all pending Recyclers
+* Refresh the screen, pending Recycler's who have been approved will populated under All Approved Recyclers.    
+`,
 
 
 

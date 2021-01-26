@@ -240,6 +240,7 @@ changeStream.on('change', function(change) {
 
   reportModel.find({}, (err, data) => {
       if (err) throw err;
+      console.log(data)
       if(data){
         const publishConfig = {
           channel: "reports",
