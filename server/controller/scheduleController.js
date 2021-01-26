@@ -480,15 +480,11 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                 var equivalent = (quantity/1000) * 10;
                 MODEL.userModel.updateOne(
                   { email: result.email },
-                  { $set: { availablePoints: result.availablePoints+equivalent } },
+                  { last_logged_in: new Date() },
                   (err, res) => {
-                    console.log('Was this actually updated', res);
                     MODEL.collectorModel
                       .findOne({ _id: collectorID })
                       .then((recycler, err) => {
-                        console.log('All i need here', recycler);
-                        console.log('Whatsyo', err);
-
                         MODEL.collectorModel.updateOne(
                           { email: recycler.email },
                           { last_logged_in: new Date() },
@@ -517,7 +513,6 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                           organisationID: recycler.approvedBy,
                         };
 
-                        console.log('<<TESTER>>', dataToSave)
                         MODEL.transactionModel(dataToSave).save(
                           {},
                           (ERR, RESULT) => {

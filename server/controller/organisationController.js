@@ -809,11 +809,19 @@ organisationController.raffleTicket = (req, res) => {
         console.log("<<>>", number)
 
       MODEL.userModel.aggregate(  [
-        { $match: { lcd: lcd ,  availablePoints : {$ne: 0 } } },
+        { $match: { lcd: lcd } },
         { $sample: { size: Number(winner_count) } }
        ]).then((winners,err)=>{
-          console.log("winner", winners)
           if (err) return res.status(400).json(err);
+          for(let i = 0 ; i < winners.length ; i++){
+            MODEL.userModel.updateOne(
+              { _id: winners[i]._id },
+              { availablePoints: winners[i].availablePoints + 10000 },
+              (res) => {
+                console.log('Winner object update');
+              }
+            );
+          }
         return res.status(200).json({ winners: winners});
         
       }
