@@ -871,6 +871,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
           (x) =>
             x.completionStatus !== 'completed' &&
             x.completionStatus !== 'cancelled' &&
+            x.collectorStatus  !== 'accept'  &&
             x.completionStatus !== 'missed'
         );
         RESPONSE.jsonp(
