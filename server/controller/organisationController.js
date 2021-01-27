@@ -809,14 +809,14 @@ organisationController.raffleTicket = (req, res) => {
         console.log("<<>>", number)
 
       MODEL.userModel.aggregate(  [
-        { $match: { lcd: lcd } },
+        { $match: { lcd: lcd ,  availablePoints : {$ne: 0 } } },
         { $sample: { size: Number(winner_count) } }
        ]).then((winners,err)=>{
           if (err) return res.status(400).json(err);
           for(let i = 0 ; i < winners.length ; i++){
             MODEL.userModel.updateOne(
               { _id: winners[i]._id },
-              { availablePoints: winners[i].availablePoints + 10000 },
+              { $set: { rafflePoints: winners[i].rafflePoints + 10000} },
               (res) => {
                 console.log('Winner object update');
               }

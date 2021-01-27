@@ -480,7 +480,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                 var equivalent = (quantity/1000) * 10;
                 MODEL.userModel.updateOne(
                   { email: result.email },
-                  { last_logged_in: new Date() },
+                  { $set: { availablePoints: result.availablePoints+equivalent } },
                   (err, res) => {
                     MODEL.collectorModel
                       .findOne({ _id: collectorID })

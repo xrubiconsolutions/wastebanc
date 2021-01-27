@@ -88,6 +88,10 @@ const user_Schema = new Schema({
     required: true,
     default: 0,
   },
+  rafflePoints: {
+    type: Number,
+    default: 0
+  },
   gender: {
     type: String,
   },
