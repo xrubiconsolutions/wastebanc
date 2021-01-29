@@ -82,6 +82,18 @@ const organisation_Schema = new Schema({
   plasticEquivalent:{
     type: Number
   },
+  woodEquivalent:{
+    type: Number
+  },
+  glassEquivalent:{
+    type: Number
+  },
+  nylonEquivalent:{
+    type: Number
+  },
+  metalEquivalent:{
+    type: Number
+  },
   createAt: {
     type: Date,
     default: Date.now,

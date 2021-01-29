@@ -1442,7 +1442,7 @@ userController.userAnalytics = (req,res)=>{
                 }
               }, {
                 createAt: {
-                  $gte: yesterday
+                  $gte: active_today
                 }
               }
               
@@ -1471,7 +1471,6 @@ userController.userAnalytics = (req,res)=>{
                 console.log("<<>>", allUser.length);
                 console.log("<<>>", newUser.length);
                 console.log(">>>??", activeTodayUser.length);
-                console.log(">>>??", InactiveUser.length);
                 console.log("<<>>>", active_today);
                 console.log("<<users", InactiveUser
                 )
