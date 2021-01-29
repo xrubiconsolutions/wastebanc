@@ -2042,13 +2042,13 @@ organisationController.categoryAnalytics = (REQUEST, RESPONSE) => {
       var petBottle = result
         .filter((x) => x.Category == "Pet Bottle")
       var carton = result
-        .filter((x) => x.Category == "carton")
+        .filter((x) => x.Category == "carton" || "Carton")
        
       var rubber = result
-        .filter((x) => x.Category == "Rubber")
+        .filter((x) => x.Category == "Rubber" || "rubber")
         
       var plastics = result
-        .filter((x) => x.Category == "Plastics")
+        .filter((x) => x.Category == "Plastics" || "plastics")
 
       return RESPONSE.status(200).json({
         can: can,
