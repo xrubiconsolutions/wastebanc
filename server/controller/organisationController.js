@@ -68,48 +68,49 @@ const msg = {
 `
 Congratulations, you have been approved by LAWMA and you've been on-boarded to the Pakam waste management ecosystem.
 
-Kindly use the following login details to sign in into your  Pakam Company Dashboard.
+Kindly use the following login details to sign in to your  Pakam Company Dashboard.
+
 
 Email: ${organisation_data.email}
 
 Password: ${password}
 
-Please note you can reset the password after logging into the App.
+Please note you can reset the password after logging into the App by clicking on the image icon on the top right corner of the screen.
 
-Best Regard
-
-Pakam Team
-
-
-* Attached to this mail is a guide on how to use the Company Dashboard.
+*Attached below is a guide on how to use the Company Dashboard.
 
 How To Use The Dashboard
 Kindly Logon to www.dashboard.pakam.ng
 
 * Select Recycling Company
 * Input your Login Details
+* You can reset your password by clicking on the image icon at the top right of the screen.
 * After Login you can see a data representation of all activities pertaining to your organization such as:
+Total Schedule Pickup: This is the sum total of the schedules within your jurisdiction, which include pending schedules, completed schedules, accepted schedules, cancelled schedules and missed schedules.
 
-Total Schedule Pickup: This is the sum total of the schedules within your jurisdiction.
+Total Waste Collected: This card display the data of all the waste collected by your organization so far. When you click on the card it shows you a data table representing the actual data of the waste collected by your organization and it's aggregators.
 
-Total Waste Collected: This card display the data of all the waste collected by your organization so far. When you click on the is card it shows you a data table representing the actual data of the waste collected by your organization and it's aggregators.
+Total Point: This table showcase details of user whose recyclables your organization have collected and how much point accrued to them
 
-Total Coin Transaction: This table showcase how much point 
+Instruction of How To Onboard Collectors or Aggregators
 
-Total Coin Transaction: 
-
-Instruction of How To Onboard Drivers, Collectors or Aggregators
-
-* You will need to onboard your drivers, collectors or aggregators into the system by asking them to download the Pakam Recycler's App.
-* Instruct then to select the name of your organization while setting up their account.
-* Once they choose you as their recycling company, you will need to approve then on your company Dashboard.
+* You will need to onboard your collectors or aggregators into the system by asking them to download the Pakam Recycler's App.
+* Instruct them to select the name of your organization while setting up their account.
+* Once they choose your organization as their recycling company, you will need to approve them on your company Dashboard.
 
 How To Approve a Collector/Aggregator
 * Login  into your Company Dashboard
-* Select all collectors on the side menu
-* Click on all Collectors
-* Click on all pending Recyclers
-* Refresh the screen, pending Recycler's who have been approved will populated under All Approved Recyclers.    
+* Click on all aggregator on the side menu
+* Click on all pending aggregator
+* You will see a list of all pending aggregator and an approve button beside it. 
+* Click on approve to Approve the aggregator
+* Refresh the screen, pending aggregators who have been approved will populated under All Approved aggregators.
+
+We wish a awesome experience using the App.
+
+Best Regards
+
+Pakam Team
 `,
 
 
