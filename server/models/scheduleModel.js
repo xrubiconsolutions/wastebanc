@@ -73,7 +73,8 @@ const schedulePick = new Schema({
         default: "decline",
     },
     acceptedBy:{
-        type: String
+        type: Boolean,
+        default: false
     },
     collectedBy: {
         type: String,
