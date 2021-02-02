@@ -236,10 +236,6 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
   MODEL.collectorModel
     .findOne({ email: REQUEST.body.client }, {}, { lean: true })
     .then((results) => {
- 
-
-      // CHeck for multiple accept
-
       if (results) {
         MODEL.scheduleModel
           .findOne({ _id: REQUEST.body._id })
@@ -516,12 +512,6 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                         MODEL.transactionModel(dataToSave).save(
                           {},
                           (ERR, RESULT) => {
-                            console.log(
-                              '<<<<<<>>>>>>',
-                              result,
-                              result.onesignal_id
-                            );
-
                             var message = {
                               app_id:
                                 '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
@@ -871,7 +861,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
           (x) =>
             x.completionStatus !== 'completed' &&
             x.completionStatus !== 'cancelled' &&
-            x.collectedBy !== collectorID &&
+            x.collectedBy == collectorID &&
             x.completionStatus !== 'missed'  
         );
         RESPONSE.jsonp(

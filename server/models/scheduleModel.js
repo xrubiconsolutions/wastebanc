@@ -72,6 +72,9 @@ const schedulePick = new Schema({
         enum: ["decline", "accept"],
         default: "decline",
     },
+    acceptedBy:{
+        type: String
+    },
     collectedBy: {
         type: String,
     },
