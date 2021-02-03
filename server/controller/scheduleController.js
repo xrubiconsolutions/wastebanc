@@ -869,12 +869,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
         });
         var geoSchedules = geofencedSchedules.filter(
           (x) =>
-            (x.completionStatus == 'pending' &&
-              x.collectorStatus == 'accept') ||
-            x.collectorStatus == 'decline'
-          // x.completionStatus !== 'completed' &&
-          // x.completionStatus !== 'cancelled' &&
-          // x.completionStatus !== 'missed'
+            x.completionStatus !== "completed" || (x.completionStatus == 'pending' && x.collectorStatus == "accept")
         );
         RESPONSE.jsonp(
           COMMON_FUN.sendSuccess(

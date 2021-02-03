@@ -65,6 +65,9 @@ const collector_Schema = new Schema({
   place:{
     type: String
   },
+  aggregatorId: {
+    type: String,
+  },
   localGovernment: {
     type:String
   },

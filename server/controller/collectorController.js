@@ -64,7 +64,6 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                   body: JSON.stringify(data),
                 };
                 request(options, function (error, response) {
-                  console.log("<<>>", response)
                   const iden = JSON.parse(response.body)
                   if (error) {
                     throw new Error(error);
@@ -139,16 +138,6 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
     }
   });
 };
-
-// console.log("verification in progress");
-// MODEL.collectorModel.updateOne(
-//   { email: RESULT.email },
-//   { $set: { mobile_carrier: phone_number.carrier.name
-//   } },
-//   (res) => {
-//     console.log(res);
-//   }
-// )
 
 collectorController.loginCollector = (REQUEST, RESPONSE) => {
   let CRITERIA = {
@@ -386,6 +375,7 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
               fullname: REQUEST.body.fullname,
               state: REQUEST.body.state,
               place: REQUEST.body.place,
+              aggregatorId: REQUEST.body.aggregatorId || "",
               organisation: REQUEST.body.organisation,
               localGovernment: REQUEST.body.localGovernment,
               profile_picture: REQUEST.body.profile_picture,
@@ -405,10 +395,6 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
               MODEL.organisationModel
                 .findOne({ companyName: REQUEST.body.organisation })
                 .then((organisation) => {
-                  console.log(organisation);
-
-                  console.log('--->', user);
-
                   MODEL.collectorModel.updateOne(
                     { email: user.email },
                     { $set: { areaOfAccess: organisation.areaOfAccess } },
@@ -470,11 +456,9 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
           MODEL.collectorModel.findOne({ phone: phone }, (err, USER) => {
             var test = JSON.parse(JSON.stringify(USER));
             if (err) return RESPONSE.status(400).jsonp(error);
-            console.log('user here at all', USER);
             var jwtToken = COMMON_FUN.createToken(
               test
             ); /** creating jwt token */
-            console.log('user token here at all', USER);
             test.token = jwtToken;
             return RESPONSE.jsonp(test);
           });
@@ -983,9 +967,6 @@ var ObjectID = require('mongodb').ObjectID;
 collectorController.triggerActivity = (req, res) => {
   const userID = req.body.userID;
   var today = new Date();
-
-  console.log('>>RESPONSE', req);
-
   try {
     MODEL.collectorModel.updateOne(
       { _id: ObjectID(userID) },
@@ -1077,7 +1058,6 @@ collectorController.resetMobile = (REQUEST, RESPONSE) => {
 
   var phoneNo = String(phone).substring(1,11);
 
-  console.log("<<phone >>", phoneNo)
 
   var data = {
     "api_key" : "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
@@ -1129,11 +1109,9 @@ MODEL.collectorModel.updateOne(
       .findOne({ "phone": phone }, (err,USER) => {
         var test = JSON.parse(JSON.stringify(USER))
         if (err) return RESPONSE.status(400).jsonp(error)
-        console.log("user here at all", USER)
         var jwtToken = COMMON_FUN.createToken(
           test
         ); /** creating jwt token */
-        console.log("user token here at all", USER)
         test.token = jwtToken;
         return RESPONSE.jsonp(test);
           
