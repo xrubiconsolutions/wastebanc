@@ -494,6 +494,8 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                   console.log('Logged date updated', new Date());
                                 }
                               );  
+
+                              console.log("coin bank here", pricing , equivalent , val)
                               var dataToSave = {
                                 weight: quantity,
         
@@ -513,6 +515,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
         
                                 organisationID: recycler.approvedBy,
                               };
+                              console.log("saved data",  dataToSave)
                               MODEL.transactionModel(dataToSave).save(
                                 {},
                                 (ERR, RESULT) => {
@@ -539,7 +542,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                       },
                                     },
                                     (err, res) => {
-                                      if (err) return RESPONSE.status(200).json(err);
+                                      if (err) return RESPONSE.status(400).json(err);
                                       
                                       MODEL.userModel.updateOne(
                                         { email: result.email },
@@ -548,7 +551,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                             availablePoints: result.availablePoints + pricing,
                                             rafflePoints : result.rafflePoints + 1
                                           },
-                                        }, (errObj, resultObject)=>{console.log("Object user update")})
+                                        }, (errObj, resultObject)=>{ console.log("Object user update") })
         
                                       return RESPONSE.status(200).json({
                                         message: 'Transaction Completed Successfully',
@@ -557,7 +560,8 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                   );
                                 }
                               );
-                            } 
+                              break;
+                            }
                           }
                         });
                     });
