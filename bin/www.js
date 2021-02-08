@@ -150,6 +150,26 @@ cron.schedule('01 7 * * *', function(){
 });
 
 
+// MODEL.transactionModel.find({}).then(TRANS=>{
+//   for(let i = 0; i < TRANS.length; i++){
+//     MODEL.collectorModel.findOne({
+//       _id: TRANS[i].completedBy
+//     }).then(recycler=>{
+//       console.log("recyler aye", recycler)
+//       MODEL.collectorModel.updateOne(
+//         { _id: TRANS[i].completedBy },
+//         {
+//           $set: {
+//             totalCollected:   (recycler.totalCollected || 0)  +  TRANS[i].weight,
+//           },
+//         }, (err,res)=> { console.log('checked', TRANS[i].weight)})
+
+//     })
+  
+//           }
+// })
+
+
 // MODEL.userModel.find({verified: true}).then((organisations)=>{
 //   for(let i = 0 ; i < organisations.length ; i++){
 

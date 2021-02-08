@@ -194,6 +194,7 @@ module.exports = (APP) => {
         auth.companyValidation,
         CONTROLLER.organisationController.monifyReceipts
     )
+    APP.route('/api/company/recyclers').get(CONTROLLER.organisationController.organisationRecyclers)
 
     APP.route('/api/pay/portal').post(
         auth.companyValidation,

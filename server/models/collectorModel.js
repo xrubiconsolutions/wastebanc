@@ -78,6 +78,10 @@ const collector_Schema = new Schema({
     type: String,
     default: null
  },
+ totalCollected:{
+   type: Number,
+   default: 0
+ },
   lat : {
     type: String
   },

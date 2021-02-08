@@ -25,13 +25,11 @@ var sendNotification = function (data) {
   var https = require('https');
   var req = https.request(options, function (res) {
     res.on('data', function (data) {
-      console.log('Response:');
       console.log(JSON.parse(data));
     });
   });
 
   req.on('error', function (e) {
-    console.log('ERROR:');
     console.log(e);
   });
 
@@ -156,15 +154,12 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE) => {
                 { _id: schedule._id },
                 { $set: { completionStatus: 'completed' } },
                 (res) => {
-                  console.log(res);
-
                   return RESPONSE.status(200).jsonp(
                     COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
                   );
                 }
               );
             });
-          console.log(response);
         });
     });
   } catch (err) {
@@ -238,7 +233,6 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
               });
             }
 
-            console.log('Is this a collector', results);
             MODEL.scheduleModel
               .updateOne(
                 { _id: REQUEST.body._id },
@@ -259,7 +253,6 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
                     MODEL.userModel
                       .findOne({ email: result.client })
                       .then((result, err) => {
-                        console.log('Opoor yeye', result);
                         var message = {
                           app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
                           contents: {
@@ -321,7 +314,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
               },
 
               (err, res) => {
-                console.log('data is real', test[0]);
+                console.log('data', test[0]);
               }
             );
 
@@ -408,7 +401,6 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({ completionStatus: 'completed', client: REQUEST.query.client })
     .then((schedules) => {
-      console.log('Completed schedules here', schedules);
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
       );
@@ -420,7 +412,6 @@ scheduleController.dashboardCompleted = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({ completionStatus: 'completed' })
     .then((schedules) => {
-      console.log('Completed schedules here', schedules);
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
       );
@@ -482,11 +473,9 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                           var organisationCheck = JSON.parse(JSON.stringify(organisation));
                           for (let val in organisationCheck) {
                             console.log(organisationCheck)
-                            console.log("organisatin here??/",'-->>', category ,val.includes(String(category)))
                             if (val.includes(category)) {
                               const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1                              
                               const pricing = quantity * equivalent;
-                              console.log("I got here price")
                               MODEL.collectorModel.updateOne(
                                 { email: recycler.email },
                                 { last_logged_in: new Date() },
@@ -494,8 +483,6 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                   console.log('Logged date updated', new Date());
                                 }
                               );  
-
-                              console.log("coin bank here", pricing , equivalent , val)
                               var dataToSave = {
                                 weight: quantity,
         
@@ -515,7 +502,6 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
         
                                 organisationID: recycler.approvedBy,
                               };
-                              console.log("saved data",  dataToSave)
                               MODEL.transactionModel(dataToSave).save(
                                 {},
                                 (ERR, RESULT) => {
@@ -532,7 +518,6 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
         
                                   // if (ERR)
                                   //   return RESPONSE.status(400).jsonp(ERR);
-                                  console.log('Transaction saved on database', RESULT);
                                   MODEL.scheduleModel.updateOne(
                                     { _id: schedule[0]._id },
                                     {
@@ -551,8 +536,14 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                             availablePoints: result.availablePoints + pricing,
                                             rafflePoints : result.rafflePoints + 1
                                           },
-                                        }, (errObj, resultObject)=>{ console.log("Object user update") })
-        
+                                        });
+                                        MODEL.userModel.updateOne(
+                                          { _id: collectorID },
+                                          {
+                                            $set: {
+                                              totalCollected: quantity,
+                                            },
+                                          });
                                       return RESPONSE.status(200).json({
                                         message: 'Transaction Completed Successfully',
                                       });
@@ -598,7 +589,6 @@ scheduleController.allAgentTransaction = (req, res) => {
           json: true,
         },
         function (err, response) {
-          console.log(response);
           return res.jsonp(response.body.content.data.reverse().slice(0, 5));
         }
       );
@@ -629,7 +619,6 @@ scheduleController.getBalance = (req, res) => {
           json: true,
         },
         function (err, response) {
-          // console.log(response)
           return res.jsonp(response.body.content.data.reverse().slice(0, 5));
         }
       );
@@ -638,21 +627,29 @@ scheduleController.getBalance = (req, res) => {
 };
 
 scheduleController.allWeight = (req, res) => {
-  MODEL.scheduleModel
+
+  try {
+    MODEL.transactionModel
     .find({})
     .sort({ _id: -1 })
     .then((schedules) => {
       var test = JSON.parse(JSON.stringify(schedules));
       let weight = test
-        .map((x) => x.quantity)
+        .map((x) => x.weight)
         .reduce((acc, curr) => {
           return acc + curr;
-        });
+        },0);
       res.jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, weight)
       );
     })
     .catch((err) => res.status(400).jsonp(COMMON_FUN.sendError(err)));
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
+ 
 };
 
 scheduleController.allCoins = (req, res) => {

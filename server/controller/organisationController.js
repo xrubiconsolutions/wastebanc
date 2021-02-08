@@ -363,8 +363,8 @@ organisationController.coinBank = (req, res) => {
 
 organisationController.wasteCounter = (req, res) => {
   const organisationID = req.query.organisationID;
-
-  MODEL.transactionModel
+  try {
+    MODEL.transactionModel
     .find({ organisationID: organisationID })
     .sort({ _id: -1 })
     .then((recycler, err) => {
@@ -376,6 +376,12 @@ organisationController.wasteCounter = (req, res) => {
       });
     })
     .catch((err) => res.status(500).json(err));
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
+  
 };
 
 organisationController.numberTransaction = (req, res) => {
@@ -786,6 +792,21 @@ organisationController.weekChartData = (req, res) => {
       .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
       .map((x) => x.quantity)
       .reduce((acc, curr) => acc + curr, 0);
+  
+      var glass = result
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      
+      var metal = result
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      var nylon = result
+        .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
         can: can,
@@ -793,6 +814,9 @@ organisationController.weekChartData = (req, res) => {
         carton: carton,
         rubber: rubber,
         plastics: plastics,
+        glass : glass,
+        metal: metal,
+        nylon: nylon
       });
     })
     .catch((err) => res.status(500).json(err));
@@ -1123,6 +1147,21 @@ organisationController.lawmaWeekChartData = (req, res) => {
         .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
+      
+      var glass = result
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      
+      var metal = result
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      var nylon = result
+        .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
         can: can,
@@ -1130,6 +1169,9 @@ organisationController.lawmaWeekChartData = (req, res) => {
         carton: carton,
         rubber: rubber,
         plastics: plastics,
+        glass : glass,
+        metal: metal,
+        nylon: nylon
       });
     })
     .catch((err) => res.status(500).json(err));
@@ -1347,7 +1389,6 @@ organisationController.totalCoinAnalytics = (req,res)=>{
 organisationController.deleteCompany = (req,res)=>{
   const companyID = req.body.companyID
   try {
-
     MODEL.organisationModel.deleteOne({
       _id: companyID
     }).then((result)=>{
@@ -1355,7 +1396,6 @@ organisationController.deleteCompany = (req,res)=>{
         message: "Recycling company deleted successfully"
       })
     })
-
   }
   catch(err){
     return res.status(500).json(err)
@@ -2784,6 +2824,27 @@ organisationController.payPortal = (REQUEST, RESPONSE)=>{
   }
   catch(err){
     return RESPONSE.status(500).json(err);
+  }
+}
+
+organisationController.organisationRecyclers = (req,res)=>{
+  const organisation_id  = req.query.organisation_id;
+  if(!organisation_id){
+    return res.status(400).json({
+      message: "Enter a valid organisation id"
+    })
+  }
+  try{
+    MODEL.collectorModel.find({
+      approvedBy: organisation_id
+    }).then(recyclers=>{
+      return res.status(200).json({
+        data: recyclers
+      })
+    })
+  }
+  catch(err){
+    return res.status(500).json(err)
   }
 }
 
