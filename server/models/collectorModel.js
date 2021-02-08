@@ -82,6 +82,10 @@ const collector_Schema = new Schema({
    type: Number,
    default: 0
  },
+ numberOfTripsCompleted:{
+  type: Number,
+  default: 0
+ },
   lat : {
     type: String
   },

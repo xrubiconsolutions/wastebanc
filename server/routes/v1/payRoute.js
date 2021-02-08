@@ -28,4 +28,8 @@ module.exports = (APP) => {
         auth.companyValidation,
         CONTROLLER.payController.allPayoutHistory
     )
+    APP.route('/api/update/payment').get(
+        auth.companyValidation,
+        CONTROLLER.payController.paymentUpdate
+    )
 }

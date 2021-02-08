@@ -1467,14 +1467,6 @@ userController.userAnalytics = (req,res)=>{
                 
                 ]
               }).sort({ _id : -1}).then((InactiveUser)=>{
-
-                console.log("<<>>", allUser.length);
-                console.log("<<>>", newUser.length);
-                console.log(">>>??", activeTodayUser.length);
-                console.log("<<>>>", active_today);
-                console.log("<<users", InactiveUser
-                )
-
                 return res.status(200).json({
                   allUsers: { allUsers: allUser.length },
                   newUsers: { newUsers: newUser.length },

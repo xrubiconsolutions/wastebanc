@@ -147,5 +147,22 @@ payController.allPayoutHistory = (req,res)=>{
     return res.status(500).json(err);
   }
 }
+
+payController.paymentUpdate = (req,res)=>{
+  const id = req.body.id;
+  try{
+    MODEL.transactionModel.updateOne(
+      { "_id": id },
+     { "$set": { "paid" : true } },
+      (err, resp) => {
+        if (err) {
+          return RESPONSE.status(400).jsonp(err);
+        }
+      }
+    );
+  }catch(err){
+    return res.status(500).json(err);
+  }
+}
 /* export payController */
 module.exports = payController;

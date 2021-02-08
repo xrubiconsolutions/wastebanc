@@ -537,11 +537,12 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                             rafflePoints : result.rafflePoints + 1
                                           },
                                         });
-                                        MODEL.userModel.updateOne(
+                                        MODEL.collectorModel.updateOne(
                                           { _id: collectorID },
                                           {
                                             $set: {
                                               totalCollected: quantity,
+                                              numberOfTripsCompleted: recycler.numberOfTripsCompleted + 1
                                             },
                                           });
                                       return RESPONSE.status(200).json({
