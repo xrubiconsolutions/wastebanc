@@ -58,11 +58,11 @@ module.exports = (APP) => {
     CONTROLLER.scheduleController.collectorMissed
   );
 
-  APP.route("/api/geofenced/schedule").get(
+  APP.route("/api/geofenced/schedule").get(auth.recyclerValidation,
     CONTROLLER.scheduleController.smartRoute
   );
 
-  APP.route("/api/geofenced/schedule/refresh").get(
+  APP.route("/api/geofenced/schedule/refresh").get(auth.recyclerValidation,
     CONTROLLER.scheduleController.afterCompletion
   );
 
@@ -98,7 +98,7 @@ module.exports = (APP) => {
     CONTROLLER.scheduleController.dashboardCompleted
   );
 
-  APP.route("/api/rewardUser").post(CONTROLLER.scheduleController.rewardSystem);
+  APP.route("/api/rewardUser").post(auth.recyclerValidation,CONTROLLER.scheduleController.rewardSystem);
 
   APP.route("/api/user/completed").post(
     CONTROLLER.scheduleController.userComplete

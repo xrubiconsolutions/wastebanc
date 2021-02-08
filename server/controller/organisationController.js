@@ -12,6 +12,7 @@ let CONSTANTS = require("../util/constants");
 let FS = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
+const sgMail = require('@sendgrid/mail');
 
 let auth = require("../util/auth");
 
@@ -57,20 +58,90 @@ organisationController.createOrganisation = (req, RESPONSE) => {
                 (ERR, RESULT) => {
                   if (ERR) RESPONSE.status(400).jsonp(ERR);
                   else {
-                    var mailOptions = {
-                      from: "pakambusiness@gmail.com",
-                      to: `${organisation_data.email}`,
-                      subject: "WELCOME TO PAKAM ORGANISATION ACCOUNT",
-                      text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`,
-                    };
 
-                    transporter.sendMail(mailOptions, function (error, info) {
-                      if (error) {
-                        console.log(error);
-                      } else {
-                        console.log("Email sent: " + info.response);
-                      }
-                    });
+sgMail.setApiKey("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");
+const msg = {
+  to: `${organisation_data.email}`,
+  from: 'pakam@xrubiconsolutions.com', // Use the email address or domain you verified above
+  subject: "WELCOME TO PAKAM!!!",
+  text: 
+`
+Congratulations, you have been approved by LAWMA and you've been on-boarded to the Pakam waste management ecosystem.
+
+Kindly use the following login details to sign in to your  Pakam Company Dashboard.
+
+
+Email: ${organisation_data.email}
+
+Password: ${password}
+
+Please note you can reset the password after logging into the App by clicking on the image icon on the top right corner of the screen.
+
+*Attached below is a guide on how to use the Company Dashboard.
+
+How To Use The Dashboard
+Kindly Logon to www.dashboard.pakam.ng
+
+* Select Recycling Company
+* Input your Login Details
+* You can reset your password by clicking on the image icon at the top right of the screen.
+* After Login you can see a data representation of all activities pertaining to your organization such as:
+Total Schedule Pickup: This is the sum total of the schedules within your jurisdiction, which include pending schedules, completed schedules, accepted schedules, cancelled schedules and missed schedules.
+
+Total Waste Collected: This card display the data of all the waste collected by your organization so far. When you click on the card it shows you a data table representing the actual data of the waste collected by your organization and it's aggregators.
+
+Total Point: This table showcase details of user whose recyclables your organization have collected and how much point accrued to them
+
+Instruction of How To Onboard Collectors or Aggregators
+
+* You will need to onboard your collectors or aggregators into the system by asking them to download the Pakam Recycler's App.
+* Instruct them to select the name of your organization while setting up their account.
+* Once they choose your organization as their recycling company, you will need to approve them on your company Dashboard.
+
+How To Approve a Collector/Aggregator
+* Login  into your Company Dashboard
+* Click on all aggregator on the side menu
+* Click on all pending aggregator
+* You will see a list of all pending aggregator and an approve button beside it. 
+* Click on approve to Approve the aggregator
+* Refresh the screen, pending aggregators who have been approved will populated under All Approved aggregators.
+
+We wish a awesome experience using the App.
+
+Best Regards
+
+Pakam Team
+`,
+
+
+
+};
+//ES6
+sgMail
+  .send(msg)
+  .then(() => {}, error => {
+    console.error(error);
+ 
+    if (error.response) {
+      console.error(error.response.body)
+    }
+  });
+
+
+                    // var mailOptions = {
+                    //   from: "pakambusiness@gmail.com",
+                    //   to: `${organisation_data.email}`,
+                    //   subject: "WELCOME TO PAKAM ORGANISATION ACCOUNT",
+                    //   text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`,
+                    // };
+
+                    // transporter.sendMail(mailOptions, function (error, info) {
+                    //   if (error) {
+                    //     console.log(error);
+                    //   } else {
+                    //     console.log("Email sent: " + info.response);
+                    //   }
+                    // });
                     return RESPONSE.status(200).json(RESULT);
                   }
                 }
@@ -86,6 +157,7 @@ organisationController.createOrganisation = (req, RESPONSE) => {
 
 organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
   let BODY = REQUEST.body;
+  COMMON_FUN.encryptPswrd(BODY.newPassword, (ERR, HASH) => { console.log(">>", HASH) });
   COMMON_FUN.objProperties(REQUEST.body, (ERR, RESULT) => {
     if (ERR) {
       return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
@@ -281,7 +353,7 @@ organisationController.coinBank = (req, res) => {
       console.log(recycler.coin);
       let totalCoin = recycler
         .map((val) => val.coin)
-        .reduce((acc, curr) => acc + curr);
+        .reduce((acc, curr) => acc + curr,0);
       return res.status(200).json({
         totalCoinTransaction: totalCoin,
       });
@@ -291,8 +363,8 @@ organisationController.coinBank = (req, res) => {
 
 organisationController.wasteCounter = (req, res) => {
   const organisationID = req.query.organisationID;
-
-  MODEL.transactionModel
+  try {
+    MODEL.transactionModel
     .find({ organisationID: organisationID })
     .sort({ _id: -1 })
     .then((recycler, err) => {
@@ -304,6 +376,12 @@ organisationController.wasteCounter = (req, res) => {
       });
     })
     .catch((err) => res.status(500).json(err));
+
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
+  
 };
 
 organisationController.numberTransaction = (req, res) => {
@@ -521,24 +599,25 @@ organisationController.monthChartData = (req, res) => {
     .then((result, err) => {
       if (err) return res.status(400).json(err);
 
-      var can = result
-        .filter((x) => x.Category == "Can")
+
+        var can = result
+        .filter((x) => x.Category == "Can" || x.Category == "can")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
-        .filter((x) => x.Category == "Pet Bottle")
+        .filter((x) => x.Category == "Pet Bottle" || x.Category == "Pet bottle")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
-        .filter((x) => x.Category == "carton")
+        .filter((x) => x.Category == "carton" || x.Category == "Carton")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
-        .filter((x) => x.Category == "Rubber")
+        .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == "Plastics")
+        .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -578,25 +657,25 @@ organisationController.thirdChartData = (req, res) => {
     .then((result, err) => {
       if (err) return res.status(400).json(err);
       var can = result
-        .filter((x) => x.Category == "Can")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var petBottle = result
-        .filter((x) => x.Category == "Pet Bottle")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var carton = result
-        .filter((x) => x.Category == "Cartoon")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var rubber = result
-        .filter((x) => x.Category == "Rubber")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var plastics = result
-        .filter((x) => x.Category == "Plastics")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
+      .filter((x) => x.Category == "Can" || x.Category == "can")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var petBottle = result
+      .filter((x) => x.Category == "Pet Bottle" || x.Category == "Pet bottle")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var carton = result
+      .filter((x) => x.Category == "carton" || x.Category == "Carton")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var rubber = result
+      .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var plastics = result
+      .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
         can: can,
@@ -636,25 +715,25 @@ organisationController.forthChartData = (req, res) => {
       if (err) return res.status(400).json(err);
 
       var can = result
-        .filter((x) => x.Category == "Can")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var petBottle = result
-        .filter((x) => x.Category == "Pet Bottle")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var carton = result
-        .filter((x) => x.Category == "carton")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var rubber = result
-        .filter((x) => x.Category == "Rubber")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var plastics = result
-        .filter((x) => x.Category == "Plastics")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
+      .filter((x) => x.Category == "Can" || x.Category == "can")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var petBottle = result
+      .filter((x) => x.Category == "Pet Bottle" || x.Category == "Pet bottle")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var carton = result
+      .filter((x) => x.Category == "carton" || x.Category == "Carton")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var rubber = result
+      .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var plastics = result
+      .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
         can: can,
@@ -694,23 +773,38 @@ organisationController.weekChartData = (req, res) => {
       console.log("result here", result);
 
       var can = result
-        .filter((x) => x.Category == "Can")
+      .filter((x) => x.Category == "Can" || x.Category == "can")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var petBottle = result
+      .filter((x) => x.Category == "Pet Bottle" || x.Category == "Pet bottle")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var carton = result
+      .filter((x) => x.Category == "carton" || x.Category == "Carton")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var rubber = result
+      .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var plastics = result
+      .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+  
+      var glass = result
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
-      var petBottle = result
-        .filter((x) => x.Category == "Pet Bottle")
+      
+      var metal = result
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
-      var carton = result
-        .filter((x) => x.Category == "carton")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var rubber = result
-        .filter((x) => x.Category == "Rubber")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var plastics = result
-        .filter((x) => x.Category == "Plastics")
+
+      var nylon = result
+        .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -720,6 +814,9 @@ organisationController.weekChartData = (req, res) => {
         carton: carton,
         rubber: rubber,
         plastics: plastics,
+        glass : glass,
+        metal: metal,
+        nylon: nylon
       });
     })
     .catch((err) => res.status(500).json(err));
@@ -740,8 +837,16 @@ organisationController.raffleTicket = (req, res) => {
         { $match: { lcd: lcd ,  availablePoints : {$ne: 0 } } },
         { $sample: { size: Number(winner_count) } }
        ]).then((winners,err)=>{
-          console.log("winner", winners)
           if (err) return res.status(400).json(err);
+          for(let i = 0 ; i < winners.length ; i++){
+            MODEL.userModel.updateOne(
+              { _id: winners[i]._id },
+              { $set: { rafflePoints: winners[i].rafflePoints + 10000} },
+              (res) => {
+                console.log('Winner object update');
+              }
+            );
+          }
         return res.status(200).json({ winners: winners});
         
       }
@@ -856,25 +961,25 @@ organisationController.lawmaMonthChartData = (req, res) => {
       if (err) return res.status(400).json(err);
 
       var can = result
-        .filter((x) => x.Category == "Can")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var petBottle = result
-        .filter((x) => x.Category == "Pet Bottle")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var carton = result
-        .filter((x) => x.Category == "carton")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var rubber = result
-        .filter((x) => x.Category == "Rubber")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var plastics = result
-        .filter((x) => x.Category == "Plastics")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
+      .filter((x) => x.Category == "Can" || x.Category == "can")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var petBottle = result
+      .filter((x) => x.Category == "Pet Bottle" || x.Category == "Pet bottle")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var carton = result
+      .filter((x) => x.Category == "carton" || x.Category == "Carton")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var rubber = result
+      .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var plastics = result
+      .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
         can: can,
@@ -910,25 +1015,25 @@ organisationController.lawmaThirdChartData = (req, res) => {
     .then((result, err) => {
       if (err) return res.status(400).json(err);
       var can = result
-        .filter((x) => x.Category == "Can")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var petBottle = result
-        .filter((x) => x.Category == "Pet Bottle")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var carton = result
-        .filter((x) => x.Category == "Cartoon")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var rubber = result
-        .filter((x) => x.Category == "Rubber")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var plastics = result
-        .filter((x) => x.Category == "Plastics")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
+      .filter((x) => x.Category == "Can" || x.Category == "cans")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var petBottle = result
+      .filter((x) => x.Category == "Pet Bottle" || x.Category == "Pet bottle")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var carton = result
+      .filter((x) => x.Category == "carton" || x.Category == "Carton")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var rubber = result
+      .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var plastics = result
+      .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
         can: can,
@@ -966,25 +1071,25 @@ organisationController.lawmaForthChartData = (req, res) => {
       if (err) return res.status(400).json(err);
 
       var can = result
-        .filter((x) => x.Category == "Can")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var petBottle = result
-        .filter((x) => x.Category == "Pet Bottle")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var carton = result
-        .filter((x) => x.Category == "carton")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var rubber = result
-        .filter((x) => x.Category == "Rubber")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
-      var plastics = result
-        .filter((x) => x.Category == "Plastics")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
+      .filter((x) => x.Category == "Can" || x.Category == "can")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var petBottle = result
+      .filter((x) => x.Category == "Pet Bottle" || x.Category == "Pet bottle")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var carton = result
+      .filter((x) => x.Category == "carton" || x.Category == "Carton")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var rubber = result
+      .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    var plastics = result
+      .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
         can: can,
@@ -1023,23 +1128,38 @@ organisationController.lawmaWeekChartData = (req, res) => {
       console.log("result here", result);
 
       var can = result
-        .filter((x) => x.Category == "Can")
+        .filter((x) => x.Category == "Can" || x.Category == "can")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
-        .filter((x) => x.Category == "Pet Bottle")
+        .filter((x) => x.Category == "Pet Bottle" || x.Category == "Pet bottle")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
-        .filter((x) => x.Category == "carton")
+        .filter((x) => x.Category == "carton" || x.Category == "Carton")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
-        .filter((x) => x.Category == "Rubber")
+        .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == "Plastics")
+        .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      
+      var glass = result
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      
+      var metal = result
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      var nylon = result
+        .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -1049,6 +1169,9 @@ organisationController.lawmaWeekChartData = (req, res) => {
         carton: carton,
         rubber: rubber,
         plastics: plastics,
+        glass : glass,
+        metal: metal,
+        nylon: nylon
       });
     })
     .catch((err) => res.status(500).json(err));
@@ -1266,7 +1389,6 @@ organisationController.totalCoinAnalytics = (req,res)=>{
 organisationController.deleteCompany = (req,res)=>{
   const companyID = req.body.companyID
   try {
-
     MODEL.organisationModel.deleteOne({
       _id: companyID
     }).then((result)=>{
@@ -1274,7 +1396,6 @@ organisationController.deleteCompany = (req,res)=>{
         message: "Recycling company deleted successfully"
       })
     })
-
   }
   catch(err){
     return res.status(500).json(err)
@@ -1962,13 +2083,13 @@ organisationController.categoryAnalytics = (REQUEST, RESPONSE) => {
       var petBottle = result
         .filter((x) => x.Category == "Pet Bottle")
       var carton = result
-        .filter((x) => x.Category == "carton")
+        .filter((x) => x.Category == "carton" || "Carton")
        
       var rubber = result
-        .filter((x) => x.Category == "Rubber")
+        .filter((x) => x.Category == "Rubber" || "rubber")
         
       var plastics = result
-        .filter((x) => x.Category == "Plastics")
+        .filter((x) => x.Category == "Plastics" || "plastics")
 
       return RESPONSE.status(200).json({
         can: can,
@@ -2635,6 +2756,97 @@ organisationController.deleteAdvert = (REQUEST,RESPONSE)=>{
 
 }
 
+
+organisationController.monifyHook = (REQUEST,RESPONSE)=>{
+  const data = {...REQUEST.body}
+  try{
+
+    MODEL.payOutModel(data).save({}, (ERR, RESULT) => {
+
+      return RESPONSE.status(200).json({
+        message: "Payment initiated successfully"
+      })
+
+  })
+
+  }
+  catch(err){
+    return RESPONSE.status(500).json(err);
+  }
+}
+
+organisationController.monifyReceipts = (REQUEST, RESPONSE)=>{
+  const email = REQUEST.query.email;
+  try{
+    MODEL.payOutModel.find({ "customer.email" : email }).sort({ _id: -1 }).then((receipts)=>{
+        return RESPONSE.status(200).json(receipts)
+    })
+  }
+  catch(err){
+      return RESPONSE.status(500).json(err);
+  }
+}
+
+organisationController.payPortal = (REQUEST, RESPONSE)=>{
+  const organisation_id = REQUEST.body.organisation_id;
+  try{
+    MODEL.organisationModel.find({
+      _id : organisation_id
+    }).then((organisation)=>{  
+      MODEL.organisationModel.updateOne(
+        { _id: organisation._id },
+        { wallet : 0 },
+        (err, resp) => {
+          if (err) {
+            return RESPONSE.status(400).jsonp(err);
+          }
+          MODEL.transactionModel
+    .find({ organisationID: organisation_id })
+    .sort({ _id: -1 })
+    .then((recycler) => { 
+      for(let i = 0 ; i < recycler.length ; i++){
+        MODEL.transactionModel.updateOne(
+          { "_id": `${recycler[i]._id}` },
+         { "$set": { "paid" : true } },
+          (err, resp) => {
+            if (err) {
+              return RESPONSE.status(400).jsonp(err);
+            }
+          }
+        );
+      }
+    })
+          return RESPONSE.status(200).json({ message: "Payout success!" });
+        }
+      );
+    })
+
+  }
+  catch(err){
+    return RESPONSE.status(500).json(err);
+  }
+}
+
+organisationController.organisationRecyclers = (req,res)=>{
+  const organisation_id  = req.query.organisation_id;
+  if(!organisation_id){
+    return res.status(400).json({
+      message: "Enter a valid organisation id"
+    })
+  }
+  try{
+    MODEL.collectorModel.find({
+      approvedBy: organisation_id
+    }).then(recyclers=>{
+      return res.status(200).json({
+        data: recyclers
+      })
+    })
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
+}
 
 /* export organisationControllers */
 module.exports = organisationController;

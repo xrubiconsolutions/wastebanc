@@ -38,17 +38,6 @@ var nodemailer = require('nodemailer');
 
 const io = require('socket.io')();
 
-io.on('connection', (client) => {
-  client.on('subscribeToTimer', (interval) => {
-    console.log('client is subscribing to event ', interval);
-    // setInterval(() => {
-    //   client.emit('timer', new Date());
-    // }, interval);
-  });
-});
-
-const tax_url =
-  'https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer';
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -141,109 +130,206 @@ userController.registerUser = (REQUEST, RESPONSE) => {
             MODEL.userModel(dataToSave).save({}, (ERR, RESULT) => {
               if (ERR) RESPONSE.status(400).jsonp(ERR);
               else {
-                request(
-                  {
-                    url:
-                      'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
-                    method: 'POST',
-                    json: true,
-                    body: {
-                      data: { username: 'xrubicon', password: 'xrubicon1234' },
-                    },
-                  },
-                  function (error, response, body) {
-                    //  return response.headers.token;
-                    request(
-                      {
-                        url:
-                          'https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer',
-                        method: 'POST',
-                        headers: {
-                          Accept: 'application/json',
-                          'Accept-Charset': 'utf-8',
-                          Token: response.headers.token,
-                        },
-                        json: true,
-                        body: {
-                          data: {
-                            username: RESULT.username,
-                            firstname: RESULT.firstname,
-                            lastname: RESULT.lastname,
-                            othernames: RESULT.othernames,
-                            email: RESULT.email,
-                            phone: RESULT.phone,
-                            address: RESULT.address,
-                          },
-                        },
-                      },
-                      function (err, res) {
-                        let card_id = res.body.content.data.cardID;
-                        need = { cardID: card_id, ...RESULT };
 
-                        // TERMII IMPLEMENTATION 
-
-                        const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
-                        const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
-                        const client = require('twilio')(accountSid, authToken);
-
-
-                        client.verify
-                          .services('VAeaa492de9598c3dcce55fd9243461ab3')
-                          .verifications.create({
-                            to: `+234${dataToSave.phone}`,
-                            channel: 'sms',
-                          })
-                          .then((verification) =>
-                            console.log(verification.status)
-                          );
-
-                        client.lookups
-                          .phoneNumbers(`+234${dataToSave.phone}`)
-                          .fetch({ type: ['carrier'] })
-                          .then((phone_number) =>
-                            MODEL.userModel.updateOne(
-                              { email: RESULT.email },
-                              {
-                                $set: {
-                                  cardID: card_id,
-                                  firstname: RESULT.username.split(' ')[0],
-                                  lastname: RESULT.username.split(' ')[1],
-                                  fullname: RESULT.username.split(' ')[0] + " " + RESULT.username.split(' ')[1],
-                                  mobile_carrier: phone_number.carrier.name,
-                                },
-                              },
-                              (res) => {
-                                //BYPASS FOR TESTING PURPOSE
-                                MODEL.userModel.findOne(
-                                  { email: RESULT.email },
-                                  (err, USER) => {
-                                    var test = JSON.parse(JSON.stringify(USER));
-
-                                    if (err)
-                                      return RESPONSE.status(400).jsonp(error);
-                                    console.log('user here at all', USER);
+                var test = JSON.parse(JSON.stringify(RESULT));
                                     var jwtToken = COMMON_FUN.createToken(
                                       test
                                     ); /** creating jwt token */
-                                    console.log('user token here at all', USER);
                                     test.token = jwtToken;
-                                    return RESPONSE.status(200).jsonp(
-                                      COMMON_FUN.sendSuccess(
-                                        CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-                                        test
-                                      )
-                                    );
-                                  }
-                                );
 
-                                console.log(res);
-                              }
-                            )
-                          );
-                      }
-                    );
-                  }
-                );
+                                    MODEL.userModel.updateOne(
+                                                    { email: RESULT.email },
+                                                    {
+                                                      $set: {
+                                                        cardID: RESULT._id
+                                                      },
+                                                    },
+                                                    (res) => { 
+                                                      var phoneNo = String(RESULT.phone).substring(1,11);
+                                                      var data = {
+                                                        api_key:'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+                                                        message_type: 'NUMERIC',
+                                                        to: `+234${phoneNo}`,
+                                                        from: 'N-Alert',
+                                                        channel: 'dnd',
+                                                        pin_attempts: 10,
+                                                        pin_time_to_live: 5,
+                                                        pin_length: 4,
+                                                        pin_placeholder: '< 1234 >',
+                                                        message_text: 'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
+                                                        pin_type: 'NUMERIC',
+                                                      };
+                                                      var options = {
+                                                        method: 'POST',
+                                                        url: 'https://termii.com/api/sms/otp/send',
+                                                        headers: {
+                                                          'Content-Type': ['application/json', 'application/json'],
+                                                        },
+                                                        body: JSON.stringify(data),
+                                                      };
+                                                      request(options, function (error, response) {
+                                                        const iden = JSON.parse(response.body)
+                                                        if (error) {
+                                                          throw new Error(error);
+                                                        } else {
+                                                          // let UserData = {
+                                                          //   email: RESULT.email,
+                                                          //   phone: RESULT.phone,
+                                                          //   username: RESULT.username,
+                                                          //   roles: RESULT.roles,
+                                                          //   pin_id: response.body.pin_id
+                                                          // };
+                                                          let UserData = {
+                                                            ...test , pin_id: iden.pinId
+                                                          }
+
+                                              var data = {
+                                                            "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+                                                            "phone_number": `+234${phoneNo}`,
+                                                            "country_code": "NG"
+                                                          };
+                                              var options = {
+                                                'method': 'GET',
+                                                'url': ' https://termii.com/api/insight/number/query',
+                                                'headers': {
+                                                  'Content-Type': ['application/json', 'application/json']
+                                                },
+                                                body: JSON.stringify(data)
+                                              
+                                              };
+                                              request(options, function (error, response) { 
+                                                if (error) throw new Error(error);
+                                                var mobileData = JSON.parse(response.body);
+                                                var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
+                                              MODEL.userModel.updateOne(
+                                                              { email: RESULT.email },
+                                                              {
+                                                                $set: {
+                                                                  fullname: RESULT.username.split(' ')[0] + " " + RESULT.username.split(' ')[1],
+                                                                  mobile_carrier: mobile_carrier,
+                                                                },
+                                                              },
+                                                              (res) => {
+
+                                                          return RESPONSE.status(200).jsonp(
+                                                            UserData
+                                                           );
+
+                                                              })
+
+                                                            })
+
+
+
+                                                        }
+                                                      })
+
+                                                    })
+                            
+
+                // request(
+                //   {
+                //     url:
+                //       'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
+                //     method: 'POST',
+                //     json: true,
+                //     body: {
+                //       data: { username: 'xrubicon', password: 'xrubicon1234' },
+                //     },
+                //   },
+                //   function (error, response, body) {
+                //     //  return response.headers.token;
+                //     request(
+                //       {
+                //         url:
+                //           'https://apis.touchandpay.me/lawma-backend/v1/agent/create/customer',
+                //         method: 'POST',
+                //         headers: {
+                //           Accept: 'application/json',
+                //           'Accept-Charset': 'utf-8',
+                //           Token: response.headers.token,
+                //         },
+                //         json: true,
+                //         body: {
+                //           data: {
+                //             username: RESULT.username,
+                //             firstname: RESULT.firstname,
+                //             lastname: RESULT.lastname,
+                //             othernames: RESULT.othernames,
+                //             email: RESULT.email,
+                //             phone: RESULT.phone,
+                //             address: RESULT.address,
+                //           },
+                //         },
+                //       },
+                //       function (err, res) {
+                //         let card_id = res.body.content.data.cardID;
+                //         need = { cardID: card_id, ...RESULT };
+
+                //         // TERMII IMPLEMENTATION 
+
+                //         const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
+                //         const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
+                //         const client = require('twilio')(accountSid, authToken);
+
+
+                //         client.verify
+                //           .services('VAeaa492de9598c3dcce55fd9243461ab3')
+                //           .verifications.create({
+                //             to: `+234${dataToSave.phone}`,
+                //             channel: 'sms',
+                //           })
+                //           .then((verification) =>
+                //             console.log(verification.status)
+                //           );
+
+                //         client.lookups
+                //           .phoneNumbers(`+234${dataToSave.phone}`)
+                //           .fetch({ type: ['carrier'] })
+                //           .then((phone_number) =>
+                //             MODEL.userModel.updateOne(
+                //               { email: RESULT.email },
+                //               {
+                //                 $set: {
+                //                   cardID: card_id,
+                //                   firstname: RESULT.username.split(' ')[0],
+                //                   lastname: RESULT.username.split(' ')[1],
+                //                   fullname: RESULT.username.split(' ')[0] + " " + RESULT.username.split(' ')[1],
+                //                   mobile_carrier: phone_number.carrier.name,
+                //                 },
+                //               },
+                //               (res) => {
+                //                 //BYPASS FOR TESTING PURPOSE
+                //                 MODEL.userModel.findOne(
+                //                   { email: RESULT.email },
+                //                   (err, USER) => {
+                //                     var test = JSON.parse(JSON.stringify(USER));
+
+                //                     if (err)
+                //                       return RESPONSE.status(400).jsonp(error);
+                //                     console.log('user here at all', USER);
+                //                     var jwtToken = COMMON_FUN.createToken(
+                //                       test
+                //                     ); /** creating jwt token */
+                //                     console.log('user token here at all', USER);
+                //                     test.token = jwtToken;
+                //                     return RESPONSE.status(200).jsonp(
+                //                       COMMON_FUN.sendSuccess(
+                //                         CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                //                         test
+                //                       )
+                //                     );
+                //                   }
+                //                 );
+
+                //                 console.log(res);
+                //               }
+                //             )
+                //           );
+                //       }
+                //     );
+                //   }
+                // );
               }
             });
           }
@@ -535,6 +621,30 @@ userController.changedlogedInPassword = (REQUEST, RESPONSE) => {
 };
 
 userController.resendVerification = (REQUEST, RESPONSE) => {
+  // var error = {};
+  // var phone = REQUEST.body.phone;
+
+  // const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
+  // const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
+  // const client = require('twilio')(accountSid, authToken);
+
+  // try {
+  //   client.verify
+  //     .services('VAeaa492de9598c3dcce55fd9243461ab3	')
+  //     .verifications.create({
+  //       to: `+234${phone}`,
+  //       channel: 'sms',
+  //     })
+  //     .then((verification) => {
+  //       console.log(verification.status);
+  //       return RESPONSE.status(200).jsonp({
+  //         message: 'Verification code sent',
+  //       });
+  //     })
+  //     .catch((err) => RESPONSE.status(404).jsonp(err));
+  // } catch (err) {
+  //   return RESPONSE.status(404).jsonp(err);
+  // }
   var error = {};
   var phone = REQUEST.body.phone;
 
@@ -543,106 +653,182 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
   const client = require('twilio')(accountSid, authToken);
 
   try {
-    client.verify
-      .services('VAeaa492de9598c3dcce55fd9243461ab3	')
-      .verifications.create({
-        to: `+234${phone}`,
-        channel: 'sms',
-      })
-      .then((verification) => {
-        console.log(verification.status);
-        return RESPONSE.status(200).jsonp({
-          message: 'Verification code sent',
-        });
-      })
-      .catch((err) => RESPONSE.status(404).jsonp(err));
+    var data = {
+      api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+      message_type: 'NUMERIC',
+      to: `+234${phone}`,
+      from: 'N-Alert',
+      channel: 'dnd',
+      pin_attempts: 10,
+      pin_time_to_live: 5,
+      pin_length: 4,
+      pin_placeholder: '< 1234 >',
+      message_text:
+        'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
+      pin_type: 'NUMERIC',
+    };
+    var options = {
+      method: 'POST',
+      url: 'https://termii.com/api/sms/otp/send',
+      headers: {
+        'Content-Type': ['application/json', 'application/json'],
+      },
+      body: JSON.stringify(data),
+    };
+    request(options, function (error, response) {
+      if (error) throw new Error(error);
+
+      return RESPONSE.status(200).json(JSON.parse(response.body));
+    });
+
+    // client.verify
+    //   .services("VAeaa492de9598c3dcce55fd9243461ab3")
+    //   .verifications.create({
+    //     to: `+234${phone}`,
+    //     channel: "sms",
+    //   })
+    //   .then((verification) => {
+    //     console.log(verification.status);
+    //     RESPONSE.status(200).jsonp({ message: "Verification code sent" });
+    //   })
+    //   .catch((err) => RESPONSE.status(404).jsonp(err));
   } catch (err) {
-    return RESPONSE.status(404).jsonp(err);
+    return RESPONSE.status(400).jsonp(err);
   }
 };
 
 userController.verifyPhone = (REQUEST, RESPONSE) => {
-  var error = {};
-  var token = REQUEST.body.token;
-  var phone = REQUEST.body.phone;
-  const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
-  const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
-  const client = require('twilio')(accountSid, authToken);
+//   var error = {};
+//   var token = REQUEST.body.token;
+//   var phone = REQUEST.body.phone;
+//   const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
+//   const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
+//   const client = require('twilio')(accountSid, authToken);
 
 
-  // TERMII VERIFICATION
+//   // TERMII VERIFICATION
 
 
-//   var data = {
-//     "api_key": "Your API key",
-//     "pin_id": "c8dcd048-5e7f-4347-8c89-4470c3af0b",
-//     "pin": "195558"
-// };
-// var options = {
-// 'method': 'POST',
-// 'url': 'https://termii.com/api/sms/otp/verify',
-// 'headers': {
-// 'Content-Type': ['application/json', 'application/json']
-// },
-// body: JSON.stringify(data)
+// //   var data = {
+// //     "api_key": "Your API key",
+// //     "pin_id": "c8dcd048-5e7f-4347-8c89-4470c3af0b",
+// //     "pin": "195558"
+// // };
+// // var options = {
+// // 'method': 'POST',
+// // 'url': 'https://termii.com/api/sms/otp/verify',
+// // 'headers': {
+// // 'Content-Type': ['application/json', 'application/json']
+// // },
+// // body: JSON.stringify(data)
 
-// };
-// request(options, function (error, response) { 
-// if (error) throw new Error(error);
-// console.log(response.body);
-// });
+// // };
+// // request(options, function (error, response) { 
+// // if (error) throw new Error(error);
+// // console.log(response.body);
+// // });
 
 
-  try {
-    client.verify
-      .services('VAeaa492de9598c3dcce55fd9243461ab3')
-      .verificationChecks.create({
-        to: `+234${phone}`,
-        code: `${token}`,
-      })
-      .then((verification_check) => {
-        if (verification_check.status == 'approved') {
-          console.log(verification_check.status);
-          MODEL.userModel.updateOne(
-            { phone: phone },
-            { verified: true },
-            (res) => {
-              MODEL.userModel.findOne({ phone: phone }, (err, USER) => {
-                var test = JSON.parse(JSON.stringify(USER));
+//   try {
+//     client.verify
+//       .services('VAeaa492de9598c3dcce55fd9243461ab3')
+//       .verificationChecks.create({
+//         to: `+234${phone}`,
+//         code: `${token}`,
+//       })
+//       .then((verification_check) => {
+//         if (verification_check.status == 'approved') {
+//           console.log(verification_check.status);
+//           MODEL.userModel.updateOne(
+//             { phone: phone },
+//             { verified: true },
+//             (res) => {
+//               MODEL.userModel.findOne({ phone: phone }, (err, USER) => {
+//                 var test = JSON.parse(JSON.stringify(USER));
 
-                if (err) return RESPONSE.status(400).jsonp(error);
-                console.log('user here at all', USER);
-                var jwtToken = COMMON_FUN.createToken(
-                  test
-                ); /** creating jwt token */
-                console.log('user token here at all', test, jwtToken);
-                test.token = jwtToken;
-                return RESPONSE.status(200).json(test);
-              });
-            }
-          );
-        } else {
-          return RESPONSE.status(404).json({
-            message: 'Wrong OTP !',
-          });
-        }
-      })
-      .catch((err) =>
-        RESPONSE.status(404).json({
-          message: 'Wrong OTP !',
-        })
-      );
-  } catch (err) {
-    return RESPONSE.status(404).json({
-      err,
-    });
+//                 if (err) return RESPONSE.status(400).jsonp(error);
+//                 console.log('user here at all', USER);
+//                 var jwtToken = COMMON_FUN.createToken(
+//                   test
+//                 ); /** creating jwt token */
+//                 console.log('user token here at all', test, jwtToken);
+//                 test.token = jwtToken;
+//                 return RESPONSE.status(200).json(test);
+//               });
+//             }
+//           );
+//         } else {
+//           return RESPONSE.status(404).json({
+//             message: 'Wrong OTP !',
+//           });
+//         }
+//       })
+//       .catch((err) =>
+//         RESPONSE.status(404).json({
+//           message: 'Wrong OTP !',
+//         })
+//       );
+//   } catch (err) {
+//     return RESPONSE.status(404).json({
+//       err,
+//     });
+//   }
+
+var error = {};
+var phone = REQUEST.body.phone;
+var token = REQUEST.body.token;
+var pin_id = REQUEST.body.pin_id;
+
+var data = {
+  api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+  pin_id: pin_id,
+  pin: token,
+};
+var options = {
+  method: 'POST',
+  url: 'https://termii.com/api/sms/otp/verify',
+  headers: {
+    'Content-Type': ['application/json', 'application/json'],
+  },
+  body: JSON.stringify(data),
+};
+request(options, function (error, response) {
+  if (error) throw new Error(error);
+
+  const verified = JSON.parse(response.body);
+  if(verified.verified == true){
+  MODEL.userModel.updateOne(
+      { phone: phone },
+      { verified: true },
+      (res) => {
+        MODEL.userModel.findOne({ phone: phone }, (err, USER) => {
+          var test = JSON.parse(JSON.stringify(USER));
+
+          if (err) return RESPONSE.status(400).jsonp(error);
+          console.log('user here at all', USER);
+          var jwtToken = COMMON_FUN.createToken(
+            test
+          ); /** creating jwt token */
+          console.log('user token here at all', USER);
+          test.token = jwtToken;
+          return RESPONSE.jsonp(test);
+        });
+      }
+    );  
   }
+  else {
+    return RESPONSE.status(400).json({
+      message: "Invalid token, retry"
+    })
+  }
+  console.log(response.body);
+});
 };
 
 userController.getAllClients = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
-    let users = await MODEL.userModel.find({ roles: 'client' }).sort({ _id : -1});
+    let users = await MODEL.userModel.find({ roles: 'client', verified: true }).sort({ _id : -1});
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);
@@ -682,7 +868,7 @@ userController.getWalletBalance = (req, res) => {
 userController.getAllCollectors = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
-    let users = await MODEL.collectorModel.find({}).sort({_id:-1});
+    let users = await MODEL.collectorModel.find({ verified : true}).sort({_id:-1});
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);
@@ -693,15 +879,16 @@ userController.resetMobile = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
   const token = REQUEST.body.token;
 
-  const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
-  const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
 
 
+  var phoneNo = String(phone).substring(1,11);
+
+  console.log("<<phone >>", phoneNo)
 
   var data = {
     "api_key" : "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
     "message_type" : "NUMERIC",
-    "to" : `+234${phone}`,
+    "to" : `+234${phoneNo}`,
     "from" : "N-Alert",
     "channel" : "dnd",
     "pin_attempts" : 10,
@@ -739,18 +926,14 @@ body: JSON.stringify(data)
 request(options, function (error, response) { 
 if (error) throw new Error(error);
 
-if(response.body.verified === true){
-
-MODEL.collectorModel.updateOne(
+MODEL.userModel.updateOne(
   { phone: phone },
   { verified: true },
   (res) => {
 
-    MODEL.collectorModel
+    MODEL.userModel
       .findOne({ "phone": phone }, (err,USER) => {
-
         var test = JSON.parse(JSON.stringify(USER))
-
         if (err) return RESPONSE.status(400).jsonp(error)
         console.log("user here at all", USER)
         var jwtToken = COMMON_FUN.createToken(
@@ -763,8 +946,6 @@ MODEL.collectorModel.updateOne(
       })
   }
 );
-
-}
 // return RESPONSE.status(200).json(JSON.parse(response.body))
 
 })
@@ -876,9 +1057,14 @@ userController.dailyActive = (req, res) => {
   const today = new Date();
   const active_today = new Date();
   active_today.setDate(today.getDate() - 1);
+  active_today.setHours(0,0,0,0)
+  active_today.setHours(active_today.getHours() + 1)
+
   try {
     MODEL.userModel
       .find({
+        verified: true,
+        roles: "client",
         last_logged_in: {
           $gte: active_today,
         },
@@ -901,6 +1087,8 @@ userController.newActiveUser = (req, res) => {
   try {
     MODEL.userModel
       .find({
+        verified: true,
+        roles: "client",
         createAt: {
           $gte: active_today,
         },
@@ -1058,13 +1246,15 @@ userController.androidUsers = (req, res) => {
   try {
     MODEL.userModel
       .find({
+        verified: true,
         phone_OS: 'android',
       }).sort({
         _id : -1
       })
         .then((result) => {
       
-          MODEL.collectorModel.find({phone_OS:"android"}).sort({
+          MODEL.collectorModel.find({      verified: true,
+            phone_OS:"android"}).sort({
             _id : -1
           }).then(recycler=>{
             var data = [...result, ...recycler]
@@ -1085,13 +1275,16 @@ userController.iosUsers = (req, res) => {
   try {
     MODEL.userModel
       .find({
+        verified: true,
         phone_OS: 'ios',
       }).sort({
         _id : -1
       })
       .then((result) => {
 
-        MODEL.collectorModel.find({phone_OS:"ios"}).sort({
+        MODEL.collectorModel.find({
+          verified: true,
+          phone_OS:"ios"}).sort({
           _id : -1
         }).then(recycler=>{
           var data = [...result, ...recycler]
@@ -1138,11 +1331,18 @@ userController.deviceAnalytics  = (REQUEST,RESPONSE)=>{
   try {
     MODEL.userModel
     .find({
+      verified: true,
       phone_OS: 'android',
     }).sort({ _id : -1})
     .then((android) => {
-
+      MODEL.collectorModel.find({  verified: true,
+        phone_OS: 'android' }).then((android_re)=>{
+            MODEL.collectorModel.find({
+              verified: true,
+              phone_OS: "ios"
+            }).then((ios_re)=>{
       MODEL.userModel.find({
+        verified: true,
         phone_OS: "ios"
       }).sort({ _id : -1}).then((ios)=>{
 
@@ -1158,15 +1358,21 @@ userController.deviceAnalytics  = (REQUEST,RESPONSE)=>{
           },
           function (err, resp){
             var desktop = JSON.parse(resp.body);
+            console.log("<ios re>", ios_re.length);
+            console.log("<ios us>", ios.length)
             return RESPONSE.status(200).json({
-              android: android.length,
-              ios: ios.length,
+              android: android.length + android_re.length,
+              ios: ios.length + ios_re.length,
               desktop: desktop.length
             })
 
         })
 
       })
+            })
+
+        })
+
     });
 } catch (err) {
   RESPONSE.status(500).json(err);
@@ -1194,42 +1400,86 @@ userController.deleteUser = (req,res)=>{
 
 
 userController.userAnalytics = (req,res)=>{
-  const today = new Date();
   const active_today = new Date();
+  active_today.setHours(0,0,0,0);
+
+  active_today.setHours(0,0,0,0)
+  active_today.setHours(active_today.getHours() + 1)
+
+  const yesterday = new Date();
+
+
+  yesterday.setDate(yesterday.getDate()-1);
+  yesterday.setHours(0,0,0,0)
+  yesterday.setHours(yesterday.getHours() + 1);
+
+ 
+
 
   try {
   MODEL.userModel.find({
+    verified: true, 
+    roles: "client"
   }).then((allUser)=>{
-  active_today.setDate(today.getDate() - 1);
     MODEL.userModel
       .find({
+        verified: true,
+        roles: "client",
          createAt: {
-          $gte: active_today,
+          $gte: yesterday
         },
       })
       .sort({ _id: -1 })
       .then((newUser) => {
-
           MODEL.userModel
             .find({
-              last_logged_in: {
-                $gte: active_today,
-              },
+              roles: "client",
+              verified: true,
+              $or: [
+                {
+                last_logged_in: {
+                  $gte: active_today,
+                }
+              }, {
+                createAt: {
+                  $gte: active_today
+                }
+              }
+              
+              ],
             })
             .sort({ _id: -1 })
             .then((activeTodayUser) => {
-
               MODEL.userModel.find({
-                last_logged_in: {
-                  $lte: active_today,
+                verified: true,                                   
+                roles: "client",  
+                $or: [
+                  {
+                    last_logged_in: {
+                      $lte: active_today,
+                    }
+                }, {
+                  last_logged_in: {
+                    $exists: false,
+                    $eq: null
+                   }
                 }
+                
+                ]
               }).sort({ _id : -1}).then((InactiveUser)=>{
+
+                console.log("<<>>", allUser.length);
+                console.log("<<>>", newUser.length);
+                console.log(">>>??", activeTodayUser.length);
+                console.log("<<>>>", active_today);
+                console.log("<<users", InactiveUser
+                )
 
                 return res.status(200).json({
                   allUsers: { allUsers: allUser.length },
                   newUsers: { newUsers: newUser.length },
                   activeTodayUsers: { activeTodayUsers : activeTodayUser.length},
-                  inactiveUsers: { inactiveUsers : allUser.length - activeTodayUser.length }
+                  inactiveUsers: { inactiveUsers : InactiveUser.length }
                 })
              })
 
@@ -1278,6 +1528,7 @@ userController.usageGrowth = (req,res)=>{
   try{
 
     MODEL.userModel.find({
+      verified: true,
       "$expr": {
         "$and": [
           {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1286,6 +1537,7 @@ userController.usageGrowth = (req,res)=>{
       }
     }).then((jan) => {
       MODEL.userModel.find({
+        verified: true,
         "$expr": {
           "$and": [
             {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1295,6 +1547,7 @@ userController.usageGrowth = (req,res)=>{
       }).then((feb)=>{
 
         MODEL.userModel.find({
+          verified: true,
           "$expr": {
             "$and": [
               {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1304,6 +1557,7 @@ userController.usageGrowth = (req,res)=>{
         }).then((march)=>{
 
           MODEL.userModel.find({
+            verified: true,
             "$expr": {
               "$and": [
                 {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1313,6 +1567,7 @@ userController.usageGrowth = (req,res)=>{
           }).then((april)=>{
 
             MODEL.userModel.find({
+              verified: true,
               "$expr": {
                 "$and": [
                   {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1322,6 +1577,7 @@ userController.usageGrowth = (req,res)=>{
             }).then((may)=>{
 
               MODEL.userModel.find({
+                verified: true,
                 "$expr": {
                   "$and": [
                     {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1331,6 +1587,7 @@ userController.usageGrowth = (req,res)=>{
               }).then((june)=>{
 
                 MODEL.userModel.find({
+                  verified: true,
                   "$expr": {
                     "$and": [
                       {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1340,6 +1597,7 @@ userController.usageGrowth = (req,res)=>{
                 }).then((july)=>{
 
                   MODEL.userModel.find({
+                    verified: true,
                     "$expr": {
                       "$and": [
                         {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1349,6 +1607,7 @@ userController.usageGrowth = (req,res)=>{
                   }).then((Aug)=>{
 
                     MODEL.userModel.find({
+                      verified: true,
                       "$expr": {
                         "$and": [
                           {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1359,6 +1618,7 @@ userController.usageGrowth = (req,res)=>{
 
 
                       MODEL.userModel.find({
+                        verified: true,
                         "$expr": {
                           "$and": [
                             {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1368,6 +1628,7 @@ userController.usageGrowth = (req,res)=>{
                       }).then((Oct)=>{
 
                         MODEL.userModel.find({
+                          verified: true,
                           "$expr": {
                             "$and": [
                               {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1377,6 +1638,7 @@ userController.usageGrowth = (req,res)=>{
                         }).then((Nov)=>{
 
                           MODEL.userModel.find({
+                            verified: true,
                             "$expr": {
                               "$and": [
                                 {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1386,6 +1648,7 @@ userController.usageGrowth = (req,res)=>{
                           }).then((Dec)=>{
 
                             MODEL.userModel.find({
+                              verified: true,
                               "$expr": {
                                 "$and": [
                                   {"$eq": [{ "$year": "$createAt" }, year]},
@@ -1455,31 +1718,39 @@ userController.usageGrowth = (req,res)=>{
 userController.mobileCarrierAnalytics = (REQUEST,RESPONSE)=>{
   try{
       MODEL.userModel.find({
-        mobile_carrier: "MTN"
+        verified: true,
+        mobile_carrier: "MTN Nigeria"
       }).then((mtn)=>{
           MODEL.collectorModel.find({
-            mobile_carrier:"MTN"
+            verified: true,
+            mobile_carrier:"MTN Nigeria"
           }).then((recycler_mtn)=>{
             var mtn_users = [...mtn, ...recycler_mtn];
               MODEL.userModel.find({
+                verified: true,
                 mobile_carrier:"Airtel Nigeria"
               }).then((airtel)=>{
                   MODEL.collectorModel.find({
+                    verified: true,
                     mobile_carrier:"Airtel Nigeria"
                   }).then((recycler_airtel)=>{
                     var airtel_users = [...airtel, ...recycler_airtel];
                       MODEL.userModel.find({
-                        mobile_carrier:"Globacom (GLO)"
+                        verified: true,
+                        mobile_carrier:"GLO Nigeria"
                       }).then((glo)=>{
                           MODEL.collectorModel.find({
-                            mobile_carrier: "Globacom (GLO)"
+                            verified: true,
+                            mobile_carrier: "GLO Nigeria"
                           }).then((recycler_glo)=>{
                               var glo_users = [...glo, ...recycler_glo];
                                 MODEL.userModel.find({
-                                  mobile_carrier:"9Mobile Nigeria (Etisalat)"
+                                  verified: true,
+                                  mobile_carrier:"9Mobile"
                                 }).then((etisalat)=>{
                                     MODEL.collectorModel.find({
-                                      mobile_carrier:"9Mobile Nigeria (Etisalat)"
+                                      verified: true,
+                                      mobile_carrier:"9Mobile"
                                     }).then((recycler_etisalat)=>{
                                         var etisalat_users = [...etisalat, ...recycler_etisalat];
                                          return RESPONSE.status(200).json({
@@ -1700,31 +1971,88 @@ userController.userReportLog = (req,res)=>{
 userController.internet_providerAnalytics = (req,res)=>{
   try{
       MODEL.userModel.find({
-        internet_provider: "MTN NG"
+        verified: true,
+        $or: [
+          {
+            internet_provider: "MTN NG",
+          },
+          {
+            internet_provider: "MTN",
+          },
+                          {
+                            internet_provider: "STAY SAFE",
+                          }
+        ]
       }).then((mtn)=>{
           MODEL.collectorModel.find({
-            internet_provider:"MTN NG"
+            verified: true,
+            $or: [
+              {
+                internet_provider: "MTN NG",
+              },
+              {
+                internet_provider: "MTN",
+              },
+                          {
+                            internet_provider: "STAY SAFE",
+                          }
+            ]
           }).then((recycler_mtn)=>{
             var mtn_users = [...mtn, ...recycler_mtn];
               MODEL.userModel.find({
-                internet_provider:"Airtel NG"
+                verified: true,
+                $or: [
+                  {
+                    internet_provider: "Airtel NG",
+                  },
+                  {
+                    internet_provider: "BeSafe Airtel",
+                  },
+                ]
               }).then((airtel)=>{
                   MODEL.collectorModel.find({
-                    internet_provider:"Airtel NG"
+                    verified: true,
+                    $or: [
+                      {
+                        internet_provider: "Airtel NG",
+                      },
+                      {
+                        internet_provider: "BeSafe Airtel",
+                      },
+                    ]
                   }).then((recycler_airtel)=>{
                     var airtel_users = [...airtel, ...recycler_airtel];
                       MODEL.userModel.find({
-                        internet_provider:"Glo LTE"
+                        verified: true,
+                        $or: [
+                          {
+                            internet_provider: "Glo NG",
+                          },
+                          {
+                            internet_provider: "glo ng",
+                          }
+                        ]
                       }).then((glo)=>{
                           MODEL.collectorModel.find({
-                            internet_provider: "Glo LTE"
+                            verified: true,
+                            $or: [
+                              {
+                                internet_provider: "Glo NG",
+                              },
+                              {
+                                internet_provider: "glo ng",
+                              }
+                              
+                            ]
                           }).then((recycler_glo)=>{
                               var glo_users = [...glo, ...recycler_glo];
                                 MODEL.userModel.find({
-                                  internet_provider:"9Mobile Nigeria (Etisalat)"
+                                  verified: true,
+                                  internet_provider:"9mobile"
                                 }).then((etisalat)=>{
                                     MODEL.collectorModel.find({
-                                      internet_provider:"9Mobile Nigeria (Etisalat)"
+                                      verified: true,
+                                      internet_provider:"9mobile"
                                     }).then((recycler_etisalat)=>{
                                         var etisalat_users = [...etisalat, ...recycler_etisalat];
                                          return res.status(200).json({
@@ -1865,15 +2193,38 @@ userController.sendPushNotification = (req,res)=>{
 
 
 userController.userInactivity = (req,res)=>{
-  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate()-1);
+  yesterday.setHours(0,0,0,0)
+  yesterday.setHours(yesterday.getHours() + 1);
+
   const active_today = new Date();
-  active_today.setDate(today.getDate() - 1);
+  active_today.setHours(0,0,0,0);
+
+  active_today.setHours(0,0,0,0)
+  active_today.setHours(active_today.getHours() + 1)
+
+  console.log(">><<", active_today)
+
+
+  $or: [
+    {
+      internet_provider: "Glo NG",
+    },
+    {
+      internet_provider: "glo ng",
+    }
+  ]
+
   try{
     MODEL.userModel.find({
+      verified: true,
+      roles:"client",
       last_logged_in: {
         $lte: active_today,
       }
     }).sort({ _id : -1}).then((InactiveUser)=>{
+      console.log(InactiveUser.length);
       return res.status(200).json({
         inactiveUsers : InactiveUser 
       })
@@ -1883,5 +2234,35 @@ userController.userInactivity = (req,res)=>{
 
   }
 }
+
+userController.updateOneSignal = (REQUEST,RESPONSE)=>{
+  const phone = REQUEST.body.phone;
+  const renewedSignal = REQUEST.body.renewedSignal;
+  try{
+    MODEL.userModel.findOne({
+      phone: phone
+    }).then((user)=>{
+      MODEL.userModel.updateOne(
+        { email: user.email },
+        {
+          $set: {
+            onesignal_id: renewedSignal
+          },
+        },
+        (res) => { 
+          return RESPONSE.status(200).json({
+            message: "Signal ID updated successfully"
+          })
+        })
+        
+    })
+
+
+  }
+  catch(err){
+      return RESPONSE.status(500).json(err);
+  }
+}
+
 /* export userControllers */
 module.exports = userController;

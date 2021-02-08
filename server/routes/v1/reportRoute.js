@@ -18,7 +18,7 @@ module.exports = (APP) => {
         .post(CONTROLLER.reportController.getReport);
 
     APP.route('/api/all/report')
-        .get(CONTROLLER.reportController.allReport);
+        .get(auth.adminPakamValidation, CONTROLLER.reportController.allReport);
 
     APP.route('/api/report/analytics')
         .get(CONTROLLER.reportController.allReportAnalytics);

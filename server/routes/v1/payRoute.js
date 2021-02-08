@@ -15,8 +15,17 @@ module.exports = (APP) => {
         .get(CONTROLLER.payController.resolveAccount);
 
     APP.route('/api/payment/receipt')
-        .post(CONTROLLER.payController.saveReceipt);
+        .post(auth.userValidation,CONTROLLER.payController.saveReceipt);
 
     APP.route('/api/payment/user/current')
         .get(CONTROLLER.payController.afterPayment);
+
+    APP.route('/api/requested/payout').get(
+        auth.companyValidation,
+        CONTROLLER.payController.requestedPayment
+    )
+    APP.route('/api/payout/history').get(
+        auth.companyValidation,
+        CONTROLLER.payController.allPayoutHistory
+    )
 }

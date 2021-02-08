@@ -67,9 +67,9 @@ module.exports = (APP) => {
 
   APP.route("/api/updateUser").post(CONTROLLER.userController.updateUser);
 
-  APP.route("/api/getAllClients").get(CONTROLLER.userController.getAllClients);
+  APP.route("/api/getAllClients").get(auth.userCollectorData,CONTROLLER.userController.getAllClients);
 
-  APP.route("/api/getAllCollectors").get(
+  APP.route("/api/getAllCollectors").get(auth.userCollectorData,
     CONTROLLER.userController.getAllCollectors
   );
 
@@ -93,18 +93,21 @@ module.exports = (APP) => {
 
   APP.route("/api/view/ads").get(CONTROLLER.userController.adsLook);
 
-  APP.route("/api/android/users").get(CONTROLLER.userController.androidUsers);
+  APP.route("/api/android/users").get(auth.adminValidation,CONTROLLER.userController.androidUsers);
 
-  APP.route("/api/ios/users").get(CONTROLLER.userController.iosUsers);
+  APP.route("/api/ios/users").get(auth.adminValidation,CONTROLLER.userController.iosUsers);
 
 
-  APP.route("/api/desktop/users").get(CONTROLLER.userController.desktopUsers);
+  APP.route("/api/desktop/users").get(auth.adminValidation,CONTROLLER.userController.desktopUsers);
 
 
   APP.route("/api/device/analytics").get(auth.adminValidation, CONTROLLER.userController.deviceAnalytics);
 
 
   APP.route("/api/delete/user").post(CONTROLLER.userController.deleteUser);
+
+  APP.route("/api/update/signal").post(auth.userValidation,CONTROLLER.userController.updateOneSignal);
+
 
 
   APP.route("/api/users/analytics").get(CONTROLLER.userController.userAnalytics);

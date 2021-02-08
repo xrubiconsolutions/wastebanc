@@ -37,20 +37,13 @@ reportController.report = (req, res) => {
     var tokenOptions = {};
     tokenOptions.expireTime = (Date.now() / 1000 ) +  2592000
 
-
-
     // generate token
     token = opentok.generateToken(session.sessionId, tokenOptions);
-
-
-
-
-
   MODEL.userModel.findOne({
     _id: userID
   }).then((userDetail)=>{
   MODEL.reportModel({
-      name: userDetail.firstname,
+      name: userDetail.fullname,
       email: userDetail.email,
       phone: userDetail.phone,
       apiKey: apiKey,
@@ -243,14 +236,14 @@ reportController.getReport = (req, res) => {
 
 
 
-reportController.allReport = (req, res) => {
+reportController.allReport = (REQUEST, RESPONSE) => {
   MODEL.reportModel
     .find({})
     .sort({ _id: -1 })
     .then((user) => {
-      return res.status(200).json(user);
+      return RESPONSE.status(200).json(user);
     })
-    .catch((err) => res.status(500).json(err));
+    .catch((err) => RESPONSE.status(500).json(err));
 };
 
 
@@ -262,6 +255,12 @@ reportController.endReport = (req,res)=>{
   MODEL.reportModel
   .findOne({ userReportID: ID })
   .then((user) => {
+    if(!user){
+      console.log("user here", user)
+      return res.status(400).json({
+        message: "No user report here"
+      })
+    }
     MODEL.reportModel.updateOne({ userReportID: ID }, { $set: { "active" : false } }, (err, resp)=>{
       if(err) { return res.status(400).json(err) }
 
@@ -286,6 +285,13 @@ reportController.endReport = (req,res)=>{
          }
             MODEL.reportLogModel(log).save( {} , (ERR, RESULT) => {
               if(ERR) return res.status(400).json(ERR)
+      MODEL.reportModel
+      .deleteOne({
+        userReportID: ID,
+      })
+      .then((result) => {
+         console.log('User deleted successfully');
+      });
               return res.status(200).json({message: "Session successfully ended"})
             })
       }

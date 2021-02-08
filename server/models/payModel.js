@@ -21,6 +21,14 @@ const pay_Schema = {
       type: String,
       required: true
   },
+  organisation: {
+    type: String,
+    required: true
+  },
+  paid: {
+      type: Boolean,
+      default: false
+  },
   cardID: {
     type: String,
     required: true,

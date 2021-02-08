@@ -185,6 +185,20 @@ module.exports = (APP) => {
         .post(CONTROLLER.organisationController.advertControl);
 
     APP.route('/api/delete/advert')
-        .post(CONTROLLER.organisationController.deleteAdvert);
+        .post(auth.adminValidation,CONTROLLER.organisationController.deleteAdvert);
+    
+    APP.route('/api/monify/payment').post(
+        CONTROLLER.organisationController.monifyHook
+    )
+    APP.route('/api/monify/receipts').get(
+        auth.companyValidation,
+        CONTROLLER.organisationController.monifyReceipts
+    )
+    APP.route('/api/company/recyclers').get(CONTROLLER.organisationController.organisationRecyclers)
+
+    APP.route('/api/pay/portal').post(
+        auth.companyValidation,
+        CONTROLLER.organisationController.payPortal
+    )
                
 };

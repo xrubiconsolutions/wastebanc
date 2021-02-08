@@ -38,9 +38,7 @@ const user_Schema = new Schema({
     default: 'Lagos',
   },
   cardID: {
-    type: Number,
-    required: true,
-    default: 1200,
+    type: String
   },
   fullname: {
     type: String,
@@ -89,6 +87,10 @@ const user_Schema = new Schema({
     type: Number,
     required: true,
     default: 0,
+  },
+  rafflePoints: {
+    type: Number,
+    default: 0
   },
   gender: {
     type: String,

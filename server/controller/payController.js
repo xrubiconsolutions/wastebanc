@@ -13,6 +13,7 @@ let FS = require('fs');
 const { Response } = require('aws-sdk');
 var request = require('request');
 const https = require('https');
+const payModel = require('../models/payModel');
 
 payController.getBanks = (req, res) => {
   request(
@@ -56,75 +57,95 @@ payController.resolveAccount = (req, res) => {
   );
 };
 
-payController.saveReceipt = (req, res) => {
+payController.saveReceipt = (REQUEST, RESPONSE) => {
   let errors = {};
-  const receipt = { ...req.body };
-  // let userId = req.body.userId;
-  // let fullname = req.body.fullname;
-  // let bankAcNo = req.body.bankAcNo;
-  // let bankName = req.body.bankName;
-  let cardID = req.body.cardID;
-  let amount = req.body.amount;
+  const receipt = { ...REQUEST.body };
+  // let userId = REQUEST.body.userId;
+  // let fullname = REQUEST.body.fullname;
+  // let bankAcNo = REQUEST.body.bankAcNo;
+  // let bankName = REQUEST.body.bankName;
+  let cardID = REQUEST.body.cardID;
+  let amount = REQUEST.body.amount;
   var balance;
 
   MODEL.userModel.findOne({ cardID: cardID }).then((result, err) => {
     if (!result)
-      return res.status(400).json({ message: 'Enter a valid card ID' });
+      return RESPONSE.status(400).json({ message: 'Enter a valid card ID' });
     if (result) {
       balance = result.availablePoints - amount;
       if (balance <= 0) {
-        return res
-          .status(406)
-          .json({
-            message:
-              "You don't have enough points to complete this transaction",
-          });
+        return RESPONSE.status(406).json({
+          message: "You don't have enough points to complete this transaction",
+        });
       }
-      MODEL.userModel.updateOne(
-        { cardID: cardID },
-        { availablePoints: balance },
-        (err, resp) => {
-          MODEL.payModel(receipt).save({}, (err, result) => {
-            console.log('error here', err);
-            if (err)
-              return res
-                .status(400)
-                .json({ message: 'Could not save receipt' });
-            console.log(result);
-            return res.status(201).json(result);
-          });
-        }
-      );
+      MODEL.transactionModel
+        .find({
+          paid: false,
+          cardID: cardID,
+        })
+        .then((unpaidFees) => {
+          for (let i = 0; i < unpaidFees.length; i++) {
+            MODEL.userModel.updateOne(
+              { cardID: cardID },
+              { availablePoints: balance },
+              (err, resp) => {
+                MODEL.payModel({
+                  ...receipt,
+                  organisation: unpaidFees[i].organisationID,
+                }).save({}, (err, result) => {
+                  if (err)
+                    return RESPONSE.status(400).json({
+                      message: 'Could not save receipt',
+                    });
+                  return RESPONSE.status(201).json(result);
+                });
+              }
+            );
+          }
+        });
     }
   });
 };
 
-
-
-payController.afterPayment = (req,res)=>{
+payController.afterPayment = (req, res) => {
   const userID = req.query.userID;
 
   try {
-    MODEL.userModel.findOne({_id: userID}).then(result=>{
+    MODEL.userModel.findOne({ _id: userID }).then((result) => {
       var test = JSON.parse(JSON.stringify(result));
-      var jwtToken = COMMON_FUN.createToken(
-        test
-      ); /** creating jwt token */
+      var jwtToken = COMMON_FUN.createToken(test); /** creating jwt token */
       test.token = jwtToken;
-      return res.status(200).jsonp(
-        COMMON_FUN.sendSuccess(
-          CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-          test
-        )
-      );
+      return res
+        .status(200)
+        .jsonp(
+          COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, test)
+        );
+    });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
 
-    })
+payController.requestedPayment = (req, res) => {
+  let company_id = req.query.company_id;
+  try {
+    payModel.find({organisation : company_id}).then((payments) => {
+      return res.status(200).json(payments);
+    });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+payController.allPayoutHistory = (req,res)=>{
+  try{
+      MODEL.paymentLogModel.find({}).then(payments=>{
+        return res.status(200).json(payments);
+      })
   }
   catch(err){
-    return res.status(500).json(err)
+    return res.status(500).json(err);
   }
-
- 
 }
 /* export payController */
 module.exports = payController;

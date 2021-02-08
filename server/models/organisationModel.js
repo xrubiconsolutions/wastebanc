@@ -45,7 +45,7 @@ const organisation_Schema = new Schema({
   },
   licence_active: { // Licence field
     type: Boolean,
-    default:false,
+    default:true,
   },
   expiry_date :{
       type: Date,
@@ -82,9 +82,25 @@ const organisation_Schema = new Schema({
   plasticEquivalent:{
     type: Number
   },
+  woodEquivalent:{
+    type: Number
+  },
+  glassEquivalent:{
+    type: Number
+  },
+  nylonEquivalent:{
+    type: Number
+  },
+  metalEquivalent:{
+    type: Number
+  },
   createAt: {
     type: Date,
     default: Date.now,
+  },
+  wallet : {
+    type: Number,
+    default: 0
   }
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);

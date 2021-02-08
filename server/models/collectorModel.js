@@ -24,6 +24,10 @@ const collector_Schema = new Schema({
     required: true,
     unique: true,
   },
+  roles:{
+    type: String,
+    default: "collector"
+  },
   password: {
     type: String,
     required: true,
@@ -61,6 +65,9 @@ const collector_Schema = new Schema({
   place:{
     type: String
   },
+  aggregatorId: {
+    type: String,
+  },
   localGovernment: {
     type:String
   },
@@ -70,6 +77,10 @@ const collector_Schema = new Schema({
   approvedBy: {
     type: String,
     default: null
+ },
+ totalCollected:{
+   type: Number,
+   default: 0
  },
   lat : {
     type: String

@@ -15,6 +15,7 @@ const PATH         = require("path");
 const BOOTSTRAPING = require("../server/util/Bootstraping/Bootstraping");
 const MODEL = require("../server/models")
 const cron = require('node-cron');
+var request = require('request');
 
 var nodemailer = require("nodemailer");
 
@@ -25,6 +26,8 @@ var transporter = nodemailer.createTransport({
     pass: "pakambusiness-2000",
   },
 });
+
+
 
 
 var sendNotification = function (data) {
@@ -58,6 +61,33 @@ var sendNotification = function (data) {
   req.end();
 };
 
+cron.schedule('* * * * *', function() {
+  console.log("<wallet check>")
+  MODEL.organisationModel.find({
+  }).then((val)=>{
+    for(let i = 0; i < val.length ; i++){
+      MODEL.transactionModel
+      .find({ organisationID: val[i]._id, paid : false  })
+      .sort({ _id: -1 })
+      .then((recycler, err) => {
+        let totalCoin = recycler
+          .map((val) => val.coin)
+          .reduce((acc, curr) => acc + curr,0);
+          MODEL.organisationModel.updateOne(
+            { "email": `${val[i].email}` },
+           { "$set": { "wallet" : totalCoin * 10 } },
+            (err, resp) => {
+              if (err) {
+                return RESPONSE.status(400).jsonp(err);
+              }             
+            }
+          );
+      })
+      .catch((err) => console.log(err));
+    }
+  })
+  })
+  
 
 cron.schedule('* * 1 * *', function() {
     var today = new Date();
@@ -85,6 +115,8 @@ cron.schedule('* * 1 * *', function() {
 })
 
 });
+
+
 
 
 // Run reminder for schedule pick up every 2 hours '0 0 */2 * * *'
@@ -115,56 +147,195 @@ cron.schedule('01 7 * * *', function(){
         })           
     }
   })
-})
+});
+
+
+// MODEL.transactionModel.find({}).then(TRANS=>{
+//   for(let i = 0; i < TRANS.length; i++){
+//     MODEL.collectorModel.findOne({
+//       _id: TRANS[i].completedBy
+//     }).then(recycler=>{
+//       console.log("recyler aye", recycler)
+//       MODEL.collectorModel.updateOne(
+//         { _id: TRANS[i].completedBy },
+//         {
+//           $set: {
+//             totalCollected:   (recycler.totalCollected || 0)  +  TRANS[i].weight,
+//           },
+//         }, (err,res)=> { console.log('checked', TRANS[i].weight)})
+
+//     })
+  
+//           }
+// })
+
+
+// MODEL.userModel.find({verified: true}).then((organisations)=>{
+//   for(let i = 0 ; i < organisations.length ; i++){
+
+
+//     MODEL.userrModel.updateOne(
+//       { email: organisations[i].email },
+//       {
+//         $set: {
+//           fullname: mobile_carrier,
+//         },
+//       },
+//       (res) => {
+//         console.log("success")
+
+//         return "Done"
+//       })
+
+
+
+//     var phoneNo = String(organisations[i].phone).substring(1,11);
+
+//     var data = {
+//       "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+//       "phone_number": `+234${phoneNo}`,
+//       "country_code": "NG"
+//     };
+// var options = {
+// 'method': 'GET',
+// 'url': ' https://termii.com/api/insight/number/query',
+// 'headers': {
+// 'Content-Type': ['application/json', 'application/json']
+// },
+// body: JSON.stringify(data)
+
+// };
+
+//     request(options, function (error, response) { 
+//       if (error) throw new Error(error);
+//       var mobileData = JSON.parse(response.body);
+//       var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
+//     MODEL.collectorModel.updateOne(
+//                     { email: organisations[i].email },
+//                     {
+//                       $set: {
+//                         mobile_carrier: mobile_carrier,
+//                       },
+//                     },
+//                     (res) => {
+//                       console.log("success")
+    
+//                       return "Done"
+//                     })
+    
+//                   })
+ 
+//   }
+//   }
+// }
+// )
+
+
+
+
+
   
 const cors = require("cors");
 
 
 
 var fileUpload = require('express-fileupload');
+const reportModel = require("../server/models/reportModel");
 
 
 
 
-// const PubNub = require('pubnub');
-// const uuid = PubNub.generateUUID();
-// const pubnub = new PubNub({
-//   publishKey: "pub-c-fc18a8e9-3662-4d35-89e9-e71e91cc4fd0",
-//   subscribeKey: "sub-c-169862d4-e21e-11ea-89a6-b2966c0cfe96",
-//   uuid: uuid
-// });
-
-// const publishConfig = {
-//   channel: "pubnub_onboarding_channel",
-//   message: {"sender": uuid, "content": "Hello From Packam"}
-// }
-
-// pubnub.addListener({
-//   message: function(message) {
-//     console.log(message);
-//   },
-//   presence: function(presenceEvent) {
-//     console.log(presenceEvent);
-//   }
-// })
-
-// pubnub.subscribe({
-//   channels: ["pubnub_onboarding_channel"],
-//   withPresence: true,
-// });
-
-// pubnub.publish(publishConfig, function(status, response) {
-//   console.log(status, response);
-// });
+const PubNub = require('pubnub');
+const uuid = PubNub.generateUUID();
+const pubnub = new PubNub({
+  publishKey: "pub-c-d3fa9420-395b-4a69-ab8d-c33b8ec61f37",
+  subscribeKey: "sub-c-04c282b2-5c10-11eb-aca9-6efe1c667573",
+  uuid: uuid
+});
 
 
-// pubnub.publish(publishConfig, function(status, response) {
-//     console.log(status, response);
-//   });
+const changeStream =  reportModel.watch();
+
+
+changeStream.on('change', function(change) {
+  console.log('COLLECTION CHANGED');
+
+  reportModel.find({}, (err, data) => {
+      if (err) throw err;
+      console.log(data)
+      if(data){
+        const publishConfig = {
+          channel: "reports",
+          message: {"sender": uuid, "content": data[data.length-1]}
+        }
+        pubnub.publish(publishConfig, function(status, response) {
+          console.log(status, response);
+        });
+      
+      }
+  });
+});
+
+pubnub.subscribe({
+  channels: ["reports"],
+  withPresence: true,
+});
+
+
 
 
 /**creating express server app for server */
 const app  = EXPRESS();
+const http = require('http').Server(app);
+
+const io = require('socket.io')(http,  {
+  origins: ["https://dashboard.pakam.ng"],
+
+  handlePreflightRequest: (req, res) => {
+    res.writeHead(200, {
+      "Access-Control-Allow-Origin": "https://dashboard.pakam.ng",
+      "Access-Control-Allow-Methods": "GET,POST",
+      "Access-Control-Allow-Headers": "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Credentials": true
+    });
+    res.end();
+  }
+});
+
+
+// const io = socket(app,  {
+//   cors: {
+//     origin: "https://dashboard.pakam.ng",
+//     methods: ["GET", "POST"],
+//     credentials: true
+//   }
+// }  );
+
+
+// io.on("connection", function(){return console.log("connected to socket")})
+
+// const changeStream =  reportModelLog.watch();  
+
+
+// changeStream.on('change', function(change) {
+//   console.log('COLLECTION CHANGED');
+
+//   reportModelLog.find({}, (err, data) => {
+//       if (err) throw err;
+
+
+//       io.on("connection",(socket)=>{
+//          if (data) {
+//         // RESEND ALL USERS
+//         console.log(data[data.length-1])
+//         socket.emit('reports', data);
+//     }
+//       } )
+
+
+     
+//   });
+// });
 
 
 
