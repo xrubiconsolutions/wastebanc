@@ -534,7 +534,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                         {
                                           $set: {
                                             availablePoints: result.availablePoints + pricing,
-                                            rafflePoints : result.rafflePoints + 1
+                                            schedulePoints : result.schedulePoints + 1
                                           },
                                         });
                                         MODEL.collectorModel.updateOne(

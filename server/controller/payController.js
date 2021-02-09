@@ -68,12 +68,13 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
   let amount = REQUEST.body.amount;
   var balance;
 
+
   MODEL.userModel.findOne({ cardID: cardID }).then((result, err) => {
     if (!result)
       return RESPONSE.status(400).json({ message: 'Enter a valid card ID' });
     if (result) {
       balance = result.availablePoints - amount;
-      if (balance <= 0) {
+      if (balance < 0) {
         return RESPONSE.status(406).json({
           message: "You don't have enough points to complete this transaction",
         });
@@ -91,6 +92,7 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
               (err, resp) => {
                 MODEL.payModel({
                   ...receipt,
+                  amount: unpaidFees[i].coin,
                   organisation: unpaidFees[i].organisationID,
                 }).save({}, (err, result) => {
                   if (err)

@@ -92,6 +92,10 @@ const user_Schema = new Schema({
     type: Number,
     default: 0
   },
+  schedulePoints:{
+    type: Number,
+    default: 0
+  },
   gender: {
     type: String,
   },
