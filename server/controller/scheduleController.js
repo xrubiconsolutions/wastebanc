@@ -463,18 +463,18 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                           var category =
                             schedule[0].Category.length < 4
                               ? schedule[0].Category.substring(
-                                  1,
+                                  0,
                                   schedule[0].Category.length
                                 )
                               : schedule[0].Category.substring(
-                                  1,
+                                  0,
                                   schedule[0].Category.length - 1
                                 );
                           var organisationCheck = JSON.parse(JSON.stringify(organisation));
                           for (let val in organisationCheck) {
                             console.log(organisationCheck)
                             if (val.includes(category)) {
-                              const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1                              
+                              const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1     
                               const pricing = quantity * equivalent;
                               MODEL.collectorModel.updateOne(
                                 { email: recycler.email },
@@ -528,7 +528,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                     },
                                     (err, res) => {
                                       if (err) return RESPONSE.status(400).json(err);
-                                      
+                                      console.log("kinni pricng", pricing)
                                       MODEL.userModel.updateOne(
                                         { email: result.email },
                                         {
@@ -541,9 +541,11 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                           { _id: collectorID },
                                           {
                                             $set: {
-                                              totalCollected: quantity,
+                                              totalCollected: recycler.totalCollected + Number(quantity),
                                               numberOfTripsCompleted: recycler.numberOfTripsCompleted + 1
                                             },
+                                          }, (err,res)=>{
+                                            console.log("update", err , res)
                                           });
                                       return RESPONSE.status(200).json({
                                         message: 'Transaction Completed Successfully',
