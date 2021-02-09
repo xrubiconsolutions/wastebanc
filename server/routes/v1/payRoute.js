@@ -25,7 +25,7 @@ module.exports = (APP) => {
         CONTROLLER.payController.requestedPayment
     )
     APP.route('/api/payout/history').get(
-        auth.companyValidation,
+        auth.adminPakamValidation,
         CONTROLLER.payController.allPayoutHistory
     )
     APP.route('/api/update/payment').get(
