@@ -536,6 +536,8 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                             availablePoints: result.availablePoints + pricing,
                                             schedulePoints : result.schedulePoints + 1
                                           },
+                                        }, (err,res)=>{
+                                          console.log("update", err , res)
                                         });
                                         MODEL.collectorModel.updateOne(
                                           { _id: collectorID },
