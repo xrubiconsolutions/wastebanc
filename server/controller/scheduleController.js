@@ -528,7 +528,6 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                     },
                                     (err, res) => {
                                       if (err) return RESPONSE.status(400).json(err);
-                                      console.log("kinni pricng", pricing)
                                       MODEL.userModel.updateOne(
                                         { email: result.email },
                                         {
@@ -537,7 +536,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                             schedulePoints : result.schedulePoints + 1
                                           },
                                         }, (err,res)=>{
-                                          console.log("update", err , res)
+                                          console.log("update user", err , res)
                                         });
                                         MODEL.collectorModel.updateOne(
                                           { _id: collectorID },
