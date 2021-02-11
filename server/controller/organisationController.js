@@ -621,12 +621,30 @@ organisationController.monthChartData = (req, res) => {
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
+        var glass = result
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      
+      var metal = result
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      var nylon = result
+        .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
       return res.status(200).json({
         can: can,
         petBottle: petBottle,
         carton: carton,
         rubber: rubber,
         plastics: plastics,
+        glass : glass,
+        metal: metal,
+        nylon: nylon
       });
     })
     .catch((err) => res.status(500).json(err));
@@ -676,6 +694,20 @@ organisationController.thirdChartData = (req, res) => {
       .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
       .map((x) => x.quantity)
       .reduce((acc, curr) => acc + curr, 0);
+      var glass = result
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      
+      var metal = result
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      var nylon = result
+        .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
         can: can,
@@ -683,6 +715,9 @@ organisationController.thirdChartData = (req, res) => {
         carton: carton,
         rubber: rubber,
         plastics: plastics,
+        glass : glass,
+        metal: metal,
+        nylon: nylon
       });
     })
     .catch((err) => res.status(500).json(err));
@@ -735,13 +770,31 @@ organisationController.forthChartData = (req, res) => {
       .map((x) => x.quantity)
       .reduce((acc, curr) => acc + curr, 0);
 
-      return res.status(200).json({
-        can: can,
-        petBottle: petBottle,
-        carton: carton,
-        rubber: rubber,
-        plastics: plastics,
-      });
+      var glass = result
+      .filter((x) => x.Category == "glass" || x.Category == "Glass")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    
+    var metal = result
+      .filter((x) => x.Category == "metal" || x.Category == "Metal")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+
+    var nylon = result
+      .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+
+    return res.status(200).json({
+      can: can,
+      petBottle: petBottle,
+      carton: carton,
+      rubber: rubber,
+      plastics: plastics,
+      glass : glass,
+      metal: metal,
+      nylon: nylon
+    });
     })
     .catch((err) => res.status(500).json(err));
 };
@@ -831,10 +884,9 @@ organisationController.raffleTicket = (req, res) => {
     MODEL.userModel
       .find({lcd:lcd}).then((checks,err)=>{
         const number = checks.length
-        console.log("<<>>", number)
 
       MODEL.userModel.aggregate(  [
-        { $match: { lcd: lcd ,  availablePoints : {$ne: 0 } } },
+        { $match: { lcd: lcd ,  schedulePoints : {$ne: 0 } } },
         { $sample: { size: Number(winner_count) } }
        ]).then((winners,err)=>{
           if (err) return res.status(400).json(err);
@@ -980,6 +1032,20 @@ organisationController.lawmaMonthChartData = (req, res) => {
       .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
       .map((x) => x.quantity)
       .reduce((acc, curr) => acc + curr, 0);
+      var glass = result
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      
+      var metal = result
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      var nylon = result
+        .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
         can: can,
@@ -987,6 +1053,9 @@ organisationController.lawmaMonthChartData = (req, res) => {
         carton: carton,
         rubber: rubber,
         plastics: plastics,
+        glass : glass,
+        metal: metal,
+        nylon: nylon
       });
     })
     .catch((err) => res.status(500).json(err));
@@ -1035,13 +1104,31 @@ organisationController.lawmaThirdChartData = (req, res) => {
       .map((x) => x.quantity)
       .reduce((acc, curr) => acc + curr, 0);
 
-      return res.status(200).json({
-        can: can,
-        petBottle: petBottle,
-        carton: carton,
-        rubber: rubber,
-        plastics: plastics,
-      });
+      var glass = result
+      .filter((x) => x.Category == "glass" || x.Category == "Glass")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+    
+    var metal = result
+      .filter((x) => x.Category == "metal" || x.Category == "Metal")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+
+    var nylon = result
+      .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
+      .map((x) => x.quantity)
+      .reduce((acc, curr) => acc + curr, 0);
+
+    return res.status(200).json({
+      can: can,
+      petBottle: petBottle,
+      carton: carton,
+      rubber: rubber,
+      plastics: plastics,
+      glass : glass,
+      metal: metal,
+      nylon: nylon
+    });
     })
     .catch((err) => res.status(500).json(err));
 };
@@ -1090,6 +1177,20 @@ organisationController.lawmaForthChartData = (req, res) => {
       .filter((x) => x.Category == "Plastics" || x.Category == "Plastics")
       .map((x) => x.quantity)
       .reduce((acc, curr) => acc + curr, 0);
+      var glass = result
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+      
+      var metal = result
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      var nylon = result
+        .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
+        .map((x) => x.quantity)
+        .reduce((acc, curr) => acc + curr, 0);
 
       return res.status(200).json({
         can: can,
@@ -1097,6 +1198,9 @@ organisationController.lawmaForthChartData = (req, res) => {
         carton: carton,
         rubber: rubber,
         plastics: plastics,
+        glass : glass,
+        metal: metal,
+        nylon: nylon
       });
     })
     .catch((err) => res.status(500).json(err));

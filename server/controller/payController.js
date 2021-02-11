@@ -140,12 +140,11 @@ payController.requestedPayment = (req, res) => {
 };
 
 payController.allPayoutHistory = (req,res)=>{
-  try{
-      MODEL.paymentLogModel.find({}).then(payments=>{
-        return res.status(200).json(payments);
-      })
-  }
-  catch(err){
+  try {
+    payModel.find({}).then((payments) => {
+      return res.status(200).json(payments);
+    });
+  } catch (err) {
     return res.status(500).json(err);
   }
 }
