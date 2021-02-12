@@ -499,6 +499,10 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                 fullname: result.firstname + ' ' + result.lastname,
         
                                 recycler: recycler.fullname,
+
+                                aggregatorId : recycler._id,
+
+                                organisation : recycler.organisation,
         
                                 organisationID: recycler.approvedBy,
                               };

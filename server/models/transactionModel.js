@@ -51,6 +51,13 @@ const transaction_Schema = {
     type: String,
     required: true,
   },
+  aggregatorId: {
+    type: String,
+    default: ""
+  },
+  organisation : {
+    type: String
+  }
 };
 
 module.exports = MONGOOSE.model("transaction", transaction_Schema);

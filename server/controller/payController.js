@@ -92,6 +92,11 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
               (err, resp) => {
                 MODEL.payModel({
                   ...receipt,
+                  aggregatorName: unpaidFees[i].recyler || "",
+                  aggregatorId : unpaidFees[i].aggregatorId || "",
+                  aggregatorOrganisation: unpaidFees[i].organisation || "",
+                  scheduleId: unpaidFees[i].scheduleId || "",
+                  quantityOfWaste: unpaidFees[i].weight || "",
                   amount: unpaidFees[i].coin,
                   organisation: unpaidFees[i].organisationID,
                 }).save({}, (err, result) => {
@@ -111,7 +116,6 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
 
 payController.afterPayment = (req, res) => {
   const userID = req.query.userID;
-
   try {
     MODEL.userModel.findOne({ _id: userID }).then((result) => {
       var test = JSON.parse(JSON.stringify(result));
@@ -131,7 +135,9 @@ payController.afterPayment = (req, res) => {
 payController.requestedPayment = (req, res) => {
   let company_id = req.query.company_id;
   try {
-    payModel.find({organisation : company_id}).then((payments) => {
+    payModel.find({organisation : company_id}).sort({
+      _id :-1
+    }).then((payments) => {
       return res.status(200).json(payments);
     });
   } catch (err) {
@@ -157,8 +163,11 @@ payController.paymentUpdate = (req,res)=>{
      { "$set": { "paid" : true } },
       (err, resp) => {
         if (err) {
-          return RESPONSE.status(400).jsonp(err);
+          return res.status(400).jsonp(err);
         }
+        return res.status(200).json({
+          message : "Payment status successfully updated!"
+        })
       }
     );
   }catch(err){

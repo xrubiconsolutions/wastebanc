@@ -29,6 +29,26 @@ const pay_Schema = {
       type: Boolean,
       default: false
   },
+  aggregatorName:{
+    type: String,
+    required: true
+  },
+  aggregatorId :{
+    type: String,
+    required: true
+  },
+  aggregatorOrganisation:{
+    type: String,
+    required: true
+  },
+  scheduleId:{
+    type: String,
+    required: true,
+  },
+  quantityOfWaste:{
+    type: Number,
+    required: true
+  },
   cardID: {
     type: String,
     required: true,
