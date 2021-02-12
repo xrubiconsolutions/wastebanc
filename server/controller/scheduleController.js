@@ -872,14 +872,13 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
             return !!need;
           })();
         });
-        var geoSchedules = geofencedSchedules.filter(
-          (x) =>
-            x.completionStatus !== "completed" || (x.completionStatus == 'pending' && x.collectorStatus == "accept")
+        var geoSchedules = geofencedSchedules.filter(x => (x.completionStatus !== "completed" && x.completionStatus !== "cancelled") || (x.completionStatus == 'pending' && x.collectorStatus == "accept")
         );
+        const referenceSchedules = [ ...new Set(geoSchedules)];
         RESPONSE.jsonp(
           COMMON_FUN.sendSuccess(
             CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-            geoSchedules
+            referenceSchedules
           )
         );
       })
