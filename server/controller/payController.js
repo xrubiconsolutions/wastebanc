@@ -92,7 +92,7 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
               (err, resp) => {
                 MODEL.payModel({
                   ...receipt,
-                  aggregatorName: unpaidFees[i].recyler || "",
+                  aggregatorName: unpaidFees[i].recycler || "",
                   aggregatorId : unpaidFees[i].aggregatorId || "",
                   aggregatorOrganisation: unpaidFees[i].organisation || "",
                   scheduleId: unpaidFees[i].scheduleId || "",
