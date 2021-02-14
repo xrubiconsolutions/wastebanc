@@ -69,6 +69,7 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
   var balance;
 
 
+
   MODEL.userModel.findOne({ cardID: cardID }).then((result, err) => {
     if (!result)
       return RESPONSE.status(400).json({ message: 'Enter a valid card ID' });
@@ -92,14 +93,16 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
               (err, resp) => {
                 MODEL.payModel({
                   ...receipt,
-                  aggregatorName: unpaidFees[i].recycler || "",
-                  aggregatorId : unpaidFees[i].aggregatorId || "",
-                  aggregatorOrganisation: unpaidFees[i].organisation || "",
-                  scheduleId: unpaidFees[i].scheduleId || "",
-                  quantityOfWaste: unpaidFees[i].weight || "",
+                  aggregatorName: unpaidFees[i].recycler || " ",
+                  aggregatorId : unpaidFees[i].aggregatorId || " ",
+                  aggregatorOrganisation: unpaidFees[i].organisation || " ",
+                  scheduleId: unpaidFees[i].scheduleId || " ",
+                  quantityOfWaste: unpaidFees[i].weight || " ",
                   amount: unpaidFees[i].coin,
                   organisation: unpaidFees[i].organisationID,
                 }).save({}, (err, result) => {
+                  console.log("errorr here", err);
+                  console.log("result here", result)
                   if (err)
                     return RESPONSE.status(400).json({
                       message: 'Could not save receipt',
