@@ -36,6 +36,10 @@ const transaction_Schema = {
     type: Boolean,
     default: false,
   },
+  requestedForPayment: {
+    type: Boolean,
+    default: false
+  },
   Category: {
     type: String,
     required: true,

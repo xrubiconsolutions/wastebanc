@@ -2182,36 +2182,33 @@ organisationController.categoryAnalytics = (REQUEST, RESPONSE) => {
       if (err) return res.status(400).json(err);
 
       var can = result
-        .filter((x) => x.Category == "Can")
+        .filter((x) => x.Category == "can")
        
       var petBottle = result
         .filter((x) => x.Category == "petBottle")
 
       var carton = result
-        .filter((x) => x.Category == "Carton" || "carton")
+        .filter((x) => x.Category == "carton")
        
       var rubber = result
-        .filter((x) => x.Category == "Rubber" || "rubber")
+        .filter((x) => x.Category == "rubber")
         
       var plastics = result
-        .filter((x) => x.Category == "plastic" || "plastic")
+        .filter((x) => x.Category == "plastics")
 
       var glass = result
         .filter((x) => x.Category == "glass" || x.Category == "Glass")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
+       
       
       var metal = result
         .filter((x) => x.Category == "metal" || x.Category == "Metal")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
+
 
       var nylon = result
         .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
-        .map((x) => x.quantity)
-        .reduce((acc, curr) => acc + curr, 0);
 
-      return res.status(200).json({
+
+      return RESPONSE.status(200).json({
         can: can,
         petBottle: petBottle,
         carton: carton,

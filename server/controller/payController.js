@@ -9,11 +9,10 @@ let MODEL = require('../models');
 let COMMON_FUN = require('../util/commonFunction');
 let SERVICE = require('../services/commonService');
 let CONSTANTS = require('../util/constants');
-let FS = require('fs');
-const { Response } = require('aws-sdk');
 var request = require('request');
-const https = require('https');
 const payModel = require('../models/payModel');
+var ObjectId = require('mongodb').ObjectID;
+
 
 payController.getBanks = (req, res) => {
   request(
@@ -68,8 +67,6 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
   let amount = REQUEST.body.amount;
   var balance;
 
-
-
   MODEL.userModel.findOne({ cardID: cardID }).then((result, err) => {
     if (!result)
       return RESPONSE.status(400).json({ message: 'Enter a valid card ID' });
@@ -83,6 +80,7 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
       MODEL.transactionModel
         .find({
           paid: false,
+          requestedForPayment: false,
           cardID: cardID,
         })
         .then((unpaidFees) => {
@@ -93,16 +91,28 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
               (err, resp) => {
                 MODEL.payModel({
                   ...receipt,
-                  aggregatorName: unpaidFees[i].recycler || " ",
-                  aggregatorId : unpaidFees[i].aggregatorId || " ",
-                  aggregatorOrganisation: unpaidFees[i].organisation || " ",
-                  scheduleId: unpaidFees[i].scheduleId || " ",
-                  quantityOfWaste: unpaidFees[i].weight || " ",
+                  aggregatorName: unpaidFees[i].recycler || ' ',
+                  aggregatorId: unpaidFees[i].aggregatorId || ' ',
+                  aggregatorOrganisation: unpaidFees[i].organisation || ' ',
+                  scheduleId: unpaidFees[i].scheduleId || ' ',
+                  quantityOfWaste: unpaidFees[i].weight || ' ',
                   amount: unpaidFees[i].coin,
                   organisation: unpaidFees[i].organisationID,
                 }).save({}, (err, result) => {
-                  console.log("errorr here", err);
-                  console.log("result here", result)
+                  MODEL.transactionModel.updateOne(
+                    { _id: unpaidFees[i]._id },
+                    {
+                      $set: {
+                        requestedForPayment: true,
+                      },
+                    },
+                    (err, res) => {
+                      console.log('requested here', res);
+                      console.log('updated here', err);
+                    }
+                  );
+                  console.log('errorr here', err);
+                  console.log('result here', result);
                   if (err)
                     return RESPONSE.status(400).json({
                       message: 'Could not save receipt',
@@ -138,17 +148,20 @@ payController.afterPayment = (req, res) => {
 payController.requestedPayment = (req, res) => {
   let company_id = req.query.company_id;
   try {
-    payModel.find({organisation : company_id}).sort({
-      _id :-1
-    }).then((payments) => {
-      return res.status(200).json(payments);
-    });
+    payModel
+      .find({ organisation: company_id, paid : false  })
+      .sort({
+        _id: -1,
+      })
+      .then((payments) => {
+        return res.status(200).json(payments);
+      });
   } catch (err) {
     return res.status(500).json(err);
   }
 };
 
-payController.allPayoutHistory = (req,res)=>{
+payController.allPayoutHistory = (req, res) => {
   try {
     payModel.find({}).then((payments) => {
       return res.status(200).json(payments);
@@ -156,26 +169,31 @@ payController.allPayoutHistory = (req,res)=>{
   } catch (err) {
     return res.status(500).json(err);
   }
-}
+};
 
-payController.paymentUpdate = (req,res)=>{
+payController.paymentUpdate = (req, res) => {
   const id = req.body.id;
-  try{
-    MODEL.transactionModel.updateOne(
-      { "_id": id },
-     { "$set": { "paid" : true } },
+  try {
+    MODEL.payModel.updateOne(
+      { 'scheduleId' : ObjectId(id) },
+      { $set: { paid : true } },
+      (_e, _res) => {
+        MODEL.transactionModel.updateOne(
+          { 'scheduleId' : ObjectId(id) },
+      { $set: { paid : true } },
       (err, resp) => {
         if (err) {
           return res.status(400).jsonp(err);
         }
         return res.status(200).json({
-          message : "Payment status successfully updated!"
-        })
+          message: 'Payment status successfully updated!',
+        });
+      })
       }
     );
-  }catch(err){
+  } catch (err) {
     return res.status(500).json(err);
   }
-}
+};
 /* export payController */
 module.exports = payController;
