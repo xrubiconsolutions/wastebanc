@@ -599,8 +599,7 @@ organisationController.monthChartData = (req, res) => {
     .then((result, err) => {
       if (err) return res.status(400).json(err);
 
-
-        var can = result
+      var can = result
         .filter((x) => x.Category == "Can" || x.Category == "can")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
@@ -2965,6 +2964,20 @@ organisationController.organisationRecyclers = (req,res)=>{
   }
   catch(err){
     return res.status(500).json(err)
+  }
+}
+
+organisationController.checkProfile = (req,res)=>{
+  const organisation_id = req.query.organisation_id;
+  try{
+    MODEL.organisationModel.findOne({
+      _id: organisation_id
+    }).then(profile=>{
+        return res.status(200).json(profile);
+    })
+
+  } catch (err){
+          return res.status(500).json(err);
   }
 }
 
