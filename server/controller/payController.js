@@ -149,7 +149,7 @@ payController.requestedPayment = (req, res) => {
   let company_id = req.query.company_id;
   try {
     payModel
-      .find({ organisation: company_id, paid : false  })
+      .find({ organisation: company_id })
       .sort({
         _id: -1,
       })

@@ -8,16 +8,6 @@ const Constants     =   require("../util/constants");
 /**************************************************
  ************* Schedule Model or collection ***********
  **************************************************/
-const geolocation = new Schema({
-    lat: {
-        type: Number,
-        default: 6.4654
-    },
-    long :{
-        type: Number,
-        default: 3.4064
-    }
-})
 
 const schedulePick = new Schema({
     client:{
@@ -85,7 +75,7 @@ const schedulePick = new Schema({
     comment: {
         type: String
     },
-    organisationCollection:{  //Organisation ID
+    organisationCollection:{
         type: String
     },
     lat: {
