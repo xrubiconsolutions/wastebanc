@@ -49,7 +49,7 @@ module.exports = (APP) => {
         .get(CONTROLLER.organisationController.wasteCounter);
 
     APP.route('/api/transactions/organisation')
-        .get(CONTROLLER.organisationController.numberTransaction);
+        .get(auth.companyValidation,CONTROLLER.organisationController.numberTransaction);
 
     APP.route('/api/totalSchedules/organisation')
         .get(CONTROLLER.organisationController.totalSchedules);

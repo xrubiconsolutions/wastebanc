@@ -500,7 +500,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
         
                                 recycler: recycler.fullname,
 
-                                aggregatorId : recycler._id,
+                                aggregatorId : recycler.aggregatorId || " ",
 
                                 organisation : recycler.organisation,
         

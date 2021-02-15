@@ -117,11 +117,11 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
                     return RESPONSE.status(400).json({
                       message: 'Could not save receipt',
                     });
-                  return RESPONSE.status(201).json(result);
                 });
               }
             );
           }
+          return RESPONSE.status(201).json(result);
         });
     }
   });
