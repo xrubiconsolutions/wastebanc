@@ -528,6 +528,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                       $set: {
                                         completionStatus: 'completed',
                                         collectedBy: collectorID,
+                                        quantity : quantity
                                       },
                                     },
                                     (err, res) => {
