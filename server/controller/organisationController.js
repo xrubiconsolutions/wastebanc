@@ -2969,6 +2969,8 @@ organisationController.organisationRecyclers = (req,res)=>{
 
 organisationController.checkProfile = (req,res)=>{
   const organisation_id = req.query.organisation_id;
+
+  console.log(organisation_id, "<<-" , req.query)
   try{
     MODEL.organisationModel.findOne({
       _id: organisation_id

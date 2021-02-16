@@ -877,7 +877,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
             return !!need;
           })();
         });
-        var geoSchedules = geofencedSchedules.filter(x => (x.completionStatus !== "completed" && x.completionStatus !== "cancelled") || (x.completionStatus == 'pending' && x.collectorStatus == "accept")
+        var geoSchedules = geofencedSchedules.filter(x => (x.completionStatus !== "completed" && x.completionStatus !== "cancelled" && x.completionStatus !== "missed") || (x.completionStatus == 'pending' && x.collectorStatus == "accept")
         );
         const referenceSchedules = [ ...new Set(geoSchedules)];
         RESPONSE.jsonp(

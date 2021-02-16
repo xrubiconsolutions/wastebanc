@@ -201,7 +201,7 @@ module.exports = (APP) => {
         CONTROLLER.organisationController.payPortal
     )
     APP.route('/api/organisation/profile').get(
-        auth.companyValidation , CONTROLLER.organisationController.checkProfile
+        auth.companyValidation,CONTROLLER.organisationController.checkProfile
     )
                
 };
