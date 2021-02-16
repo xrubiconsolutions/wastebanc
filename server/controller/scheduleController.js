@@ -854,12 +854,21 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
   var need = [];
   var count = 0;
   var geofencedSchedules = [];
+  const today = new Date();
+  const active_today = new Date();
+  active_today.setDate(today.getDate() - 1);
+
+  console.log("active tiday", active_today)
 
   MODEL.collectorModel.findOne({ _id: collectorID }).then((collector) => {
     var accessArea = collector.areaOfAccess;
 
     MODEL.scheduleModel
-      .find({})
+      .find({
+        pickUpDate : {
+          $gte: active_today
+        }
+      })
       .sort({ _id: -1 })
       .then((schedules) => {
         schedules.forEach((schedule, index) => {
