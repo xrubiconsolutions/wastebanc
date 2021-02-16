@@ -940,6 +940,20 @@ scheduleController.collectorMissed = (req, res) => {
           { $set: { completionStatus: 'missed' } }
         )
         .then((resp, err) => {
+
+          MODEL.userModel
+          .findOne({ email: result.client })
+          .then((result, err) => {
+            var message = {
+              app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+              contents: {
+                en: 'A collector just missed your schedule. Kindly reschedule this pickup',
+              },
+              include_player_ids: [`${result.onesignal_id}`],
+            };
+
+            sendNotification(message);
+          });
           return res.status(200).json({
             message: 'You missed this schedule',
           });
