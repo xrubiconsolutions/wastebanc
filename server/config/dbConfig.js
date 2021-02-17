@@ -12,8 +12,8 @@ let serverConfig = {
         host        : "127.0.0.1",
         port        : 27017,
         name        : "mongodb",
-        connector   : "mongodb",
-        url         : process.env.dbUrl || "mongodb+srv://bukolasobowale:Bukdan1997-2004@cluster0.dc0os.mongodb.net/xrubicondb?retryWrites=true&w=majority",
+        connector   : "mongodb", 
+        url         : process.env.dbUrl || "mongodb+srv://pakamXrubicon:me202010*@pakam.wcabw.mongodb.net/pakam?retryWrites=true&w=majority",
         database    : "demo_dev",
         user        : "",
         password    : "",
@@ -28,15 +28,14 @@ let serverConfig = {
  ** Maintain server Configuration **
  **** according to env variable ****
  ***********************************/
-if(process.env.NODE_ENV === "development"){
-    
+if(process.env.NODE_ENV === "development"){   
     serverConfig.mongodb.user           =   "";
     serverConfig.mongodb.password       =   "";
 }
 else if( process.env.NODE_ENV === "production"){
 
-    serverConfig.mongodb.url            =   "mongodb+srv://bukolasobowale:Bukdan1997-2004@cluster0.dc0os.mongodb.net/xrubicondb?retryWrites=true&w=majority";
-    serverConfig.mongodb.database       =   "xrubicon";
+    serverConfig.mongodb.url            =   "mongodb+srv://pakamXrubicon:me202010*@pakam.wcabw.mongodb.net/pakam?retryWrites=true&w=majority" ;
+    serverConfig.mongodb.database       =   "pakam";
     serverConfig.mongodb.user           =   "";
     serverConfig.mongodb.password       =   "";
     serverConfig.port                   =   process.env.PORT || "4001";
