@@ -90,12 +90,13 @@ Total Schedule Pickup: This is the sum total of the schedules within your jurisd
 
 Total Waste Collected: This card display the data of all the waste collected by your organization so far. When you click on the card it shows you a data table representing the actual data of the waste collected by your organization and it's aggregators.
 
-Total Point: This table showcase details of user whose recyclables your organization have collected and how much point accrued to them
+Total Payout: This card embodies the table that showcase details of user whose recyclables your organization have collected and how much you are meant to pay them.
 
 Instruction of How To Onboard Collectors or Aggregators
 
 * You will need to onboard your collectors or aggregators into the system by asking them to download the Pakam Recycler's App.
-* Instruct them to select the name of your organization while setting up their account.
+* Create a unique company ID No for your collector/aggregator.
+* Instruct them to select the name of your organization and input unique company ID No while setting up their account.
 * Once they choose your organization as their recycling company, you will need to approve them on your company Dashboard.
 
 How To Approve a Collector/Aggregator
@@ -106,7 +107,7 @@ How To Approve a Collector/Aggregator
 * Click on approve to Approve the aggregator
 * Refresh the screen, pending aggregators who have been approved will populated under All Approved aggregators.
 
-We wish a awesome experience using the App.
+We wish you an awesome experience using the App.
 
 Best Regards
 
