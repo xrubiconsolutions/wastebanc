@@ -66,9 +66,9 @@ const msg = {
   subject: "WELCOME TO PAKAM!!!",
   text: 
 `
-Congratulations, you have been approved by LAWMA and you've been on-boarded to the Pakam waste management ecosystem.
+Congratulations, you have been approved and you've been on-boarded to the Pakam waste management ecosystem.
 
-Kindly use the following login details to sign in to your  Pakam Company Dashboard.
+Kindly use the following login details to sign in to your Pakam Company Dashboard.
 
 
 Email: ${organisation_data.email}
