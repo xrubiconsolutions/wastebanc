@@ -66,9 +66,9 @@ const msg = {
   subject: "WELCOME TO PAKAM!!!",
   text: 
 `
-Congratulations, you have been approved and you've been on-boarded to the Pakam waste management ecosystem.
+Congratulations, you have been approved by Pakam and have been on-boarded to the Pakam waste management ecosystem.
 
-Kindly use the following login details to sign in to your Pakam Company Dashboard.
+Kindly use the following login details to sign in to your  Pakam Company Dashboard.
 
 
 Email: ${organisation_data.email}
@@ -80,12 +80,12 @@ Please note you can reset the password after logging into the App by clicking on
 *Attached below is a guide on how to use the Company Dashboard.
 
 How To Use The Dashboard
-Kindly Logon to dashboard.pakam.ng
+Kindly Logon to https://dashboard.pakam.ng
 
 * Select Recycling Company
 * Input your Login Details
 * You can reset your password by clicking on the image icon at the top right of the screen.
-* After Login you can see a data representation of all activities pertaining to your organization such as:
+* After Login you can see a data representation of all activities pertaining to your organisation such as:
 Total Schedule Pickup: This is the sum total of the schedules within your jurisdiction, which include pending schedules, completed schedules, accepted schedules, cancelled schedules and missed schedules.
 
 Total Waste Collected: This card display the data of all the waste collected by your organization so far. When you click on the card it shows you a data table representing the actual data of the waste collected by your organization and it's aggregators.
@@ -107,16 +107,14 @@ How To Approve a Collector/Aggregator
 * Click on approve to Approve the aggregator
 * Refresh the screen, pending aggregators who have been approved will populated under All Approved aggregators.
 
-We wish you an awesome experience using the App.
+We wish you an awesome experience using the App waste management software.
 
 Best Regards
 
 Pakam Team
 `,
-
-
-
 };
+
 //ES6
 sgMail
   .send(msg)
