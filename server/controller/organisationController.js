@@ -2205,6 +2205,9 @@ organisationController.categoryAnalytics = (REQUEST, RESPONSE) => {
       var nylon = result
         .filter((x) => x.Category == "nylonSachet" || x.Category == "nylonSachet")
 
+      var wood = result
+      .filter((x) => x.Category == "wood" || x.Category == "wood")
+
 
       return RESPONSE.status(200).json({
         can: can,
@@ -2214,7 +2217,8 @@ organisationController.categoryAnalytics = (REQUEST, RESPONSE) => {
         plastics: plastics,
         glass : glass,
         metal: metal,
-        nylon: nylon
+        nylon: nylon,
+        wood: wood
       });
     })
     .catch((err) => RESPONSE.status(500).json(err));
