@@ -2174,7 +2174,7 @@ organisationController.totalWeightAnalytics = (req,res)=>{
 
 organisationController.categoryAnalytics = (REQUEST, RESPONSE) => {
    MODEL.scheduleModel
-    .find({ completionStatus : "pending" })
+    .find({ completionStatus : "completed" })
     .sort({ _id: -1 })
     .then((result, err) => {
       if (err) return res.status(400).json(err);
