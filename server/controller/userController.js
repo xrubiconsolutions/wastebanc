@@ -2002,6 +2002,9 @@ userController.internet_providerAnalytics = (req,res)=>{
                     internet_provider: "Airtel NG",
                   },
                   {
+                    internet_provider: "Airtel",
+                  },
+                  {
                     internet_provider: "BeSafe Airtel",
                   },
                 ]
@@ -2011,6 +2014,9 @@ userController.internet_providerAnalytics = (req,res)=>{
                     $or: [
                       {
                         internet_provider: "Airtel NG",
+                      },
+                      {
+                        internet_provider: "Airtel",
                       },
                       {
                         internet_provider: "BeSafe Airtel",
