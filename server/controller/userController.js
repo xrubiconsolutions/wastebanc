@@ -1056,9 +1056,7 @@ userController.uploadProfile = (req, res) => {
 userController.dailyActive = (req, res) => {
   const today = new Date();
   const active_today = new Date();
-  active_today.setDate(today.getDate() - 1);
   active_today.setHours(0,0,0,0)
-  active_today.setHours(active_today.getHours() + 1)
 
   try {
     MODEL.userModel
@@ -1973,6 +1971,9 @@ userController.internet_providerAnalytics = (req,res)=>{
           },
                           {
                             internet_provider: "STAY SAFE",
+                          },
+                          {
+                            internet_provider: "Stay Safe",
                           }
         ]
       }).then((mtn)=>{
@@ -1987,6 +1988,9 @@ userController.internet_providerAnalytics = (req,res)=>{
               },
                           {
                             internet_provider: "STAY SAFE",
+                          },
+                          {
+                            internet_provider: "Stay Safe",
                           }
             ]
           }).then((recycler_mtn)=>{
@@ -2040,12 +2044,25 @@ userController.internet_providerAnalytics = (req,res)=>{
                               var glo_users = [...glo, ...recycler_glo];
                                 MODEL.userModel.find({
                                   verified: true,
-                                  internet_provider:"9mobile"
+                                  $or: [
+                                    {
+                                      internet_provider:"9mobile"
+                                    },
+                                    {
+                                      internet_provider: "9Mobile",
+                                    }
+                                  ]
                                 }).then((etisalat)=>{
                                     MODEL.collectorModel.find({
                                       verified: true,
-                                      internet_provider:"9mobile"
-                                    }).then((recycler_etisalat)=>{
+                                      $or: [
+                                        {
+                                          internet_provider:"9mobile"
+                                        },
+                                        {
+                                          internet_provider: "9Mobile",
+                                        }
+                                      ]                                    }).then((recycler_etisalat)=>{
                                         var etisalat_users = [...etisalat, ...recycler_etisalat];
                                          return res.status(200).json({
                                            MTN: { amount: mtn_users.length, data : mtn_users },
