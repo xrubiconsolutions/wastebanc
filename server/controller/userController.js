@@ -647,6 +647,8 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
   // }
   var error = {};
   var phone = REQUEST.body.phone;
+  var phoneNo = String(phone).substring(1,11);
+
 
   const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
   const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
@@ -656,7 +658,7 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
     var data = {
       api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
       message_type: 'NUMERIC',
-      to: `+234${phone}`,
+      to: `+234${phoneNo}`,
       from: 'N-Alert',
       channel: 'dnd',
       pin_attempts: 10,

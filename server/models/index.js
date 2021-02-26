@@ -18,5 +18,6 @@ module.exports = {
     paymentLogModel : require("./paymentLogModel"),
     advertModel: require("./advertModel"),
     payOutModel: require("./payOutModel"),
+    versionModel: require("./versionModel"),
 };
 

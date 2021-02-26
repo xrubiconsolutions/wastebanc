@@ -203,5 +203,7 @@ module.exports = (APP) => {
     APP.route('/api/organisation/profile').get(
         auth.companyValidation,CONTROLLER.organisationController.checkProfile
     )
-               
+    APP.route('/api/update/organisation/data').post(
+        auth.companyValidation,CONTROLLER.organisationController.updateOrganisationProfile
+    )               
 };
