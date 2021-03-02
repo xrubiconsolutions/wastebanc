@@ -61,6 +61,45 @@ var sendNotification = function (data) {
   req.end();
 };
 
+
+//'01 7 * * *'
+cron.schedule('01 7 * * *', function(){
+  const active_today = new Date();
+  active_today.setHours(0,0,0,0);
+  const messages = "Your pick up schedule was missed yesterday. Kindly reschedule"  //Custom schedule missed message
+  console.log('<<SCHEDULE JOB CHECK>>>');
+  MODEL.scheduleModel.find({
+    completionStatus : "pending" ,
+    pickUpDate: {
+      $lte: active_today,
+    },
+  }).then((schedules)=>{
+    for(let i = 0 ; i < schedules.length ; i++){
+        MODEL.userModel.findOne({
+          email: schedules[i].client
+        }).then((user)=>{
+          var message = {
+            app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+            contents: {
+              en: `${messages}`,
+            },
+            include_player_ids: [`${user.onesignal_id}`],
+          };
+          MODEL.scheduleModel.updateOne({
+            _id: schedules[i]._id
+          } , {
+            completionStatus : "missed"
+          }, (err,res)=>{
+            sendNotification(message);
+          })
+        })           
+    }
+  })
+});
+
+
+
+
 cron.schedule('* * * * *', function() {
   console.log("<wallet check>")
   MODEL.organisationModel.find({
