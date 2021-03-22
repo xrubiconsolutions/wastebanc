@@ -76,6 +76,9 @@ module.exports = (APP) => {
     APP.route('/api/collector/reset/change/password')
     .post(CONTROLLER.collectorController.resetMobilePassword);
 
+    APP.route('/api/collector/profile/approval')
+    .get(auth.recyclerValidation, CONTROLLER.collectorController.getCollectorProfile);
+
 
 
 

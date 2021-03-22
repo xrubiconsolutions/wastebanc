@@ -41,9 +41,10 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
             MODEL.collectorModel(dataToSave).save({}, (ERR, RESULT) => {
               if (ERR) RESPONSE.status(400).jsonp(ERR);
               else {
-                var phoneNo = String(RESULT.phone).substring(1,11);
+                var phoneNo = String(RESULT.phone).substring(1, 11);
                 var data = {
-                  api_key:'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+                  api_key:
+                    'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
                   message_type: 'NUMERIC',
                   to: `+234${phoneNo}`,
                   from: 'N-Alert',
@@ -52,7 +53,8 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                   pin_time_to_live: 5,
                   pin_length: 4,
                   pin_placeholder: '< 1234 >',
-                  message_text: 'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
+                  message_text:
+                    'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
                   pin_type: 'NUMERIC',
                 };
                 var options = {
@@ -64,7 +66,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                   body: JSON.stringify(data),
                 };
                 request(options, function (error, response) {
-                  const iden = JSON.parse(response.body)
+                  const iden = JSON.parse(response.body);
                   if (error) {
                     throw new Error(error);
                   } else {
@@ -73,62 +75,53 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                       phone: RESULT.phone,
                       username: RESULT.username,
                       roles: RESULT.roles,
-                      pin_id: iden.pinId
-                      };
+                      pin_id: iden.pinId,
+                    };
 
-                      var data = {
-                        "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-                        "phone_number": `+234${phoneNo}`,
-                        "country_code": "NG"
-                      };
-          var options = {
-            'method': 'GET',
-            'url': ' https://termii.com/api/insight/number/query',
-            'headers': {
-              'Content-Type': ['application/json', 'application/json']
-            },
-            body: JSON.stringify(data)
-          
-          };
-          request(options, function (error, response) { 
-            if (error) throw new Error(error);
-            var mobileData = JSON.parse(response.body);
-            var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
-          MODEL.collectorModel.updateOne(
-                          { email: RESULT.email },
-                          {
-                            $set: {
-                              fullname: RESULT.fullname,
-                              mobile_carrier: mobile_carrier,
-                            },
+                    var data = {
+                      api_key:
+                        'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+                      phone_number: `+234${phoneNo}`,
+                      country_code: 'NG',
+                    };
+                    var options = {
+                      method: 'GET',
+                      url: ' https://termii.com/api/insight/number/query',
+                      headers: {
+                        'Content-Type': [
+                          'application/json',
+                          'application/json',
+                        ],
+                      },
+                      body: JSON.stringify(data),
+                    };
+                    request(options, function (error, response) {
+                      if (error) throw new Error(error);
+                      var mobileData = JSON.parse(response.body);
+                      var mobile_carrier =
+                        mobileData.result[0].operatorDetail.operatorName;
+                      MODEL.collectorModel.updateOne(
+                        { email: RESULT.email },
+                        {
+                          $set: {
+                            fullname: RESULT.fullname,
+                            mobile_carrier: mobile_carrier,
                           },
-                          (res) => {
+                        },
+                        (res) => {
+                          return RESPONSE.status(200).jsonp(
+                            COMMON_FUN.sendSuccess(
+                              CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                              UserData
+                            )
+                          );
 
-                            return RESPONSE.status(200).jsonp(
-                              COMMON_FUN.sendSuccess(
-                                CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-                                UserData
-                              )
-                            );
-
-                      // return RESPONSE.status(200).jsonp(
-                      //   UserData
-                      //  );
-
-                          })
-
-                        })
-
-
-
-
-
-
-
-
-
-
-                   
+                          // return RESPONSE.status(200).jsonp(
+                          //   UserData
+                          //  );
+                        }
+                      );
+                    });
                   }
                 });
               }
@@ -375,7 +368,7 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
               fullname: REQUEST.body.fullname,
               state: REQUEST.body.state,
               place: REQUEST.body.place,
-              aggregatorId: REQUEST.body.aggregatorId || "",
+              aggregatorId: REQUEST.body.aggregatorId || '',
               organisation: REQUEST.body.organisation,
               localGovernment: REQUEST.body.localGovernment,
               profile_picture: REQUEST.body.profile_picture,
@@ -448,7 +441,7 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
   request(options, function (error, response) {
     if (error) throw new Error(error);
     const verified = JSON.parse(response.body);
-    if(verified.verified == true){
+    if (verified.verified == true) {
       MODEL.collectorModel.updateOne(
         { phone: phone },
         { verified: true },
@@ -463,14 +456,13 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
             return RESPONSE.jsonp(test);
           });
         }
-      );  
-    }
-    else {
+      );
+    } else {
       return RESPONSE.status(400).json({
-        message: "Invalid token, retry"
-      })
+        message: 'Invalid token, retry',
+      });
     }
- 
+
     console.log(response.body);
   });
 };
@@ -514,9 +506,8 @@ collectorController.resendVerification = (REQUEST, RESPONSE) => {
   var error = {};
   var phone = REQUEST.body.phone;
 
-
   try {
-    var phoneNo = String(phone).substring(1,11);
+    var phoneNo = String(phone).substring(1, 11);
     var data = {
       api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
       message_type: 'NUMERIC',
@@ -658,7 +649,7 @@ collectorController.collectorAnalytics = (req, res) => {
   const active_today = new Date();
 
   try {
-    MODEL.collectorModel.find({        verified: true    }).then((allUser) => {
+    MODEL.collectorModel.find({ verified: true }).then((allUser) => {
       active_today.setDate(today.getDate() - 1);
       MODEL.collectorModel
         .find({
@@ -988,8 +979,7 @@ collectorController.collectorActivityAnalytics = (req, res) => {
   const active_today = new Date();
 
   try {
-    MODEL.collectorModel.find({ verified: true
-    }).then((allUser) => {
+    MODEL.collectorModel.find({ verified: true }).then((allUser) => {
       active_today.setDate(today.getDate() - 1);
       MODEL.collectorModel
         .find({
@@ -1050,80 +1040,71 @@ collectorController.collectorActivityAnalytics = (req, res) => {
   }
 };
 
-
 collectorController.resetMobile = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
   const token = REQUEST.body.token;
 
-
-  var phoneNo = String(phone).substring(1,11);
-
+  var phoneNo = String(phone).substring(1, 11);
 
   var data = {
-    "api_key" : "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-    "message_type" : "NUMERIC",
-    "to" : `+234${phoneNo}`,
-    "from" : "N-Alert",
-    "channel" : "dnd",
-    "pin_attempts" : 10,
-    "pin_time_to_live" :  5,
-    "pin_length" : 4,
-    "pin_placeholder" : "< 1234 >",
-    "message_text" : "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
-    "pin_type" : "NUMERIC"
- };
-var options = {
-'method': 'POST',
-'url': 'https://termii.com/api/sms/otp/send',
-'headers': {
-'Content-Type': ['application/json', 'application/json']
-},
-body: JSON.stringify(data)
+    api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+    message_type: 'NUMERIC',
+    to: `+234${phoneNo}`,
+    from: 'N-Alert',
+    channel: 'dnd',
+    pin_attempts: 10,
+    pin_time_to_live: 5,
+    pin_length: 4,
+    pin_placeholder: '< 1234 >',
+    message_text:
+      'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
+    pin_type: 'NUMERIC',
+  };
+  var options = {
+    method: 'POST',
+    url: 'https://termii.com/api/sms/otp/send',
+    headers: {
+      'Content-Type': ['application/json', 'application/json'],
+    },
+    body: JSON.stringify(data),
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
 
+    var data = {
+      api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+      pin_id: pin_id,
+      pin: token,
+    };
+    var options = {
+      method: 'POST',
+      url: 'https://termii.com/api/sms/otp/verify',
+      headers: {
+        'Content-Type': ['application/json', 'application/json'],
+      },
+      body: JSON.stringify(data),
+    };
+    request(options, function (error, response) {
+      if (error) throw new Error(error);
+
+      MODEL.collectorModel.updateOne(
+        { phone: phone },
+        { verified: true },
+        (res) => {
+          MODEL.collectorModel.findOne({ phone: phone }, (err, USER) => {
+            var test = JSON.parse(JSON.stringify(USER));
+            if (err) return RESPONSE.status(400).jsonp(error);
+            var jwtToken = COMMON_FUN.createToken(
+              test
+            ); /** creating jwt token */
+            test.token = jwtToken;
+            return RESPONSE.jsonp(test);
+          });
+        }
+      );
+    });
+  });
 };
-request(options, function (error, response) { 
-if (error) throw new Error(error);
-
-var data = {
-  "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-  "pin_id": pin_id,
-  "pin": token
-};
-var options = {
-'method': 'POST',
-'url': 'https://termii.com/api/sms/otp/verify',
-'headers': {
-'Content-Type': ['application/json', 'application/json']
-},
-body: JSON.stringify(data)
-};
-request(options, function (error, response) { 
-if (error) throw new Error(error);
-
-MODEL.collectorModel.updateOne(
-  { phone: phone },
-  { verified: true },
-  (res) => {
-
-    MODEL.collectorModel
-      .findOne({ "phone": phone }, (err,USER) => {
-        var test = JSON.parse(JSON.stringify(USER))
-        if (err) return RESPONSE.status(400).jsonp(error)
-        var jwtToken = COMMON_FUN.createToken(
-          test
-        ); /** creating jwt token */
-        test.token = jwtToken;
-        return RESPONSE.jsonp(test);
-          
-      })
-  }
-);
-
-})
-}
-)
-}
-
 
 collectorController.resetMobilePassword = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
@@ -1150,7 +1131,19 @@ collectorController.resetMobilePassword = (REQUEST, RESPONSE) => {
   });
 };
 
-
-
+collectorController.getCollectorProfile = (req, res) => {
+  const collectorID = req.query.collectorID;
+  try {
+    MODEL.collectorModel
+      .findOne({
+        _id: collectorID,
+      })
+      .then((collector) => {
+        return res.status(200).json(collector);
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
 
 module.exports = collectorController;
