@@ -16,7 +16,6 @@ const schedulePick = new Schema({
     },
     scheduleCreator:{
         type: String,
-        required: true,
         default: "",
     },
     phone : {

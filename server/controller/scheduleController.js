@@ -857,15 +857,24 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
   const active_today = new Date();
   active_today.setHours(0);
   active_today.setMinutes(0);
+  var tomorrow = new Date();
+  tomorrow.setDate(new Date().getDate()+1);
 
   MODEL.collectorModel.findOne({ _id: collectorID }).then((collector) => {
     var accessArea = collector.areaOfAccess;
 
     MODEL.scheduleModel
       .find({
-        pickUpDate : {
-          $gte: active_today
-        }
+        $and: [
+          {
+          pickUpDate : {
+            $gte: active_today
+          },
+          pickUpDate : {
+            $lt: tomorrow
+          },    
+        }       
+        ],
       })
       .sort({ _id: -1 })
       .then((schedules) => {
@@ -874,7 +883,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
           (function route() {
             for (let i = 0; i < accessArea.length; i++) {
               for (let j = 0; j < test.length; j++) {
-                if (accessArea[i].includes(test[j])) {
+                if (test[j].includes(accessArea[i])) {
                   need.push(test[j]);
                   geofencedSchedules.push(schedule);
                   count++;
