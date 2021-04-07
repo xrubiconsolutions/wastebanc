@@ -28,6 +28,10 @@ const collector_Schema = new Schema({
     type: String,
     default: "collector"
   },
+  busy:{
+    type: Boolean,
+    default: false
+  },
   password: {
     type: String,
     required: true,

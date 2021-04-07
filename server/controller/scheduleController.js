@@ -263,6 +263,14 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
 
                         sendNotification(message);
                       });
+                    
+                    MODEL.collectorModel.updateOne({
+                      _id: results._id
+                    },  {
+                      $set: {
+                        busy: true
+                      },
+                    }, (err,resp)=>console.log("collector updated") )
 
                     return RESPONSE.status(200).jsonp(
                       COMMON_FUN.sendSuccess(
