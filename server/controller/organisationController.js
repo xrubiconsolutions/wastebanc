@@ -3307,9 +3307,23 @@ organisationController.updateOrganisationProfile = (req, res) => {
             streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess
           },
           (err, resp) => {
-            return res.status(200).json({
-              message: 'Organisation profile updated successfully!',
-            });
+            MODEL.collectorModel.find({
+              approvedBy: organisation._id
+            }).then((collector)=>{
+                   for(let i = 0 ; i < collector.length ; i++){
+                            MODEL.collectorModel.updateOne({
+                              _id: collector[i]._id
+                            }, {
+                              $set: {
+                                  areaOfAccess: req.body.streetOfAccess
+                              }
+                            }, (err,resp)=>{
+                              return res.status(200).json({
+                                message: 'Organisation profile updated successfully!',
+                              });
+                            })
+                   }
+            })            
           }
         );
       });
