@@ -43,6 +43,11 @@ const schedulePick = new Schema({
         type: Date,
         required: true,
     },
+    expiryDuration:{
+        type : Date,
+        required: true,
+        default: () => Date.now() + 7*24*60*60*1000
+    },
     reminder:{
         type: Boolean,
         required: true,

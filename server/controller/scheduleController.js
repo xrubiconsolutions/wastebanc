@@ -858,7 +858,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
   active_today.setHours(0);
   active_today.setMinutes(0);
   var tomorrow = new Date();
-  tomorrow.setDate(new Date().getDate()+1);
+  tomorrow.setDate(new Date().getDate()+7);
 
   MODEL.collectorModel.findOne({ _id: collectorID }).then((collector) => {
     var accessArea = collector.areaOfAccess;

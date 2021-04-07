@@ -67,6 +67,10 @@ const organisation_Schema = new Schema({
     type: [String],
     required: true
   },
+  streetOfAccess: {
+    type: [String],
+    default: ""
+  },
   canEquivalent:{
     type: Number
   },

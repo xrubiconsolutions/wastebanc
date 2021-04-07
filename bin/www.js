@@ -63,14 +63,14 @@ var sendNotification = function (data) {
 
 
 //'01 7 * * *'
-cron.schedule('01 7 * * *', function(){
+cron.schedule('0 7 * * *', function(){
   const active_today = new Date();
   active_today.setHours(0,0,0,0);
   const messages = "Your pick up schedule was missed yesterday. Kindly reschedule"  //Custom schedule missed message
   console.log('<<SCHEDULE JOB CHECK>>>');
   MODEL.scheduleModel.find({
     completionStatus : "pending" ,
-    pickUpDate: {
+    expiryDuration: {
       $lte: active_today,
     },
   }).then((schedules)=>{
@@ -96,6 +96,13 @@ cron.schedule('01 7 * * *', function(){
     }
   })
 });
+
+
+MODEL.organisationModel.find({
+  areaOfAccess: "Amuwo-odofin"
+}).then(org=>{
+  console.log("Organ-->>", org)
+})
 
 
 
