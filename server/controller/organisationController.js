@@ -3304,6 +3304,7 @@ organisationController.updateOrganisationProfile = (req, res) => {
               req.body.nylonEquivalent || organisation.nylonEquivalent,
             metalEquivalent:
               req.body.metalEquivalent || organisation.metalEquivalent,
+            streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess
           },
           (err, resp) => {
             return res.status(200).json({
