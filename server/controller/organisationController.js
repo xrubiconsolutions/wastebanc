@@ -3354,7 +3354,7 @@ organisationController.updateOrganisationProfile = (req, res) => {
 organisationController.getGeofencedCoordinates = (req, res) => {
   const organisation_id = req.query.organisation_id;
   try {
-    MODEL.subscriptionModel
+    MODEL.geofenceModel
       .find({
         organisationId: organisation_id,
       })
