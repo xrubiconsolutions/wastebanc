@@ -19,5 +19,6 @@ module.exports = {
     advertModel: require("./advertModel"),
     payOutModel: require("./payOutModel"),
     versionModel: require("./versionModel"),
+    geofenceModel: require("./geofenceModel")
 };
 

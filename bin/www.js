@@ -98,14 +98,6 @@ cron.schedule('0 7 * * *', function(){
 });
 
 
-MODEL.organisationModel.find({
-  areaOfAccess: "Amuwo-odofin"
-}).then(org=>{
-  console.log("Organ-->>", org)
-})
-
-
-
 
 cron.schedule('* * * * *', function() {
   console.log("<wallet check>")

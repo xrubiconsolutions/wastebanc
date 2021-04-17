@@ -205,5 +205,10 @@ module.exports = (APP) => {
     )
     APP.route('/api/update/organisation/data').post(
         auth.companyValidation,CONTROLLER.organisationController.updateOrganisationProfile
-    )               
+    )    
+    APP.route('/api/organisation/rad/geofenced').get(
+        auth.companyValidation,
+        CONTROLLER.organisationController.getGeofencedCoordinates
+      );
+               
 };

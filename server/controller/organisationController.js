@@ -127,20 +127,29 @@ Pakam Team
                       }
                     );
 
-                    // var mailOptions = {
-                    //   from: "pakambusiness@gmail.com",
-                    //   to: `${organisation_data.email}`,
-                    //   subject: "WELCOME TO PAKAM ORGANISATION ACCOUNT",
-                    //   text: `Organisation account credentials: Log into your account with your email :${organisation_data.email}. Your password for your account is :  ${password}`,
-                    // };
+                    const areas = RESULT.areaOfAccess;
 
-                    // transporter.sendMail(mailOptions, function (error, info) {
-                    //   if (error) {
-                    //     console.log(error);
-                    //   } else {
-                    //     console.log("Email sent: " + info.response);
-                    //   }
-                    // });
+                    for (let j = 0; j < areas.length; j++) {
+                      request.get(
+                        {
+                          url: `https://maps.googleapis.com/maps/api/geocode/json?address=${areas[j]}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
+                        },
+                        function (error, response, body) {
+                          var result = JSON.parse(body);
+                          var LatLong = result.results.map((area) => ({
+                            formatted_address: area.formatted_address,
+                            geometry: area.geometry,
+                          }));
+                          MODEL.geofenceModel({
+                            organisationId: RESULT._id,
+                            data: LatLong,
+                          }).save({}, (err, result) => {
+                            console.log(result);
+                          });
+                        }
+                      );
+                    }
+
                     return RESPONSE.status(200).json(RESULT);
                   }
                 }
@@ -3340,6 +3349,49 @@ organisationController.updateOrganisationProfile = (req, res) => {
     return res.status(500).json(err);
   }
 };
+
+
+organisationController.getGeofencedCoordinates = (req, res) => {
+  const organisation_id = req.query.organisation_id;
+  try {
+    MODEL.subscriptionModel
+      .find({
+        organisationId: organisation_id,
+      })
+      .then((geofence) => {
+
+        return res.status(200).json(geofence)
+        // const areas = organisation.areaOfAccess;
+
+        // for (let j = 0; j < areas.length; j++) {
+        //   request.get(
+        //     {
+        //       url: `https://maps.googleapis.com/maps/api/geocode/json?address=${areas[j]}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
+        //     },
+        //     function (error, response, body) {
+        //       var result = JSON.parse(body);
+        //       var LatLong = result.results.map((area) => ({
+        //         formatted_address: area.formatted_address,
+        //         geometry: area.geometry,
+        //       }));
+        //       MODEL.geofenceModel({
+        //         organisationId: organisation_id,
+        //         data: LatLong,
+        //       }).save({}, (err, result) => {
+        //         console.log(result);
+        //       });
+        //       arrLat.push(LatLong);
+        //       console.log(arrLat);
+        //     }
+        //   );
+        // }
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+
 
 /* export organisationControllers */
 module.exports = organisationController;
