@@ -59,6 +59,10 @@ const organisation_Schema = new Schema({
     type: Number,
     default: 0
   },
+  resetToken:{
+    type: Number,
+    default: null
+  },
   location: {
     type: String,
     required: true
