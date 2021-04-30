@@ -556,7 +556,8 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                           {
                                             $set: {
                                               totalCollected: recycler.totalCollected + Number(quantity),
-                                              numberOfTripsCompleted: recycler.numberOfTripsCompleted + 1
+                                              numberOfTripsCompleted: recycler.numberOfTripsCompleted + 1,
+                                              busy: false
                                             },
                                           }, (err,res)=>{
                                             console.log("update", err , res)

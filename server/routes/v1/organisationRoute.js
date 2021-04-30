@@ -210,5 +210,17 @@ module.exports = (APP) => {
         auth.companyValidation,
         CONTROLLER.organisationController.getGeofencedCoordinates
       );
+    
+    APP.route('/api/forgot/company/token').post(
+        CONTROLLER.organisationController.resetCompanyPassword
+      );
+    
+    APP.route('/api/validate/company/token').post(
+        CONTROLLER.organisationController.validateCompanyToken
+      );
+    
+    APP.route('/api/reset/company/password').post(
+        CONTROLLER.organisationController.changeCompanyPassword
+      );
                
 };

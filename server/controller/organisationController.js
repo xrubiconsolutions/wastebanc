@@ -3391,6 +3391,122 @@ organisationController.getGeofencedCoordinates = (req, res) => {
   }
 };
 
+organisationController.resetCompanyPassword = (req, res) => {
+  const resetToken = COMMON_FUN.generateRandomString();
+  const email = req.body.email;
+  try {
+    MODEL.organisationModel.findOne({
+      email: email
+    }).then((organisation)=>{
+             if(!organisation) return res.status(400).json({
+               message : "Organisation does not exist"
+             })
+    })
+    sgMail.setApiKey(
+      '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'
+    );
+    const msg = {
+      to: `${email}`,
+      from: 'pakam@xrubiconsolutions.com', // Use the email address or domain you verified above
+      subject: 'FORGOT PASSWORD',
+      text: `
+      Kindly log on to https://dashboard.pakam.ng/otp to input your reset token.
+      
+    
+      Reset Token: ${resetToken}
+    
+   
+      Best Regard
+
+      Pakam Team
+`,
+    };
+    //ES6
+    sgMail.send(msg).then(
+      () => {},
+      (error) => {
+        console.error(error);
+
+        if (error.response) {
+          console.error(error.response.body);
+        }
+      }
+    );
+    MODEL.organisationModel.updateOne(
+      {
+        email: email,
+      },
+      {
+        $set: {
+          resetToken: resetToken,
+        },
+      },
+      (err, response) => {
+        return res.status(200).json({
+          message: 'Reset token sent successfully',
+        });
+      }
+    );
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+organisationController.validateCompanyToken = (req, res) => {
+  const email = req.body.email;
+  const resetToken = req.body.resetToken;
+
+  try {
+    MODEL.organisationModel
+      .findOne({
+        email: email,
+      })
+      .then((organisation) => {
+        if (resetToken === organisation.resetToken) {
+          return res.status(200).json({
+            message: 'Token input successful',
+          });
+        }
+        return res.status(400).json({
+          message: 'Token input failed',
+        });
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+organisationController.changeCompanyPassword = (req, res) => {
+  const email = req.body.email;
+  try {
+    MODEL.organisationModel.findOne({ email: email }).then((result) => {
+      if (!result) {
+        return RESPONSE.status(400).json({
+          message: 'This account does not exist',
+        });
+      }
+
+      COMMON_FUN.encryptPswrd(req.body.password, (ERR, HASH) => {
+        /********** update password in organisationModel ********/
+        MODEL.organisationModel
+          .updateOne({ email: email }, { $set: { password: HASH } })
+          .then((SUCCESS) => {
+            return res
+              .status(200)
+              .json(
+                COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
+              );
+          })
+          .catch((ERR) => {
+            return res.status(400).json(COMMON_FUN.sendError(ERR));
+          });
+      });
+    });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
 
 
 /* export organisationControllers */
