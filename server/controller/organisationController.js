@@ -3300,7 +3300,7 @@ organisationController.updateOrganisationProfile = (req, res) => {
             cartonEquivalent:
               req.body.cartonEquivalent || organisation.cartonEquivalent,
             petBottleEquivalent:
-              req.body.petBottle || organisation.petBottleEquivalent,
+              req.body.petBottleEquivalent || organisation.petBottleEquivalent,
             rubberEquivalent:
               req.body.rubberEquivalent || organisation.rubberEquivalent,
             plasticEquivalent:
@@ -3317,6 +3317,36 @@ organisationController.updateOrganisationProfile = (req, res) => {
               req.body.streetOfAccess || organisation.streetOfAccess,
           },
           (err, resp) => {
+
+            MODEL.geofenceModel
+            .deleteMany({
+              organisationId: organisation_id,
+            })
+            .then((err, geo) => {
+              console.log(geo);
+            });
+          var areas = req.body.areaOfAccess;
+          for (let j = 0; j < areas.length; j++) {
+            request.get(
+              {
+                url: `https://maps.googleapis.com/maps/api/geocode/json?address=${areas[j]}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
+              },
+              function (error, response, body) {
+                var result = JSON.parse(body);
+                var LatLong =
+                  result.results.map((area) => ({
+                    formatted_address: area.formatted_address,
+                    geometry: area.geometry,
+                  })) || '';
+                MODEL.geofenceModel({
+                  organisationId: organisation_id,
+                  data: LatLong,
+                }).save({}, (err, result) => {
+                  console.log('geofenced');
+                });
+              }
+            );
+          }
             MODEL.collectorModel
               .find({
                 approvedBy: organisation._id,

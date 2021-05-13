@@ -58,7 +58,7 @@ module.exports = (APP) => {
     CONTROLLER.scheduleController.collectorMissed
   );
 
-  APP.route("/api/geofenced/schedule").get(auth.recyclerValidation,
+  APP.route("/api/geofenced/schedule").get(
     CONTROLLER.scheduleController.smartRoute
   );
 
