@@ -16,6 +16,11 @@ const BOOTSTRAPING = require("../server/util/Bootstraping/Bootstraping");
 const MODEL = require("../server/models")
 const cron = require('node-cron');
 var request = require('request');
+const { AwakeHeroku } = require("awake-heroku");
+
+
+
+
 
 var nodemailer = require("nodemailer");
 
@@ -490,6 +495,10 @@ module.exports = () => {
     app.listen(ALLFILES.CONFIG.dbConfig.port, ()=>{
         ALLFILES.COMMON_FUN.messageLogs(null, `**************Server is running on ${ALLFILES.CONFIG.dbConfig.port} **************`);
     });
+
+    AwakeHeroku.add("https://packamserver.herokuapp.com/");
+    AwakeHeroku.start();
+
 };
 
 

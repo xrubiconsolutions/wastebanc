@@ -204,7 +204,7 @@ module.exports = (APP) => {
         auth.companyValidation,CONTROLLER.organisationController.checkProfile
     )
     APP.route('/api/update/organisation/data').post(
-        auth.companyValidation,CONTROLLER.organisationController.updateOrganisationProfile
+        auth.companyPakamDataValidation ,CONTROLLER.organisationController.updateOrganisationProfile
     )    
     APP.route('/api/organisation/rad/geofenced').get(
         auth.companyValidation,

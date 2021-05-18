@@ -62,6 +62,10 @@ const schedulePick = new Schema({
         enum: ["completed", "pending", "missed", "cancelled"],
         default: "pending"
     },
+    organisation: {
+        type: String,
+        default: ""
+    },
     cancelReason : {
         type: String
     },
