@@ -47,7 +47,7 @@ validateUser.companyPakamDataValidation = (REQUEST, RESPONSE, NEXT)=>{
     let status = REQUEST.headers.authorization ?
         JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY):
         JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
-    (validated && validated.roles === "admin" || validated.roles === "company" ) ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    (validated && validated.roles === "admin" || validated.roles == "company" ) ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 }
 
 validateUser.recyclerValidation = ( REQUEST, RESPONSE, NEXT )=>{
