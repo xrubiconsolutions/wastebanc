@@ -481,8 +481,9 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                 );
                           var organisationCheck = JSON.parse(JSON.stringify(organisation));
                           for (let val in organisationCheck) {
-                            console.log(organisationCheck)
+                            console.log('test here-->',organisationCheck);
                             if (val.includes(category)) {
+                              console.log("opooor yeye--->",val )
                               const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1     
                               console.log("oricing--->>", equivalent)
                               const pricing = quantity * equivalent;
