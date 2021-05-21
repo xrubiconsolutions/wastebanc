@@ -167,7 +167,7 @@ cron.schedule('* * 1 * *', function() {
 
 cron.schedule('01 7 * * *', function(){
   var today = new Date()
-  const messages = "Your pick up schedule is today. Kindly be available to receiver our recycler"  //Custom schedule reminder message
+  const messages = "Your pick up schedule is today. Kindly be available to receive our recycler"  //Custom schedule reminder message
   console.log('<<RUNNER CHECK>>>');
   MODEL.scheduleModel.find({
     reminder: true , completionStatus : "pending" , collectorStatus: "accept"
@@ -191,6 +191,23 @@ cron.schedule('01 7 * * *', function(){
     }
   })
 });
+
+MODEL.scheduleModel.find({ completionStatus : "completed"}).then((data)=>{
+  for (let i = 0; i < data.length ; i++){
+      MODEL.organisationModel.findOne({
+        _id :  data[i].organisationCollection
+      }).then((data_metric)=>{
+        MODEL.scheduleModel.updateOne({
+          _id : data[i]._id
+        }, {
+          $set: {
+            organisation : data_metric.companyName
+          }
+        }, (err,resp)=>{ console.log("updated", data_metric)})
+      })
+  }
+  
+})
 
 
 // MODEL.transactionModel.find({}).then(TRANS=>{

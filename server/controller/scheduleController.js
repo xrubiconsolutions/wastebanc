@@ -484,6 +484,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                             console.log(organisationCheck)
                             if (val.includes(category)) {
                               const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1     
+                              console.log("oricing--->>", equivalent)
                               const pricing = quantity * equivalent;
                               MODEL.collectorModel.updateOne(
                                 { email: recycler.email },
@@ -574,8 +575,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                             }
                           }
                         });
-                    });
-              
+                    });   
             }
           });
       });
