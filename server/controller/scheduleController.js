@@ -470,6 +470,8 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                         .then((organisation) => {
                           var category = schedule[0].Category === "nylonSachet" ?  "nylon"
                            :
+                           schedule[0].Category === "glassBottle" ? "glass" 
+                           :
                             schedule[0].Category.length < 4
                               ? schedule[0].Category.substring(
                                   0,
@@ -477,7 +479,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                 )
                               : schedule[0].Category.substring(
                                   0,
-                                  schedule[0].Category.length
+                                  schedule[0].Category.length - 1
                                 );
                           
                           var organisationCheck = JSON.parse(JSON.stringify(organisation));

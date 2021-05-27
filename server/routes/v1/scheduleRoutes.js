@@ -59,6 +59,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/geofenced/schedule").get(
+    auth.recyclerValidation,
     CONTROLLER.scheduleController.smartRoute
   );
 
