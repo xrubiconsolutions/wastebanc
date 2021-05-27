@@ -483,6 +483,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                           var organisationCheck = JSON.parse(JSON.stringify(organisation));
                           console.log("organisation check here", organisationCheck);
                           for (let val in organisationCheck) {
+                            console.log("category check here", category);
                             if (val.includes(category)) {
                               const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1  
                               console.log("equivalent here", equivalent)
