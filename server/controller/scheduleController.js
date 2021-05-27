@@ -477,7 +477,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                 )
                               : schedule[0].Category.substring(
                                   0,
-                                  schedule[0].Category.length - 1
+                                  schedule[0].Category.length
                                 );
                           
                           var organisationCheck = JSON.parse(JSON.stringify(organisation));
