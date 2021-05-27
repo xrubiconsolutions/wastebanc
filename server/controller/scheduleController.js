@@ -316,7 +316,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
               {
                 $set: {
                   collectorStatus: 'accept',
-                  organisation : results.organisation,
+                  organisation : result.organisation,
                   collectedBy: result._id,
                   organisationCollection: result.approvedBy,
                 },
@@ -463,7 +463,6 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                   MODEL.collectorModel
                     .findOne({ _id: collectorID })
                     .then((recycler, err) => {
-
                       MODEL.organisationModel
                         .findOne({
                           _id: recycler.approvedBy,
@@ -482,9 +481,12 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                 );
                           
                           var organisationCheck = JSON.parse(JSON.stringify(organisation));
+                          console.log("organisation check here", organisationCheck);
                           for (let val in organisationCheck) {
                             if (val.includes(category)) {
-                              const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1     
+                              const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1  
+                              console.log("equivalent here", equivalent)
+   
                               const pricing = quantity * equivalent;
                               MODEL.collectorModel.updateOne(
                                 { email: recycler.email },

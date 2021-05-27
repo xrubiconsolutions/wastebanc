@@ -192,22 +192,20 @@ cron.schedule('01 7 * * *', function(){
   })
 });
 
-MODEL.scheduleModel.find({ completionStatus : "completed"}).then((data)=>{
-  for (let i = 0; i < data.length ; i++){
-      MODEL.organisationModel.findOne({
-        _id :  data[i].organisationCollection
-      }).then((data_metric)=>{
-        MODEL.scheduleModel.updateOne({
-          _id : data[i]._id
-        }, {
-          $set: {
-            organisation : data_metric.companyName
-          }
-        }, (err,resp)=>{ console.log("updated", data_metric)})
-      })
-  }
-  
-})
+// MODEL.scheduleModel.find({"collectorStatus": "accept" , "completionStatus": "pending", "organisation": "RecyclePoints Limited"}).then((data)=>{
+//   console.log("data", data)
+//   for (let i = 0; i < data.length ; i++){
+//             MODEL.scheduleModel.updateOne({
+//           _id : data[i]._id
+//         }, {
+//           $set: {
+//             collectorStatus : "decline",
+//             organisationCollection: "",
+//             organisation : ""
+//           }
+//         }, (err,resp)=>{ console.log("updated")})
+//   }
+// })
 
 
 // MODEL.transactionModel.find({}).then(TRANS=>{
