@@ -253,9 +253,8 @@ organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
                   )
                 );
               else {
-                var jwtToken = COMMON_FUN.createToken(
-                  USER
-                ); /** creating jwt token */
+                var jwtToken =
+                  COMMON_FUN.createToken(USER); /** creating jwt token */
                 USER.token = jwtToken;
                 if (USER.licence_active == false) {
                   return RESPONSE.status(400).json({
@@ -891,9 +890,31 @@ organisationController.raffleTicket = (req, res) => {
   const winner_count = req.body.winner_count;
 
   try {
-    MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
-      const number = checks.length;
+    if (lcd.length == 1) {
+        MODEL.scheduleModel
+          .find({ completionStatus: 'completed' })
+          .then((schedule) => {
+            for (let i = 0; i < schedule.length; i++) {
+              MODEL.userModel
+                .find({ phone: schedule[i].phone })
+                .then((user) => {
+                  console.log(user);
+                });
+            }
+          });
 
+      MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
+        // const individuals = numberOfOccurence;
+        MODEL.scheduleModel
+          .find({ completionStatus: 'completed' })
+          .then((schedule) => {
+            for (let i = 0; i < schedule.length; i++) {
+              MODEL.userModel
+                .findOne({ phone: schedule[i].phone })
+                .then((user) => {});
+            }
+          });
+      });
       MODEL.userModel
         .aggregate([
           { $match: { lcd: lcd, schedulePoints: { $ne: 0 } } },
@@ -912,7 +933,77 @@ organisationController.raffleTicket = (req, res) => {
           }
           return res.status(200).json({ winners: winners });
         });
-    });
+
+      MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
+        // const individuals = numberOfOccurence;
+        MODEL.scheduleModel
+          .find({ completionStatus: 'completed' })
+          .then((schedule) => {
+            for (let i = 0; i < schedule.length; i++) {
+              MODEL.userModel
+                .find({ phone: schedule[i].phone })
+                .then((user) => {});
+            }
+          });
+      });
+    } else {
+      MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
+        // const individuals = numberOfOccurence;
+        MODEL.scheduleModel
+          .find({ completionStatus: 'completed' })
+          .then((schedule) => {
+            for (let i = 0; i < schedule.length; i++) {
+              MODEL.userModel
+                .find({ phone: schedule[i].phone })
+                .then((user) => {});
+            }
+          });
+      });
+
+      MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
+        // const individuals = numberOfOccurence;
+        MODEL.scheduleModel
+          .find({ completionStatus: 'completed' })
+          .then((schedule) => {
+            for (let i = 0; i < schedule.length; i++) {
+              MODEL.userModel
+                .find({ phone: schedule[i].phone })
+                .then((user) => {});
+            }
+          });
+      });
+      MODEL.userModel
+        .aggregate([
+          { $match: { lcd: lcd, schedulePoints: { $ne: 0 } } },
+          { $sample: { size: Number(winner_count) } },
+        ])
+        .then((winners, err) => {
+          if (err) return res.status(400).json(err);
+          for (let i = 0; i < winners.length; i++) {
+            MODEL.userModel.updateOne(
+              { _id: winners[i]._id },
+              { $set: { rafflePoints: winners[i].rafflePoints + 10000 } },
+              (res) => {
+                console.log('Winner object update');
+              }
+            );
+          }
+          return res.status(200).json({ winners: winners });
+        });
+
+      MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
+        // const individuals = numberOfOccurence;
+        MODEL.scheduleModel
+          .find({ completionStatus: 'completed' })
+          .then((schedule) => {
+            for (let i = 0; i < schedule.length; i++) {
+              MODEL.userModel
+                .find({ phone: schedule[i].phone })
+                .then((user) => {});
+            }
+          });
+      });
+    }
   } catch (err) {
     return res.status(500).json(err);
   }
@@ -3317,36 +3408,35 @@ organisationController.updateOrganisationProfile = (req, res) => {
               req.body.streetOfAccess || organisation.streetOfAccess,
           },
           (err, resp) => {
-
             MODEL.geofenceModel
-            .deleteMany({
-              organisationId: organisation_id,
-            })
-            .then((err, geo) => {
-              console.log(geo);
-            });
-          var areas = req.body.areaOfAccess;
-          for (let j = 0; j < areas.length; j++) {
-            request.get(
-              {
-                url: `https://maps.googleapis.com/maps/api/geocode/json?address=${areas[j]}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
-              },
-              function (error, response, body) {
-                var result = JSON.parse(body);
-                var LatLong =
-                  result.results.map((area) => ({
-                    formatted_address: area.formatted_address,
-                    geometry: area.geometry,
-                  })) || '';
-                MODEL.geofenceModel({
-                  organisationId: organisation_id,
-                  data: LatLong,
-                }).save({}, (err, result) => {
-                  console.log('geofenced');
-                });
-              }
-            );
-          }
+              .deleteMany({
+                organisationId: organisation_id,
+              })
+              .then((err, geo) => {
+                console.log(geo);
+              });
+            var areas = req.body.areaOfAccess;
+            for (let j = 0; j < areas.length; j++) {
+              request.get(
+                {
+                  url: `https://maps.googleapis.com/maps/api/geocode/json?address=${areas[j]}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
+                },
+                function (error, response, body) {
+                  var result = JSON.parse(body);
+                  var LatLong =
+                    result.results.map((area) => ({
+                      formatted_address: area.formatted_address,
+                      geometry: area.geometry,
+                    })) || '';
+                  MODEL.geofenceModel({
+                    organisationId: organisation_id,
+                    data: LatLong,
+                  }).save({}, (err, result) => {
+                    console.log('geofenced');
+                  });
+                }
+              );
+            }
             MODEL.collectorModel
               .find({
                 approvedBy: organisation._id,
@@ -3380,7 +3470,6 @@ organisationController.updateOrganisationProfile = (req, res) => {
   }
 };
 
-
 organisationController.getGeofencedCoordinates = (req, res) => {
   const organisation_id = req.query.organisation_id;
   try {
@@ -3389,8 +3478,7 @@ organisationController.getGeofencedCoordinates = (req, res) => {
         organisationId: organisation_id,
       })
       .then((geofence) => {
-
-        return res.status(200).json(geofence)
+        return res.status(200).json(geofence);
         // const areas = organisation.areaOfAccess;
 
         // for (let j = 0; j < areas.length; j++) {
@@ -3425,26 +3513,26 @@ organisationController.resetCompanyPassword = (req, res) => {
   const resetToken = COMMON_FUN.generateRandomString();
   const email = req.body.email;
 
- 
   try {
+    MODEL.organisationModel
+      .findOne({
+        email: email,
+      })
+      .then((organisation) => {
+        if (!organisation) {
+          return res.status(400).json({
+            message: 'Organisation does not exist',
+          });
+        }
 
-    MODEL.organisationModel.findOne({
-      email: email
-    }).then((organisation)=>{
-      
-             if(!organisation) { return res.status(400).json({
-               message : "Organisation does not exist"
-             })
-             }
-
-             sgMail.setApiKey(
-              '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'
-            );
-            const msg = {
-              to: `${email}`,
-              from: 'pakam@xrubiconsolutions.com', // Use the email address or domain you verified above
-              subject: 'FORGOT PASSWORD',
-              text: `
+        sgMail.setApiKey(
+          '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'
+        );
+        const msg = {
+          to: `${email}`,
+          from: 'pakam@xrubiconsolutions.com', // Use the email address or domain you verified above
+          subject: 'FORGOT PASSWORD',
+          text: `
               Kindly log on to https://dashboard.pakam.ng/otp to input your reset token.
               
             
@@ -3455,34 +3543,34 @@ organisationController.resetCompanyPassword = (req, res) => {
         
               Pakam Team
         `,
-            };
-            //ES6
-            sgMail.send(msg).then(
-              () => {},
-              (error) => {
-                console.error(error);
-        
-                if (error.response) {
-                  console.error(error.response.body);
-                }
-              }
-            );
-            MODEL.organisationModel.updateOne(
-              {
-                email: email,
-              },
-              {
-                $set: {
-                  resetToken: resetToken,
-                },
-              },
-              (err, response) => {
-                return res.status(200).json({
-                  message: 'Reset token sent successfully',
-                });
-              }
-            );
-    }) 
+        };
+        //ES6
+        sgMail.send(msg).then(
+          () => {},
+          (error) => {
+            console.error(error);
+
+            if (error.response) {
+              console.error(error.response.body);
+            }
+          }
+        );
+        MODEL.organisationModel.updateOne(
+          {
+            email: email,
+          },
+          {
+            $set: {
+              resetToken: resetToken,
+            },
+          },
+          (err, response) => {
+            return res.status(200).json({
+              message: 'Reset token sent successfully',
+            });
+          }
+        );
+      });
   } catch (err) {
     return res.status(500).json(err);
   }
@@ -3544,6 +3632,63 @@ organisationController.changeCompanyPassword = (req, res) => {
 };
 
 
+organisationController.organisationSchedulesPending = (REQUEST,RESPONSE)=>{
+  const organisationID = REQUEST.query.organisationID;
+  var need = [];
+  var count = 0;
+  var geofencedSchedules = [];
+  const active_today = new Date();
+  active_today.setHours(0);
+  active_today.setMinutes(0);
+  var tomorrow = new Date();
+  tomorrow.setDate(new Date().getDate()+7);
+
+  MODEL.organisationModel.findOne({ _id: organisationID }).then((collector) => {
+    var accessArea = collector.streetOfAccess;
+
+    MODEL.scheduleModel
+      .find({
+        $and: [
+          {
+          pickUpDate : {
+            $gte: active_today
+          },
+          pickUpDate : {
+            $lt: tomorrow
+          },    
+        }       
+        ],
+      })
+      .sort({ _id: -1 })
+      .then((schedules) => {
+        schedules.forEach((schedule, index) => {
+          var test = schedule.address.split(', ');
+          (function route() {
+            for (let i = 0; i < accessArea.length; i++) {
+              for (let j = 0; j < test.length; j++) {
+                if (test[j].includes(accessArea[i])) {
+                  need.push(test[j]);
+                  geofencedSchedules.push(schedule);
+                  count++;
+                }
+              }
+            }
+            return !!need;
+          })();
+        });
+        var geoSchedules = geofencedSchedules.filter(x => (x.completionStatus !== "completed" && x.completionStatus !== "cancelled" && x.completionStatus !== "missed") || (x.completionStatus == 'pending' && x.collectorStatus == "accept")
+        );
+        const referenceSchedules = [ ...new Set(geoSchedules)];
+        RESPONSE.jsonp(
+          COMMON_FUN.sendSuccess(
+            CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+            referenceSchedules
+          )
+        );
+      })
+      .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+  });
+}
 
 /* export organisationControllers */
 module.exports = organisationController;

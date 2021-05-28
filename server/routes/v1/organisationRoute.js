@@ -95,7 +95,7 @@ module.exports = (APP) => {
         .get(CONTROLLER.organisationController.weekChartData);
     
     APP.route('/api/organisation/raffle')
-        .post(auth.adminPakamValidation,CONTROLLER.organisationController.raffleTicket);
+        .post(CONTROLLER.organisationController.raffleTicket);
     
     APP.route('/api/organisation/waste/history')
         .get(CONTROLLER.organisationController.wasteHistory);
@@ -209,6 +209,11 @@ module.exports = (APP) => {
     APP.route('/api/organisation/rad/geofenced').get(
         auth.companyValidation,
         CONTROLLER.organisationController.getGeofencedCoordinates
+      );
+
+      APP.route('/api/organisation/pending/geofenced').get(
+        auth.companyValidation,
+        CONTROLLER.organisationController.organisationSchedulesPending
       );
     
     APP.route('/api/forgot/company/token').post(
