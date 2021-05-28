@@ -888,125 +888,189 @@ organisationController.weekChartData = (req, res) => {
 organisationController.raffleTicket = (req, res) => {
   const lcd = req.body.lcd;
   const winner_count = req.body.winner_count;
-
   try {
-    if (lcd.length == 1) {
-        MODEL.scheduleModel
-          .find({ completionStatus: 'completed' })
-          .then((schedule) => {
-            for (let i = 0; i < schedule.length; i++) {
-              MODEL.userModel
-                .find({ phone: schedule[i].phone })
-                .then((user) => {
-                  console.log(user);
-                });
-            }
-          });
+    var allUser = [];
 
-      MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
-        // const individuals = numberOfOccurence;
-        MODEL.scheduleModel
-          .find({ completionStatus: 'completed' })
-          .then((schedule) => {
-            for (let i = 0; i < schedule.length; i++) {
-              MODEL.userModel
-                .findOne({ phone: schedule[i].phone })
-                .then((user) => {});
-            }
-          });
-      });
-      MODEL.userModel
-        .aggregate([
-          { $match: { lcd: lcd, schedulePoints: { $ne: 0 } } },
-          { $sample: { size: Number(winner_count) } },
-        ])
-        .then((winners, err) => {
-          if (err) return res.status(400).json(err);
-          for (let i = 0; i < winners.length; i++) {
-            MODEL.userModel.updateOne(
-              { _id: winners[i]._id },
-              { $set: { rafflePoints: winners[i].rafflePoints + 10000 } },
-              (res) => {
-                console.log('Winner object update');
-              }
-            );
-          }
-          return res.status(200).json({ winners: winners });
-        });
 
-      MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
-        // const individuals = numberOfOccurence;
-        MODEL.scheduleModel
-          .find({ completionStatus: 'completed' })
-          .then((schedule) => {
-            for (let i = 0; i < schedule.length; i++) {
-              MODEL.userModel
-                .find({ phone: schedule[i].phone })
-                .then((user) => {});
+    MODEL.userModel
+          .aggregate([
+            { $match: { schedulePoints: { $ne: 0 } } },
+            { $sample: { size: Number(winner_count) } },
+          ])
+          .then((winners, err) => {
+            if (err) return res.status(400).json(err);
+            for (let i = 0; i < winners.length; i++) {
+              MODEL.userModel.updateOne(
+                { _id: winners[i]._id },
+                { $set: { rafflePoints: winners[i].rafflePoints + 10000 } },
+                (res) => {
+                  console.log('Winner object update' , winners.length);
+                }
+              );
             }
+            return res.status(200).json({ winners: winners });
           });
-      });
-    } else {
-      MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
-        // const individuals = numberOfOccurence;
-        MODEL.scheduleModel
-          .find({ completionStatus: 'completed' })
-          .then((schedule) => {
-            for (let i = 0; i < schedule.length; i++) {
-              MODEL.userModel
-                .find({ phone: schedule[i].phone })
-                .then((user) => {});
-            }
-          });
-      });
+  
 
-      MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
-        // const individuals = numberOfOccurence;
-        MODEL.scheduleModel
-          .find({ completionStatus: 'completed' })
-          .then((schedule) => {
-            for (let i = 0; i < schedule.length; i++) {
-              MODEL.userModel
-                .find({ phone: schedule[i].phone })
-                .then((user) => {});
-            }
-          });
-      });
-      MODEL.userModel
-        .aggregate([
-          { $match: { lcd: lcd, schedulePoints: { $ne: 0 } } },
-          { $sample: { size: Number(winner_count) } },
-        ])
-        .then((winners, err) => {
-          if (err) return res.status(400).json(err);
-          for (let i = 0; i < winners.length; i++) {
-            MODEL.userModel.updateOne(
-              { _id: winners[i]._id },
-              { $set: { rafflePoints: winners[i].rafflePoints + 10000 } },
-              (res) => {
-                console.log('Winner object update');
-              }
-            );
-          }
-          return res.status(200).json({ winners: winners });
-        });
+    // MODEL.scheduleModel.find({
+    // }).then((schedule)=>{
+    //   for(let i = 0 ; i < schedule.length ; i++){
+    //       MODEL.userModel.findOne({
+    //         phone : schedule[i].phone
+    //       }).then((user)=>{
+    //           allUser.push(user);
+    //       })
+    //       console.log(allUser)
+    //   }
+    // })
 
-      MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
-        // const individuals = numberOfOccurence;
-        MODEL.scheduleModel
-          .find({ completionStatus: 'completed' })
-          .then((schedule) => {
-            for (let i = 0; i < schedule.length; i++) {
-              MODEL.userModel
-                .find({ phone: schedule[i].phone })
-                .then((user) => {});
-            }
-          });
-      });
-    }
-  } catch (err) {
-    return res.status(500).json(err);
+
+    // MODEL.scheduleModel
+    // .find({
+    //   completionStatus: "completed"
+    // })
+    // .sort({ _id: -1 })
+    // .then((schedules) => {
+    //   schedules.forEach((schedule, index) => {
+    //     (function raffle() {
+    //         for (let j = 0; j < schedules.length; j++) {
+    //             for(let i = 0 ; i < schedules.length ; i++){
+    //                       MODEL.userModel.findOne({
+    //                         phone : schedules[i].phone
+    //                       }).then((user)=>{
+    //                         allUser.push(user);
+    //                       })
+    //             }
+    //         }
+    //     })();
+    //   });
+    //   return res.status.json(allUser)
+    // })
+    // console.log("all user here", allUser)
+
+  } catch(err){
+      return res.status(500).json(err)
   }
+
+
+  // try {
+  //   if (lcd.length == 1) {
+  //       MODEL.scheduleModel
+  //         .find({ completionStatus: 'completed' })
+  //         .then((schedule) => {
+  //           for (let i = 0; i < schedule.length; i++) {
+  //             MODEL.userModel
+  //               .find({ phone: schedule[i].phone })
+  //               .then((user) => {
+  //                 console.log(user);
+  //               });
+  //           }
+  //         });
+
+  //     MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
+  //       // const individuals = numberOfOccurence;
+  //       MODEL.scheduleModel
+  //         .find({ completionStatus: 'completed' })
+  //         .then((schedule) => {
+  //           for (let i = 0; i < schedule.length; i++) {
+  //             MODEL.userModel
+  //               .findOne({ phone: schedule[i].phone })
+  //               .then((user) => {});
+  //           }
+  //         });
+  //     });
+  //     MODEL.userModel
+  //       .aggregate([
+  //         { $match: { lcd: lcd, schedulePoints: { $ne: 0 } } },
+  //         { $sample: { size: Number(winner_count) } },
+  //       ])
+  //       .then((winners, err) => {
+  //         if (err) return res.status(400).json(err);
+  //         for (let i = 0; i < winners.length; i++) {
+  //           MODEL.userModel.updateOne(
+  //             { _id: winners[i]._id },
+  //             { $set: { rafflePoints: winners[i].rafflePoints + 10000 } },
+  //             (res) => {
+  //               console.log('Winner object update');
+  //             }
+  //           );
+  //         }
+  //         return res.status(200).json({ winners: winners });
+  //       });
+
+  //     MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
+  //       // const individuals = numberOfOccurence;
+  //       MODEL.scheduleModel
+  //         .find({ completionStatus: 'completed' })
+  //         .then((schedule) => {
+  //           for (let i = 0; i < schedule.length; i++) {
+  //             MODEL.userModel
+  //               .find({ phone: schedule[i].phone })
+  //               .then((user) => {});
+  //           }
+  //         });
+  //     });
+  //   } else {
+  //     MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
+  //       // const individuals = numberOfOccurence;
+  //       MODEL.scheduleModel
+  //         .find({ completionStatus: 'completed' })
+  //         .then((schedule) => {
+  //           for (let i = 0; i < schedule.length; i++) {
+  //             MODEL.userModel
+  //               .find({ phone: schedule[i].phone })
+  //               .then((user) => {});
+  //           }
+  //         });
+  //     });
+
+  //     MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
+  //       // const individuals = numberOfOccurence;
+  //       MODEL.scheduleModel
+  //         .find({ completionStatus: 'completed' })
+  //         .then((schedule) => {
+  //           for (let i = 0; i < schedule.length; i++) {
+  //             MODEL.userModel
+  //               .find({ phone: schedule[i].phone })
+  //               .then((user) => {});
+  //           }
+  //         });
+  //     });
+  //     MODEL.userModel
+  //       .aggregate([
+  //         { $match: { lcd: lcd, schedulePoints: { $ne: 0 } } },
+  //         { $sample: { size: Number(winner_count) } },
+  //       ])
+  //       .then((winners, err) => {
+  //         if (err) return res.status(400).json(err);
+  //         for (let i = 0; i < winners.length; i++) {
+  //           MODEL.userModel.updateOne(
+  //             { _id: winners[i]._id },
+  //             { $set: { rafflePoints: winners[i].rafflePoints + 10000 } },
+  //             (res) => {
+  //               console.log('Winner object update');
+  //             }
+  //           );
+  //         }
+  //         return res.status(200).json({ winners: winners });
+  //       });
+
+  //     MODEL.userModel.find({ lcd: lcd }).then((checks, err) => {
+  //       // const individuals = numberOfOccurence;
+  //       MODEL.scheduleModel
+  //         .find({ completionStatus: 'completed' })
+  //         .then((schedule) => {
+  //           for (let i = 0; i < schedule.length; i++) {
+  //             MODEL.userModel
+  //               .find({ phone: schedule[i].phone })
+  //               .then((user) => {});
+  //           }
+  //         });
+  //     });
+  //   }
+  // } catch (err) {
+  //   return res.status(500).json(err);
+  // }
 };
 
 organisationController.wasteHistory = (req, res) => {

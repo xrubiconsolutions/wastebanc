@@ -880,12 +880,10 @@ userController.getAllCollectors = async (REQUEST, RESPONSE) => {
 userController.resetMobile = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
   const token = REQUEST.body.token;
-
-
+  const pin_id = REQUEST.body.pin_id;
 
   var phoneNo = String(phone).substring(1,11);
 
-  console.log("<<phone >>", phoneNo)
 
   var data = {
     "api_key" : "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
@@ -900,17 +898,7 @@ userController.resetMobile = (REQUEST, RESPONSE) => {
     "message_text" : "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
     "pin_type" : "NUMERIC"
  };
-var options = {
-'method': 'POST',
-'url': 'https://termii.com/api/sms/otp/send',
-'headers': {
-'Content-Type': ['application/json', 'application/json']
-},
-body: JSON.stringify(data)
 
-};
-request(options, function (error, response) { 
-if (error) throw new Error(error);
 
 var data = {
   "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
@@ -932,7 +920,6 @@ MODEL.userModel.updateOne(
   { phone: phone },
   { verified: true },
   (res) => {
-
     MODEL.userModel
       .findOne({ "phone": phone }, (err,USER) => {
         var test = JSON.parse(JSON.stringify(USER))
@@ -948,11 +935,9 @@ MODEL.userModel.updateOne(
       })
   }
 );
-// return RESPONSE.status(200).json(JSON.parse(response.body))
 
 })
-}
-)
+
 }
 
 
