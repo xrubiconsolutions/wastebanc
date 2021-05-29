@@ -889,28 +889,24 @@ organisationController.raffleTicket = (req, res) => {
   const lcd = req.body.lcd;
   const winner_count = req.body.winner_count;
   try {
-    var allUser = [];
-
-
     MODEL.userModel
-          .aggregate([
-            { $match: { schedulePoints: { $ne: 0 } } },
-            { $sample: { size: Number(winner_count) } },
-          ])
-          .then((winners, err) => {
-            if (err) return res.status(400).json(err);
-            for (let i = 0; i < winners.length; i++) {
-              MODEL.userModel.updateOne(
-                { _id: winners[i]._id },
-                { $set: { rafflePoints: winners[i].rafflePoints + 10000 } },
-                (res) => {
-                  console.log('Winner object update' , winners.length);
-                }
-              );
+      .aggregate([
+        { $match: { schedulePoints: { $ne: 0 },   lcd: { $in: lcd } } },
+        { $sample: { size: Number(winner_count) } },
+      ])
+      .then((winners, err) => {
+        if (err) return res.status(400).json(err);
+        for (let i = 0; i < winners.length; i++) {
+          MODEL.userModel.updateOne(
+            { _id: winners[i]._id },
+            { $set: { rafflePoints: winners[i].rafflePoints + 10000 } },
+            (res) => {
+              console.log('Winner object update', winners.length);
             }
-            return res.status(200).json({ winners: winners });
-          });
-  
+          );
+        }
+        return res.status(200).json({ winners: winners });
+      });
 
     // MODEL.scheduleModel.find({
     // }).then((schedule)=>{
@@ -923,7 +919,6 @@ organisationController.raffleTicket = (req, res) => {
     //       console.log(allUser)
     //   }
     // })
-
 
     // MODEL.scheduleModel
     // .find({
@@ -947,11 +942,9 @@ organisationController.raffleTicket = (req, res) => {
     //   return res.status.json(allUser)
     // })
     // console.log("all user here", allUser)
-
-  } catch(err){
-      return res.status(500).json(err)
+  } catch (err) {
+    return res.status(500).json(err);
   }
-
 
   // try {
   //   if (lcd.length == 1) {
@@ -3695,8 +3688,7 @@ organisationController.changeCompanyPassword = (req, res) => {
   }
 };
 
-
-organisationController.organisationSchedulesPending = (REQUEST,RESPONSE)=>{
+organisationController.organisationSchedulesPending = (REQUEST, RESPONSE) => {
   const organisationID = REQUEST.query.organisationID;
   var need = [];
   var count = 0;
@@ -3705,7 +3697,7 @@ organisationController.organisationSchedulesPending = (REQUEST,RESPONSE)=>{
   active_today.setHours(0);
   active_today.setMinutes(0);
   var tomorrow = new Date();
-  tomorrow.setDate(new Date().getDate()+7);
+  tomorrow.setDate(new Date().getDate() + 7);
 
   MODEL.organisationModel.findOne({ _id: organisationID }).then((collector) => {
     var accessArea = collector.streetOfAccess;
@@ -3714,13 +3706,13 @@ organisationController.organisationSchedulesPending = (REQUEST,RESPONSE)=>{
       .find({
         $and: [
           {
-          pickUpDate : {
-            $gte: active_today
+            pickUpDate: {
+              $gte: active_today,
+            },
+            pickUpDate: {
+              $lt: tomorrow,
+            },
           },
-          pickUpDate : {
-            $lt: tomorrow
-          },    
-        }       
         ],
       })
       .sort({ _id: -1 })
@@ -3740,9 +3732,14 @@ organisationController.organisationSchedulesPending = (REQUEST,RESPONSE)=>{
             return !!need;
           })();
         });
-        var geoSchedules = geofencedSchedules.filter(x => (x.completionStatus !== "completed" && x.completionStatus !== "cancelled" && x.completionStatus !== "missed") || (x.completionStatus == 'pending' && x.collectorStatus == "accept")
+        var geoSchedules = geofencedSchedules.filter(
+          (x) =>
+            (x.completionStatus !== 'completed' &&
+              x.completionStatus !== 'cancelled' &&
+              x.completionStatus !== 'missed') ||
+            (x.completionStatus == 'pending' && x.collectorStatus == 'accept')
         );
-        const referenceSchedules = [ ...new Set(geoSchedules)];
+        const referenceSchedules = [...new Set(geoSchedules)];
         RESPONSE.jsonp(
           COMMON_FUN.sendSuccess(
             CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
@@ -3752,7 +3749,7 @@ organisationController.organisationSchedulesPending = (REQUEST,RESPONSE)=>{
       })
       .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
   });
-}
+};
 
 /* export organisationControllers */
 module.exports = organisationController;

@@ -95,7 +95,8 @@ module.exports = (APP) => {
         .get(CONTROLLER.organisationController.weekChartData);
     
     APP.route('/api/organisation/raffle')
-        .post(CONTROLLER.organisationController.raffleTicket);
+        .post(auth.adminPakamValidation,
+            CONTROLLER.organisationController.raffleTicket);
     
     APP.route('/api/organisation/waste/history')
         .get(CONTROLLER.organisationController.wasteHistory);
