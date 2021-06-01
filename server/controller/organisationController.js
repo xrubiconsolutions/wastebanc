@@ -1189,7 +1189,7 @@ organisationController.lawmaMonthChartData = (req, res) => {
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var glass = result
-        .filter((x) => x.Category == 'glass' || x.Category == 'Glass')
+        .filter((x) => x.Category == 'glassBottle' || x.Category == 'Glass')
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -1200,7 +1200,7 @@ organisationController.lawmaMonthChartData = (req, res) => {
 
       var nylon = result
         .filter(
-          (x) => x.Category == 'nylonSachet' || x.Category == 'nylonSachet'
+          (x) => x.Category == 'nylon' || x.Category == 'nylonSachet'
         )
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
@@ -1263,7 +1263,7 @@ organisationController.lawmaThirdChartData = (req, res) => {
         .reduce((acc, curr) => acc + curr, 0);
 
       var glass = result
-        .filter((x) => x.Category == 'glass' || x.Category == 'Glass')
+        .filter((x) => x.Category == 'glassBottle' || x.Category == 'Glass')
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -1274,7 +1274,7 @@ organisationController.lawmaThirdChartData = (req, res) => {
 
       var nylon = result
         .filter(
-          (x) => x.Category == 'nylonSachet' || x.Category == 'nylonSachet'
+          (x) => x.Category == 'nylon' || x.Category == 'nylonSachet'
         )
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
@@ -1334,11 +1334,11 @@ organisationController.lawmaForthChartData = (req, res) => {
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == 'plastic' || x.Category == 'plastic')
+        .filter((x) => x.Category == 'plasticBottle' || x.Category == 'plastic')
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var glass = result
-        .filter((x) => x.Category == 'glass' || x.Category == 'Glass')
+        .filter((x) => x.Category == 'glassBottle' || x.Category == 'Glass')
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -1349,7 +1349,7 @@ organisationController.lawmaForthChartData = (req, res) => {
 
       var nylon = result
         .filter(
-          (x) => x.Category == 'nylonSachet' || x.Category == 'nylonSachet'
+          (x) => x.Category == 'nylon' || x.Category == 'nylonSachet'
         )
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
@@ -1410,12 +1410,12 @@ organisationController.lawmaWeekChartData = (req, res) => {
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == 'plastic' || x.Category == 'plastic')
+        .filter((x) => x.Category == 'plasticBottle' || x.Category == 'plastic')
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var glass = result
-        .filter((x) => x.Category == 'glass' || x.Category == 'Glass')
+        .filter((x) => x.Category == 'glassBottle' || x.Category == 'Glass')
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -1426,7 +1426,7 @@ organisationController.lawmaWeekChartData = (req, res) => {
 
       var nylon = result
         .filter(
-          (x) => x.Category == 'nylonSachet' || x.Category == 'nylonSachet'
+          (x) => x.Category == 'nylon' || x.Category == 'nylonSachet'
         )
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
