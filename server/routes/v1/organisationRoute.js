@@ -228,5 +228,18 @@ module.exports = (APP) => {
     APP.route('/api/reset/company/password').post(
         CONTROLLER.organisationController.changeCompanyPassword
       );
-               
+            
+    APP.route('/api/organisation/payment/aggregate').get(
+        auth.adminValidation,
+        CONTROLLER.organisationController.organisationPaymentAggregate
+    );
+
+    APP.route('/api/organisation/submit/drop/location').post(
+        auth.companyValidation,
+        CONTROLLER.organisationController.submitDropOff
+    );
+
+    APP.route('/api/organisation/drop').get(
+        CONTROLLER.organisationController.getDropOff
+    );
 };
