@@ -32,4 +32,7 @@ module.exports = (APP) => {
         auth.companyValidation,
         CONTROLLER.payController.paymentUpdate
     )
+    APP.route('/api/charity/payment').post(
+        auth.userValidation, CONTROLLER.payController.charityPayment
+    )
 }

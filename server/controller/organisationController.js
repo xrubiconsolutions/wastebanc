@@ -4069,7 +4069,7 @@ organisationController.submitDropOff = (req,res)=>{
   const dropLocation = { ...req.body }
   try{
 
-    MODEL.dropOffModel(dropLocation).save({}, (err,drop)=>{
+    MODEL.dropOffModel({dropLocation}).save({}, (err,drop)=>{
       if(err) return res.status(400).json(err);
       return res.status(200).json(drop)
     })

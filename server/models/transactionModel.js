@@ -55,6 +55,11 @@ const transaction_Schema = {
     type: String,
     required: true,
   },
+  paymentResolution: {
+    type: String,
+    enum: ['charity', 'gain'],
+    default: 'gain'
+  },
   aggregatorId: {
     type: String,
     default: ""

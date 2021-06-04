@@ -107,12 +107,76 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
                       },
                     },
                     (err, res) => {
-                      console.log('requested here', res);
                       console.log('updated here', err);
                     }
                   );
-                  console.log('errorr here', err);
-                  console.log('result here', result);
+                  if (err)
+                    return RESPONSE.status(400).json({
+                      message: 'Could not save receipt',
+                    });
+                });
+              }
+            );
+          }
+          return RESPONSE.status(201).json(result);
+        });
+    }
+  });
+};
+
+
+
+payController.charityPayment = (REQUEST, RESPONSE) => {
+  let errors = {};
+  const receipt = { ...REQUEST.body };
+  let cardID = REQUEST.body.cardID;
+  let amount = REQUEST.body.amount;
+  var balance;
+
+  MODEL.userModel.findOne({ cardID: cardID }).then((result, err) => {
+    if (!result)
+      return RESPONSE.status(400).json({ message: 'Enter a valid card ID' });
+    if (result) {
+      balance = result.availablePoints - amount;
+      if (balance < 0) {
+        return RESPONSE.status(406).json({
+          message: "You don't have enough points to complete this transaction",
+        });
+      }
+      MODEL.transactionModel
+        .find({
+          paid: false,
+          requestedForPayment: false,
+          cardID: cardID,
+        })
+        .then((unpaidFees) => {
+          for (let i = 0; i < unpaidFees.length; i++) {
+            MODEL.userModel.updateOne(
+              { cardID: cardID },
+              { availablePoints: balance },
+              (err, resp) => {
+                MODEL.charityModel({
+                  ...receipt,
+                  aggregatorName: unpaidFees[i].recycler || ' ',
+                  aggregatorId: unpaidFees[i].aggregatorId || ' ',
+                  aggregatorOrganisation: unpaidFees[i].organisation || ' ',
+                  scheduleId: unpaidFees[i].scheduleId || ' ',
+                  quantityOfWaste: unpaidFees[i].weight || ' ',
+                  amount: unpaidFees[i].coin,
+                  organisation: unpaidFees[i].organisationID,
+                }).save({}, (err, result) => {
+                  MODEL.transactionModel.updateOne(
+                    { _id: unpaidFees[i]._id },
+                    {
+                      $set: {
+                        requestedForPayment: true,
+                        paymentResolution: 'charity'
+                      },
+                    },
+                    (err, res) => {
+                      console.log('updated here', err);
+                    }
+                  );
                   if (err)
                     return RESPONSE.status(400).json({
                       message: 'Could not save receipt',
