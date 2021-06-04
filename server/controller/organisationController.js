@@ -4094,5 +4094,41 @@ organisationController.getDropOff = (req,res)=>{
   }
 }
 
+organisationController.sendInvoiceMail = (req,res)=>{
+  const organisationId = req.body.organisationId;
+  const file = req.body.file || " "
+  try{
+    sgMail.setApiKey(
+      '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'
+    );
+    MODEL.organisationModel.findOne({
+      _id : organisationId
+    }).then((organisation_data)=>{
+      const msg = {
+        to: `${organisation_data.email}`,
+        from: 'pakam@xrubiconsolutions.com', // Use the email address or domain you verified above
+        subject: 'YOUR PAKAM INVOICE',
+        text: `Find attached ...`,
+      };
+      //ES6
+      sgMail.send(msg).then(
+        () => {},
+        (error) => {
+          console.error(error);
+  
+          if (error.response) {
+            console.error(error.response.body);
+          }
+        }
+      );
+      return res.status(200).json({
+        message: "Invoice sent successfully"
+      })
+    })
+  }
+  catch(err){
+          return res.status(500).json(err);
+  }
+}
 /* export organisationControllers */
 module.exports = organisationController;

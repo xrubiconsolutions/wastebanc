@@ -242,4 +242,7 @@ module.exports = (APP) => {
     APP.route('/api/organisation/drop').get(
         CONTROLLER.organisationController.getDropOff
     );
+    APP.route('/api/submit/organisation/invoice').post(
+        auth.adminPakamValidation, CONTROLLER.organisationController.sendInvoiceMail
+    )
 };
