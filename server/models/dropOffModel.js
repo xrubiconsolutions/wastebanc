@@ -16,20 +16,28 @@ const dropOff_Schema = new Schema({
     type: String,
     required : true
   },
-  address: {
-    type: String,
+  location: {
+    type: [{
+      address: {
+        type : String,
+        required: true
+      },
+      lat: {
+        type: String,
+        required: true
+      },
+      long: {
+        type: String,
+        required: true
+      }
+    }],
+    required: true
   },
-  lat: {
-    type: String,
-    required: true,
-  },
-  long: {
-    type: String,
-    required: true,
-  },
-
   lastDroppedDate: {
     type: Date,
+  },
+  organisationLocation: {
+    type: String
   },
   createdAt: {
     type: Date,
