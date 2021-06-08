@@ -9,10 +9,12 @@ const Constants = require('../util/constants');
  **************************************************/
 const dropOff_Schema = new Schema({
   organisation: {
-    type: String
+    type: String,
+    required: true
   },
   organisationId: {
-    type: String
+    type: String,
+    required: true
   },
   location: {
     type: [ {
