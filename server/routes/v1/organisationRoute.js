@@ -235,7 +235,6 @@ module.exports = (APP) => {
     );
 
     APP.route('/api/organisation/submit/drop/location').post(
-        auth.companyValidation,
         CONTROLLER.organisationController.submitDropOff
     );
 
