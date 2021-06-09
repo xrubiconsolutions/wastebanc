@@ -4132,5 +4132,37 @@ organisationController.sendInvoiceMail = (req,res)=>{
           return res.status(500).json(err);
   }
 }
+
+
+organisationController.getCharityPaymentLawma = (req,res)=>{
+  try{
+
+    MODEL.charityModel.find({}).sort({
+      _id : -1
+    }).then((data)=>{
+            return res.status(200).json(data)
+    })
+  }catch(err){
+    return res.status(500).json(err);
+  }
+}
+
+
+
+organisationController.getCharityPaymentOrganisation = (req,res)=>{
+
+  const organisation = req.query.organisation
+
+  try{
+    MODEL.charityModel.find({ organisation : organisation }).sort({
+      _id : -1
+    }).then((data)=>{
+            return res.status(200).json(data)
+    })
+  }catch(err){
+    return res.status(500).json(err);
+  }
+}
+
 /* export organisationControllers */
 module.exports = organisationController;
