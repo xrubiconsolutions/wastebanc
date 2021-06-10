@@ -177,10 +177,10 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
                       console.log('updated here', err);
                     }
                   );
-                  if (err)
-                    return RESPONSE.status(400).json({
-                      message: 'Could not save receipt',
-                    });
+                  // if (err)
+                  //   return RESPONSE.status(400).json({
+                  //     message: 'Could not save receipt',
+                  //   });
                 });
               }
             );

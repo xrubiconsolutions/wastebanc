@@ -300,7 +300,6 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/all/charity').get(
-    auth.adminPakamValidation,
     CONTROLLER.organisationController.getCharityPaymentLawma
   );
 

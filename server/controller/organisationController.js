@@ -14,9 +14,12 @@ const { Response } = require('aws-sdk');
 var request = require('request');
 const sgMail = require('@sendgrid/mail');
 
+
 let auth = require('../util/auth');
 
 var nodemailer = require('nodemailer');
+
+const multer = require('multer');
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -4136,7 +4139,6 @@ organisationController.sendInvoiceMail = (req,res)=>{
 
 organisationController.getCharityPaymentLawma = (req,res)=>{
   try{
-
     MODEL.charityModel.find({}).sort({
       _id : -1
     }).then((data)=>{
