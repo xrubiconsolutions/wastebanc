@@ -165,6 +165,11 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
                   amount: unpaidFees[i].coin,
                   organisation: unpaidFees[i].organisationID,
                 }).save({}, (err, result) => {
+                  if (err) {return RESPONSE.status(400).json({
+                    message: 'Could not save receipt',
+                  });
+                }
+                console.log("Charity saved here", result)
                   MODEL.transactionModel.updateOne(
                     { _id: unpaidFees[i]._id },
                     {
@@ -177,10 +182,7 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
                       console.log('updated here', err);
                     }
                   );
-                  // if (err)
-                  //   return RESPONSE.status(400).json({
-                  //     message: 'Could not save receipt',
-                  //   });
+                
                 });
               }
             );

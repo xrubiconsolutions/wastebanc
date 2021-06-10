@@ -13,14 +13,6 @@ const charity_Schema = {
       type: String,
       required:true
   },
-  bankAcNo: {
-      type: String,
-      required:true
-  },
-  bankName: {
-      type: String,
-      required: true
-  },
   organisation: {
     type: String,
     required: true
