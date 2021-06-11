@@ -4099,6 +4099,18 @@ organisationController.getDropOff = (req,res)=>{
   }
 }
 
+organisationController.getDropOffUser = (req,res)=>{
+  try{
+        MODEL.dropOffModel.find({
+        }).then(drop=>{
+          return res.status(200).json(drop)
+        })
+  }
+  catch(err){
+    return res.status(500).json(err);
+  }
+}
+
 organisationController.sendInvoiceMail = (req,res)=>{
   const organisationId = req.body.organisationId;
   const file = req.body.file || " "

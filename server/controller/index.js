@@ -15,5 +15,6 @@ module.exports = {
   payController : require("./payController"),
   notificationController : require("./notificationController"),
   analyticsFilterController : require("./analyticsFilterController"),
-  versionController: require("./versionController")
+  versionController: require("./versionController"),
+  scheduleDropController: require("./scheduleDropController"),
 };

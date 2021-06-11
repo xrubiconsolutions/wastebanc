@@ -22,5 +22,6 @@ module.exports = {
     geofenceModel: require("./geofenceModel"),
     dropOffModel : require("./dropOffModel"),
     charityModel: require("./charityModel"),
+    scheduleDropModel: require("./scheduleDropModel"),
 };
 

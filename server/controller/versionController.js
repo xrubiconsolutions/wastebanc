@@ -79,5 +79,48 @@ versionController.adminAppVersions = (req, res) => {
   }
 };
 
+versionController.sendBulkSms = (req, res) => {
+  try {
+    MODEL.userModel
+      .find({
+        roles: 'client',
+      })
+      .then((data) => {
+        var phones = data.map((x) => x.phone);
+        for (let i = 0; i < phones.length; i++) {
+          var phoneNo = String(phones[i]).substring(1, 11);
+
+          var data = {
+            to: `234${phoneNo}`,
+            from: 'N-Alert',
+            sms: `Dear Pakam Customer,       
+              Apologies for delay in pick-up. We are working with partners to resolved
+              this as soon as possible. Thank you for your patience.`,
+            type: 'plain',
+            api_key:
+              'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+            channel: 'dnd',
+          };
+
+          var options = {
+            method: 'POST',
+            url: 'https://termii.com/api/sms/send',
+            headers: {
+              'Content-Type': ['application/json', 'application/json'],
+            },
+            body: JSON.stringify(data),
+          };
+          console.log('->', phoneNo);
+
+          request(options, function (error, response) {
+            if (error) throw new Error(error);
+            console.log(response.body);
+          });
+        }
+      });
+  } catch (err) {
+    return res, status(500).json(err);
+  }
+};
 /* export versionController */
 module.exports = versionController;

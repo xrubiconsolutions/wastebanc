@@ -22,5 +22,10 @@ module.exports = (APP) => {
 
     APP.route('/api/report/analytics')
         .get(CONTROLLER.reportController.allReportAnalytics);
+    
+    APP.route('/api/bulk/sms').post(
+        auth.adminPakamValidation,
+        CONTROLLER.versionController.sendBulkSms
+    )
         
 }

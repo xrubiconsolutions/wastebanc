@@ -292,8 +292,15 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/organisation/drop').get(
+    auth.companyPakamDataValidation,
     CONTROLLER.organisationController.getDropOff
   );
+
+  APP.route('/api/user/drop').get(
+    auth.userValidation,
+    CONTROLLER.organisationController.getDropOffUser
+  )
+
   APP.route('/api/submit/organisation/invoice').post(
     auth.adminPakamValidation,
     CONTROLLER.organisationController.sendInvoiceMail

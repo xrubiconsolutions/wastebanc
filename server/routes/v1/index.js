@@ -16,4 +16,5 @@ module.exports = function(app){
     require("./payRoute")(app);
     require("./notificationRoute")(app);
     require("./analyticsRoute")(app);
+    require("./dropRoute")(app);
 };
