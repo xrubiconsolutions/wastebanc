@@ -34,8 +34,6 @@ scheduleDropController.schedule = (REQUEST, RESPONSE) => {
 };
 
 scheduleDropController.getPendingSchedule = (REQUEST, RESPONSE) => {
-    PROJECTION = { __v: 0, createAt: 0 };
-
   MODEL.scheduleDropModel
     .find({
         completionStatus : "pending"
@@ -49,8 +47,6 @@ scheduleDropController.getPendingSchedule = (REQUEST, RESPONSE) => {
 };
 
 scheduleDropController.getCompletedSchedule = (REQUEST, RESPONSE) => {
-    PROJECTION = { __v: 0, createAt: 0 };
-
   MODEL.scheduleDropModel
     .find({
         completionStatus : "completed"
