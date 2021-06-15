@@ -34,12 +34,10 @@ scheduleDropController.schedule = (REQUEST, RESPONSE) => {
 };
 
 scheduleDropController.getPendingSchedule = (REQUEST, RESPONSE) => {
-    const creator = REQUEST.query.email
     PROJECTION = { __v: 0, createAt: 0 };
 
   MODEL.scheduleDropModel
     .find({
-        scheduleCreator : email,
         completionStatus : "pending"
     })
     .then((schedules) => {
@@ -51,12 +49,10 @@ scheduleDropController.getPendingSchedule = (REQUEST, RESPONSE) => {
 };
 
 scheduleDropController.getCompletedSchedule = (REQUEST, RESPONSE) => {
-    const creator = REQUEST.query.email
     PROJECTION = { __v: 0, createAt: 0 };
 
   MODEL.scheduleDropModel
     .find({
-        scheduleCreator : email,
         completionStatus : "completed"
     })
     .then((schedules) => {
