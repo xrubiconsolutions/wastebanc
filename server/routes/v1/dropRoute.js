@@ -10,7 +10,6 @@ module.exports = (APP) => {
 
     APP.route('/api/submit/drop/request')
         .post(
-            auth.userValidation,
             CONTROLLER.scheduleDropController.schedule);
 
     APP.route('/api/pending/drop/request')

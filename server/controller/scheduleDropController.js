@@ -18,11 +18,6 @@ scheduleDropController.schedule = (REQUEST, RESPONSE) => {
       }
     );
 
-    if (result.cardID == null) {
-      return RESPONSE.status(400).json({
-        message: "You don't have a valid card ID, contact support for help",
-      });
-    }
     
     MODEL.scheduleDropModel(data).save({}, (ERR, RESULT) => {
       try {
