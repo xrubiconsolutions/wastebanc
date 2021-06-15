@@ -28,7 +28,7 @@ module.exports = (APP) => {
                         CONTROLLER.scheduleDropController.rewardDropSystem);
 
     APP.route('/api/get/recycler/drop')
-                        .post(
+                        .get(
                             auth.recyclerValidation,
                             CONTROLLER.scheduleDropController.dropRequestRecycler);
 }
