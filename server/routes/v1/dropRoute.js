@@ -21,4 +21,14 @@ module.exports = (APP) => {
                 .get(
                     auth.adminPakamValidation,
                     CONTROLLER.scheduleDropController.getCompletedSchedule);
+
+    APP.route('/api/complete/recycler/payment/drop')
+                    .post(
+                        auth.recyclerValidation,
+                        CONTROLLER.scheduleDropController.rewardDropSystem);
+
+    APP.route('/api/get/recycler/drop')
+                        .post(
+                            auth.recyclerValidation,
+                            CONTROLLER.scheduleDropController.dropRequestRecycler);
 }
