@@ -71,7 +71,7 @@ scheduleDropController.rewardDropSystem = (REQUEST, RESPONSE) => {
         return RESPONSE.status(400).json({
           message: "This schedule is invalid",
         });
-      MODEL.userModel.findOne({ email: schedule[0].client }).then((result) => {
+      MODEL.userModel.findOne({ email: schedule[0].scheduleCreator }).then((result) => {
         if (result.cardID == null)
           return RESPONSE.status(400).jsonp({
             message: "you don't have a valid card ID",
