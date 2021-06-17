@@ -1,31 +1,30 @@
-'use strict';
+"use strict";
 
 /**************************************************
  ***** Organisation controller for organisation logic ****
  **************************************************/
 
 let organisationController = {};
-let MODEL = require('../models');
-let COMMON_FUN = require('../util/commonFunction');
-let SERVICE = require('../services/commonService');
-let CONSTANTS = require('../util/constants');
-let FS = require('fs');
-const { Response } = require('aws-sdk');
-var request = require('request');
-const sgMail = require('@sendgrid/mail');
+let MODEL = require("../models");
+let COMMON_FUN = require("../util/commonFunction");
+let SERVICE = require("../services/commonService");
+let CONSTANTS = require("../util/constants");
+let FS = require("fs");
+const { Response } = require("aws-sdk");
+var request = require("request");
+const sgMail = require("@sendgrid/mail");
 
+let auth = require("../util/auth");
 
-let auth = require('../util/auth');
+var nodemailer = require("nodemailer");
 
-var nodemailer = require('nodemailer');
-
-const multer = require('multer');
+const multer = require("multer");
 
 var transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-    user: 'pakambusiness@gmail.com',
-    pass: 'pakambusiness-2000',
+    user: "pakambusiness@gmail.com",
+    pass: "pakambusiness-2000",
   },
 });
 
@@ -53,7 +52,7 @@ organisationController.createOrganisation = (req, RESPONSE) => {
           })
           .then((user) => {
             if (user) {
-              errors.email = 'Company already exists';
+              errors.email = "Company already exists";
               RESPONSE.status(400).jsonp(errors);
             } else {
               MODEL.organisationModel(organisation_data).save(
@@ -62,12 +61,12 @@ organisationController.createOrganisation = (req, RESPONSE) => {
                   if (ERR) RESPONSE.status(400).jsonp(ERR);
                   else {
                     sgMail.setApiKey(
-                      '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'
+                      "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"
                     );
                     const msg = {
                       to: `${organisation_data.email}`,
-                      from: 'pakam@xrubiconsolutions.com', // Use the email address or domain you verified above
-                      subject: 'WELCOME TO PAKAM!!!',
+                      from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+                      subject: "WELCOME TO PAKAM!!!",
                       text: `
 Congratulations, you have been approved by Pakam and have been on-boarded to the Pakam waste management ecosystem.
 
@@ -169,7 +168,7 @@ Pakam Team
 organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
   let BODY = REQUEST.body;
   COMMON_FUN.encryptPswrd(BODY.newPassword, (ERR, HASH) => {
-    console.log('>>', HASH);
+    console.log(">>", HASH);
   });
   COMMON_FUN.objProperties(REQUEST.body, (ERR, RESULT) => {
     if (ERR) {
@@ -262,7 +261,7 @@ organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
                 if (USER.licence_active == false) {
                   return RESPONSE.status(400).json({
                     message:
-                      'Your licence expired. Kindly contact support for difficulty in renewal',
+                      "Your licence expired. Kindly contact support for difficulty in renewal",
                   });
                 }
                 return RESPONSE.jsonp(USER);
@@ -309,8 +308,8 @@ organisationController.agentApproval = (req, res) => {
       if (err) {
         return res.status(400).jsonp(err);
       }
-      console.log('approved by us');
-      return res.jsonp({ message: 'You just approved a recycler' });
+      console.log("approved by us");
+      return res.jsonp({ message: "You just approved a recycler" });
     }
   );
 };
@@ -485,7 +484,7 @@ organisationController.allPendingRecycler = (req, res) => {
 
   if (!organisation)
     return res.status(400).json({
-      message: 'Enter your organisation name !',
+      message: "Enter your organisation name !",
     });
   try {
     MODEL.collectorModel
@@ -496,7 +495,7 @@ organisationController.allPendingRecycler = (req, res) => {
       .then((result, err) => {
         if (err)
           return res.status(400).json({
-            message: 'No recycler found',
+            message: "No recycler found",
           });
         return res.status(200).json(result);
       });
@@ -514,12 +513,12 @@ organisationController.payRecyclers = (req, res) => {
       .then((result, err) => {
         if (result)
           return res.status(400).json({
-            message: 'This transaction had already been saved on the database',
+            message: "This transaction had already been saved on the database",
           });
         MODEL.companyReceiptModel(receipt).save({}, (ERR, RESULT) => {
           if (ERR) return res.status(400).json(ERR);
 
-          if (receipt.paymentType === 'licence') {
+          if (receipt.paymentType === "licence") {
             MODEL.organisationModel.updateOne(
               { email: receipt.customerMail },
               {
@@ -528,7 +527,7 @@ organisationController.payRecyclers = (req, res) => {
                 },
               },
               (activated) => {
-                console.log('<<activated>>');
+                console.log("<<activated>>");
               }
             );
           }
@@ -550,7 +549,7 @@ organisationController.paymentLog = (req, res) => {
       .then((result, err) => {
         if (result)
           return res.status(400).json({
-            message: 'This log had already been saved on the database',
+            message: "This log had already been saved on the database",
           });
 
         MODEL.paymentLogModel(log).save({}, (ERR, RESULT) => {
@@ -595,7 +594,7 @@ organisationController.monthChartData = (req, res) => {
   MODEL.scheduleModel
     .find({
       organisationCollection: organisationID,
-      completionStatus: 'completed',
+      completionStatus: "completed",
       pickUpDate: {
         $gte: lastWeek,
         $lt: today,
@@ -606,39 +605,39 @@ organisationController.monthChartData = (req, res) => {
       if (err) return res.status(400).json(err);
 
       var can = result
-        .filter((x) => x.Category == 'Can' || x.Category == 'can')
+        .filter((x) => x.Category == "Can" || x.Category == "can")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
-        .filter((x) => x.Category == 'petBottle' || x.Category == 'PetBottle')
+        .filter((x) => x.Category == "petBottle" || x.Category == "PetBottle")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
-        .filter((x) => x.Category == 'carton' || x.Category == 'Carton')
+        .filter((x) => x.Category == "carton" || x.Category == "Carton")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
-        .filter((x) => x.Category == 'Rubber' || x.Category == 'rubber')
+        .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == 'plastic' || x.Category == 'plastic')
+        .filter((x) => x.Category == "plastic" || x.Category == "plastic")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var glass = result
-        .filter((x) => x.Category == 'glass' || x.Category == 'Glass')
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var metal = result
-        .filter((x) => x.Category == 'metal' || x.Category == 'Metal')
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var nylon = result
         .filter(
-          (x) => x.Category == 'nylonSachet' || x.Category == 'nylonSachet'
+          (x) => x.Category == "nylonSachet" || x.Category == "nylonSachet"
         )
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
@@ -672,7 +671,7 @@ organisationController.thirdChartData = (req, res) => {
   MODEL.scheduleModel
     .find({
       organisationCollection: organisationID,
-      completionStatus: 'completed',
+      completionStatus: "completed",
       pickUpDate: {
         $gte: forthWeek,
         $lt: lastWeek,
@@ -682,38 +681,38 @@ organisationController.thirdChartData = (req, res) => {
     .then((result, err) => {
       if (err) return res.status(400).json(err);
       var can = result
-        .filter((x) => x.Category == 'Can' || x.Category == 'can')
+        .filter((x) => x.Category == "Can" || x.Category == "can")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
-        .filter((x) => x.Category == 'petBottle' || x.Category == 'petBottle')
+        .filter((x) => x.Category == "petBottle" || x.Category == "petBottle")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
-        .filter((x) => x.Category == 'carton' || x.Category == 'Carton')
+        .filter((x) => x.Category == "carton" || x.Category == "Carton")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
-        .filter((x) => x.Category == 'Rubber' || x.Category == 'rubber')
+        .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == 'plastic' || x.Category == 'plastic')
+        .filter((x) => x.Category == "plastic" || x.Category == "plastic")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var glass = result
-        .filter((x) => x.Category == 'glass' || x.Category == 'Glass')
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var metal = result
-        .filter((x) => x.Category == 'metal' || x.Category == 'Metal')
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var nylon = result
         .filter(
-          (x) => x.Category == 'nylonSachet' || x.Category == 'nylonSachet'
+          (x) => x.Category == "nylonSachet" || x.Category == "nylonSachet"
         )
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
@@ -748,7 +747,7 @@ organisationController.forthChartData = (req, res) => {
   MODEL.scheduleModel
     .find({
       organisationCollection: organisationID,
-      completionStatus: 'completed',
+      completionStatus: "completed",
       pickUpDate: {
         $gte: thirdWeek,
         $lt: forthWeek,
@@ -759,39 +758,39 @@ organisationController.forthChartData = (req, res) => {
       if (err) return res.status(400).json(err);
 
       var can = result
-        .filter((x) => x.Category == 'Can' || x.Category == 'can')
+        .filter((x) => x.Category == "Can" || x.Category == "can")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
-        .filter((x) => x.Category == 'petBottle' || x.Category == 'petBottle')
+        .filter((x) => x.Category == "petBottle" || x.Category == "petBottle")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
-        .filter((x) => x.Category == 'carton' || x.Category == 'Carton')
+        .filter((x) => x.Category == "carton" || x.Category == "Carton")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
-        .filter((x) => x.Category == 'Rubber' || x.Category == 'rubber')
+        .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == 'plastic' || x.Category == 'plastic')
+        .filter((x) => x.Category == "plastic" || x.Category == "plastic")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var glass = result
-        .filter((x) => x.Category == 'glass' || x.Category == 'Glass')
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var metal = result
-        .filter((x) => x.Category == 'metal' || x.Category == 'Metal')
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var nylon = result
         .filter(
-          (x) => x.Category == 'nylonSachet' || x.Category == 'nylonSachet'
+          (x) => x.Category == "nylonSachet" || x.Category == "nylonSachet"
         )
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
@@ -825,7 +824,7 @@ organisationController.weekChartData = (req, res) => {
   MODEL.scheduleModel
     .find({
       organisationCollection: organisationID,
-      completionStatus: 'completed',
+      completionStatus: "completed",
       pickUpDate: {
         $gte: lastMonth,
         $lt: thirdWeek,
@@ -834,42 +833,42 @@ organisationController.weekChartData = (req, res) => {
     .sort({ _id: -1 })
     .then((result, err) => {
       if (err) return res.status(400).json(err);
-      console.log('result here', result);
+      console.log("result here", result);
 
       var can = result
-        .filter((x) => x.Category == 'Can' || x.Category == 'can')
+        .filter((x) => x.Category == "Can" || x.Category == "can")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
-        .filter((x) => x.Category == 'petBottle' || x.Category == 'petBottle')
+        .filter((x) => x.Category == "petBottle" || x.Category == "petBottle")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
-        .filter((x) => x.Category == 'carton' || x.Category == 'Carton')
+        .filter((x) => x.Category == "carton" || x.Category == "Carton")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
-        .filter((x) => x.Category == 'Rubber' || x.Category == 'rubber')
+        .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == 'plastic' || x.Category == 'plastic')
+        .filter((x) => x.Category == "plastic" || x.Category == "plastic")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var glass = result
-        .filter((x) => x.Category == 'glass' || x.Category == 'Glass')
+        .filter((x) => x.Category == "glass" || x.Category == "Glass")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var metal = result
-        .filter((x) => x.Category == 'metal' || x.Category == 'Metal')
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var nylon = result
         .filter(
-          (x) => x.Category == 'nylonSachet' || x.Category == 'nylonSachet'
+          (x) => x.Category == "nylonSachet" || x.Category == "nylonSachet"
         )
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
@@ -894,7 +893,7 @@ organisationController.raffleTicket = (req, res) => {
   try {
     MODEL.userModel
       .aggregate([
-        { $match: { schedulePoints: { $ne: 0 },   lcd: { $in: lcd } } },
+        { $match: { schedulePoints: { $ne: 0 }, lcd: { $in: lcd } } },
         { $sample: { size: Number(winner_count) } },
       ])
       .then((winners, err) => {
@@ -904,7 +903,7 @@ organisationController.raffleTicket = (req, res) => {
             { _id: winners[i]._id },
             { $set: { rafflePoints: winners[i].rafflePoints + 10000 } },
             (res) => {
-              console.log('Winner object update', winners.length);
+              console.log("Winner object update", winners.length);
             }
           );
         }
@@ -1075,7 +1074,7 @@ organisationController.wasteHistory = (req, res) => {
   MODEL.scheduleModel
     .find({
       organisationCollection: organisationID,
-      completionStatus: 'completed',
+      completionStatus: "completed",
     })
     .then((result, err) => {
       if (err) return res.status(400).json(err);
@@ -1097,9 +1096,9 @@ organisationController.logHistory = (req, res) => {
 organisationController.lawmaTransaction = (REQUEST, RESPONSE) => {
   const lawmaID = REQUEST.query.lawmaID;
 
-  MODEL.userModel.findOne({ _id: lawmaID, roles: 'admin' }).then((admin) => {
+  MODEL.userModel.findOne({ _id: lawmaID, roles: "admin" }).then((admin) => {
     if (!admin)
-      return RESPONSE.status(400).json({ message: 'Not a valid lawma admin' });
+      return RESPONSE.status(400).json({ message: "Not a valid lawma admin" });
     MODEL.transactionModel.find({}).then((result, err) => {
       if (err) return RESPONSE.status(400).status(err);
       return RESPONSE.status(200).json(result);
@@ -1161,7 +1160,7 @@ organisationController.lawmaMonthChartData = (req, res) => {
 
   MODEL.scheduleModel
     .find({
-      completionStatus: 'completed',
+      completionStatus: "completed",
       pickUpDate: {
         $gte: lastWeek,
         $lt: today,
@@ -1172,39 +1171,37 @@ organisationController.lawmaMonthChartData = (req, res) => {
       if (err) return res.status(400).json(err);
 
       var can = result
-        .filter((x) => x.Category == 'Can' || x.Category == 'can')
+        .filter((x) => x.Category == "Can" || x.Category == "can")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
-        .filter((x) => x.Category == 'petBottle' || x.Category == 'petBottle')
+        .filter((x) => x.Category == "petBottle" || x.Category == "petBottle")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
-        .filter((x) => x.Category == 'carton' || x.Category == 'Carton')
+        .filter((x) => x.Category == "carton" || x.Category == "Carton")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
-        .filter((x) => x.Category == 'Rubber' || x.Category == 'rubber')
+        .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == 'plastic' || x.Category == 'plastic')
+        .filter((x) => x.Category == "plastic" || x.Category == "plastic")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var glass = result
-        .filter((x) => x.Category == 'glassBottle' || x.Category == 'Glass')
+        .filter((x) => x.Category == "glassBottle" || x.Category == "Glass")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var metal = result
-        .filter((x) => x.Category == 'metal' || x.Category == 'Metal')
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var nylon = result
-        .filter(
-          (x) => x.Category == 'nylon' || x.Category == 'nylonSachet'
-        )
+        .filter((x) => x.Category == "nylon" || x.Category == "nylonSachet")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -1235,7 +1232,7 @@ organisationController.lawmaThirdChartData = (req, res) => {
   lastMonth.setDate(today.getDate() - 28);
   MODEL.scheduleModel
     .find({
-      completionStatus: 'completed',
+      completionStatus: "completed",
       pickUpDate: {
         $gte: forthWeek,
         $lt: lastWeek,
@@ -1245,40 +1242,38 @@ organisationController.lawmaThirdChartData = (req, res) => {
     .then((result, err) => {
       if (err) return res.status(400).json(err);
       var can = result
-        .filter((x) => x.Category == 'Can' || x.Category == 'cans')
+        .filter((x) => x.Category == "Can" || x.Category == "cans")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
-        .filter((x) => x.Category == 'petBottle' || x.Category == 'petBottle')
+        .filter((x) => x.Category == "petBottle" || x.Category == "petBottle")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
-        .filter((x) => x.Category == 'carton' || x.Category == 'Carton')
+        .filter((x) => x.Category == "carton" || x.Category == "Carton")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
-        .filter((x) => x.Category == 'Rubber' || x.Category == 'rubber')
+        .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == 'plastic' || x.Category == 'plastic')
+        .filter((x) => x.Category == "plastic" || x.Category == "plastic")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var glass = result
-        .filter((x) => x.Category == 'glassBottle' || x.Category == 'Glass')
+        .filter((x) => x.Category == "glassBottle" || x.Category == "Glass")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var metal = result
-        .filter((x) => x.Category == 'metal' || x.Category == 'Metal')
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var nylon = result
-        .filter(
-          (x) => x.Category == 'nylon' || x.Category == 'nylonSachet'
-        )
+        .filter((x) => x.Category == "nylon" || x.Category == "nylonSachet")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -1310,7 +1305,7 @@ organisationController.lawmaForthChartData = (req, res) => {
 
   MODEL.scheduleModel
     .find({
-      completionStatus: 'completed',
+      completionStatus: "completed",
       pickUpDate: {
         $gte: thirdWeek,
         $lt: forthWeek,
@@ -1321,39 +1316,37 @@ organisationController.lawmaForthChartData = (req, res) => {
       if (err) return res.status(400).json(err);
 
       var can = result
-        .filter((x) => x.Category == 'Can' || x.Category == 'can')
+        .filter((x) => x.Category == "Can" || x.Category == "can")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
-        .filter((x) => x.Category == 'petBottle' || x.Category == 'petBottle')
+        .filter((x) => x.Category == "petBottle" || x.Category == "petBottle")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
-        .filter((x) => x.Category == 'carton' || x.Category == 'Carton')
+        .filter((x) => x.Category == "carton" || x.Category == "Carton")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
-        .filter((x) => x.Category == 'Rubber' || x.Category == 'rubber')
+        .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == 'plasticBottle' || x.Category == 'plastic')
+        .filter((x) => x.Category == "plasticBottle" || x.Category == "plastic")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var glass = result
-        .filter((x) => x.Category == 'glassBottle' || x.Category == 'Glass')
+        .filter((x) => x.Category == "glassBottle" || x.Category == "Glass")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var metal = result
-        .filter((x) => x.Category == 'metal' || x.Category == 'Metal')
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var nylon = result
-        .filter(
-          (x) => x.Category == 'nylon' || x.Category == 'nylonSachet'
-        )
+        .filter((x) => x.Category == "nylon" || x.Category == "nylonSachet")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -1385,7 +1378,7 @@ organisationController.lawmaWeekChartData = (req, res) => {
 
   MODEL.scheduleModel
     .find({
-      completionStatus: 'completed',
+      completionStatus: "completed",
       pickUpDate: {
         $gte: lastMonth,
         $lt: thirdWeek,
@@ -1394,43 +1387,41 @@ organisationController.lawmaWeekChartData = (req, res) => {
     .sort({ _id: -1 })
     .then((result, err) => {
       if (err) return res.status(400).json(err);
-      console.log('result here', result);
+      console.log("result here", result);
 
       var can = result
-        .filter((x) => x.Category == 'Can' || x.Category == 'can')
+        .filter((x) => x.Category == "Can" || x.Category == "can")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var petBottle = result
-        .filter((x) => x.Category == 'petBottle' || x.Category == 'petBottle')
+        .filter((x) => x.Category == "petBottle" || x.Category == "petBottle")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var carton = result
-        .filter((x) => x.Category == 'carton' || x.Category == 'Carton')
+        .filter((x) => x.Category == "carton" || x.Category == "Carton")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var rubber = result
-        .filter((x) => x.Category == 'Rubber' || x.Category == 'rubber')
+        .filter((x) => x.Category == "Rubber" || x.Category == "rubber")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
       var plastics = result
-        .filter((x) => x.Category == 'plasticBottle' || x.Category == 'plastic')
+        .filter((x) => x.Category == "plasticBottle" || x.Category == "plastic")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var glass = result
-        .filter((x) => x.Category == 'glassBottle' || x.Category == 'Glass')
+        .filter((x) => x.Category == "glassBottle" || x.Category == "Glass")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var metal = result
-        .filter((x) => x.Category == 'metal' || x.Category == 'Metal')
+        .filter((x) => x.Category == "metal" || x.Category == "Metal")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
       var nylon = result
-        .filter(
-          (x) => x.Category == 'nylon' || x.Category == 'nylonSachet'
-        )
+        .filter((x) => x.Category == "nylon" || x.Category == "nylonSachet")
         .map((x) => x.quantity)
         .reduce((acc, curr) => acc + curr, 0);
 
@@ -1454,7 +1445,7 @@ organisationController.organisationPayout = (req, res) => {
   MODEL.organisationModel.findOne({ _id: organisationID }).then((result) => {
     if (!result)
       return res.status(400).json({
-        message: 'This is not a valid organisation',
+        message: "This is not a valid organisation",
       });
   });
 
@@ -1464,7 +1455,7 @@ organisationController.organisationPayout = (req, res) => {
       .then((result, err) => {
         if (err) return res.status(400).json(err);
 
-        console.log('Debts here===>', result);
+        console.log("Debts here===>", result);
       });
   } catch (err) {
     return res.status(500).json(err);
@@ -1480,7 +1471,7 @@ organisationController.recyclerPay = (req, res) => {
       MODEL.collectorModel.findOne({ _id: recyclerID }).then((result) => {
         if (!result)
           return res.status(400).json({
-            message: 'Your collector ID is invalid',
+            message: "Your collector ID is invalid",
           });
 
         const totalCoin = transaction
@@ -1505,14 +1496,14 @@ organisationController.recyclerActions = (req, res) => {
 
     for (let i = 0; i < transaction.length; i++) {
       if (IDs.includes(transaction[i].completedBy)) {
-        console.log('already present');
+        console.log("already present");
       } else {
         IDs.push(transaction[i].completedBy);
       }
-      console.log('Opooor from here', IDs);
+      console.log("Opooor from here", IDs);
 
       return IDs;
-      console.log('transaction here====>>', transaction[i].completedBy, IDs);
+      console.log("transaction here====>>", transaction[i].completedBy, IDs);
 
       // MODEL.collectorModel
       //   .findOne({ _id: transaction[i].completedBy })
@@ -1538,7 +1529,7 @@ organisationController.recyclerActions = (req, res) => {
 
 organisationController.allMissedSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: 'missed' })
+    .find({ completionStatus: "missed" })
     .sort({ _id: -1 })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
@@ -1565,7 +1556,7 @@ organisationController.viewAllSchedules = (REQUEST, RESPONSE) => {
 
 organisationController.allPendingSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: 'pending' })
+    .find({ completionStatus: "pending" })
     .sort({ _id: -1 })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
@@ -1577,10 +1568,10 @@ organisationController.allPendingSchedules = (REQUEST, RESPONSE) => {
 
 organisationController.allCompletedSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: 'completed' })
+    .find({ completionStatus: "completed" })
     .sort({ _id: -1 })
     .then((schedules) => {
-      console.log('Completed schedules here', schedules);
+      console.log("Completed schedules here", schedules);
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
       );
@@ -1590,10 +1581,10 @@ organisationController.allCompletedSchedules = (REQUEST, RESPONSE) => {
 
 organisationController.allCancelledchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: 'cancelled' })
+    .find({ completionStatus: "cancelled" })
     .sort({ _id: -1 })
     .then((schedules) => {
-      console.log('Completed schedules here', schedules);
+      console.log("Completed schedules here", schedules);
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
       );
@@ -1626,7 +1617,7 @@ organisationController.deleteCompany = (req, res) => {
       })
       .then((result) => {
         return res.status(200).json({
-          message: 'Recycling company deleted successfully',
+          message: "Recycling company deleted successfully",
         });
       });
   } catch (err) {
@@ -1640,15 +1631,15 @@ organisationController.companyGrowth = (req, res) => {
   // var Mar
 
   var year = new Date().getFullYear();
-  console.log('<<<Year>>>', year);
+  console.log("<<<Year>>>", year);
 
   try {
     MODEL.organisationModel
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createAt' }, year] },
-            { $eq: [{ $month: '$createAt' }, 1] },
+            { $eq: [{ $year: "$createAt" }, year] },
+            { $eq: [{ $month: "$createAt" }, 1] },
           ],
         },
       })
@@ -1657,8 +1648,8 @@ organisationController.companyGrowth = (req, res) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createAt' }, year] },
-                { $eq: [{ $month: '$createAt' }, 2] },
+                { $eq: [{ $year: "$createAt" }, year] },
+                { $eq: [{ $month: "$createAt" }, 2] },
               ],
             },
           })
@@ -1667,8 +1658,8 @@ organisationController.companyGrowth = (req, res) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createAt' }, year] },
-                    { $eq: [{ $month: '$createAt' }, 3] },
+                    { $eq: [{ $year: "$createAt" }, year] },
+                    { $eq: [{ $month: "$createAt" }, 3] },
                   ],
                 },
               })
@@ -1677,8 +1668,8 @@ organisationController.companyGrowth = (req, res) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createAt' }, year] },
-                        { $eq: [{ $month: '$createAt' }, 4] },
+                        { $eq: [{ $year: "$createAt" }, year] },
+                        { $eq: [{ $month: "$createAt" }, 4] },
                       ],
                     },
                   })
@@ -1687,8 +1678,8 @@ organisationController.companyGrowth = (req, res) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createAt' }, year] },
-                            { $eq: [{ $month: '$createAt' }, 5] },
+                            { $eq: [{ $year: "$createAt" }, year] },
+                            { $eq: [{ $month: "$createAt" }, 5] },
                           ],
                         },
                       })
@@ -1697,8 +1688,8 @@ organisationController.companyGrowth = (req, res) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createAt' }, year] },
-                                { $eq: [{ $month: '$createAt' }, 6] },
+                                { $eq: [{ $year: "$createAt" }, year] },
+                                { $eq: [{ $month: "$createAt" }, 6] },
                               ],
                             },
                           })
@@ -1707,8 +1698,8 @@ organisationController.companyGrowth = (req, res) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createAt' }, year] },
-                                    { $eq: [{ $month: '$createAt' }, 7] },
+                                    { $eq: [{ $year: "$createAt" }, year] },
+                                    { $eq: [{ $month: "$createAt" }, 7] },
                                   ],
                                 },
                               })
@@ -1717,8 +1708,8 @@ organisationController.companyGrowth = (req, res) => {
                                   .find({
                                     $expr: {
                                       $and: [
-                                        { $eq: [{ $year: '$createAt' }, year] },
-                                        { $eq: [{ $month: '$createAt' }, 8] },
+                                        { $eq: [{ $year: "$createAt" }, year] },
+                                        { $eq: [{ $month: "$createAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -1729,12 +1720,12 @@ organisationController.companyGrowth = (req, res) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createAt' },
+                                                { $year: "$createAt" },
                                                 year,
                                               ],
                                             },
                                             {
-                                              $eq: [{ $month: '$createAt' }, 9],
+                                              $eq: [{ $month: "$createAt" }, 9],
                                             },
                                           ],
                                         },
@@ -1746,13 +1737,13 @@ organisationController.companyGrowth = (req, res) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createAt' },
+                                                    { $year: "$createAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createAt' },
+                                                    { $month: "$createAt" },
                                                     10,
                                                   ],
                                                 },
@@ -1766,13 +1757,13 @@ organisationController.companyGrowth = (req, res) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createAt' },
+                                                        { $year: "$createAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
-                                                        { $month: '$createAt' },
+                                                        { $month: "$createAt" },
                                                         11,
                                                       ],
                                                     },
@@ -1788,7 +1779,7 @@ organisationController.companyGrowth = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createAt',
+                                                                "$createAt",
                                                             },
                                                             year,
                                                           ],
@@ -1797,7 +1788,7 @@ organisationController.companyGrowth = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createAt',
+                                                                "$createAt",
                                                             },
                                                             12,
                                                           ],
@@ -1814,7 +1805,7 @@ organisationController.companyGrowth = (req, res) => {
                                                               $eq: [
                                                                 {
                                                                   $year:
-                                                                    '$createAt',
+                                                                    "$createAt",
                                                                 },
                                                                 year,
                                                               ],
@@ -1823,7 +1814,7 @@ organisationController.companyGrowth = (req, res) => {
                                                               $eq: [
                                                                 {
                                                                   $month:
-                                                                    '$createAt',
+                                                                    "$createAt",
                                                                 },
                                                                 11,
                                                               ],
@@ -1871,15 +1862,15 @@ organisationController.salesGrowth = (req, res) => {
   // var Mar
 
   var year = new Date().getFullYear();
-  console.log('<<<Year>>>', year);
+  console.log("<<<Year>>>", year);
 
   try {
     MODEL.transactionModel
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -1888,8 +1879,8 @@ organisationController.salesGrowth = (req, res) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -1898,8 +1889,8 @@ organisationController.salesGrowth = (req, res) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -1908,8 +1899,8 @@ organisationController.salesGrowth = (req, res) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -1918,8 +1909,8 @@ organisationController.salesGrowth = (req, res) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -1928,8 +1919,8 @@ organisationController.salesGrowth = (req, res) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -1938,8 +1929,8 @@ organisationController.salesGrowth = (req, res) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -1949,9 +1940,9 @@ organisationController.salesGrowth = (req, res) => {
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -1962,13 +1953,13 @@ organisationController.salesGrowth = (req, res) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -1982,13 +1973,13 @@ organisationController.salesGrowth = (req, res) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -2002,14 +1993,14 @@ organisationController.salesGrowth = (req, res) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -2026,7 +2017,7 @@ organisationController.salesGrowth = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -2035,7 +2026,7 @@ organisationController.salesGrowth = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -2052,7 +2043,7 @@ organisationController.salesGrowth = (req, res) => {
                                                               $eq: [
                                                                 {
                                                                   $year:
-                                                                    '$createdAt',
+                                                                    "$createdAt",
                                                                 },
                                                                 year,
                                                               ],
@@ -2061,7 +2052,7 @@ organisationController.salesGrowth = (req, res) => {
                                                               $eq: [
                                                                 {
                                                                   $month:
-                                                                    '$createdAt',
+                                                                    "$createdAt",
                                                                 },
                                                                 11,
                                                               ],
@@ -2105,21 +2096,21 @@ organisationController.salesGrowth = (req, res) => {
 
 organisationController.scheduleAnalysis = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: 'completed' })
+    .find({ completionStatus: "completed" })
     .sort({ _id: -1 })
     .then((completed) => {
       MODEL.scheduleModel
-        .find({ completionStatus: 'missed' })
+        .find({ completionStatus: "missed" })
         .then((missed) => {
           MODEL.scheduleModel
-            .find({ completionStatus: 'pending' })
+            .find({ completionStatus: "pending" })
             .then((pending) => {
               MODEL.scheduleModel
-                .find({ completionStatus: 'cancelled' })
+                .find({ completionStatus: "cancelled" })
                 .then((cancelled) => {
                   MODEL.scheduleModel
                     .find({
-                      collectorStatus: 'accept',
+                      collectorStatus: "accept",
                     })
                     .then((accepted) => {
                       MODEL.scheduleModel.find({}).then((allSchedules) => {
@@ -2160,15 +2151,15 @@ organisationController.scheduleAnalysis = (REQUEST, RESPONSE) => {
 
 organisationController.advertGrowth = (req, res) => {
   var year = new Date().getFullYear();
-  console.log('<<<Year>>>', year);
+  console.log("<<<Year>>>", year);
 
   try {
     MODEL.advertModel
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -2177,8 +2168,8 @@ organisationController.advertGrowth = (req, res) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -2187,8 +2178,8 @@ organisationController.advertGrowth = (req, res) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -2197,8 +2188,8 @@ organisationController.advertGrowth = (req, res) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -2207,8 +2198,8 @@ organisationController.advertGrowth = (req, res) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -2217,8 +2208,8 @@ organisationController.advertGrowth = (req, res) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -2227,8 +2218,8 @@ organisationController.advertGrowth = (req, res) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -2238,9 +2229,9 @@ organisationController.advertGrowth = (req, res) => {
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -2251,13 +2242,13 @@ organisationController.advertGrowth = (req, res) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -2271,13 +2262,13 @@ organisationController.advertGrowth = (req, res) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -2291,14 +2282,14 @@ organisationController.advertGrowth = (req, res) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -2315,7 +2306,7 @@ organisationController.advertGrowth = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -2324,7 +2315,7 @@ organisationController.advertGrowth = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -2341,7 +2332,7 @@ organisationController.advertGrowth = (req, res) => {
                                                               $eq: [
                                                                 {
                                                                   $year:
-                                                                    '$createdAt',
+                                                                    "$createdAt",
                                                                 },
                                                                 year,
                                                               ],
@@ -2350,7 +2341,7 @@ organisationController.advertGrowth = (req, res) => {
                                                               $eq: [
                                                                 {
                                                                   $month:
-                                                                    '$createdAt',
+                                                                    "$createdAt",
                                                                 },
                                                                 11,
                                                               ],
@@ -2421,35 +2412,35 @@ organisationController.totalWeightAnalytics = (req, res) => {
 
 organisationController.categoryAnalytics = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: 'completed' })
+    .find({ completionStatus: "completed" })
     .sort({ _id: -1 })
     .then((result, err) => {
       if (err) return res.status(400).json(err);
 
-      var can = result.filter((x) => x.Category == 'can');
+      var can = result.filter((x) => x.Category == "can");
 
-      var petBottle = result.filter((x) => x.Category == 'petBottle');
+      var petBottle = result.filter((x) => x.Category == "petBottle");
 
-      var carton = result.filter((x) => x.Category == 'carton');
+      var carton = result.filter((x) => x.Category == "carton");
 
-      var rubber = result.filter((x) => x.Category == 'rubber');
+      var rubber = result.filter((x) => x.Category == "rubber");
 
-      var plastics = result.filter((x) => x.Category == 'plastics');
+      var plastics = result.filter((x) => x.Category == "plastics");
 
       var glass = result.filter(
-        (x) => x.Category == 'glass' || x.Category == 'Glass'
+        (x) => x.Category == "glass" || x.Category == "Glass"
       );
 
       var metal = result.filter(
-        (x) => x.Category == 'metal' || x.Category == 'Metal'
+        (x) => x.Category == "metal" || x.Category == "Metal"
       );
 
       var nylon = result.filter(
-        (x) => x.Category == 'nylonSachet' || x.Category == 'nylonSachet'
+        (x) => x.Category == "nylonSachet" || x.Category == "nylonSachet"
       );
 
       var wood = result.filter(
-        (x) => x.Category == 'wood' || x.Category == 'wood'
+        (x) => x.Category == "wood" || x.Category == "wood"
       );
 
       return RESPONSE.status(200).json({
@@ -2473,108 +2464,108 @@ organisationController.licencePaymentGrowth = (REQUEST, RESPONSE) => {
   try {
     MODEL.companyReceiptModel
       .find({
-        paymentType: 'licence',
+        paymentType: "licence",
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
       .then((jan) => {
         MODEL.companyReceiptModel
           .find({
-            paymentType: 'licence',
+            paymentType: "licence",
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
           .then((feb) => {
             MODEL.companyReceiptModel
               .find({
-                paymentType: 'licence',
+                paymentType: "licence",
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
               .then((march) => {
                 MODEL.companyReceiptModel
                   .find({
-                    paymentType: 'licence',
+                    paymentType: "licence",
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
                   .then((april) => {
                     MODEL.companyReceiptModel
                       .find({
-                        paymentType: 'licence',
+                        paymentType: "licence",
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
                       .then((may) => {
                         MODEL.companyReceiptModel
                           .find({
-                            paymentType: 'licence',
+                            paymentType: "licence",
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
                           .then((june) => {
                             MODEL.companyReceiptModel
                               .find({
-                                paymentType: 'licence',
+                                paymentType: "licence",
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
                               .then((july) => {
                                 MODEL.companyReceiptModel
                                   .find({
-                                    paymentType: 'licence',
+                                    paymentType: "licence",
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
                                   .then((Aug) => {
                                     MODEL.companyReceiptModel
                                       .find({
-                                        paymentType: 'licence',
+                                        paymentType: "licence",
                                         $expr: {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -2584,18 +2575,18 @@ organisationController.licencePaymentGrowth = (REQUEST, RESPONSE) => {
                                       .then((sept) => {
                                         MODEL.companyReceiptModel
                                           .find({
-                                            paymentType: 'licence',
+                                            paymentType: "licence",
                                             $expr: {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -2605,19 +2596,19 @@ organisationController.licencePaymentGrowth = (REQUEST, RESPONSE) => {
                                           .then((Oct) => {
                                             MODEL.companyReceiptModel
                                               .find({
-                                                paymentType: 'licence',
+                                                paymentType: "licence",
                                                 $expr: {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -2628,14 +2619,14 @@ organisationController.licencePaymentGrowth = (REQUEST, RESPONSE) => {
                                               .then((Nov) => {
                                                 MODEL.companyReceiptModel
                                                   .find({
-                                                    paymentType: 'licence',
+                                                    paymentType: "licence",
                                                     $expr: {
                                                       $and: [
                                                         {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -2644,7 +2635,7 @@ organisationController.licencePaymentGrowth = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -2655,14 +2646,14 @@ organisationController.licencePaymentGrowth = (REQUEST, RESPONSE) => {
                                                   .then((Dec) => {
                                                     MODEL.companyReceiptModel
                                                       .find({
-                                                        paymentType: 'licence',
+                                                        paymentType: "licence",
                                                         $expr: {
                                                           $and: [
                                                             {
                                                               $eq: [
                                                                 {
                                                                   $year:
-                                                                    '$createdAt',
+                                                                    "$createdAt",
                                                                 },
                                                                 year,
                                                               ],
@@ -2671,7 +2662,7 @@ organisationController.licencePaymentGrowth = (REQUEST, RESPONSE) => {
                                                               $eq: [
                                                                 {
                                                                   $month:
-                                                                    '$createdAt',
+                                                                    "$createdAt",
                                                                 },
                                                                 11,
                                                               ],
@@ -2717,7 +2708,7 @@ organisationController.licencePaymentGrowth = (REQUEST, RESPONSE) => {
 organisationController.companyReceiptTransactions = (req, res) => {
   try {
     MODEL.companyReceiptModel.find({}).then((receipts) => {
-      var business = receipts.filter((x) => x.paymentType !== 'licence');
+      var business = receipts.filter((x) => x.paymentType !== "licence");
       return res.status(200).json(business);
     });
   } catch (err) {
@@ -2733,8 +2724,8 @@ organisationController.companyGrowthAnalytics = (req, res) => {
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createAt' }, year] },
-            { $eq: [{ $month: '$createAt' }, 1] },
+            { $eq: [{ $year: "$createAt" }, year] },
+            { $eq: [{ $month: "$createAt" }, 1] },
           ],
         },
       })
@@ -2743,8 +2734,8 @@ organisationController.companyGrowthAnalytics = (req, res) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createAt' }, year] },
-                { $eq: [{ $month: '$createAt' }, 2] },
+                { $eq: [{ $year: "$createAt" }, year] },
+                { $eq: [{ $month: "$createAt" }, 2] },
               ],
             },
           })
@@ -2753,8 +2744,8 @@ organisationController.companyGrowthAnalytics = (req, res) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createAt' }, year] },
-                    { $eq: [{ $month: '$createAt' }, 3] },
+                    { $eq: [{ $year: "$createAt" }, year] },
+                    { $eq: [{ $month: "$createAt" }, 3] },
                   ],
                 },
               })
@@ -2763,8 +2754,8 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createAt' }, year] },
-                        { $eq: [{ $month: '$createAt' }, 4] },
+                        { $eq: [{ $year: "$createAt" }, year] },
+                        { $eq: [{ $month: "$createAt" }, 4] },
                       ],
                     },
                   })
@@ -2773,8 +2764,8 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createAt' }, year] },
-                            { $eq: [{ $month: '$createAt' }, 5] },
+                            { $eq: [{ $year: "$createAt" }, year] },
+                            { $eq: [{ $month: "$createAt" }, 5] },
                           ],
                         },
                       })
@@ -2783,8 +2774,8 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createAt' }, year] },
-                                { $eq: [{ $month: '$createAt' }, 6] },
+                                { $eq: [{ $year: "$createAt" }, year] },
+                                { $eq: [{ $month: "$createAt" }, 6] },
                               ],
                             },
                           })
@@ -2793,8 +2784,8 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createAt' }, year] },
-                                    { $eq: [{ $month: '$createAt' }, 7] },
+                                    { $eq: [{ $year: "$createAt" }, year] },
+                                    { $eq: [{ $month: "$createAt" }, 7] },
                                   ],
                                 },
                               })
@@ -2803,8 +2794,8 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                                   .find({
                                     $expr: {
                                       $and: [
-                                        { $eq: [{ $year: '$createAt' }, year] },
-                                        { $eq: [{ $month: '$createAt' }, 8] },
+                                        { $eq: [{ $year: "$createAt" }, year] },
+                                        { $eq: [{ $month: "$createAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -2815,12 +2806,12 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createAt' },
+                                                { $year: "$createAt" },
                                                 year,
                                               ],
                                             },
                                             {
-                                              $eq: [{ $month: '$createAt' }, 9],
+                                              $eq: [{ $month: "$createAt" }, 9],
                                             },
                                           ],
                                         },
@@ -2832,13 +2823,13 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createAt' },
+                                                    { $year: "$createAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createAt' },
+                                                    { $month: "$createAt" },
                                                     10,
                                                   ],
                                                 },
@@ -2852,13 +2843,13 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createAt' },
+                                                        { $year: "$createAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
-                                                        { $month: '$createAt' },
+                                                        { $month: "$createAt" },
                                                         11,
                                                       ],
                                                     },
@@ -2874,7 +2865,7 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createAt',
+                                                                "$createAt",
                                                             },
                                                             year,
                                                           ],
@@ -2883,7 +2874,7 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createAt',
+                                                                "$createAt",
                                                             },
                                                             12,
                                                           ],
@@ -2900,7 +2891,7 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                                                               $eq: [
                                                                 {
                                                                   $year:
-                                                                    '$createAt',
+                                                                    "$createAt",
                                                                 },
                                                                 year,
                                                               ],
@@ -2909,7 +2900,7 @@ organisationController.companyGrowthAnalytics = (req, res) => {
                                                               $eq: [
                                                                 {
                                                                   $month:
-                                                                    '$createAt',
+                                                                    "$createAt",
                                                                 },
                                                                 11,
                                                               ],
@@ -2997,8 +2988,8 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
         licence_active: false,
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createAt' }, year] },
-            { $eq: [{ $month: '$createAt' }, 1] },
+            { $eq: [{ $year: "$createAt" }, year] },
+            { $eq: [{ $month: "$createAt" }, 1] },
           ],
         },
       })
@@ -3008,8 +2999,8 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
             licence_active: false,
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createAt' }, year] },
-                { $eq: [{ $month: '$createAt' }, 2] },
+                { $eq: [{ $year: "$createAt" }, year] },
+                { $eq: [{ $month: "$createAt" }, 2] },
               ],
             },
           })
@@ -3019,8 +3010,8 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                 licence_active: false,
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createAt' }, year] },
-                    { $eq: [{ $month: '$createAt' }, 3] },
+                    { $eq: [{ $year: "$createAt" }, year] },
+                    { $eq: [{ $month: "$createAt" }, 3] },
                   ],
                 },
               })
@@ -3030,8 +3021,8 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                     licence_active: false,
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createAt' }, year] },
-                        { $eq: [{ $month: '$createAt' }, 4] },
+                        { $eq: [{ $year: "$createAt" }, year] },
+                        { $eq: [{ $month: "$createAt" }, 4] },
                       ],
                     },
                   })
@@ -3041,8 +3032,8 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                         licence_active: false,
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createAt' }, year] },
-                            { $eq: [{ $month: '$createAt' }, 5] },
+                            { $eq: [{ $year: "$createAt" }, year] },
+                            { $eq: [{ $month: "$createAt" }, 5] },
                           ],
                         },
                       })
@@ -3052,8 +3043,8 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                             licence_active: false,
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createAt' }, year] },
-                                { $eq: [{ $month: '$createAt' }, 6] },
+                                { $eq: [{ $year: "$createAt" }, year] },
+                                { $eq: [{ $month: "$createAt" }, 6] },
                               ],
                             },
                           })
@@ -3063,8 +3054,8 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                                 licence_active: false,
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createAt' }, year] },
-                                    { $eq: [{ $month: '$createAt' }, 7] },
+                                    { $eq: [{ $year: "$createAt" }, year] },
+                                    { $eq: [{ $month: "$createAt" }, 7] },
                                   ],
                                 },
                               })
@@ -3074,8 +3065,8 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                                     licence_active: false,
                                     $expr: {
                                       $and: [
-                                        { $eq: [{ $year: '$createAt' }, year] },
-                                        { $eq: [{ $month: '$createAt' }, 8] },
+                                        { $eq: [{ $year: "$createAt" }, year] },
+                                        { $eq: [{ $month: "$createAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -3087,12 +3078,12 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createAt' },
+                                                { $year: "$createAt" },
                                                 year,
                                               ],
                                             },
                                             {
-                                              $eq: [{ $month: '$createAt' }, 9],
+                                              $eq: [{ $month: "$createAt" }, 9],
                                             },
                                           ],
                                         },
@@ -3105,13 +3096,13 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createAt' },
+                                                    { $year: "$createAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createAt' },
+                                                    { $month: "$createAt" },
                                                     10,
                                                   ],
                                                 },
@@ -3126,13 +3117,13 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createAt' },
+                                                        { $year: "$createAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
-                                                        { $month: '$createAt' },
+                                                        { $month: "$createAt" },
                                                         11,
                                                       ],
                                                     },
@@ -3149,7 +3140,7 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createAt',
+                                                                "$createAt",
                                                             },
                                                             year,
                                                           ],
@@ -3158,7 +3149,7 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createAt',
+                                                                "$createAt",
                                                             },
                                                             12,
                                                           ],
@@ -3176,7 +3167,7 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                                                               $eq: [
                                                                 {
                                                                   $year:
-                                                                    '$createAt',
+                                                                    "$createAt",
                                                                 },
                                                                 year,
                                                               ],
@@ -3185,7 +3176,7 @@ organisationController.companyDeclineAnalytics = (REQUEST, RESPONSE) => {
                                                               $eq: [
                                                                 {
                                                                   $month:
-                                                                    '$createAt',
+                                                                    "$createAt",
                                                                 },
                                                                 11,
                                                               ],
@@ -3284,7 +3275,7 @@ organisationController.advertControl = (req, res) => {
   try {
     MODEL.advertModel(advert).save({}, (ERR, RESULT) => {
       return res.status(200).json({
-        message: 'Advert Posted Successfully',
+        message: "Advert Posted Successfully",
       });
     });
   } catch (err) {
@@ -3300,7 +3291,7 @@ organisationController.deleteAdvert = (REQUEST, RESPONSE) => {
         _id: advertID,
       })
       .then((adverts) => {
-        console.log('<<>>>', adverts);
+        console.log("<<>>>", adverts);
         if (!adverts) {
           return RESPONSE.status(200).json({
             message: "This advert doesn't exist",
@@ -3312,7 +3303,7 @@ organisationController.deleteAdvert = (REQUEST, RESPONSE) => {
             })
             .then((result) => {
               return RESPONSE.status(200).json({
-                message: 'Advert deleted successfully',
+                message: "Advert deleted successfully",
               });
             });
         }
@@ -3327,7 +3318,7 @@ organisationController.monifyHook = (REQUEST, RESPONSE) => {
   try {
     MODEL.payOutModel(data).save({}, (ERR, RESULT) => {
       return RESPONSE.status(200).json({
-        message: 'Payment initiated successfully',
+        message: "Payment initiated successfully",
       });
     });
   } catch (err) {
@@ -3339,7 +3330,7 @@ organisationController.monifyReceipts = (REQUEST, RESPONSE) => {
   const email = REQUEST.query.email;
   try {
     MODEL.payOutModel
-      .find({ 'customer.email': email })
+      .find({ "customer.email": email })
       .sort({ _id: -1 })
       .then((receipts) => {
         return RESPONSE.status(200).json(receipts);
@@ -3380,7 +3371,7 @@ organisationController.payPortal = (REQUEST, RESPONSE) => {
                   );
                 }
               });
-            return RESPONSE.status(200).json({ message: 'Payout success!' });
+            return RESPONSE.status(200).json({ message: "Payout success!" });
           }
         );
       });
@@ -3393,7 +3384,7 @@ organisationController.organisationRecyclers = (req, res) => {
   const organisation_id = req.query.organisation_id;
   if (!organisation_id) {
     return res.status(400).json({
-      message: 'Enter a valid organisation id',
+      message: "Enter a valid organisation id",
     });
   }
   try {
@@ -3414,7 +3405,7 @@ organisationController.organisationRecyclers = (req, res) => {
 organisationController.checkProfile = (req, res) => {
   const organisation_id = req.query.organisation_id;
 
-  console.log(organisation_id, '<<-', req.query);
+  console.log(organisation_id, "<<-", req.query);
   try {
     MODEL.organisationModel
       .findOne({
@@ -3438,7 +3429,7 @@ organisationController.updateOrganisationProfile = (req, res) => {
       .then((organisation) => {
         if (!organisation)
           return res.status(400).json({
-            message: 'Organisation does not exist, check your id and retry!',
+            message: "Organisation does not exist, check your id and retry!",
           });
         MODEL.organisationModel.updateOne(
           {
@@ -3487,12 +3478,12 @@ organisationController.updateOrganisationProfile = (req, res) => {
                     result.results.map((area) => ({
                       formatted_address: area.formatted_address,
                       geometry: area.geometry,
-                    })) || '';
+                    })) || "";
                   MODEL.geofenceModel({
                     organisationId: organisation_id,
                     data: LatLong,
                   }).save({}, (err, result) => {
-                    console.log('geofenced');
+                    console.log("geofenced");
                   });
                 }
               );
@@ -3513,13 +3504,13 @@ organisationController.updateOrganisationProfile = (req, res) => {
                       },
                     },
                     (err, resp) => {
-                      console.log('update ?', resp);
+                      console.log("update ?", resp);
                     }
                   );
                 }
 
                 return res.status(200).json({
-                  message: 'Organisation profile updated successfully!',
+                  message: "Organisation profile updated successfully!",
                 });
               });
           }
@@ -3581,17 +3572,17 @@ organisationController.resetCompanyPassword = (req, res) => {
       .then((organisation) => {
         if (!organisation) {
           return res.status(400).json({
-            message: 'Organisation does not exist',
+            message: "Organisation does not exist",
           });
         }
 
         sgMail.setApiKey(
-          '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'
+          "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"
         );
         const msg = {
           to: `${email}`,
-          from: 'pakam@xrubiconsolutions.com', // Use the email address or domain you verified above
-          subject: 'FORGOT PASSWORD',
+          from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+          subject: "FORGOT PASSWORD",
           text: `
               Kindly log on to https://dashboard.pakam.ng/otp to input your reset token.
               
@@ -3626,7 +3617,7 @@ organisationController.resetCompanyPassword = (req, res) => {
           },
           (err, response) => {
             return res.status(200).json({
-              message: 'Reset token sent successfully',
+              message: "Reset token sent successfully",
             });
           }
         );
@@ -3648,11 +3639,11 @@ organisationController.validateCompanyToken = (req, res) => {
       .then((organisation) => {
         if (resetToken === organisation.resetToken) {
           return res.status(200).json({
-            message: 'Token input successful',
+            message: "Token input successful",
           });
         }
         return res.status(400).json({
-          message: 'Token input failed',
+          message: "Token input failed",
         });
       });
   } catch (err) {
@@ -3666,7 +3657,7 @@ organisationController.changeCompanyPassword = (req, res) => {
     MODEL.organisationModel.findOne({ email: email }).then((result) => {
       if (!result) {
         return RESPONSE.status(400).json({
-          message: 'This account does not exist',
+          message: "This account does not exist",
         });
       }
 
@@ -3721,7 +3712,7 @@ organisationController.organisationSchedulesPending = (REQUEST, RESPONSE) => {
       .sort({ _id: -1 })
       .then((schedules) => {
         schedules.forEach((schedule, index) => {
-          var test = schedule.address.split(', ');
+          var test = schedule.address.split(", ");
           (function route() {
             for (let i = 0; i < accessArea.length; i++) {
               for (let j = 0; j < test.length; j++) {
@@ -3737,10 +3728,10 @@ organisationController.organisationSchedulesPending = (REQUEST, RESPONSE) => {
         });
         var geoSchedules = geofencedSchedules.filter(
           (x) =>
-            (x.completionStatus !== 'completed' &&
-              x.completionStatus !== 'cancelled' &&
-              x.completionStatus !== 'missed') ||
-            (x.completionStatus == 'pending' && x.collectorStatus == 'accept')
+            (x.completionStatus !== "completed" &&
+              x.completionStatus !== "cancelled" &&
+              x.completionStatus !== "missed") ||
+            (x.completionStatus == "pending" && x.collectorStatus == "accept")
         );
         const referenceSchedules = [...new Set(geoSchedules)];
         RESPONSE.jsonp(
@@ -3754,15 +3745,15 @@ organisationController.organisationSchedulesPending = (REQUEST, RESPONSE) => {
   });
 };
 
-organisationController.organisationPaymentAggregate = (req,res)=>{
+organisationController.organisationPaymentAggregate = (req, res) => {
   const year = new Date().getFullYear();
   try {
     MODEL.transactionModel
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -3774,8 +3765,8 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -3787,8 +3778,8 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -3800,8 +3791,8 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -3813,8 +3804,8 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -3826,8 +3817,8 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -3839,8 +3830,8 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -3853,9 +3844,9 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -3869,13 +3860,13 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -3892,13 +3883,13 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -3915,14 +3906,14 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -3942,7 +3933,7 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -3951,7 +3942,7 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -3987,67 +3978,67 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
                                                           .json({
                                                             JANUARY: groupBy(
                                                               jan,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             FEBRUARY: groupBy(
                                                               feb,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             MARCH: groupBy(
                                                               march,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             APRIL: groupBy(
                                                               april,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             MAY: groupBy(
                                                               may,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             JUNE: groupBy(
                                                               june,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             JULY: groupBy(
                                                               july,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             AUGUST: groupBy(
                                                               Aug,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             SEPTEMBER: groupBy(
                                                               sept,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             OCTOBER: groupBy(
                                                               Oct,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             NOVEMBER: groupBy(
                                                               Nov,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             DECEMBER: groupBy(
                                                               Dec,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
 
                                                             ALL: groupBy(
                                                               Analytics,
-                                                              'organisation'
+                                                              "organisation"
                                                             ),
                                                           });
                                                       });
@@ -4066,14 +4057,12 @@ organisationController.organisationPaymentAggregate = (req,res)=>{
   } catch (err) {
     return res.status(500).json(err);
   }
-}
-
-
+};
 
 organisationController.submitDropOff = (req, res) => {
   const dropLocation = { ...req.body };
   try {
-        MODEL.dropOffModel(dropLocation).save({}, (err, drop) => {
+    MODEL.dropOffModel(dropLocation).save({}, (err, drop) => {
       if (err) return res.status(400).json(err);
       return res.status(200).json(drop);
     });
@@ -4082,29 +4071,59 @@ organisationController.submitDropOff = (req, res) => {
   }
 };
 
-
-
-
-organisationController.getDropOff = (req,res)=>{
+organisationController.getDropOff = (req, res) => {
   const organisationId = req.query.organisationId;
-  try{
-        MODEL.dropOffModel.find({
-          organisationId : organisationId
-        }).then(drop=>{
-          return res.status(200).json(drop)
-        })
-  }
-  catch(err){
+  try {
+    MODEL.dropOffModel
+      .find({
+        organisationId: organisationId,
+      })
+      .then((drop) => {
+        return res.status(200).json(drop);
+      });
+  } catch (err) {
     return res.status(500).json(err);
   }
-}
+};
 
-organisationController.getDropOffUser = (req,res)=>{
+organisationController.getPendingSchedulesDrop = (req, res) => {
+  const organisationId = req.query.organisationId;
+  try {
+    MODEL.scheduleDropModel
+      .find({
+        completionStatus: "pending",
+        organisationId: organisationId,
+      })
+      .then((drop) => {
+        return res.status(200).json(drop);
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+organisationController.getCompletedSchedulesDrop = (req, res) => {
+  const organisationId = req.query.organisationId;
+  try {
+    MODEL.scheduleDropModel
+      .find({
+        completionStatus: "completed",
+        organisationId: organisationId,
+      })
+      .then((drop) => {
+        return res.status(200).json(drop);
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+organisationController.getDropOffUser = (req, res) => {
   const lat = req.query.lat;
   const long = req.query.long;
-  function rad (x) {
+  function rad(x) {
     return (x * Math.PI) / 180;
-  };
+  }
 
   const getDistance = function (p1, p2) {
     let R = 6378137; // Earth’s mean radius in meter
@@ -4115,97 +4134,103 @@ organisationController.getDropOffUser = (req,res)=>{
 
     let dLat = rad(p2.lat - p1.lat);
     let dLong = rad(p2.long - p1.long);
-   
-    let a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad(p1.latitude)) * Math.cos(rad(p2.latitude)) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
-    console.log("a ->>>", a)
+
+    let a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(rad(p1.latitude)) *
+        Math.cos(rad(p2.latitude)) *
+        Math.sin(dLong / 2) *
+        Math.sin(dLong / 2);
+    console.log("a ->>>", a);
     let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     let d = R * c;
-    console.warn('the get distance d', d);
+    console.warn("the get distance d", d);
     return d;
 
     // returns the distance in meter
   };
 
-  try{
-        MODEL.dropOffModel.find({
-        }).then(drop=>{
-            for(let i = 0; i < drop.length ; i++){
-                  getDistance(drop[i].location[0] , {lat : "6.234224", long: "3.35643"})
-            }
-          return res.status(200).json(drop)
-        })
-  }
-  catch(err){
+  try {
+    MODEL.dropOffModel.find({}).then((drop) => {
+      for (let i = 0; i < drop.length; i++) {
+        getDistance(drop[i].location[0], { lat: "6.234224", long: "3.35643" });
+      }
+      return res.status(200).json(drop);
+    });
+  } catch (err) {
     return res.status(500).json(err);
   }
-}
+};
 
-organisationController.sendInvoiceMail = (req,res)=>{
+organisationController.sendInvoiceMail = (req, res) => {
   const organisationId = req.body.organisationId;
-  const file = req.body.file || " "
-  try{
+  const file = req.body.file || " ";
+  try {
     sgMail.setApiKey(
-      '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'
+      "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"
     );
-    MODEL.organisationModel.findOne({
-      _id : organisationId
-    }).then((organisation_data)=>{
-      const msg = {
-        to: `${organisation_data.email}`,
-        from: 'pakam@xrubiconsolutions.com', // Use the email address or domain you verified above
-        subject: 'YOUR PAKAM INVOICE',
-        text: `Find attached ...`,
-      };
-      //ES6
-      sgMail.send(msg).then(
-        () => {},
-        (error) => {
-          console.error(error);
-  
-          if (error.response) {
-            console.error(error.response.body);
-          }
-        }
-      );
-      return res.status(200).json({
-        message: "Invoice sent successfully"
+    MODEL.organisationModel
+      .findOne({
+        _id: organisationId,
       })
-    })
-  }
-  catch(err){
-          return res.status(500).json(err);
-  }
-}
+      .then((organisation_data) => {
+        const msg = {
+          to: `${organisation_data.email}`,
+          from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+          subject: "YOUR PAKAM INVOICE",
+          text: `Find attached ...`,
+        };
+        //ES6
+        sgMail.send(msg).then(
+          () => {},
+          (error) => {
+            console.error(error);
 
-
-organisationController.getCharityPaymentLawma = (req,res)=>{
-  try{
-    MODEL.charityModel.find({}).sort({
-      _id : -1
-    }).then((data)=>{
-            return res.status(200).json(data)
-    })
-  }catch(err){
+            if (error.response) {
+              console.error(error.response.body);
+            }
+          }
+        );
+        return res.status(200).json({
+          message: "Invoice sent successfully",
+        });
+      });
+  } catch (err) {
     return res.status(500).json(err);
   }
-}
+};
 
-
-
-organisationController.getCharityPaymentOrganisation = (req,res)=>{
-
-  const organisation = req.query.organisation
-
-  try{
-    MODEL.charityModel.find({ organisation : organisation }).sort({
-      _id : -1
-    }).then((data)=>{
-            return res.status(200).json(data)
-    })
-  }catch(err){
+organisationController.getCharityPaymentLawma = (req, res) => {
+  try {
+    MODEL.charityModel
+      .find({})
+      .sort({
+        _id: -1,
+      })
+      .then((data) => {
+        return res.status(200).json(data);
+      });
+  } catch (err) {
     return res.status(500).json(err);
   }
-}
+};
+
+organisationController.getCharityPaymentOrganisation = (req, res) => {
+  const organisation = req.query.organisation;
+
+  try {
+    MODEL.charityModel
+      .find({ organisation: organisation })
+      .sort({
+        _id: -1,
+      })
+      .then((data) => {
+        return res.status(200).json(data);
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
 
 /* export organisationControllers */
 module.exports = organisationController;

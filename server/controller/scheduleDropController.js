@@ -5,31 +5,31 @@ let MODEL = require("../models");
 let COMMON_FUN = require("../util/commonFunction");
 let CONSTANTS = require("../util/constants");
 
-var request = require('request');
+var request = require("request");
 
-const OneSignal = require('onesignal-node');
+const OneSignal = require("onesignal-node");
 
 var sendNotification = function (data) {
   var headers = {
-    'Content-Type': 'application/json; charset=utf-8',
+    "Content-Type": "application/json; charset=utf-8",
   };
 
   var options = {
-    host: 'onesignal.com',
+    host: "onesignal.com",
     port: 443,
-    path: '/api/v1/notifications',
-    method: 'POST',
+    path: "/api/v1/notifications",
+    method: "POST",
     headers: headers,
   };
 
-  var https = require('https');
+  var https = require("https");
   var req = https.request(options, function (res) {
-    res.on('data', function (data) {
+    res.on("data", function (data) {
       console.log(JSON.parse(data));
     });
   });
 
-  req.on('error', function (e) {
+  req.on("error", function (e) {
     console.log(e);
   });
 
@@ -75,14 +75,12 @@ scheduleDropController.getPendingSchedule = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
-
 scheduleDropController.getPendingScheduleUser = (REQUEST, RESPONSE) => {
-  const phone = req.query.phone;
+  const phone = REQUEST.query.phone;
   MODEL.scheduleDropModel
     .find({
       completionStatus: "pending",
-      phone : phone
-
+      phone: phone,
     })
     .then((schedules) => {
       return RESPONSE.json(
@@ -93,12 +91,11 @@ scheduleDropController.getPendingScheduleUser = (REQUEST, RESPONSE) => {
 };
 
 scheduleDropController.getCompletedScheduleUser = (REQUEST, RESPONSE) => {
-  const phone = req.query.phone;
+  const phone = REQUEST.query.phone;
   MODEL.scheduleDropModel
     .find({
       completionStatus: "completed",
-      phone : phone
-
+      phone: phone,
     })
     .then((schedules) => {
       return RESPONSE.json(
@@ -107,9 +104,6 @@ scheduleDropController.getCompletedScheduleUser = (REQUEST, RESPONSE) => {
     })
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
-
-
-
 
 scheduleDropController.getCompletedSchedule = (REQUEST, RESPONSE) => {
   MODEL.scheduleDropModel
@@ -138,159 +132,165 @@ scheduleDropController.rewardDropSystem = (REQUEST, RESPONSE) => {
         return RESPONSE.status(400).json({
           message: "This schedule is invalid",
         });
-      MODEL.userModel.findOne({ email: schedule[0].scheduleCreator }).then((result) => {
-        if (result.cardID == null)
-          return RESPONSE.status(400).jsonp({
-            message: "you don't have a valid card ID",
-          });
-        MODEL.transactionModel
-          .findOne({ scheduleId: REQUEST.body._id })
-          .then((transaction) => {
-            if (transaction) {
-              return RESPONSE.status(400).jsonp({
-                message:
-                  "This transaction had been completed by another recycler",
-              });
-            } else {
-              //100g is equivalent to 1 coin i.e 1kg is equivalent to 10 coins
-              // quantity in g
-
-              // var equivalent = (quantity / 1000) * 10;
-              MODEL.collectorModel
-                .findOne({ _id: collectorID })
-                .then((recycler, err) => {
-                  MODEL.organisationModel
-                    .findOne({
-                      _id: recycler.approvedBy,
-                    })
-                    .then((organisation) => {
-                      var category =
-                        schedule[0].Category === "nylonSachet"
-                          ? "nylon"
-                          : schedule[0].Category === "glassBottle"
-                          ? "glass"
-                          : schedule[0].Category.length < 4
-                          ? schedule[0].Category.substring(
-                              0,
-                              schedule[0].Category.length
-                            )
-                          : schedule[0].Category.substring(
-                              0,
-                              schedule[0].Category.length - 1
-                            );
-
-                      var organisationCheck = JSON.parse(
-                        JSON.stringify(organisation)
-                      );
-                      for (let val in organisationCheck) {
-                        if (val.includes(category)) {
-                          const equivalent = !!organisationCheck[val]
-                            ? organisationCheck[val]
-                            : 1;
-                          const pricing = quantity * equivalent;
-                          MODEL.collectorModel.updateOne(
-                            { email: recycler.email },
-                            { last_logged_in: new Date() },
-                            (res) => {
-                              console.log("Logged date updated", new Date());
-                            }
-                          );
-                          var dataToSave = {
-                            weight: quantity,
-
-                            coin: pricing,
-
-                            cardID: result._id,
-
-                            scheduleId: schedule[0]._id,
-
-                            completedBy: collectorID,
-
-                            Category: schedule[0].Category,
-
-                            fullname: result.firstname + " " + result.lastname,
-
-                            recycler: recycler.fullname,
-
-                            aggregatorId: recycler.aggregatorId || " ",
-
-                            organisation: recycler.organisation,
-
-                            organisationID: recycler.approvedBy,
-                          };
-                          MODEL.transactionModel(dataToSave).save(
-                            {},
-                            (ERR, RESULT) => {
-                              var message = {
-                                app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-                                contents: {
-                                  en: "Your schedule drop off has been completed successfully. You have received the equivalent amount in your wallet",
-                                },
-                                include_player_ids: [`${result.onesignal_id}`],
-                              };
-
-                              sendNotification(message);
-
-                              // if (ERR)
-                              //   return RESPONSE.status(400).jsonp(ERR);
-                              MODEL.scheduleDropModel.updateOne(
-                                { _id: schedule[0]._id },
-                                {
-                                  $set: {
-                                    completionStatus: "completed",
-                                    collectedBy: collectorID,
-                                    quantity: quantity,
-                                  },
-                                },
-                                (err, res) => {
-                                  if (err)
-                                    return RESPONSE.status(400).json(err);
-                                  MODEL.userModel.updateOne(
-                                    { email: result.email },
-                                    {
-                                      $set: {
-                                        availablePoints:
-                                          result.availablePoints + pricing,
-                                        schedulePoints:
-                                          result.schedulePoints + 1,
-                                      },
-                                    },
-                                    (err, res) => {
-                                      console.log("update user", err, res);
-                                    }
-                                  );
-                                  MODEL.collectorModel.updateOne(
-                                    { _id: collectorID },
-                                    {
-                                      $set: {
-                                        totalCollected:
-                                          recycler.totalCollected +
-                                          Number(quantity),
-                                        numberOfTripsCompleted:
-                                          recycler.numberOfTripsCompleted + 1,
-                                        busy: false,
-                                      },
-                                    },
-                                    (err, res) => {
-                                      console.log("update", err, res);
-                                    }
-                                  );
-                                  return RESPONSE.status(200).json({
-                                    message:
-                                      "Transaction Completed Successfully",
-                                  });
-                                }
-                              );
-                            }
-                          );
-                          break;
-                        }
-                      }
-                    });
+      MODEL.userModel
+        .findOne({ email: schedule[0].scheduleCreator })
+        .then((result) => {
+          if (result.cardID == null)
+            return RESPONSE.status(400).jsonp({
+              message: "you don't have a valid card ID",
+            });
+          MODEL.transactionModel
+            .findOne({ scheduleId: REQUEST.body._id })
+            .then((transaction) => {
+              if (transaction) {
+                return RESPONSE.status(400).jsonp({
+                  message:
+                    "This transaction had been completed by another recycler",
                 });
-            }
-          });
-      });
+              } else {
+                //100g is equivalent to 1 coin i.e 1kg is equivalent to 10 coins
+                // quantity in g
+
+                // var equivalent = (quantity / 1000) * 10;
+                MODEL.collectorModel
+                  .findOne({ _id: collectorID })
+                  .then((recycler, err) => {
+                    MODEL.organisationModel
+                      .findOne({
+                        _id: recycler.approvedBy,
+                      })
+                      .then((organisation) => {
+                        var category =
+                          schedule[0].Category === "nylonSachet"
+                            ? "nylon"
+                            : schedule[0].Category === "glassBottle"
+                            ? "glass"
+                            : schedule[0].Category.length < 4
+                            ? schedule[0].Category.substring(
+                                0,
+                                schedule[0].Category.length
+                              )
+                            : schedule[0].Category.substring(
+                                0,
+                                schedule[0].Category.length - 1
+                              );
+
+                        var organisationCheck = JSON.parse(
+                          JSON.stringify(organisation)
+                        );
+                        for (let val in organisationCheck) {
+                          if (val.includes(category)) {
+                            const equivalent = !!organisationCheck[val]
+                              ? organisationCheck[val]
+                              : 1;
+                            const pricing = quantity * equivalent;
+                            MODEL.collectorModel.updateOne(
+                              { email: recycler.email },
+                              { last_logged_in: new Date() },
+                              (res) => {
+                                console.log("Logged date updated", new Date());
+                              }
+                            );
+                            var dataToSave = {
+                              weight: quantity,
+
+                              coin: pricing,
+
+                              cardID: result._id,
+
+                              scheduleId: schedule[0]._id,
+
+                              completedBy: collectorID,
+
+                              Category: schedule[0].Category,
+
+                              fullname:
+                                result.firstname + " " + result.lastname,
+
+                              recycler: recycler.fullname,
+
+                              aggregatorId: recycler.aggregatorId || " ",
+
+                              organisation: recycler.organisation,
+
+                              organisationID: recycler.approvedBy,
+                            };
+                            MODEL.transactionModel(dataToSave).save(
+                              {},
+                              (ERR, RESULT) => {
+                                var message = {
+                                  app_id:
+                                    "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+                                  contents: {
+                                    en: "Your schedule drop off has been completed successfully. You have received the equivalent amount in your wallet",
+                                  },
+                                  include_player_ids: [
+                                    `${result.onesignal_id}`,
+                                  ],
+                                };
+
+                                sendNotification(message);
+
+                                // if (ERR)
+                                //   return RESPONSE.status(400).jsonp(ERR);
+                                MODEL.scheduleDropModel.updateOne(
+                                  { _id: schedule[0]._id },
+                                  {
+                                    $set: {
+                                      completionStatus: "completed",
+                                      collectedBy: collectorID,
+                                      quantity: quantity,
+                                    },
+                                  },
+                                  (err, res) => {
+                                    if (err)
+                                      return RESPONSE.status(400).json(err);
+                                    MODEL.userModel.updateOne(
+                                      { email: result.email },
+                                      {
+                                        $set: {
+                                          availablePoints:
+                                            result.availablePoints + pricing,
+                                          schedulePoints:
+                                            result.schedulePoints + 1,
+                                        },
+                                      },
+                                      (err, res) => {
+                                        console.log("update user", err, res);
+                                      }
+                                    );
+                                    MODEL.collectorModel.updateOne(
+                                      { _id: collectorID },
+                                      {
+                                        $set: {
+                                          totalCollected:
+                                            recycler.totalCollected +
+                                            Number(quantity),
+                                          numberOfTripsCompleted:
+                                            recycler.numberOfTripsCompleted + 1,
+                                          busy: false,
+                                        },
+                                      },
+                                      (err, res) => {
+                                        console.log("update", err, res);
+                                      }
+                                    );
+                                    return RESPONSE.status(200).json({
+                                      message:
+                                        "Transaction Completed Successfully",
+                                    });
+                                  }
+                                );
+                              }
+                            );
+                            break;
+                          }
+                        }
+                      });
+                  });
+              }
+            });
+        });
     });
   } catch (err) {
     return RESPONSE.status(500).json(err);

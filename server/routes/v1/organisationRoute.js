@@ -297,9 +297,20 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/user/drop').get(
-    // auth.userValidation,
+    auth.userValidation,
     CONTROLLER.organisationController.getDropOffUser
-  )
+  );
+
+  APP.route('/api/drop/organisation/pending/schedule').get(
+    auth.companyValidation,
+    CONTROLLER.organisationController.getPendingSchedulesDrop
+  );
+
+  APP.route('/api/drop/organisation/completed/schedule').get(
+    auth.companyValidation,
+    CONTROLLER.organisationController.getCompletedSchedulesDrop
+  );
+
 
   APP.route('/api/submit/organisation/invoice').post(
     auth.adminPakamValidation,
