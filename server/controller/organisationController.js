@@ -4100,9 +4100,38 @@ organisationController.getDropOff = (req,res)=>{
 }
 
 organisationController.getDropOffUser = (req,res)=>{
+  const lat = req.query.lat;
+  const long = req.query.long;
+  function rad (x) {
+    return (x * Math.PI) / 180;
+  };
+
+  const getDistance = function (p1, p2) {
+    let R = 6378137; // Earth’s mean radius in meter
+    // console.log("P1 lat", p1.lat);
+    // console.log("P2 lat", p2.lat);
+    // console.log("P2 long", p2.long);
+    // console.log("P1 long", p1.long);
+
+    let dLat = rad(p2.lat - p1.lat);
+    let dLong = rad(p2.long - p1.long);
+   
+    let a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad(p1.latitude)) * Math.cos(rad(p2.latitude)) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
+    console.log("a ->>>", a)
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    let d = R * c;
+    console.warn('the get distance d', d);
+    return d;
+
+    // returns the distance in meter
+  };
+
   try{
         MODEL.dropOffModel.find({
         }).then(drop=>{
+            for(let i = 0; i < drop.length ; i++){
+                  getDistance(drop[i].location[0] , {lat : "6.234224", long: "3.35643"})
+            }
           return res.status(200).json(drop)
         })
   }

@@ -297,7 +297,7 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/user/drop').get(
-    auth.userValidation,
+    // auth.userValidation,
     CONTROLLER.organisationController.getDropOffUser
   )
 

@@ -75,6 +75,42 @@ scheduleDropController.getPendingSchedule = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
+
+scheduleDropController.getPendingScheduleUser = (REQUEST, RESPONSE) => {
+  const phone = req.query.phone;
+  MODEL.scheduleDropModel
+    .find({
+      completionStatus: "pending",
+      phone : phone
+
+    })
+    .then((schedules) => {
+      return RESPONSE.json(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
+
+scheduleDropController.getCompletedScheduleUser = (REQUEST, RESPONSE) => {
+  const phone = req.query.phone;
+  MODEL.scheduleDropModel
+    .find({
+      completionStatus: "completed",
+      phone : phone
+
+    })
+    .then((schedules) => {
+      return RESPONSE.json(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+      );
+    })
+    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+};
+
+
+
+
 scheduleDropController.getCompletedSchedule = (REQUEST, RESPONSE) => {
   MODEL.scheduleDropModel
     .find({
