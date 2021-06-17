@@ -4092,7 +4092,7 @@ organisationController.getPendingSchedulesDrop = (req, res) => {
     MODEL.scheduleDropModel
       .find({
         completionStatus: "pending",
-        organisationId: organisationId,
+        organisationCollection: organisationId,
       })
       .then((drop) => {
         return res.status(200).json(drop);
@@ -4108,7 +4108,7 @@ organisationController.getCompletedSchedulesDrop = (req, res) => {
     MODEL.scheduleDropModel
       .find({
         completionStatus: "completed",
-        organisationId: organisationId,
+        organisationCollection: organisationId,
       })
       .then((drop) => {
         return res.status(200).json(drop);
