@@ -303,6 +303,7 @@ scheduleDropController.dropRequestRecycler = (req, res) => {
     MODEL.scheduleDropModel
       .find({
         organisationCollection: organisationId,
+        completionStatus: "pending",
       })
       .then((drop) => {
         return res.status(200).json(drop);

@@ -308,7 +308,6 @@ organisationController.agentApproval = (req, res) => {
       if (err) {
         return res.status(400).jsonp(err);
       }
-      console.log("approved by us");
       return res.jsonp({ message: "You just approved a recycler" });
     }
   );
