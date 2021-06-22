@@ -313,4 +313,23 @@ scheduleDropController.dropRequestRecycler = (req, res) => {
   }
 };
 
+scheduleDropController.getScheduleDropCompletedRecycler = (req,res)=>{
+  const recyclerId = req.query.recyclerId;
+  try{
+
+      MODEL.scheduleDropModel.find({
+        completionStatus: "completed",
+        collectedBy : recyclerId
+      }).sort({
+        _id : -1
+      }).then((drop)=>{
+        return res.status(200).json(drop)
+      })
+
+  }
+  catch(err){
+        return res.status(500).json(err);
+  }
+}
+
 module.exports = scheduleDropController;
