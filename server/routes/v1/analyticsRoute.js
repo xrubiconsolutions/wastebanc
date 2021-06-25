@@ -8,42 +8,42 @@ let auth = require('../../util/auth');
  ****************************************/
 module.exports = (APP) => {
   APP.route('/api/filter/users').get(
-    auth.adminValidation,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlyUsers
   );
 
   APP.route('/api/filter/recyclers').get(
-    auth.adminValidation,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlyRecyclers
   );
 
   APP.route('/api/filter/schedules').get(
-    auth.adminValidation,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlySchedules
   );
 
   APP.route('/api/filter/adverts').get(
-    auth.adminValidation,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlyAdverts
   );
 
   APP.route('/api/filter/reports').get(
-    auth.adminValidation,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlyReports
   );
 
   APP.route('/api/filter/companies').get(
-    auth.adminValidation,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlyCompanies
   );
 
   APP.route('/api/filter/wastes').get(
-    auth.adminValidation,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlyWasteCollected
   );
 
   APP.route('/api/adverts/request').get(
-    auth.adminValidation,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.advertsRequest
   );
   APP.route('/api/create/version').post(
