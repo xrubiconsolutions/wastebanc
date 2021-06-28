@@ -116,7 +116,7 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/organisation/raffle').post(
-    auth.adminPakamValidation,
+    // auth.adminPakamValidation,
     CONTROLLER.organisationController.raffleTicket
   );
 
@@ -297,7 +297,7 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/user/drop').get(
-    auth.userValidation,
+    // auth.userValidation,
     CONTROLLER.organisationController.getDropOffUser
   );
 

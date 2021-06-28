@@ -2850,6 +2850,7 @@ organisationController.raffleTicket = (req, res) => {
       })
       .then((user) => {
         const raffleUser = user.map((x) => x.phone);
+        console.log("--->", raffleUser)
         MODEL.userModel
           .aggregate([
             {
@@ -5937,11 +5938,6 @@ organisationController.getDropOffUser = (req, res) => {
 
   const getDistance = function (p1, p2) {
     let R = 6378137; // Earth’s mean radius in meter
-    // console.log("P1 lat", p1.lat);
-    // console.log("P2 lat", p2.lat);
-    // console.log("P2 long", p2.long);
-    // console.log("P1 long", p1.long);
-
     let dLat = rad(p2.lat - p1.lat);
     let dLong = rad(p2.long - p1.long);
 
@@ -5956,14 +5952,12 @@ organisationController.getDropOffUser = (req, res) => {
     let d = R * c;
     console.warn("the get distance d", d);
     return d;
-
-    // returns the distance in meter
   };
 
   try {
     MODEL.dropOffModel.find({}).then((drop) => {
       for (let i = 0; i < drop.length; i++) {
-        getDistance(drop[i].location[0], { lat: "6.234224", long: "3.35643" });
+        getDistance(drop[i].location[0], { lat,long });
       }
       return res.status(200).json(drop);
     });

@@ -17,7 +17,7 @@ const dropOff_Schema = new Schema({
     required: true
   },
   location: {
-    type: [ {
+    type: {
       address: {
         type : String,
         required: true
@@ -30,7 +30,7 @@ const dropOff_Schema = new Schema({
         type: String,
         required: true
       }
-    } ],
+    },
     required: true
   },
   lastDroppedDate: {
