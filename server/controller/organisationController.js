@@ -2835,7 +2835,7 @@ organisationController.raffleTicket = (req, res) => {
   const year = yearData.getFullYear();
   const month = yearData.getMonth() + 1;
 
-  console.log("<>", month)
+  console.log("<>", month);
 
   try {
     MODEL.scheduleModel
@@ -2850,17 +2850,20 @@ organisationController.raffleTicket = (req, res) => {
       })
       .then((user) => {
         const raffleUser = user.map((x) => x.phone);
-        console.log("--->", raffleUser)
+        console.log("--->", raffleUser);
         MODEL.userModel
           .aggregate([
             {
-              $match: { schedulePoints: { $ne: 0 }, lcd: { $in: lcd } , phone: { $in : raffleUser }},
-              
+              $match: {
+                schedulePoints: { $ne: 0 },
+                lcd: { $in: lcd },
+                phone: { $in: raffleUser },
+              },
             },
             { $sample: { size: Number(winner_count) } },
           ])
           .then((winners, err) => {
-            console.log("winners here", winners)
+            console.log("winners here", winners);
             if (err) return res.status(400).json(err);
             for (let i = 0; i < winners.length; i++) {
               MODEL.userModel.updateOne(
@@ -2870,8 +2873,8 @@ organisationController.raffleTicket = (req, res) => {
                   console.log("Winner object update", winners.length);
                 }
               );
-            }            return res.status(200).json({ winners: winners });
-
+            }
+            return res.status(200).json({ winners: winners });
           });
       });
   } catch (err) {
@@ -5943,23 +5946,37 @@ organisationController.getDropOffUser = (req, res) => {
 
     let a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(rad(p1.latitude)) *
-        Math.cos(rad(p2.latitude)) *
+      Math.cos(rad(p1.lat)) *
+        Math.cos(rad(p2.lat)) *
         Math.sin(dLong / 2) *
         Math.sin(dLong / 2);
-    console.log("a ->>>", a);
     let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     let d = R * c;
-    console.warn("the get distance d", d);
     return d;
   };
 
   try {
+    var nearestLocation = [];
+    var nearestDistances = [];
+    var addresses = [];
+    var datum = [];
     MODEL.dropOffModel.find({}).then((drop) => {
       for (let i = 0; i < drop.length; i++) {
-        getDistance(drop[i].location[0], { lat,long });
+        getDistance(drop[i].location, { lat, long });
+
+        nearestLocation.push(drop[i].location);
+        nearestDistances.push(getDistance(drop[i].location, { lat, long }));
+        datum.push(drop[i]);
       }
-      return res.status(200).json(drop);
+      addresses = datum
+        .map((address) => ({
+          Organisation: address.organisation,
+          distance: getDistance(address.location, { lat, long }),
+
+          location: address.location,
+        }))
+        .sort((a, b) => a.distance - b.distance);
+      return res.status(200).json(addresses);
     });
   } catch (err) {
     return res.status(500).json(err);
