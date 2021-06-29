@@ -5972,7 +5972,7 @@ organisationController.getDropOffUser = (req, res) => {
         .map((address) => ({
           Organisation: address.organisation,
 
-          OrganisationId : address.organisationId
+          OrganisationId : address.organisationId,
           distance: getDistance(address.location, { lat, long }),
 
           location: address.location,
