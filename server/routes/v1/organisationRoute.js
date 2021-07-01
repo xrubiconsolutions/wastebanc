@@ -116,7 +116,7 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/organisation/raffle').post(
-    // auth.adminPakamValidation,
+    auth.adminPakamValidation,
     CONTROLLER.organisationController.raffleTicket
   );
 

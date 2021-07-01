@@ -2836,9 +2836,8 @@ organisationController.raffleTicket = (req, res) => {
   const month = yearData.getMonth();
 
   try {
-    MODEL.scheduleModel
+    MODEL.transactionModel
       .find({
-        completionStatus: "completed",
         $expr: {
           $and: [
             { $eq: [{ $year: "$createdAt" }, year] },
@@ -2847,7 +2846,7 @@ organisationController.raffleTicket = (req, res) => {
         },
       })
       .then((user) => {
-        const raffleUser = user.map((x) => x.phone);
+        const raffleUser = user.map((x) => x.cardID);
         console.log("--->", raffleUser);
         MODEL.userModel
           .aggregate([
@@ -2855,7 +2854,7 @@ organisationController.raffleTicket = (req, res) => {
               $match: {
                 schedulePoints: { $ne: 0 },
                 lcd: { $in: lcd },
-                phone: { $in: raffleUser },
+                cardID : { $in: raffleUser },
               },
             },
             { $sample: { size: Number(winner_count) } },
