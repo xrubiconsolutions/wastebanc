@@ -2833,9 +2833,7 @@ organisationController.raffleTicket = (req, res) => {
   const winner_count = req.body.winner_count;
   const yearData = new Date();
   const year = yearData.getFullYear();
-  const month = yearData.getMonth() + 1;
-
-  console.log("<>", month);
+  const month = yearData.getMonth();
 
   try {
     MODEL.scheduleModel
