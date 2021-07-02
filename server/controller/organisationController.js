@@ -2631,7 +2631,7 @@ organisationController.weekChartData = (req, res) => {
                                                             0
                                                           );
 
-                                                     return RESPONSE.status(200).json(
+                                                     return res.status(200).json(
                                                         {
                                                           JANUARY: {
                                                             can: januaryCan,
