@@ -808,6 +808,1990 @@ organisationController.forthChartData = (req, res) => {
     .catch((err) => res.status(500).json(err));
 };
 
+organisationController.weekChartDataPriorityLawma = (req, res) => {
+  const today = new Date();
+  const lastWeek = new Date();
+  const forthWeek = new Date();
+  const thirdWeek = new Date();
+  const lastMonth = new Date();
+
+  lastWeek.setDate(today.getDate() - 7);
+  forthWeek.setDate(today.getDate() - 14);
+  thirdWeek.setDate(today.getDate() - 21);
+  lastMonth.setDate(today.getDate() - 28);
+
+  var year = new Date().getFullYear();
+
+  const organisationID = req.query.organisationID;
+
+  MODEL.scheduleModel
+    .find({
+      completionStatus: "completed",
+
+      $expr: {
+        $and: [
+          { $eq: [{ $year: "$createdAt" }, year] },
+          { $eq: [{ $month: "$createdAt" }, 1] },
+        ],
+      },
+    })
+    .then((jan) => {
+      MODEL.scheduleModel
+        .find({
+              completionStatus: "completed",
+
+          $expr: {
+            $and: [
+              { $eq: [{ $year: "$createdAt" }, year] },
+              { $eq: [{ $month: "$createdAt" }, 2] },
+            ],
+          },
+        })
+        .then((feb) => {
+          MODEL.scheduleModel
+            .find({
+              completionStatus: "completed",
+
+              $expr: {
+                $and: [
+                  { $eq: [{ $year: "$createdAt" }, year] },
+                  { $eq: [{ $month: "$createdAt" }, 3] },
+                ],
+              },
+            })
+            .then((march) => {
+              MODEL.scheduleModel
+                .find({
+                      completionStatus: "completed",
+
+                  $expr: {
+                    $and: [
+                      { $eq: [{ $year: "$createdAt" }, year] },
+                      { $eq: [{ $month: "$createdAt" }, 4] },
+                    ],
+                  },
+                })
+                .then((april) => {
+                  MODEL.scheduleModel
+                    .find({
+                      completionStatus: "completed",
+
+                      $expr: {
+                        $and: [
+                          { $eq: [{ $year: "$createdAt" }, year] },
+                          { $eq: [{ $month: "$createdAt" }, 5] },
+                        ],
+                      },
+                    })
+                    .then((may) => {
+                      MODEL.scheduleModel
+                        .find({
+                              completionStatus: "completed",
+
+                          $expr: {
+                            $and: [
+                              { $eq: [{ $year: "$createdAt" }, year] },
+                              { $eq: [{ $month: "$createdAt" }, 6] },
+                            ],
+                          },
+                        })
+                        .then((june) => {
+                          MODEL.scheduleModel
+                            .find({
+                              completionStatus: "completed",
+
+                              $expr: {
+                                $and: [
+                                  { $eq: [{ $year: "$createdAt" }, year] },
+                                  { $eq: [{ $month: "$createdAt" }, 7] },
+                                ],
+                              },
+                            })
+                            .then((july) => {
+                              MODEL.scheduleModel
+                                .find({
+                                  completionStatus: "completed",
+
+                                  $expr: {
+                                    $and: [
+                                      { $eq: [{ $year: "$createdAt" }, year] },
+                                      { $eq: [{ $month: "$createdAt" }, 8] },
+                                    ],
+                                  },
+                                })
+                                .then((Aug) => {
+                                  MODEL.scheduleModel
+                                    .find({
+                                      completionStatus: "completed",
+
+                                      $expr: {
+                                        $and: [
+                                          {
+                                            $eq: [
+                                              { $year: "$createdAt" },
+                                              year,
+                                            ],
+                                          },
+                                          {
+                                            $eq: [{ $month: "$createdAt" }, 9],
+                                          },
+                                        ],
+                                      },
+                                    })
+                                    .then((sept) => {
+                                      MODEL.scheduleModel
+                                        .find({
+                                  
+                                          completionStatus: "completed",
+
+                                          $expr: {
+                                            $and: [
+                                              {
+                                                $eq: [
+                                                  { $year: "$createdAt" },
+                                                  year,
+                                                ],
+                                              },
+                                              {
+                                                $eq: [
+                                                  { $month: "$createdAt" },
+                                                  10,
+                                                ],
+                                              },
+                                            ],
+                                          },
+                                        })
+                                        .then((Oct) => {
+                                          MODEL.scheduleModel
+                                            .find({
+                                              organisationCollection:
+                                                organisationID,
+                                              completionStatus: "completed",
+
+                                              $expr: {
+                                                $and: [
+                                                  {
+                                                    $eq: [
+                                                      { $year: "$createdAt" },
+                                                      year,
+                                                    ],
+                                                  },
+                                                  {
+                                                    $eq: [
+                                                      { $month: "$createdAt" },
+                                                      11,
+                                                    ],
+                                                  },
+                                                ],
+                                              },
+                                            })
+                                            .then((Nov) => {
+                                              MODEL.scheduleModel
+                                                .find({
+                                                              completionStatus: "completed",
+
+                                                  $expr: {
+                                                    $and: [
+                                                      {
+                                                        $eq: [
+                                                          {
+                                                            $year: "$createdAt",
+                                                          },
+                                                          year,
+                                                        ],
+                                                      },
+                                                      {
+                                                        $eq: [
+                                                          {
+                                                            $month:
+                                                              "$createdAt",
+                                                          },
+                                                          12,
+                                                        ],
+                                                      },
+                                                    ],
+                                                  },
+                                                })
+                                                .then((Dec) => {
+                                                  MODEL.scheduleModel
+                                                    .find({
+                                             completionStatus: "completed",   
+                                                    })
+                                                    .then((Analytics) => {
+                                                      console.log("--->>><<<<", )
+                                                      var januaryCan = jan
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Can" ||
+                                                            x.Category == "can"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var januaryPetBottle = jan
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var januaryCarton = jan
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var januaryRubber = jan
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var januaryPlastics = jan
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var januaryGlass = jan
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "glass" ||
+                                                            x.Category ==
+                                                              "Glass"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var januaryMetal = jan
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "metal" ||
+                                                            x.Category ==
+                                                              "Metal"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var januaryNylon = jan
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "nylonSachet" ||
+                                                            x.Category ==
+                                                              "nylonSachet"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var januaryEwaste = jan
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var februaryCan = feb
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Can" ||
+                                                            x.Category == "can"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var februaryPetBottle =
+                                                        feb
+                                                          .filter(
+                                                            (x) =>
+                                                              x.Category ==
+                                                                "petBottle" ||
+                                                              x.Category ==
+                                                                "petBottle"
+                                                          )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var februaryCarton = feb
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var februaryRubber = feb
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var februaryPlastics = feb
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var februaryGlass = feb
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "glass" ||
+                                                            x.Category ==
+                                                              "Glass"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var februaryMetal = feb
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "metal" ||
+                                                            x.Category ==
+                                                              "Metal"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var februaryNylon = feb
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "nylonSachet" ||
+                                                            x.Category ==
+                                                              "nylonSachet"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var februaryEwaste = feb
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var marchCan = march
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Can" ||
+                                                            x.Category == "can"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var marchPetBottle = march
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var marchCarton = march
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var marchRubber = march
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var marchPlastics = march
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var marchGlass = march
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "glass" ||
+                                                            x.Category ==
+                                                              "Glass"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var marchMetal = march
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "metal" ||
+                                                            x.Category ==
+                                                              "Metal"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var marchNylon = march
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "nylonSachet" ||
+                                                            x.Category ==
+                                                              "nylonSachet"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var marchEwaste = march
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var mayCan = may
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Can" ||
+                                                            x.Category == "can"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var mayPetBottle = may
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var mayCarton = may
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var mayRubber = may
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var mayPlastics = may
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var mayGlass = may
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "glass" ||
+                                                            x.Category ==
+                                                              "Glass"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var mayMetal = may
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "metal" ||
+                                                            x.Category ==
+                                                              "Metal"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var mayNylon = may
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "nylonSachet" ||
+                                                            x.Category ==
+                                                              "nylonSachet"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var mayEwaste = may
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var aprilCan = april
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Can" ||
+                                                            x.Category == "can"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var aprilPetBottle = april
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var aprilCarton = april
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var aprilRubber = april
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var aprilPlastics = april
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var aprilGlass = april
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "glass" ||
+                                                            x.Category ==
+                                                              "Glass"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var aprilMetal = april
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "metal" ||
+                                                            x.Category ==
+                                                              "Metal"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var aprilNylon = april
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "nylonSachet" ||
+                                                            x.Category ==
+                                                              "nylonSachet"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var aprilEwaste = april
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var juneCan = june
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Can" ||
+                                                            x.Category == "can"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var junePetBottle = june
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var juneCarton = june
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var juneRubber = june
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var junePlastics = june
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var juneGlass = june
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "glass" ||
+                                                            x.Category ==
+                                                              "Glass"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var juneMetal = june
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "metal" ||
+                                                            x.Category ==
+                                                              "Metal"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var juneNylon = june
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "nylonSachet" ||
+                                                            x.Category ==
+                                                              "nylonSachet"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var juneEwaste = june
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var julyCan = july
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Can" ||
+                                                            x.Category == "can"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var julyPetBottle = july
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var julyCarton = july
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var julyRubber = july
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var julyPlastics = july
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var julyGlass = july
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "glass" ||
+                                                            x.Category ==
+                                                              "Glass"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var julyMetal = july
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "metal" ||
+                                                            x.Category ==
+                                                              "Metal"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var julyNylon = july
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "nylonSachet" ||
+                                                            x.Category ==
+                                                              "nylonSachet"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var julyEwaste = july
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var AugCan = Aug.filter(
+                                                        (x) =>
+                                                          x.Category == "Can" ||
+                                                          x.Category == "can"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var AugPetBottle =
+                                                        Aug.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var AugCarton =
+                                                        Aug.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var AugRubber =
+                                                        Aug.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var AugPlastics =
+                                                        Aug.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+
+                                                      var AugGlass = Aug.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "glass" ||
+                                                          x.Category == "Glass"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var AugMetal = Aug.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "metal" ||
+                                                          x.Category == "Metal"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var AugNylon = Aug.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "nylonSachet" ||
+                                                          x.Category ==
+                                                            "nylonSachet"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var AugEwaste =
+                                                        Aug.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+
+                                                      var septCan = sept
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Can" ||
+                                                            x.Category == "can"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var septPetBottle = sept
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var septCarton = sept
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var septRubber = sept
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var septPlastics = sept
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var septGlass = sept
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "glass" ||
+                                                            x.Category ==
+                                                              "Glass"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var septMetal = sept
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "metal" ||
+                                                            x.Category ==
+                                                              "Metal"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var septNylon = sept
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "nylonSachet" ||
+                                                            x.Category ==
+                                                              "nylonSachet"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var septEwaste = sept
+                                                        .filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var OctCan = Oct.filter(
+                                                        (x) =>
+                                                          x.Category == "Can" ||
+                                                          x.Category == "can"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var OctPetBottle =
+                                                        Oct.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var OctCarton =
+                                                        Oct.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var OctRubber =
+                                                        Oct.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var OctPlastics =
+                                                        Oct.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+
+                                                      var OctGlass = Oct.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "glass" ||
+                                                          x.Category == "Glass"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var OctMetal = Oct.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "metal" ||
+                                                          x.Category == "Metal"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var OctNylon = Oct.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "nylonSachet" ||
+                                                          x.Category ==
+                                                            "nylonSachet"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var OctEwaste =
+                                                        Oct.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+
+                                                      var NovCan = Nov.filter(
+                                                        (x) =>
+                                                          x.Category == "Can" ||
+                                                          x.Category == "can"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var NovPetBottle =
+                                                        Nov.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var NovCarton =
+                                                        Nov.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var NovRubber =
+                                                        Nov.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var NovPlastics =
+                                                        Nov.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+
+                                                      var NovGlass = Nov.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "glass" ||
+                                                          x.Category == "Glass"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var NovMetal = Nov.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "metal" ||
+                                                          x.Category == "Metal"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var NovNylon = Nov.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "nylonSachet" ||
+                                                          x.Category ==
+                                                            "nylonSachet"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var NovEwaste =
+                                                        Nov.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+
+                                                      var DecCan = Dec.filter(
+                                                        (x) =>
+                                                          x.Category == "Can" ||
+                                                          x.Category == "can"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+                                                      var DecPetBottle =
+                                                        Dec.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "petBottle" ||
+                                                            x.Category ==
+                                                              "petBottle"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var DecCarton =
+                                                        Dec.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "carton" ||
+                                                            x.Category ==
+                                                              "Carton"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var DecRubber =
+                                                        Dec.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "Rubber" ||
+                                                            x.Category ==
+                                                              "rubber"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+                                                      var DecPlastics =
+                                                        Dec.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "plastic" ||
+                                                            x.Category ==
+                                                              "plastic"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+
+                                                      var DecGlass = Dec.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "glass" ||
+                                                          x.Category == "Glass"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var DecMetal = Dec.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "metal" ||
+                                                          x.Category == "Metal"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var DecNylon = Dec.filter(
+                                                        (x) =>
+                                                          x.Category ==
+                                                            "nylonSachet" ||
+                                                          x.Category ==
+                                                            "nylonSachet"
+                                                      )
+                                                        .map((x) => x.quantity)
+                                                        .reduce(
+                                                          (acc, curr) =>
+                                                            acc + curr,
+                                                          0
+                                                        );
+
+                                                      var DecEwaste =
+                                                        Dec.filter(
+                                                          (x) =>
+                                                            x.Category ==
+                                                              "eWaste" ||
+                                                            x.Category ==
+                                                              "e-waste"
+                                                        )
+                                                          .map(
+                                                            (x) => x.quantity
+                                                          )
+                                                          .reduce(
+                                                            (acc, curr) =>
+                                                              acc + curr,
+                                                            0
+                                                          );
+
+                                                     return res.status(200).json(
+                                                        {
+                                                          JANUARY: {
+                                                            can: januaryCan,
+                                                            petBottle:
+                                                              januaryPetBottle,
+                                                            carton:
+                                                              januaryCarton,
+                                                            rubber:
+                                                              januaryRubber,
+                                                            plastics:
+                                                              januaryPlastics,
+                                                            glass: januaryGlass,
+                                                            metal: januaryMetal,
+                                                            nylon: januaryNylon,
+
+                                                            eWaste:
+                                                              januaryEwaste,
+                                                          },
+                                                          FEBRUARY: {
+                                                            can: februaryCan,
+                                                            petBottle:
+                                                              februaryPetBottle,
+                                                            carton:
+                                                              februaryCarton,
+                                                            rubber:
+                                                              februaryRubber,
+                                                            plastics:
+                                                              februaryPlastics,
+                                                            glass:
+                                                              februaryGlass,
+                                                            metal:
+                                                              februaryMetal,
+                                                            nylon:
+                                                              februaryNylon,
+
+                                                            eWaste:
+                                                              februaryEwaste,
+                                                          },
+                                                          MARCH: {
+                                                            can: marchCan,
+                                                            petBottle:
+                                                              marchPetBottle,
+                                                            carton: marchCarton,
+                                                            rubber: marchRubber,
+                                                            plastics:
+                                                              marchPlastics,
+                                                            glass: marchGlass,
+                                                            metal: marchMetal,
+                                                            nylon: marchNylon,
+
+                                                            eWaste: marchEwaste,
+                                                          },
+                                                          APRIL: {
+                                                            can: aprilCan,
+                                                            petBottle:
+                                                              aprilPetBottle,
+                                                            carton: aprilCarton,
+                                                            rubber: aprilRubber,
+                                                            plastics:
+                                                              aprilPlastics,
+                                                            glass: aprilGlass,
+                                                            metal: aprilMetal,
+                                                            nylon: aprilNylon,
+
+                                                            eWaste: aprilEwaste,
+                                                          },
+                                                          MAY: {
+                                                            can: mayCan,
+                                                            petBottle:
+                                                              mayPetBottle,
+                                                            carton: mayCarton,
+                                                            rubber: mayRubber,
+                                                            plastics:
+                                                              mayPlastics,
+                                                            glass: mayGlass,
+                                                            metal: mayMetal,
+                                                            nylon: mayNylon,
+
+                                                            eWaste: mayEwaste,
+                                                          },
+                                                          JUNE: {
+                                                            can: juneCan,
+                                                            petBottle:
+                                                              junePetBottle,
+                                                            carton: juneCarton,
+                                                            rubber: juneRubber,
+                                                            plastics:
+                                                              junePlastics,
+                                                            glass: juneGlass,
+                                                            metal: juneMetal,
+                                                            nylon: juneNylon,
+
+                                                            eWaste: juneEwaste,
+                                                          },
+                                                          JULY: {
+                                                            can: julyCan,
+                                                            petBottle:
+                                                              julyPetBottle,
+                                                            carton: julyCarton,
+                                                            rubber: julyRubber,
+                                                            plastics:
+                                                              julyPlastics,
+                                                            glass: julyGlass,
+                                                            metal: julyMetal,
+                                                            nylon: julyNylon,
+
+                                                            eWaste: julyEwaste,
+                                                          },
+                                                          AUGUST: {
+                                                            can: AugCan,
+                                                            petBottle:
+                                                              AugPetBottle,
+                                                            carton: AugCarton,
+                                                            rubber: AugRubber,
+                                                            plastics:
+                                                              AugPlastics,
+                                                            glass: AugGlass,
+                                                            metal: AugMetal,
+                                                            nylon: AugNylon,
+
+                                                            eWaste: AugEwaste,
+                                                          },
+                                                          SEPTEMBER: {
+                                                            can: septCan,
+                                                            petBottle:
+                                                              septPetBottle,
+                                                            carton: septCarton,
+                                                            rubber: septRubber,
+                                                            plastics:
+                                                              septPlastics,
+                                                            glass: septGlass,
+                                                            metal: septMetal,
+                                                            nylon: septNylon,
+
+                                                            eWaste: septEwaste,
+                                                          },
+                                                          OCTOBER: {
+                                                            can: OctCan,
+                                                            petBottle:
+                                                              OctPetBottle,
+                                                            carton: OctCarton,
+                                                            rubber: OctRubber,
+                                                            plastics:
+                                                              OctPlastics,
+                                                            glass: OctGlass,
+                                                            metal: OctMetal,
+                                                            nylon: OctNylon,
+
+                                                            eWaste: OctEwaste,
+                                                          },
+                                                          NOVEMBER: {
+                                                            can: NovCan,
+                                                            petBottle:
+                                                              NovPetBottle,
+                                                            carton: NovCarton,
+                                                            rubber: NovRubber,
+                                                            plastics:
+                                                              NovPlastics,
+                                                            glass: NovGlass,
+                                                            metal: NovMetal,
+                                                            nylon: NovNylon,
+
+                                                            eWaste: NovEwaste,
+                                                          },
+                                                          DECEMBER: {
+                                                            can: DecCan,
+                                                            petBottle:
+                                                              DecPetBottle,
+                                                            carton: DecCarton,
+                                                            rubber: DecRubber,
+                                                            plastics:
+                                                              DecPlastics,
+                                                            glass: DecGlass,
+                                                            metal: DecMetal,
+                                                            nylon: DecNylon,
+
+                                                            eWaste: DecEwaste,
+                                                          },
+                                                        }
+                                                      );
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    })
+    .catch((err) => res.status(500).json(err));
+};
+
+
+
 organisationController.weekChartData = (req, res) => {
   const today = new Date();
   const lastWeek = new Date();
@@ -832,7 +2816,7 @@ organisationController.weekChartData = (req, res) => {
       $expr: {
         $and: [
           { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 2] },
+          { $eq: [{ $month: "$createdAt" }, 1] },
         ],
       },
     })
@@ -858,7 +2842,7 @@ organisationController.weekChartData = (req, res) => {
               $expr: {
                 $and: [
                   { $eq: [{ $year: "$createdAt" }, year] },
-                  { $eq: [{ $month: "$createdAt" }, 2] },
+                  { $eq: [{ $month: "$createdAt" }, 3] },
                 ],
               },
             })
@@ -871,7 +2855,7 @@ organisationController.weekChartData = (req, res) => {
                   $expr: {
                     $and: [
                       { $eq: [{ $year: "$createdAt" }, year] },
-                      { $eq: [{ $month: "$createdAt" }, 2] },
+                      { $eq: [{ $month: "$createdAt" }, 4] },
                     ],
                   },
                 })
@@ -884,7 +2868,7 @@ organisationController.weekChartData = (req, res) => {
                       $expr: {
                         $and: [
                           { $eq: [{ $year: "$createdAt" }, year] },
-                          { $eq: [{ $month: "$createdAt" }, 2] },
+                          { $eq: [{ $month: "$createdAt" }, 5] },
                         ],
                       },
                     })
@@ -897,7 +2881,7 @@ organisationController.weekChartData = (req, res) => {
                           $expr: {
                             $and: [
                               { $eq: [{ $year: "$createdAt" }, year] },
-                              { $eq: [{ $month: "$createdAt" }, 2] },
+                              { $eq: [{ $month: "$createdAt" }, 6] },
                             ],
                           },
                         })
@@ -910,7 +2894,7 @@ organisationController.weekChartData = (req, res) => {
                               $expr: {
                                 $and: [
                                   { $eq: [{ $year: "$createdAt" }, year] },
-                                  { $eq: [{ $month: "$createdAt" }, 2] },
+                                  { $eq: [{ $month: "$createdAt" }, 7] },
                                 ],
                               },
                             })
@@ -923,7 +2907,7 @@ organisationController.weekChartData = (req, res) => {
                                   $expr: {
                                     $and: [
                                       { $eq: [{ $year: "$createdAt" }, year] },
-                                      { $eq: [{ $month: "$createdAt" }, 2] },
+                                      { $eq: [{ $month: "$createdAt" }, 8] },
                                     ],
                                   },
                                 })
@@ -942,7 +2926,7 @@ organisationController.weekChartData = (req, res) => {
                                             ],
                                           },
                                           {
-                                            $eq: [{ $month: "$createdAt" }, 2],
+                                            $eq: [{ $month: "$createdAt" }, 9],
                                           },
                                         ],
                                       },
@@ -965,7 +2949,7 @@ organisationController.weekChartData = (req, res) => {
                                               {
                                                 $eq: [
                                                   { $month: "$createdAt" },
-                                                  2,
+                                                  10,
                                                 ],
                                               },
                                             ],
@@ -989,7 +2973,7 @@ organisationController.weekChartData = (req, res) => {
                                                   {
                                                     $eq: [
                                                       { $month: "$createdAt" },
-                                                      2,
+                                                      11,
                                                     ],
                                                   },
                                                 ],
@@ -1018,7 +3002,7 @@ organisationController.weekChartData = (req, res) => {
                                                             $month:
                                                               "$createdAt",
                                                           },
-                                                          2,
+                                                          12,
                                                         ],
                                                       },
                                                     ],
@@ -1388,7 +3372,6 @@ organisationController.weekChartData = (req, res) => {
                                                             acc + curr,
                                                           0
                                                         );
-
                                                       var marchGlass = march
                                                         .filter(
                                                           (x) =>

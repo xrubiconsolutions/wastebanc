@@ -149,8 +149,8 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/organisation/lawma/week/chart').get(
-    auth.adminPakamValidation,
-    CONTROLLER.organisationController.weekChartData
+    // auth.adminPakamValidation,
+    CONTROLLER.organisationController.weekChartDataPriorityLawma
   );
 
   APP.route('/api/analytics/missed/schedule').get(
