@@ -149,7 +149,8 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/organisation/lawma/week/chart').get(
-    CONTROLLER.organisationController.lawmaWeekChartData
+    auth.adminPakamValidation,
+    CONTROLLER.organisationController.weekChartData
   );
 
   APP.route('/api/analytics/missed/schedule').get(

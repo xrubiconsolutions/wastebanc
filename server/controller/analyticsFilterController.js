@@ -840,58 +840,58 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                                         RESPONSE.status(200).json({
                                                           JANUARY: {
                                                             amount: jan.length,
-                                                            // schedules: jan,
+                                                            schedules: jan,
                                                           },
                                                           FEBRUARY: {
                                                             amount: feb.length,
-                                                            // schedules: feb,
+                                                            schedules: feb,
                                                           },
                                                           MARCH: {
                                                             amount:
                                                               march.length,
-                                                            // schedules: march,
+                                                            schedules: march,
                                                           },
                                                           APRIL: {
                                                             amount:
                                                               april.length,
-                                                            // schedules: april,
+                                                            schedules: april,
                                                           },
                                                           MAY: {
                                                             amount: may.length,
-                                                            // schedules: may,
+                                                            schedules: may,
                                                           },
                                                           JUNE: {
                                                             amount: june.length,
-                                                            // schedules: june,
+                                                            schedules: june,
                                                           },
                                                           JULY: {
                                                             amount: july.length,
-                                                            // schedules: july,
+                                                            schedules: july,
                                                           },
                                                           AUGUST: {
                                                             amount: Aug.length,
-                                                            // schedules: Aug,
+                                                            schedules: Aug,
                                                           },
                                                           SEPTEMBER: {
                                                             amount: sept.length,
-                                                            // schedules: sept,
+                                                            schedules: sept,
                                                           },
                                                           OCTOBER: {
                                                             amount: Oct.length,
-                                                            // schedules: Oct,
+                                                            schedules: Oct,
                                                           },
                                                           NOVEMBER: {
                                                             amount: Nov.length,
-                                                            // schedules: Nov,
+                                                            schedules: Nov,
                                                           },
                                                           DECEMBER: {
                                                             amount: Dec.length,
-                                                            // schedules: Dec,
+                                                             schedules: Dec,
                                                           },
                                                           ALL: {
                                                             amount:
                                                               Analytics.length,
-                                                            // schedules: Analytics,
+                                                            schedules: Analytics,
                                                           },
                                                         });
                                                       });
