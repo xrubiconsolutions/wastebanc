@@ -731,22 +731,295 @@ scheduleController.allCoins = (req, res) => {
   //     );
   //   }
   // );
-  try {
-    MODEL.transactionModel.find({}).then((transactions) => {
-      var coins = transactions
-        .map((x) => x.coin)
-        .reduce((acc, curr) => acc + curr, 0);
+  // try {
+  //   MODEL.transactionModel.find({}).then((transactions) => {
+  //     var coins = transactions
+  //       .map((x) => x.coin)
+  //       .reduce((acc, curr) => acc + curr, 0);
 
-      return res
-        .status(200)
-        .json(
-          COMMON_FUN.sendSuccess(
-            CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-            coins.toFixed(2)
-          )
-        );
-    });
-  } catch (err) {
+  //     return res
+  //       .status(200)
+  //       .json(
+  //         COMMON_FUN.sendSuccess(
+  //           CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+  //           coins.toFixed(2)
+  //         )
+  //       );
+  //   });
+  // } 
+  var year = new Date().getFullYear();
+  try {
+    MODEL.transactionModel
+      .find({
+        $expr: {
+          $and: [
+            { $eq: [{ $year: '$createdAt' }, year] },
+            { $eq: [{ $month: '$createdAt' }, 1] },
+          ],
+        },
+      })
+      .sort({
+        _id: -1,
+      })
+      .then((jan) => {
+        MODEL.transactionModel
+          .find({
+            $expr: {
+              $and: [
+                { $eq: [{ $year: '$createdAt' }, year] },
+                { $eq: [{ $month: '$createdAt' }, 2] },
+              ],
+            },
+          })
+          .sort({
+            _id: -1,
+          })
+          .then((feb) => {
+            MODEL.transactionModel
+              .find({
+                $expr: {
+                  $and: [
+                    { $eq: [{ $year: '$createdAt' }, year] },
+                    { $eq: [{ $month: '$createdAt' }, 3] },
+                  ],
+                },
+              })
+              .sort({
+                _id: -1,
+              })
+              .then((march) => {
+                MODEL.transactionModel
+                  .find({
+                    $expr: {
+                      $and: [
+                        { $eq: [{ $year: '$createdAt' }, year] },
+                        { $eq: [{ $month: '$createdAt' }, 4] },
+                      ],
+                    },
+                  })
+                  .sort({
+                    _id: -1,
+                  })
+                  .then((april) => {
+                    MODEL.transactionModel
+                      .find({
+                        $expr: {
+                          $and: [
+                            { $eq: [{ $year: '$createdAt' }, year] },
+                            { $eq: [{ $month: '$createdAt' }, 5] },
+                          ],
+                        },
+                      })
+                      .sort({
+                        _id: -1,
+                      })
+                      .then((may) => {
+                        MODEL.transactionModel
+                          .find({
+                            $expr: {
+                              $and: [
+                                { $eq: [{ $year: '$createdAt' }, year] },
+                                { $eq: [{ $month: '$createdAt' }, 6] },
+                              ],
+                            },
+                          })
+                          .sort({
+                            _id: -1,
+                          })
+                          .then((june) => {
+                            MODEL.transactionModel
+                              .find({
+                                $expr: {
+                                  $and: [
+                                    { $eq: [{ $year: '$createdAt' }, year] },
+                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                  ],
+                                },
+                              })
+                              .sort({
+                                _id: -1,
+                              })
+                              .then((july) => {
+                                MODEL.transactionModel
+                                  .find({
+                                    $expr: {
+                                      $and: [
+                                        {
+                                          $eq: [{ $year: '$createdAt' }, year],
+                                        },
+                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                      ],
+                                    },
+                                  })
+                                  .sort({
+                                    _id: -1,
+                                  })
+                                  .then((Aug) => {
+                                    MODEL.transactionModel
+                                      .find({
+                                        $expr: {
+                                          $and: [
+                                            {
+                                              $eq: [
+                                                { $year: '$createdAt' },
+                                                year,
+                                              ],
+                                            },
+                                            {
+                                              $eq: [
+                                                { $month: '$createdAt' },
+                                                9,
+                                              ],
+                                            },
+                                          ],
+                                        },
+                                      })
+                                      .sort({
+                                        _id: -1,
+                                      })
+                                      .then((sept) => {
+                                        MODEL.transactionModel
+                                          .find({
+                                            $expr: {
+                                              $and: [
+                                                {
+                                                  $eq: [
+                                                    { $year: '$createdAt' },
+                                                    year,
+                                                  ],
+                                                },
+                                                {
+                                                  $eq: [
+                                                    { $month: '$createdAt' },
+                                                    10,
+                                                  ],
+                                                },
+                                              ],
+                                            },
+                                          })
+                                          .sort({
+                                            _id: -1,
+                                          })
+                                          .then((Oct) => {
+                                            MODEL.transactionModel
+                                              .find({
+                                                $expr: {
+                                                  $and: [
+                                                    {
+                                                      $eq: [
+                                                        { $year: '$createdAt' },
+                                                        year,
+                                                      ],
+                                                    },
+                                                    {
+                                                      $eq: [
+                                                        {
+                                                          $month: '$createdAt',
+                                                        },
+                                                        11,
+                                                      ],
+                                                    },
+                                                  ],
+                                                },
+                                              })
+                                              .sort({
+                                                _id: -1,
+                                              })
+                                              .then((Nov) => {
+                                                MODEL.transactionModel
+                                                  .find({
+                                                    $expr: {
+                                                      $and: [
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $year:
+                                                                '$createdAt',
+                                                            },
+                                                            year,
+                                                          ],
+                                                        },
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $month:
+                                                                '$createdAt',
+                                                            },
+                                                            12,
+                                                          ],
+                                                        },
+                                                      ],
+                                                    },
+                                                  })
+                                                  .sort({
+                                                    _id: -1,
+                                                  })
+                                                  .then((Dec) => {
+                                                    MODEL.transactionModel
+                                                      .find({})
+                                                      .then((Analytics) => {
+                                                
+                                                        RESPONSE.status(200).json({
+                                                          JANUARY: {
+                                                            amount: jan.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)                                                          
+                                                          },
+                                                          FEBRUARY: {
+                                                            amount: feb.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)                                                          },
+                                                          MARCH: {
+                                                            amount:
+                                                              march.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)                                                          },
+                                                          APRIL: {
+                                                            amount:
+                                                              april.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
+                                                          MAY: {
+                                                            amount: may.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
+                                                          JUNE: {
+                                                            amount: june.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
+                                                          JULY: {
+                                                            amount: july.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
+                                                          AUGUST: {
+                                                            amount: Aug .map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
+                                                          SEPTEMBER: {
+                                                            amount: sept.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
+                                                          OCTOBER: {
+                                                            amount: Oct.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
+                                                          NOVEMBER: {
+                                                            amount: Nov.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
+                                                          DECEMBER: {
+                                                            amount: Dec.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
+                                                          ALL: {
+                                                            amount:
+                                                              Analytics.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
+                                                        });
+                                                      });
+                                                  });
+                                              });
+                                          });
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  } 
+  
+  
+  
+  
+  catch (err) {
     return res.status(500).json(err);
   }
 };

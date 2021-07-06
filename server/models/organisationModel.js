@@ -102,6 +102,13 @@ const organisation_Schema = new Schema({
   metalEquivalent:{
     type: Number
   },
+
+  eWasteEquivalent : {
+    type : Number
+  },
+  tyreEquivalent: {
+    type: Number
+  },
   createAt: {
     type: Date,
     default: Date.now,
