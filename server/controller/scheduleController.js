@@ -959,7 +959,7 @@ scheduleController.allCoins = (req, res) => {
                                                       .find({})
                                                       .then((Analytics) => {
                                                 
-                                                        RESPONSE.status(200).json({
+                                                        return res.status(200).json({
                                                           JANUARY: {
                                                             amount: jan.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)                                                          
                                                           },
