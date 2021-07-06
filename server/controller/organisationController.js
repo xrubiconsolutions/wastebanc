@@ -838,7 +838,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
     .then((jan) => {
       MODEL.scheduleModel
         .find({
-              completionStatus: "completed",
+          completionStatus: "completed",
 
           $expr: {
             $and: [
@@ -862,7 +862,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
             .then((march) => {
               MODEL.scheduleModel
                 .find({
-                      completionStatus: "completed",
+                  completionStatus: "completed",
 
                   $expr: {
                     $and: [
@@ -886,7 +886,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                     .then((may) => {
                       MODEL.scheduleModel
                         .find({
-                              completionStatus: "completed",
+                          completionStatus: "completed",
 
                           $expr: {
                             $and: [
@@ -941,7 +941,6 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                     .then((sept) => {
                                       MODEL.scheduleModel
                                         .find({
-                                  
                                           completionStatus: "completed",
 
                                           $expr: {
@@ -988,7 +987,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                             .then((Nov) => {
                                               MODEL.scheduleModel
                                                 .find({
-                                                              completionStatus: "completed",
+                                                  completionStatus: "completed",
 
                                                   $expr: {
                                                     $and: [
@@ -1015,10 +1014,11 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                 .then((Dec) => {
                                                   MODEL.scheduleModel
                                                     .find({
-                                             completionStatus: "completed",   
+                                                      completionStatus:
+                                                        "completed",
                                                     })
                                                     .then((Analytics) => {
-                                                      console.log("--->>><<<<", )
+                                                      console.log("--->>><<<<");
                                                       var januaryCan = jan
                                                         .filter(
                                                           (x) =>
@@ -2593,8 +2593,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             0
                                                           );
 
-                                                     return res.status(200).json(
-                                                        {
+                                                      return res
+                                                        .status(200)
+                                                        .json({
                                                           JANUARY: {
                                                             can: januaryCan,
                                                             petBottle:
@@ -2772,8 +2773,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
 
                                                             eWaste: DecEwaste,
                                                           },
-                                                        }
-                                                      );
+                                                        });
                                                     });
                                                 });
                                             });
@@ -2789,8 +2789,6 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
     })
     .catch((err) => res.status(500).json(err));
 };
-
-
 
 organisationController.weekChartData = (req, res) => {
   const today = new Date();
@@ -4614,8 +4612,9 @@ organisationController.weekChartData = (req, res) => {
                                                             0
                                                           );
 
-                                                     return res.status(200).json(
-                                                        {
+                                                      return res
+                                                        .status(200)
+                                                        .json({
                                                           JANUARY: {
                                                             can: januaryCan,
                                                             petBottle:
@@ -4793,8 +4792,7 @@ organisationController.weekChartData = (req, res) => {
 
                                                             eWaste: DecEwaste,
                                                           },
-                                                        }
-                                                      );
+                                                        });
                                                     });
                                                 });
                                             });
@@ -4837,7 +4835,7 @@ organisationController.raffleTicket = (req, res) => {
               $match: {
                 schedulePoints: { $ne: 0 },
                 lcd: { $in: lcd },
-                cardID : { $in: raffleUser },
+                cardID: { $in: raffleUser },
               },
             },
             { $sample: { size: Number(winner_count) } },
@@ -5420,12 +5418,7 @@ organisationController.deleteCompany = (req, res) => {
 };
 
 organisationController.companyGrowth = (req, res) => {
-  // var Jan
-  // var Feb
-  // var Mar
-
   var year = new Date().getFullYear();
-  console.log("<<<Year>>>", year);
 
   try {
     MODEL.organisationModel
@@ -7249,6 +7242,12 @@ organisationController.updateOrganisationProfile = (req, res) => {
               req.body.nylonEquivalent || organisation.nylonEquivalent,
             metalEquivalent:
               req.body.metalEquivalent || organisation.metalEquivalent,
+
+            eWasteEquivalent:
+              req.body.eWasteEquivalent || organisation.eWasteEquivalent,
+
+            tyreEquivalent:
+              req.body.tyreEquivalent || organisation.tyreEquivalent,
             streetOfAccess:
               req.body.streetOfAccess || organisation.streetOfAccess,
           },
@@ -7952,7 +7951,7 @@ organisationController.getDropOffUser = (req, res) => {
         .map((address) => ({
           Organisation: address.organisation,
 
-          OrganisationId : address.organisationId,
+          OrganisationId: address.organisationId,
           distance: getDistance(address.location, { lat, long }),
 
           location: address.location,
