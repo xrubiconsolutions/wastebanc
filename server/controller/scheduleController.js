@@ -76,6 +76,8 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
           callOnArrival: RESULT.callOnArrival,
           lat: RESULT.lat,
           long: RESULT.long,
+
+          lcd : RESULT.lcd || ""
           completionStatus: RESULT.completionStatus,
         };
         if (!RESULT.lat || !RESULT.long) {

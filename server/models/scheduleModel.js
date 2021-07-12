@@ -90,6 +90,10 @@ const schedulePick = new Schema({
     organisationCollection:{
         type: String
     },
+
+    lcd  : {
+        type: String
+    },
     lat: {
         type: Number,
         required: true
