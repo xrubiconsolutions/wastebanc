@@ -81,6 +81,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
           completionStatus: RESULT.completionStatus,
         };
         if (!RESULT.lat || !RESULT.long) {
+
           return RESPONSE.status(400).jsonp({
             message: 'Location Invalid',
           });
