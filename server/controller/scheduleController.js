@@ -1167,16 +1167,21 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
       .sort({ _id: -1 })
       .then((schedules) => {
         schedules.forEach((schedule, index) => {
-          var test = schedule.address.split(', ');
+          // var test = schedule.address.split(', '); 
           (function route() {
             for (let i = 0; i < accessArea.length; i++) {
-              for (let j = 0; j < test.length; j++) {
-                if (test[j].includes(accessArea[i])) {
-                  need.push(test[j]);
-                  geofencedSchedules.push(schedule);
-                  count++;
-                }
+              if (schedule.lcd === accessArea[i]) {
+                need.push(schedule['lcd']);
+                geofencedSchedules.push(schedule);
+                count++;
               }
+              // for (let j = 0; j < test.length; j++) {
+              //   if (test[j].includes(accessArea[i])) {
+              //     need.push(test[j]);
+              //     geofencedSchedules.push(schedule);
+              //     count++;
+              //   }
+              // }
             }
             return !!need;
           })();

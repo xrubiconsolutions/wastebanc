@@ -58,6 +58,10 @@ const scheduleDrop = new Schema({
     organisationCollection:{
         type: String
     },
+
+    lcd  : {
+        type: String
+    },
     dropOffDate: {
         type: Date,
         required: true

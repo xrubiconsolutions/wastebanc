@@ -4814,7 +4814,7 @@ organisationController.raffleTicket = (req, res) => {
   const winner_count = req.body.winner_count;
   const yearData = new Date();
   const year = yearData.getFullYear();
-  const month = yearData.getMonth();
+  const month = yearData.getMonth() + 1;
 
   try {
     MODEL.transactionModel
@@ -4828,7 +4828,6 @@ organisationController.raffleTicket = (req, res) => {
       })
       .then((user) => {
         const raffleUser = user.map((x) => x.cardID);
-        console.log("--->", raffleUser);
         MODEL.userModel
           .aggregate([
             {
