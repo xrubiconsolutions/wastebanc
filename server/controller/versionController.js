@@ -122,5 +122,30 @@ versionController.sendBulkSms = (req, res) => {
     return res, status(500).json(err);
   }
 };
+
+versionController.submitLCD = (req,res)=>{
+  const data = { ...req.body }
+  try{
+    MODEL.localGovernmentModel(data).save({}, (err,result)=>{
+      if(err) return res.status(400).json(err)
+      return res.status(200).json(result);
+    })
+
+  }
+  catch(err){
+          return res.status(500).json(err);
+  }
+}
+
+versionController.getLCD = (req,res)=>{
+  try{
+        MODEL.localGovernmentModel.find({}).then(data=>{
+          return res.status(200).json(data)
+        })
+  }
+  catch(err){
+        return res.status(500).json(err);
+  }
+}
 /* export versionController */
 module.exports = versionController;

@@ -47,4 +47,12 @@ module.exports = (APP) => {
                             .get(
                                 auth.recyclerValidation,
                                 CONTROLLER.scheduleDropController.getScheduleDropCompletedRecycler);
+
+    APP.route('/api/post/lcd/area').post(
+        auth.adminValidation, CONTROLLER.versionController.submitLCD
+    );
+
+    APP.route('/api/get/lcd/areas').get(
+        CONTROLLER.versionController.getLCD
+    );
 }
