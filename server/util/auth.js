@@ -103,6 +103,18 @@ validateUser.companyValidation = (REQUEST,RESPONSE,NEXT)=>{
     (validated && validated.role === "company") ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 }
 
+validateUser.lcdValidation = (REQUEST,RESPONSE,NEXT)=>{
+    if(!REQUEST.headers.authorization){
+        return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED)
+    }
+    var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1])    
+    let status = REQUEST.headers.authorization ?
+        JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY):
+        JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
+    (validated && validated.role === "client" || validated.roles === "collector" || validated.role === "company" || validated.roles === "admin") ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+}
+
+
 /********************************
 ****** admin check model ********
 *********************************/

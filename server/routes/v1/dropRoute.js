@@ -49,10 +49,12 @@ module.exports = (APP) => {
                                 CONTROLLER.scheduleDropController.getScheduleDropCompletedRecycler);
 
     APP.route('/api/post/lcd/area').post(
-        auth.adminValidation, CONTROLLER.versionController.submitLCD
+         auth.adminPakamValidation,
+         CONTROLLER.versionController.submitLCD
     );
 
     APP.route('/api/get/lcd/areas').get(
+        auth.lcdValidation,
         CONTROLLER.versionController.getLCD
     );
 }
