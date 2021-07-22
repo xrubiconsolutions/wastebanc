@@ -111,7 +111,7 @@ validateUser.lcdValidation = (REQUEST,RESPONSE,NEXT)=>{
     let status = REQUEST.headers.authorization ?
         JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY):
         JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
-    (validated && validated.role === "client" || validated.roles === "collector" || validated.role === "company" || validated.roles === "admin") ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    (validated && validated.roles === "client" || validated.roles === "collector" || validated.role === "company" || validated.roles === "admin") ? NEXT() : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 }
 
 
