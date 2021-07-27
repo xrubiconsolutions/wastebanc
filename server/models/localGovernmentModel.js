@@ -14,6 +14,10 @@ const localGovernment_Schema = new Schema({
     type: String,
     required: true,
   },
+  lga: {
+    type: String,
+    required: true
+  },
   createdAt: {
     type: Date,
     default: Date.now,
