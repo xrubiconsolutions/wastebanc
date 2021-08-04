@@ -1092,10 +1092,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var januaryGlass = jan
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                           x.Category == "glassBottle" || 
+                                                           x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1225,10 +1223,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var februaryGlass = feb
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                          x.Category == "glassBottle" || 
+                                                          x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1354,10 +1350,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var marchGlass = march
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                          x.Category == "glassBottle" || 
+                                                          x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1484,10 +1478,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var mayGlass = may
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                          x.Category == "glassBottle" || 
+                                                          x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1614,10 +1606,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var aprilGlass = april
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                          x.Category == "glassBottle" || 
+                                                          x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1744,10 +1734,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var juneGlass = june
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                          x.Category == "glassBottle" || 
+                                                          x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1874,10 +1862,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var julyGlass = july
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                          x.Category == "glassBottle" || 
+                                                          x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2009,9 +1995,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
 
                                                       var AugGlass = Aug.filter(
                                                         (x) =>
-                                                          x.Category ==
-                                                            "glass" ||
-                                                          x.Category == "Glass"
+                                                        x.Category == "glassBottle" || 
+                                                        x.Category == "glass"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2137,10 +2122,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var septGlass = sept
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                          x.Category == "glassBottle" || 
+                                                          x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2272,9 +2255,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
 
                                                       var OctGlass = Oct.filter(
                                                         (x) =>
-                                                          x.Category ==
-                                                            "glass" ||
-                                                          x.Category == "Glass"
+                                                        x.Category == "glassBottle" || 
+                                                        x.Category == "glass"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2405,9 +2387,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
 
                                                       var NovGlass = Nov.filter(
                                                         (x) =>
-                                                          x.Category ==
-                                                            "glass" ||
-                                                          x.Category == "Glass"
+                                                        x.Category == "glassBottle" || 
+                                                        x.Category == "glass"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2538,9 +2519,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
 
                                                       var DecGlass = Dec.filter(
                                                         (x) =>
-                                                          x.Category ==
-                                                            "glass" ||
-                                                          x.Category == "Glass"
+                                                        x.Category == "glassBottle" || 
+                                                        x.Category == "glass"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3111,10 +3091,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var januaryGlass = jan
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                           x.Category == "glassBottle" || 
+                                                           x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3244,10 +3222,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var februaryGlass = feb
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                           x.Category == "glassBottle" || 
+                                                           x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3373,10 +3349,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var marchGlass = march
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                           x.Category == "glassBottle" || 
+                                                           x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3503,10 +3477,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var mayGlass = may
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                           x.Category == "glassBottle" || 
+                                                           x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3633,10 +3605,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var aprilGlass = april
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                           x.Category == "glassBottle" || 
+                                                           x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3763,10 +3733,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var juneGlass = june
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                           x.Category == "glassBottle" || 
+                                                           x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3893,10 +3861,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var julyGlass = july
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                           x.Category == "glassBottle" || 
+                                                           x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4156,10 +4122,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var septGlass = sept
                                                         .filter(
                                                           (x) =>
-                                                            x.Category ==
-                                                              "glass" ||
-                                                            x.Category ==
-                                                              "Glass"
+                                                           x.Category == "glassBottle" || 
+                                                           x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -7862,6 +7826,22 @@ organisationController.submitDropOff = (req, res) => {
     return res.status(500).json(err);
   }
 };
+
+organisationController.deleteDropOff = (req,res)=>{
+  const id = req.body.id;
+    try{
+      MODEL.dropOffModel.deleteOne({
+        _id: id
+      }).then((result)=>{
+          return res.status(200).json({
+            message: "Drop off location deleted successfully"
+          })
+      })
+    }
+    catch(err){
+      return res.status(500).json(err);
+    }
+}
 
 organisationController.getDropOff = (req, res) => {
   const organisationId = req.query.organisationId;

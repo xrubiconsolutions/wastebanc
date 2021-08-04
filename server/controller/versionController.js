@@ -147,5 +147,24 @@ versionController.getLCD = (req,res)=>{
         return res.status(500).json(err);
   }
 }
+
+versionController.updateLCD = (req,res)=>{
+  const id = req.body.id;
+  try{
+      MODEL.localGovernmentModel.updateOne({
+        _id: id
+      }, {
+          lcd  : req.body.lcd,
+          lga: req.body.lga
+      }, (err, result)=>{
+        return res.status(200).json({
+          message: "Manage areas updated successfully"
+        })
+      })
+  }
+  catch(err){
+    return res.status(500).json(err)
+  }
+}
 /* export versionController */
 module.exports = versionController;

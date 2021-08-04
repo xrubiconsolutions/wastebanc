@@ -149,7 +149,7 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/organisation/lawma/week/chart').get(
-    // auth.adminPakamValidation,
+    auth.adminPakamValidation,
     CONTROLLER.organisationController.weekChartDataPriorityLawma
   );
 
@@ -290,6 +290,11 @@ module.exports = (APP) => {
   APP.route('/api/organisation/submit/drop/location').post(
     auth.companyValidation,
     CONTROLLER.organisationController.submitDropOff
+  );
+
+  APP.route('/api/organisation/delete/drop/location').post(
+    auth.adminPakamValidation,
+    CONTROLLER.organisationController.deleteDropOff
   );
 
   APP.route('/api/organisation/drop').get(
