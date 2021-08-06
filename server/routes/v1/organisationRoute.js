@@ -293,7 +293,7 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/organisation/delete/drop/location').post(
-    auth.adminPakamValidation,
+    auth.companyPakamDataValidation,
     CONTROLLER.organisationController.deleteDropOff
   );
 

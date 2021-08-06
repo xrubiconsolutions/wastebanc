@@ -58,7 +58,7 @@ module.exports = (APP) => {
         CONTROLLER.versionController.getLCD
     );
 
-    APP.route('/api/update/lcd/areas').get(
+    APP.route('/api/update/lcd/areas').post(
         auth.companyPakamDataValidation,
         CONTROLLER.versionController.updateLCD
     );
