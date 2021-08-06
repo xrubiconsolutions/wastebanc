@@ -302,6 +302,11 @@ module.exports = (APP) => {
     CONTROLLER.organisationController.getDropOff
   );
 
+  APP.route('/api/organisation/pakam/drop/locations').get(
+    auth.adminPakamValidation,
+    CONTROLLER.organisationController.getDropOffPakam
+  );
+
   APP.route('/api/user/drop').get(
     auth.userValidation,
     CONTROLLER.organisationController.getDropOffUser

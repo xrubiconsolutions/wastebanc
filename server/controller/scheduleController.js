@@ -76,8 +76,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
           callOnArrival: RESULT.callOnArrival,
           lat: RESULT.lat,
           long: RESULT.long,
-
-          lcd : RESULT.lcd || "",
+          lcd: RESULT.lcd || "",
           completionStatus: RESULT.completionStatus,
         };
         if (!RESULT.lat || !RESULT.long) {
@@ -243,7 +242,7 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
                   $set: {
                     collectorStatus: 'accept',
                     collectedBy: results._id,
-                    organisation : results.organisation,
+                    organisation: results.organisation,
                     organisationCollection: results.approvedBy,
                   },
                 }
@@ -267,14 +266,14 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
 
                         sendNotification(message);
                       });
-                    
+
                     MODEL.collectorModel.updateOne({
                       _id: results._id
-                    },  {
+                    }, {
                       $set: {
                         busy: true
                       },
-                    }, (err,resp)=>console.log("collector updated") )
+                    }, (err, resp) => console.log("collector updated"))
 
                     return RESPONSE.status(200).jsonp(
                       COMMON_FUN.sendSuccess(
@@ -319,7 +318,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
               {
                 $set: {
                   collectorStatus: 'accept',
-                  organisation : result.organisation,
+                  organisation: result.organisation,
                   collectedBy: result._id,
                   organisationCollection: result.approvedBy,
                 },
@@ -462,128 +461,128 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
               //100g is equivalent to 1 coin i.e 1kg is equivalent to 10 coins
               // quantity in g
 
-             // var equivalent = (quantity / 1000) * 10;
-                  MODEL.collectorModel
-                    .findOne({ _id: collectorID })
-                    .then((recycler, err) => {
-                      MODEL.organisationModel
-                        .findOne({
-                          _id: recycler.approvedBy,
-                        })
-                        .then((organisation) => {
-                          var category = schedule[0].Category === "nylonSachet" ?  "nylon"
-                           :
-                           schedule[0].Category === "glassBottle" ? "glass" 
-                           :
-                            schedule[0].Category.length < 4
-                              ? schedule[0].Category.substring(
-                                  0,
-                                  schedule[0].Category.length
-                                )
-                              : schedule[0].Category.substring(
-                                  0,
-                                  schedule[0].Category.length - 1
-                                );
-                          
-                          var organisationCheck = JSON.parse(JSON.stringify(organisation));
-                          console.log("organisation check here", organisationCheck);
-                          for (let val in organisationCheck) {
-                            console.log("category check here", category);
-                            if (val.includes(category)) {
-                              const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1  
-                              console.log("equivalent here", equivalent)
-   
-                              const pricing = quantity * equivalent;
-                              MODEL.collectorModel.updateOne(
-                                { email: recycler.email },
-                                { last_logged_in: new Date() },
-                                (res) => {
-                                  console.log('Logged date updated', new Date());
-                                }
-                              );  
-                              var dataToSave = {
-                                weight: quantity,
-        
-                                coin: pricing,
-        
-                                cardID: result._id,
-        
-                                scheduleId: schedule[0]._id,
-        
-                                completedBy: collectorID,
-        
-                                Category: schedule[0].Category,
-        
-                                fullname: result.firstname + ' ' + result.lastname,
-        
-                                recycler: recycler.fullname,
+              // var equivalent = (quantity / 1000) * 10;
+              MODEL.collectorModel
+                .findOne({ _id: collectorID })
+                .then((recycler, err) => {
+                  MODEL.organisationModel
+                    .findOne({
+                      _id: recycler.approvedBy,
+                    })
+                    .then((organisation) => {
+                      var category = schedule[0].Category === "nylonSachet" ? "nylon"
+                        :
+                        schedule[0].Category === "glassBottle" ? "glass"
+                          :
+                          schedule[0].Category.length < 4
+                            ? schedule[0].Category.substring(
+                              0,
+                              schedule[0].Category.length
+                            )
+                            : schedule[0].Category.substring(
+                              0,
+                              schedule[0].Category.length - 1
+                            );
 
-                                aggregatorId : recycler.aggregatorId || " ",
+                      var organisationCheck = JSON.parse(JSON.stringify(organisation));
+                      console.log("organisation check here", organisationCheck);
+                      for (let val in organisationCheck) {
+                        console.log("category check here", category);
+                        if (val.includes(category)) {
+                          const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1
+                          console.log("equivalent here", equivalent)
 
-                                organisation : recycler.organisation,
-        
-                                organisationID: recycler.approvedBy,
+                          const pricing = quantity * equivalent;
+                          MODEL.collectorModel.updateOne(
+                            { email: recycler.email },
+                            { last_logged_in: new Date() },
+                            (res) => {
+                              console.log('Logged date updated', new Date());
+                            }
+                          );
+                          var dataToSave = {
+                            weight: quantity,
+
+                            coin: pricing,
+
+                            cardID: result._id,
+
+                            scheduleId: schedule[0]._id,
+
+                            completedBy: collectorID,
+
+                            Category: schedule[0].Category,
+
+                            fullname: result.firstname + ' ' + result.lastname,
+
+                            recycler: recycler.fullname,
+
+                            aggregatorId: recycler.aggregatorId || " ",
+
+                            organisation: recycler.organisation,
+
+                            organisationID: recycler.approvedBy,
+                          };
+                          MODEL.transactionModel(dataToSave).save(
+                            {},
+                            (ERR, RESULT) => {
+                              var message = {
+                                app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+                                contents: {
+                                  en:
+                                    'You just received a payout for your schedule',
+                                },
+                                include_player_ids: [`${result.onesignal_id}`],
                               };
-                              MODEL.transactionModel(dataToSave).save(
-                                {},
-                                (ERR, RESULT) => {
-                                  var message = {
-                                    app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
-                                    contents: {
-                                      en:
-                                        'You just received a payout for your schedule',
-                                    },
-                                    include_player_ids: [`${result.onesignal_id}`],
-                                  };
-        
-                                  sendNotification(message);
-        
-                                  // if (ERR)
-                                  //   return RESPONSE.status(400).jsonp(ERR);
-                                  MODEL.scheduleModel.updateOne(
-                                    { _id: schedule[0]._id },
+
+                              sendNotification(message);
+
+                              // if (ERR)
+                              //   return RESPONSE.status(400).jsonp(ERR);
+                              MODEL.scheduleModel.updateOne(
+                                { _id: schedule[0]._id },
+                                {
+                                  $set: {
+                                    completionStatus: 'completed',
+                                    collectedBy: collectorID,
+                                    quantity: quantity
+                                  },
+                                },
+                                (err, res) => {
+                                  if (err) return RESPONSE.status(400).json(err);
+                                  MODEL.userModel.updateOne(
+                                    { email: result.email },
                                     {
                                       $set: {
-                                        completionStatus: 'completed',
-                                        collectedBy: collectorID,
-                                        quantity : quantity
+                                        availablePoints: result.availablePoints + pricing,
+                                        schedulePoints: result.schedulePoints + 1
                                       },
-                                    },
-                                    (err, res) => {
-                                      if (err) return RESPONSE.status(400).json(err);
-                                      MODEL.userModel.updateOne(
-                                        { email: result.email },
-                                        {
-                                          $set: {
-                                            availablePoints: result.availablePoints + pricing,
-                                            schedulePoints : result.schedulePoints + 1
-                                          },
-                                        }, (err,res)=>{
-                                          console.log("update user", err , res)
-                                        });
-                                        MODEL.collectorModel.updateOne(
-                                          { _id: collectorID },
-                                          {
-                                            $set: {
-                                              totalCollected: recycler.totalCollected + Number(quantity),
-                                              numberOfTripsCompleted: recycler.numberOfTripsCompleted + 1,
-                                              busy: false
-                                            },
-                                          }, (err,res)=>{
-                                            console.log("update", err , res)
-                                          });
-                                      return RESPONSE.status(200).json({
-                                        message: 'Transaction Completed Successfully',
-                                      });
-                                    }
-                                  );
+                                    }, (err, res) => {
+                                      console.log("update user", err, res)
+                                    });
+                                  MODEL.collectorModel.updateOne(
+                                    { _id: collectorID },
+                                    {
+                                      $set: {
+                                        totalCollected: recycler.totalCollected + Number(quantity),
+                                        numberOfTripsCompleted: recycler.numberOfTripsCompleted + 1,
+                                        busy: false
+                                      },
+                                    }, (err, res) => {
+                                      console.log("update", err, res)
+                                    });
+                                  return RESPONSE.status(200).json({
+                                    message: 'Transaction Completed Successfully',
+                                  });
                                 }
                               );
-                              break;
                             }
-                          }
-                        });
-                    });   
+                          );
+                          break;
+                        }
+                      }
+                    });
+                });
             }
           });
       });
@@ -657,26 +656,26 @@ scheduleController.allWeight = (req, res) => {
 
   try {
     MODEL.transactionModel
-    .find({})
-    .sort({ _id: -1 })
-    .then((schedules) => {
-      var test = JSON.parse(JSON.stringify(schedules));
-      let weight = test
-        .map((x) => x.weight)
-        .reduce((acc, curr) => {
-          return acc + curr;
-        },0);
-      res.jsonp(
-        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, weight)
-      );
-    })
-    .catch((err) => res.status(400).jsonp(COMMON_FUN.sendError(err)));
+      .find({})
+      .sort({ _id: -1 })
+      .then((schedules) => {
+        var test = JSON.parse(JSON.stringify(schedules));
+        let weight = test
+          .map((x) => x.weight)
+          .reduce((acc, curr) => {
+            return acc + curr;
+          }, 0);
+        res.jsonp(
+          COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, weight)
+        );
+      })
+      .catch((err) => res.status(400).jsonp(COMMON_FUN.sendError(err)));
 
   }
-  catch(err){
+  catch (err) {
     return res.status(500).json(err)
   }
- 
+
 };
 
 scheduleController.allCoins = (req, res) => {
@@ -961,16 +960,18 @@ scheduleController.allCoins = (req, res) => {
                                                     MODEL.transactionModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                
+
                                                         return res.status(200).json({
                                                           JANUARY: {
-                                                            amount: jan.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)                                                          
+                                                            amount: jan.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
                                                           },
                                                           FEBRUARY: {
-                                                            amount: feb.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)                                                          },
+                                                            amount: feb.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
                                                           MARCH: {
                                                             amount:
-                                                              march.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)                                                          },
+                                                              march.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                          },
                                                           APRIL: {
                                                             amount:
                                                               april.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
@@ -985,7 +986,7 @@ scheduleController.allCoins = (req, res) => {
                                                             amount: july.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
                                                           },
                                                           AUGUST: {
-                                                            amount: Aug .map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
+                                                            amount: Aug.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
                                                           },
                                                           SEPTEMBER: {
                                                             amount: sept.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
@@ -1017,11 +1018,11 @@ scheduleController.allCoins = (req, res) => {
               });
           });
       });
-  } 
-  
-  
-  
-  
+  }
+
+
+
+
   catch (err) {
     return res.status(500).json(err);
   }
@@ -1149,7 +1150,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
   active_today.setHours(0);
   active_today.setMinutes(0);
   var tomorrow = new Date();
-  tomorrow.setDate(new Date().getDate()+7);
+  tomorrow.setDate(new Date().getDate() + 7);
 
   MODEL.collectorModel.findOne({ _id: collectorID }).then((collector) => {
     var accessArea = collector.areaOfAccess;
@@ -1158,19 +1159,19 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
       .find({
         $and: [
           {
-          pickUpDate : {
-            $gte: active_today
-          },
-          pickUpDate : {
-            $lt: tomorrow
-          },    
-        }       
+            pickUpDate: {
+              $gte: active_today
+            },
+            pickUpDate: {
+              $lt: tomorrow
+            },
+          }
         ],
       })
       .sort({ _id: -1 })
       .then((schedules) => {
         schedules.forEach((schedule, index) => {
-          var test = schedule.address.split(', '); 
+          var test = schedule.address.split(', ');
           (function route() {
             for (let i = 0; i < accessArea.length; i++) {
               if (schedule.lcd === accessArea[i]) {
@@ -1191,7 +1192,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
         });
         var geoSchedules = geofencedSchedules.filter(x => (x.completionStatus !== "completed" && x.completionStatus !== "cancelled" && x.completionStatus !== "missed") || (x.completionStatus == 'pending' && x.collectorStatus == "accept")
         );
-        const referenceSchedules = [ ...new Set(geoSchedules)];
+        const referenceSchedules = [...new Set(geoSchedules)];
         RESPONSE.jsonp(
           COMMON_FUN.sendSuccess(
             CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
@@ -1245,18 +1246,18 @@ scheduleController.collectorMissed = (req, res) => {
         .then((resp, err) => {
 
           MODEL.userModel
-          .findOne({ email: result.client })
-          .then((result, err) => {
-            var message = {
-              app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
-              contents: {
-                en: 'A collector just missed your schedule. Kindly reschedule this pickup',
-              },
-              include_player_ids: [`${result.onesignal_id}`],
-            };
+            .findOne({ email: result.client })
+            .then((result, err) => {
+              var message = {
+                app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+                contents: {
+                  en: 'A collector just missed your schedule. Kindly reschedule this pickup',
+                },
+                include_player_ids: [`${result.onesignal_id}`],
+              };
 
-            sendNotification(message);
-          });
+              sendNotification(message);
+            });
           return res.status(200).json({
             message: 'You missed this schedule',
           });
