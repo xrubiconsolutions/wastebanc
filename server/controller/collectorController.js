@@ -419,6 +419,30 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
   }
 };
 
+collectorController.updateCollectorSignal = (req,res)=>{
+  const phone = req.body.phone;
+  const signal = req.body.signal_id
+
+  try{
+      MODEL.collectorModel.updateOne({
+        phone : phone
+      },
+      {
+        $set:{
+            onesignal_id: signal
+        }
+      }, (err,result)=>{
+        return res.status(200).json({
+          message: "Signal id updated"
+        })
+      })
+  }
+  catch(err){
+      return res.status(500).json(err);
+
+  }
+}
+
 collectorController.verifyPhone = (REQUEST, RESPONSE) => {
   var error = {};
   var phone = REQUEST.body.phone;

@@ -96,6 +96,9 @@ const collector_Schema = new Schema({
   long : {
     type :String
   },
+  onesignal_id:{
+    type: String
+  },
   profile_picture:{
     type: String
   },

@@ -23,7 +23,7 @@ module.exports = {
     dropOffModel : require("./dropOffModel"),
     charityModel: require("./charityModel"),
     scheduleDropModel: require("./scheduleDropModel"),
-
+    notificationModel: require("./notificationModel"),
     localGovernmentModel: require("./localGovernmentModel")
 };
 

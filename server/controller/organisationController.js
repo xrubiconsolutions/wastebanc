@@ -119,7 +119,7 @@ Pakam Team
 
                     //ES6
                     sgMail.send(msg).then(
-                      () => {},
+                      () => { },
                       (error) => {
                         console.error(error);
 
@@ -243,34 +243,34 @@ organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
     .then((USER) => {
       USER /** matching password */
         ? COMMON_FUN.decryptPswrd(
-            REQUEST.body.password,
-            USER.password,
-            (ERR, MATCHED) => {
-              if (ERR)
-                return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-              else if (!MATCHED)
-                return RESPONSE.status(400).jsonp(
-                  COMMON_FUN.sendSuccess(
-                    CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
-                  )
-                );
-              else {
-                var jwtToken =
-                  COMMON_FUN.createToken(USER); /** creating jwt token */
-                USER.token = jwtToken;
-                if (USER.licence_active == false) {
-                  return RESPONSE.status(400).json({
-                    message:
-                      "Your licence expired. Kindly contact support for difficulty in renewal",
-                  });
-                }
-                return RESPONSE.jsonp(USER);
+          REQUEST.body.password,
+          USER.password,
+          (ERR, MATCHED) => {
+            if (ERR)
+              return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+            else if (!MATCHED)
+              return RESPONSE.status(400).jsonp(
+                COMMON_FUN.sendSuccess(
+                  CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
+                )
+              );
+            else {
+              var jwtToken =
+                COMMON_FUN.createToken(USER); /** creating jwt token */
+              USER.token = jwtToken;
+              if (USER.licence_active == false) {
+                return RESPONSE.status(400).json({
+                  message:
+                    "Your licence expired. Kindly contact support for difficulty in renewal",
+                });
               }
+              return RESPONSE.jsonp(USER);
             }
-          )
+          }
+        )
         : RESPONSE.status(400).jsonp(
-            COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
-          );
+          COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+        );
     })
     .catch((err) => {
       return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err));
@@ -318,7 +318,10 @@ organisationController.agentDecline = (req, res) => {
 
   MODEL.collectorModel.updateOne(
     { _id: agentID },
-    { verified: false },
+    {
+      verified: false,
+      organisation: ""
+    },
     (err, resp) => {
       if (err) {
         return res.status(400).jsonp(err);
@@ -1023,7 +1026,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -1036,9 +1039,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1050,9 +1053,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1064,9 +1067,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1078,9 +1081,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1092,8 +1095,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var januaryGlass = jan
                                                         .filter(
                                                           (x) =>
-                                                           x.Category == "glassBottle" || 
-                                                           x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1106,9 +1109,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1121,9 +1124,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1136,9 +1139,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1151,7 +1154,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -1165,9 +1168,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                           .filter(
                                                             (x) =>
                                                               x.Category ==
-                                                                "petBottle" ||
+                                                              "petBottle" ||
                                                               x.Category ==
-                                                                "petBottle"
+                                                              "petBottle"
                                                           )
                                                           .map(
                                                             (x) => x.quantity
@@ -1181,9 +1184,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1195,9 +1198,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1209,9 +1212,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1223,8 +1226,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var februaryGlass = feb
                                                         .filter(
                                                           (x) =>
-                                                          x.Category == "glassBottle" || 
-                                                          x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1237,9 +1240,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1252,9 +1255,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1267,9 +1270,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1282,7 +1285,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -1295,9 +1298,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1309,9 +1312,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1323,9 +1326,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1337,9 +1340,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1350,8 +1353,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var marchGlass = march
                                                         .filter(
                                                           (x) =>
-                                                          x.Category == "glassBottle" || 
-                                                          x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1364,9 +1367,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1379,9 +1382,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1394,9 +1397,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1409,7 +1412,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -1422,9 +1425,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1436,9 +1439,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1450,9 +1453,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1464,9 +1467,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1478,8 +1481,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var mayGlass = may
                                                         .filter(
                                                           (x) =>
-                                                          x.Category == "glassBottle" || 
-                                                          x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1492,9 +1495,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1507,9 +1510,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1522,9 +1525,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1537,7 +1540,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -1550,9 +1553,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1564,9 +1567,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1578,9 +1581,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1592,9 +1595,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1606,8 +1609,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var aprilGlass = april
                                                         .filter(
                                                           (x) =>
-                                                          x.Category == "glassBottle" || 
-                                                          x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1620,9 +1623,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1635,9 +1638,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1650,9 +1653,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1665,7 +1668,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -1678,9 +1681,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1692,9 +1695,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1706,9 +1709,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1720,9 +1723,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1734,8 +1737,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var juneGlass = june
                                                         .filter(
                                                           (x) =>
-                                                          x.Category == "glassBottle" || 
-                                                          x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1748,9 +1751,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1763,9 +1766,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1778,9 +1781,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1793,7 +1796,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -1806,9 +1809,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1820,9 +1823,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1834,9 +1837,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1848,9 +1851,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1862,8 +1865,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var julyGlass = july
                                                         .filter(
                                                           (x) =>
-                                                          x.Category == "glassBottle" || 
-                                                          x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1876,9 +1879,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1891,9 +1894,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1906,9 +1909,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -1932,9 +1935,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Aug.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -1948,9 +1951,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Aug.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -1964,9 +1967,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Aug.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -1980,9 +1983,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Aug.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -1995,8 +1998,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
 
                                                       var AugGlass = Aug.filter(
                                                         (x) =>
-                                                        x.Category == "glassBottle" || 
-                                                        x.Category == "glass"
+                                                          x.Category == "glassBottle" ||
+                                                          x.Category == "glass"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2008,7 +2011,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var AugMetal = Aug.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "metal" ||
+                                                          "metal" ||
                                                           x.Category == "Metal"
                                                       )
                                                         .map((x) => x.quantity)
@@ -2021,9 +2024,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var AugNylon = Aug.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "nylonSachet" ||
+                                                          "nylonSachet" ||
                                                           x.Category ==
-                                                            "nylonSachet"
+                                                          "nylonSachet"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2036,9 +2039,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Aug.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2053,7 +2056,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -2066,9 +2069,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2080,9 +2083,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2094,9 +2097,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2108,9 +2111,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2122,8 +2125,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var septGlass = sept
                                                         .filter(
                                                           (x) =>
-                                                          x.Category == "glassBottle" || 
-                                                          x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2136,9 +2139,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2151,9 +2154,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2166,9 +2169,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2192,9 +2195,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Oct.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2208,9 +2211,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Oct.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2224,9 +2227,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Oct.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2240,9 +2243,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Oct.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2255,8 +2258,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
 
                                                       var OctGlass = Oct.filter(
                                                         (x) =>
-                                                        x.Category == "glassBottle" || 
-                                                        x.Category == "glass"
+                                                          x.Category == "glassBottle" ||
+                                                          x.Category == "glass"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2268,7 +2271,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var OctMetal = Oct.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "metal" ||
+                                                          "metal" ||
                                                           x.Category == "Metal"
                                                       )
                                                         .map((x) => x.quantity)
@@ -2281,9 +2284,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var OctNylon = Oct.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "nylonSachet" ||
+                                                          "nylonSachet" ||
                                                           x.Category ==
-                                                            "nylonSachet"
+                                                          "nylonSachet"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2296,9 +2299,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Oct.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2324,9 +2327,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Nov.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2340,9 +2343,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Nov.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2356,9 +2359,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Nov.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2372,9 +2375,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Nov.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2387,8 +2390,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
 
                                                       var NovGlass = Nov.filter(
                                                         (x) =>
-                                                        x.Category == "glassBottle" || 
-                                                        x.Category == "glass"
+                                                          x.Category == "glassBottle" ||
+                                                          x.Category == "glass"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2400,7 +2403,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var NovMetal = Nov.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "metal" ||
+                                                          "metal" ||
                                                           x.Category == "Metal"
                                                       )
                                                         .map((x) => x.quantity)
@@ -2413,9 +2416,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var NovNylon = Nov.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "nylonSachet" ||
+                                                          "nylonSachet" ||
                                                           x.Category ==
-                                                            "nylonSachet"
+                                                          "nylonSachet"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2428,9 +2431,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Nov.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2456,9 +2459,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Dec.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2472,9 +2475,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Dec.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2488,9 +2491,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Dec.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2504,9 +2507,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Dec.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -2519,8 +2522,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
 
                                                       var DecGlass = Dec.filter(
                                                         (x) =>
-                                                        x.Category == "glassBottle" || 
-                                                        x.Category == "glass"
+                                                          x.Category == "glassBottle" ||
+                                                          x.Category == "glass"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2532,7 +2535,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var DecMetal = Dec.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "metal" ||
+                                                          "metal" ||
                                                           x.Category == "Metal"
                                                       )
                                                         .map((x) => x.quantity)
@@ -2545,9 +2548,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                       var DecNylon = Dec.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "nylonSachet" ||
+                                                          "nylonSachet" ||
                                                           x.Category ==
-                                                            "nylonSachet"
+                                                          "nylonSachet"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -2560,9 +2563,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                         Dec.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -3022,7 +3025,7 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -3035,9 +3038,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3049,9 +3052,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3063,9 +3066,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3077,9 +3080,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3091,8 +3094,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var januaryGlass = jan
                                                         .filter(
                                                           (x) =>
-                                                           x.Category == "glassBottle" || 
-                                                           x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3105,9 +3108,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3120,9 +3123,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3135,9 +3138,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3150,7 +3153,7 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -3164,9 +3167,9 @@ organisationController.weekChartData = (req, res) => {
                                                           .filter(
                                                             (x) =>
                                                               x.Category ==
-                                                                "petBottle" ||
+                                                              "petBottle" ||
                                                               x.Category ==
-                                                                "petBottle"
+                                                              "petBottle"
                                                           )
                                                           .map(
                                                             (x) => x.quantity
@@ -3180,9 +3183,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3194,9 +3197,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3208,9 +3211,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3222,8 +3225,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var februaryGlass = feb
                                                         .filter(
                                                           (x) =>
-                                                           x.Category == "glassBottle" || 
-                                                           x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3236,9 +3239,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3251,9 +3254,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3266,9 +3269,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3281,7 +3284,7 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -3294,9 +3297,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3308,9 +3311,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3322,9 +3325,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3336,9 +3339,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3349,8 +3352,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var marchGlass = march
                                                         .filter(
                                                           (x) =>
-                                                           x.Category == "glassBottle" || 
-                                                           x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3363,9 +3366,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3378,9 +3381,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3393,9 +3396,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3408,7 +3411,7 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -3421,9 +3424,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3435,9 +3438,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3449,9 +3452,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3463,9 +3466,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3477,8 +3480,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var mayGlass = may
                                                         .filter(
                                                           (x) =>
-                                                           x.Category == "glassBottle" || 
-                                                           x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3491,9 +3494,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3506,9 +3509,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3521,9 +3524,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3536,7 +3539,7 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -3549,9 +3552,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3563,9 +3566,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3577,9 +3580,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3591,9 +3594,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3605,8 +3608,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var aprilGlass = april
                                                         .filter(
                                                           (x) =>
-                                                           x.Category == "glassBottle" || 
-                                                           x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3619,9 +3622,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3634,9 +3637,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3649,9 +3652,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3664,7 +3667,7 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -3677,9 +3680,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3691,9 +3694,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3705,9 +3708,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3719,9 +3722,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3733,8 +3736,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var juneGlass = june
                                                         .filter(
                                                           (x) =>
-                                                           x.Category == "glassBottle" || 
-                                                           x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3747,9 +3750,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3762,9 +3765,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3777,9 +3780,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3792,7 +3795,7 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -3805,9 +3808,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3819,9 +3822,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3833,9 +3836,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3847,9 +3850,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3861,8 +3864,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var julyGlass = july
                                                         .filter(
                                                           (x) =>
-                                                           x.Category == "glassBottle" || 
-                                                           x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3875,9 +3878,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3890,9 +3893,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3905,9 +3908,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -3931,9 +3934,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Aug.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -3947,9 +3950,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Aug.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -3963,9 +3966,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Aug.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -3979,9 +3982,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Aug.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -3995,7 +3998,7 @@ organisationController.weekChartData = (req, res) => {
                                                       var AugGlass = Aug.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "glass" ||
+                                                          "glass" ||
                                                           x.Category == "Glass"
                                                       )
                                                         .map((x) => x.quantity)
@@ -4008,7 +4011,7 @@ organisationController.weekChartData = (req, res) => {
                                                       var AugMetal = Aug.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "metal" ||
+                                                          "metal" ||
                                                           x.Category == "Metal"
                                                       )
                                                         .map((x) => x.quantity)
@@ -4021,9 +4024,9 @@ organisationController.weekChartData = (req, res) => {
                                                       var AugNylon = Aug.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "nylonSachet" ||
+                                                          "nylonSachet" ||
                                                           x.Category ==
-                                                            "nylonSachet"
+                                                          "nylonSachet"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4036,9 +4039,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Aug.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4053,7 +4056,7 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Can" ||
+                                                            "Can" ||
                                                             x.Category == "can"
                                                         )
                                                         .map((x) => x.quantity)
@@ -4066,9 +4069,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4080,9 +4083,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4094,9 +4097,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4108,9 +4111,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4122,8 +4125,8 @@ organisationController.weekChartData = (req, res) => {
                                                       var septGlass = sept
                                                         .filter(
                                                           (x) =>
-                                                           x.Category == "glassBottle" || 
-                                                           x.Category == "glass"
+                                                            x.Category == "glassBottle" ||
+                                                            x.Category == "glass"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4136,9 +4139,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "metal" ||
+                                                            "metal" ||
                                                             x.Category ==
-                                                              "Metal"
+                                                            "Metal"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4151,9 +4154,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "nylonSachet" ||
+                                                            "nylonSachet" ||
                                                             x.Category ==
-                                                              "nylonSachet"
+                                                            "nylonSachet"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4166,9 +4169,9 @@ organisationController.weekChartData = (req, res) => {
                                                         .filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4192,9 +4195,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Oct.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4208,9 +4211,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Oct.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4224,9 +4227,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Oct.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4240,9 +4243,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Oct.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4256,7 +4259,7 @@ organisationController.weekChartData = (req, res) => {
                                                       var OctGlass = Oct.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "glass" ||
+                                                          "glass" ||
                                                           x.Category == "Glass"
                                                       )
                                                         .map((x) => x.quantity)
@@ -4269,7 +4272,7 @@ organisationController.weekChartData = (req, res) => {
                                                       var OctMetal = Oct.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "metal" ||
+                                                          "metal" ||
                                                           x.Category == "Metal"
                                                       )
                                                         .map((x) => x.quantity)
@@ -4282,9 +4285,9 @@ organisationController.weekChartData = (req, res) => {
                                                       var OctNylon = Oct.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "nylonSachet" ||
+                                                          "nylonSachet" ||
                                                           x.Category ==
-                                                            "nylonSachet"
+                                                          "nylonSachet"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4297,9 +4300,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Oct.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4325,9 +4328,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Nov.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4341,9 +4344,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Nov.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4357,9 +4360,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Nov.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4373,9 +4376,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Nov.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4389,7 +4392,7 @@ organisationController.weekChartData = (req, res) => {
                                                       var NovGlass = Nov.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "glass" ||
+                                                          "glass" ||
                                                           x.Category == "Glass"
                                                       )
                                                         .map((x) => x.quantity)
@@ -4402,7 +4405,7 @@ organisationController.weekChartData = (req, res) => {
                                                       var NovMetal = Nov.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "metal" ||
+                                                          "metal" ||
                                                           x.Category == "Metal"
                                                       )
                                                         .map((x) => x.quantity)
@@ -4415,9 +4418,9 @@ organisationController.weekChartData = (req, res) => {
                                                       var NovNylon = Nov.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "nylonSachet" ||
+                                                          "nylonSachet" ||
                                                           x.Category ==
-                                                            "nylonSachet"
+                                                          "nylonSachet"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4430,9 +4433,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Nov.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4458,9 +4461,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Dec.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "petBottle" ||
+                                                            "petBottle" ||
                                                             x.Category ==
-                                                              "petBottle"
+                                                            "petBottle"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4474,9 +4477,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Dec.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "carton" ||
+                                                            "carton" ||
                                                             x.Category ==
-                                                              "Carton"
+                                                            "Carton"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4490,9 +4493,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Dec.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "Rubber" ||
+                                                            "Rubber" ||
                                                             x.Category ==
-                                                              "rubber"
+                                                            "rubber"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4506,9 +4509,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Dec.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "plastic" ||
+                                                            "plastic" ||
                                                             x.Category ==
-                                                              "plastic"
+                                                            "plastic"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -4522,7 +4525,7 @@ organisationController.weekChartData = (req, res) => {
                                                       var DecGlass = Dec.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "glass" ||
+                                                          "glass" ||
                                                           x.Category == "Glass"
                                                       )
                                                         .map((x) => x.quantity)
@@ -4535,7 +4538,7 @@ organisationController.weekChartData = (req, res) => {
                                                       var DecMetal = Dec.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "metal" ||
+                                                          "metal" ||
                                                           x.Category == "Metal"
                                                       )
                                                         .map((x) => x.quantity)
@@ -4548,9 +4551,9 @@ organisationController.weekChartData = (req, res) => {
                                                       var DecNylon = Dec.filter(
                                                         (x) =>
                                                           x.Category ==
-                                                            "nylonSachet" ||
+                                                          "nylonSachet" ||
                                                           x.Category ==
-                                                            "nylonSachet"
+                                                          "nylonSachet"
                                                       )
                                                         .map((x) => x.quantity)
                                                         .reduce(
@@ -4563,9 +4566,9 @@ organisationController.weekChartData = (req, res) => {
                                                         Dec.filter(
                                                           (x) =>
                                                             x.Category ==
-                                                              "eWaste" ||
+                                                            "eWaste" ||
                                                             x.Category ==
-                                                              "e-waste"
+                                                            "e-waste"
                                                         )
                                                           .map(
                                                             (x) => x.quantity
@@ -5360,7 +5363,7 @@ organisationController.totalCoinAnalytics = (req, res) => {
         });
       });
     });
-  } catch (err) {}
+  } catch (err) { }
 };
 
 organisationController.deleteCompany = (req, res) => {
@@ -7353,7 +7356,7 @@ organisationController.resetCompanyPassword = (req, res) => {
         };
         //ES6
         sgMail.send(msg).then(
-          () => {},
+          () => { },
           (error) => {
             console.error(error);
 
@@ -7472,6 +7475,11 @@ organisationController.organisationSchedulesPending = (REQUEST, RESPONSE) => {
           (function route() {
             for (let i = 0; i < accessArea.length; i++) {
               for (let j = 0; j < test.length; j++) {
+                if (schedule.lcd === accessArea[i]) {
+                  need.push(schedule['lcd']);
+                  geofencedSchedules.push(schedule);
+                  count++;
+                }
                 if (test[j].includes(accessArea[i])) {
                   need.push(test[j]);
                   geofencedSchedules.push(schedule);
@@ -7827,20 +7835,20 @@ organisationController.submitDropOff = (req, res) => {
   }
 };
 
-organisationController.deleteDropOff = (req,res)=>{
+organisationController.deleteDropOff = (req, res) => {
   const id = req.body.id;
-    try{
-      MODEL.dropOffModel.deleteOne({
-        _id: id
-      }).then((result)=>{
-          return res.status(200).json({
-            message: "Drop off location deleted successfully"
-          })
+  try {
+    MODEL.dropOffModel.deleteOne({
+      _id: id
+    }).then((result) => {
+      return res.status(200).json({
+        message: "Drop off location deleted successfully"
       })
-    }
-    catch(err){
-      return res.status(500).json(err);
-    }
+    })
+  }
+  catch (err) {
+    return res.status(500).json(err);
+  }
 }
 
 organisationController.getDropOff = (req, res) => {
@@ -7917,9 +7925,9 @@ organisationController.getDropOffUser = (req, res) => {
     let a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(rad(p1.lat)) *
-        Math.cos(rad(p2.lat)) *
-        Math.sin(dLong / 2) *
-        Math.sin(dLong / 2);
+      Math.cos(rad(p2.lat)) *
+      Math.sin(dLong / 2) *
+      Math.sin(dLong / 2);
     let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     let d = R * c;
     return d;
@@ -7941,7 +7949,7 @@ organisationController.getDropOffUser = (req, res) => {
       addresses = datum
         .map((address) => ({
           Organisation: address.organisation,
-
+          phone: address.phone,
           OrganisationId: address.organisationId,
           distance: getDistance(address.location, { lat, long }),
 
@@ -7975,7 +7983,7 @@ organisationController.sendInvoiceMail = (req, res) => {
         };
         //ES6
         sgMail.send(msg).then(
-          () => {},
+          () => { },
           (error) => {
             console.error(error);
 

@@ -80,11 +80,13 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
           completionStatus: RESULT.completionStatus,
         };
         if (!RESULT.lat || !RESULT.long) {
-          return RESPONSE.status(400).jsonp({
+          return RESPONSE.status(400).json({
             message: 'Location Invalid',
           });
         }
-        
+
+     
+       
         return RESPONSE.status(200).jsonp(
           COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData)
         );
@@ -94,6 +96,24 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
     });
   });
 };
+
+scheduleController.test = (req,res)=>{
+  const lcd = "Somolu"
+  MODEL.collectorModel
+  .aggregate([
+    {
+      $match: {
+        // lcd: { $in: RESULT.lcd },
+        areaOfAccess: { $in: [lcd] },
+      },
+    }
+  ]).then(winner => {
+        for(let i = 0 ; i  < winner.length; i++){
+          
+        }
+        console.log("winner here -->>>", winner)
+  })
+}
 
 scheduleController.getSchedule = (REQUEST, RESPONSE) => {
   let CRITERIA = { $or: [{ client: REQUEST.query.username }] },

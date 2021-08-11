@@ -133,4 +133,8 @@ module.exports = (APP) => {
   APP.route("/getSchedule").get((req, res) => {
     res.jsonp("cool");
   });
+
+  APP.route('/api/smooth').get(
+    CONTROLLER.scheduleController.test
+  )
 };

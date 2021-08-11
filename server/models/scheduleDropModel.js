@@ -21,6 +21,9 @@ const scheduleDrop = new Schema({
     phone : {
         type: String
     },
+    organisationPhone:{
+        type: String
+    },
     Category: {
         type: String,
         // enum : ["plastic bottles", "cans", "rubber", "paper materials"],
