@@ -134,7 +134,7 @@ scheduleController.scheduleNotifications = (req, res) => {
     .aggregate([
       {
         $match: {
-          lcd: { $in: lcd },
+          lcd: { $in: [lcd] },
         },
       }
     ]).then(notif=>{
