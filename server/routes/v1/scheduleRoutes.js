@@ -94,12 +94,12 @@ module.exports = (APP) => {
   APP.route("/api/allCompleted").get(
     CONTROLLER.scheduleController.allCompletedSchedules
   );
-  
+
   APP.route("/api/dashboard/Completed").get(
     CONTROLLER.scheduleController.dashboardCompleted
   );
 
-  APP.route("/api/rewardUser").post(auth.recyclerValidation,CONTROLLER.scheduleController.rewardSystem);
+  APP.route("/api/rewardUser").post(auth.recyclerValidation, CONTROLLER.scheduleController.rewardSystem);
 
   APP.route("/api/user/completed").post(
     CONTROLLER.scheduleController.userComplete
@@ -134,7 +134,7 @@ module.exports = (APP) => {
     res.jsonp("cool");
   });
 
-  APP.route('/api/smooth').get(
-    CONTROLLER.scheduleController.test
+  APP.route('/api/get/notifications').get(
+    CONTROLLER.scheduleController.scheduleNotifications
   )
 };

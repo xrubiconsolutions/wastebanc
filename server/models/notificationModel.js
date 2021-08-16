@@ -15,6 +15,9 @@ const notification_Schema = new Schema({
        enum: ["schedule_made"],
        required: true
   },
+  lcd : {
+      type: String
+  },
   title : {
       type: String
   },

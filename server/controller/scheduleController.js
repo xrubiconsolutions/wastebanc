@@ -106,6 +106,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
               sendNotification(message);
               MODEL.notificationModel({
                 title: "Schedule made",
+                lcd : lcd,
                 message: `A schedule was made in ${lcd}`
 
               }).save({}, (err, data) => {
@@ -126,8 +127,23 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
   });
 };
 
-scheduleController.test = (req, res) => {
-  const lcd = "Somolu"
+scheduleController.scheduleNotifications = (req, res) => {
+  const lcd = req.query.lcd;
+  try {
+    MODEL.notificationModel
+    .aggregate([
+      {
+        $match: {
+          lcd: { $in: [lcd] },
+        },
+      }
+    ]).then(notif=>{
+        return res.status(200).json(notif)
+      })
+  }
+  catch(err){
+        return res.status(500).json(err);
+  }
 
 }
 
