@@ -98,7 +98,7 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
                   quantityOfWaste: unpaidFees[i].weight || ' ',
                   amount: unpaidFees[i].coin,
                   organisation: unpaidFees[i].organisationID,
-                }).save({}, (err, result) => {
+                }).save({}, (err, results) => {
                   MODEL.transactionModel.updateOne(
                     { _id: unpaidFees[i]._id },
                     {
@@ -110,6 +110,30 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
                       console.log('updated here', err);
                     }
                   );
+                  var data = {
+                    to: `234${result.phone}`,
+                    from: 'N-Alert',
+                    sms: `Dear ${unpaidFees[i].organisation}, a user named ${receipt.fullname} just requested for a payout of ${unpaidFees[i].coin}, kindly attend to the payment.`,
+                    type: 'plain',
+                    api_key:
+                      'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+                    channel: 'dnd',
+                  };
+        
+                  var options = {
+                    method: 'POST',
+                    url: 'https://termii.com/api/sms/send',
+                    headers: {
+                      'Content-Type': ['application/json', 'application/json'],
+                    },
+                    body: JSON.stringify(data),
+                  };
+        
+                  request(options, function (error, response) {
+                    if (error) throw new Error(error);
+                    console.log(response.body);
+                  });
+
                   if (err)
                     return RESPONSE.status(400).json({
                       message: 'Could not save receipt',

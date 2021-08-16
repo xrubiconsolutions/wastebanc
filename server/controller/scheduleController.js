@@ -84,9 +84,38 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
             message: 'Location Invalid',
           });
         }
+        const lcd = UserData.lcd;
 
-     
-       
+        MODEL.collectorModel
+          .aggregate([
+            {
+              $match: {
+                areaOfAccess: { $in: [lcd] },
+              },
+            }
+          ]).then(recycler => {
+            for (let i = 0; i < recycler.length; i++) {
+
+              var message = {
+                app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+                contents: {
+                  en: `A user in ${lcd} just created a schedule`,
+                },
+                include_player_ids: [`${recycler[i].onesignal_id} || ' '`],
+              };
+              sendNotification(message);
+              MODEL.notificationModel({
+                title: "Schedule made",
+                message: `A schedule was made in ${lcd}`
+
+              }).save({}, (err, data) => {
+                console.log("-->", data)
+              })
+
+            }
+          })
+
+
         return RESPONSE.status(200).jsonp(
           COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData)
         );
@@ -97,22 +126,9 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
   });
 };
 
-scheduleController.test = (req,res)=>{
+scheduleController.test = (req, res) => {
   const lcd = "Somolu"
-  MODEL.collectorModel
-  .aggregate([
-    {
-      $match: {
-        // lcd: { $in: RESULT.lcd },
-        areaOfAccess: { $in: [lcd] },
-      },
-    }
-  ]).then(winner => {
-        for(let i = 0 ; i  < winner.length; i++){
-          
-        }
-        console.log("winner here -->>>", winner)
-  })
+
 }
 
 scheduleController.getSchedule = (REQUEST, RESPONSE) => {
