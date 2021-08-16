@@ -135,6 +135,7 @@ module.exports = (APP) => {
   });
 
   APP.route('/api/get/notifications').get(
+    auth.recyclerValidation,
     CONTROLLER.scheduleController.scheduleNotifications
   )
 };
