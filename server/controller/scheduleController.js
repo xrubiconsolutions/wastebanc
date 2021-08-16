@@ -104,19 +104,17 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
                 include_player_ids: [`${recycler[i].onesignal_id} || ' '`],
               };
               sendNotification(message);
-              MODEL.notificationModel({
+              const datum = {
                 title: "Schedule made",
                 lcd : lcd,
-                message: `A schedule was made in ${lcd}`
-
-              }).save({}, (err, data) => {
+                message: `A schedule was made in ${lcd}`,
+                recycler_id: recycler[i]._id
+              }
+              MODEL.notificationModel(datum).save({}, (err, data) => {
                 console.log("-->", data)
               })
-
             }
           })
-
-
         return RESPONSE.status(200).jsonp(
           COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData)
         );
@@ -128,23 +126,38 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
 };
 
 scheduleController.scheduleNotifications = (req, res) => {
-  const lcd = req.query.lcd;
+  const id = req.query.id;
   try {
-    MODEL.notificationModel
-    .aggregate([
-      {
-        $match: {
-          lcd: { $in: [lcd] },
-        },
-      }
-    ]).then(notif=>{
+    console.log("-->", id)
+    MODEL.notificationModel.find({
+      recycler_id: id,
+      seenNotification: false
+    }).then(notif=>{
         return res.status(200).json(notif)
       })
   }
   catch(err){
         return res.status(500).json(err);
   }
+}
 
+/* Update Notification */
+scheduleController.updateScheduleNotifications = (req, res) => {
+  const id = req.query.id;
+  try {
+    MODEL.notificationModel.updateOne({
+      _id: id
+    },{
+      $set: { seenNotification: true }
+    }, (err,result)=>{
+          return res.status(200).json({
+            message: "Notification message seen"
+          })
+    })
+  }
+  catch(err){
+        return res.status(500).json(err);
+  }
 }
 
 scheduleController.getSchedule = (REQUEST, RESPONSE) => {

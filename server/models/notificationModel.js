@@ -13,7 +13,16 @@ const notification_Schema = new Schema({
     notification_type: {
       type: String,
        enum: ["schedule_made"],
-       required: true
+       required: true,
+       default: "schedule_made"
+  },
+  recycler_id: {
+    type: String,
+    required: true
+  },
+  seenNotification: {
+    type: Boolean,
+    default: false
   },
   lcd : {
       type: String
