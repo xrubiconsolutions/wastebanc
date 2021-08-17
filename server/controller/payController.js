@@ -110,8 +110,9 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
                       console.log('updated here', err);
                     }
                   );
+                  var phoneNo = String(result.phone).substring(1, 11);
                   var data = {
-                    to: `234${result.phone}`,
+                    to: `234${phoneNo}`,
                     from: 'N-Alert',
                     sms: `Dear ${unpaidFees[i].organisation}, a user named ${receipt.fullname} just requested for a payout of ${unpaidFees[i].coin}, kindly attend to the payment.`,
                     type: 'plain',
