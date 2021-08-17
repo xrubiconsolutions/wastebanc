@@ -42,7 +42,9 @@ const ProtectedRoutes = express.Router();
  ***** @param APP (express instance)*****
  ****************************************/
 module.exports = (APP) => {
-  APP.route("/api/schedule").post(CONTROLLER.scheduleController.schedule);
+  APP.route("/api/schedule").post(
+    auth.userValidation,
+    CONTROLLER.scheduleController.schedule);
 
   APP.route("/api/getSchedule").get(CONTROLLER.scheduleController.getSchedule);
 
@@ -135,7 +137,15 @@ module.exports = (APP) => {
   });
 
   APP.route('/api/get/notifications').get(
-    // auth.recyclerValidation,
+    auth.recyclerValidation,
     CONTROLLER.scheduleController.scheduleNotifications
-  )
+  );
+
+  APP.route('/api/seen/notification').get(
+    auth.recyclerValidation,
+    CONTROLLER.scheduleController.updateScheduleNotifications
+  );
+
+
+
 };
