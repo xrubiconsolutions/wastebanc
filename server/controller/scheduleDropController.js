@@ -332,4 +332,605 @@ scheduleDropController.getScheduleDropCompletedRecycler = (req,res)=>{
   }
 }
 
+scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
+  var year = new Date().getFullYear();
+  try {
+    MODEL.scheduleDropModel
+      .find({
+        completionStatus: "pending",
+        $expr: {
+          $and: [
+            { $eq: [{ $year: '$createdAt' }, year] },
+            { $eq: [{ $month: '$createdAt' }, 1] },
+          ],
+        },
+      })
+      .sort({
+        _id: -1,
+      })
+      .then((jan) => {
+        MODEL.scheduleDropModel
+          .find({
+            completionStatus: "pending",
+            $expr: {
+              $and: [
+                { $eq: [{ $year: '$createdAt' }, year] },
+                { $eq: [{ $month: '$createdAt' }, 2] },
+              ],
+            },
+          })
+          .sort({
+            _id: -1,
+          })
+          .then((feb) => {
+            MODEL.scheduleDropModel
+              .find({
+                completionStatus: "pending",
+                $expr: {
+                  $and: [
+                    { $eq: [{ $year: '$createdAt' }, year] },
+                    { $eq: [{ $month: '$createdAt' }, 3] },
+                  ],
+                },
+              })
+              .sort({
+                _id: -1,
+              })
+              .then((march) => {
+                MODEL.scheduleDropModel
+                  .find({
+                    completionStatus: "pending",
+                    $expr: {
+                      $and: [
+                        { $eq: [{ $year: '$createdAt' }, year] },
+                        { $eq: [{ $month: '$createdAt' }, 4] },
+                      ],
+                    },
+                  })
+                  .sort({
+                    _id: -1,
+                  })
+                  .then((april) => {
+                    MODEL.scheduleDropModel
+                      .find({
+                        completionStatus: "pending",
+                        $expr: {
+                          $and: [
+                            { $eq: [{ $year: '$createdAt' }, year] },
+                            { $eq: [{ $month: '$createdAt' }, 5] },
+                          ],
+                        },
+                      })
+                      .sort({
+                        _id: -1,
+                      })
+                      .then((may) => {
+                        MODEL.scheduleDropModel
+                          .find({
+                            completionStatus: "pending",
+                            $expr: {
+                              $and: [
+                                { $eq: [{ $year: '$createdAt' }, year] },
+                                { $eq: [{ $month: '$createdAt' }, 6] },
+                              ],
+                            },
+                          })
+                          .sort({
+                            _id: -1,
+                          })
+                          .then((june) => {
+                            MODEL.scheduleDropModel
+                              .find({
+                                completionStatus: "pending",
+                                $expr: {
+                                  $and: [
+                                    { $eq: [{ $year: '$createdAt' }, year] },
+                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                  ],
+                                },
+                              })
+                              .sort({
+                                _id: -1,
+                              })
+                              .then((july) => {
+                                MODEL.scheduleDropModel
+                                  .find({
+                                    completionStatus: "pending",
+                                    $expr: {
+                                      $and: [
+                                        {
+                                          $eq: [{ $year: '$createdAt' }, year],
+                                        },
+                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                      ],
+                                    },
+                                  })
+                                  .sort({
+                                    _id: -1,
+                                  })
+                                  .then((Aug) => {
+                                    MODEL.scheduleDropModel
+                                      .find({
+                                        completionStatus: "pending",
+                                        $expr: {
+                                          $and: [
+                                            {
+                                              $eq: [
+                                                { $year: '$createdAt' },
+                                                year,
+                                              ],
+                                            },
+                                            {
+                                              $eq: [
+                                                { $month: '$createdAt' },
+                                                9,
+                                              ],
+                                            },
+                                          ],
+                                        },
+                                      })
+                                      .sort({
+                                        _id: -1,
+                                      })
+                                      .then((sept) => {
+                                        MODEL.scheduleDropModel
+                                          .find({
+                                            completionStatus: "pending",
+                                            $expr: {
+                                              $and: [
+                                                {
+                                                  $eq: [
+                                                    { $year: '$createdAt' },
+                                                    year,
+                                                  ],
+                                                },
+                                                {
+                                                  $eq: [
+                                                    { $month: '$createdAt' },
+                                                    10,
+                                                  ],
+                                                },
+                                              ],
+                                            },
+                                          })
+                                          .sort({
+                                            _id: -1,
+                                          })
+                                          .then((Oct) => {
+                                            MODEL.scheduleDropModel
+                                              .find({
+                                                completionStatus: "pending",
+                                                $expr: {
+                                                  $and: [
+                                                    {
+                                                      $eq: [
+                                                        { $year: '$createdAt' },
+                                                        year,
+                                                      ],
+                                                    },
+                                                    {
+                                                      $eq: [
+                                                        {
+                                                          $month: '$createdAt',
+                                                        },
+                                                        11,
+                                                      ],
+                                                    },
+                                                  ],
+                                                },
+                                              })
+                                              .sort({
+                                                _id: -1,
+                                              })
+                                              .then((Nov) => {
+                                                MODEL.scheduleDropModel
+                                                  .find({
+                                                    completionStatus: "pending",
+                                                    $expr: {
+                                                      $and: [
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $year:
+                                                                '$createdAt',
+                                                            },
+                                                            year,
+                                                          ],
+                                                        },
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $month:
+                                                                '$createdAt',
+                                                            },
+                                                            12,
+                                                          ],
+                                                        },
+                                                      ],
+                                                    },
+                                                  })
+                                                  .sort({
+                                                    _id: -1,
+                                                  })
+                                                  .then((Dec) => {
+                                                    MODEL.scheduleDropModel
+                                                      .find({ completionStatus: "pending",
+                                                    })
+                                                      .then((Analytics) => {
+                                                        RESPONSE.status(200).json({
+                                                          JANUARY: {
+                                                            amount: jan.length,
+                                                            schedules: jan,
+                                                          },
+                                                          FEBRUARY: {
+                                                            amount: feb.length,
+                                                            schedules: feb,
+                                                          },
+                                                          MARCH: {
+                                                            amount:
+                                                              march.length,
+                                                            schedules: march,
+                                                          },
+                                                          APRIL: {
+                                                            amount:
+                                                              april.length,
+                                                            schedules: april,
+                                                          },
+                                                          MAY: {
+                                                            amount: may.length,
+                                                            schedules: may,
+                                                          },
+                                                          JUNE: {
+                                                            amount: june.length,
+                                                            schedules: june,
+                                                          },
+                                                          JULY: {
+                                                            amount: july.length,
+                                                            schedules: july,
+                                                          },
+                                                          AUGUST: {
+                                                            amount: Aug.length,
+                                                            schedules: Aug,
+                                                          },
+                                                          SEPTEMBER: {
+                                                            amount: sept.length,
+                                                            schedules: sept,
+                                                          },
+                                                          OCTOBER: {
+                                                            amount: Oct.length,
+                                                            schedules: Oct,
+                                                          },
+                                                          NOVEMBER: {
+                                                            amount: Nov.length,
+                                                            schedules: Nov,
+                                                          },
+                                                          DECEMBER: {
+                                                            amount: Dec.length,
+                                                             schedules: Dec,
+                                                          },
+                                                          ALL: {
+                                                            amount:
+                                                              Analytics.length,
+                                                            schedules: Analytics,
+                                                          },
+                                                        });
+                                                      });
+                                                  });
+                                              });
+                                          });
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  } catch (err) {
+    return RESPONSE.status(500).json(err);
+  }
+}
+
+
+scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
+  var year = new Date().getFullYear();
+  try {
+    MODEL.scheduleDropModel
+      .find({
+        completionStatus: "completed",
+        $expr: {
+          $and: [
+            { $eq: [{ $year: '$createdAt' }, year] },
+            { $eq: [{ $month: '$createdAt' }, 1] },
+          ],
+        },
+      })
+      .sort({
+        _id: -1,
+      })
+      .then((jan) => {
+        MODEL.scheduleDropModel
+          .find({
+            completionStatus: "completed",
+            $expr: {
+              $and: [
+                { $eq: [{ $year: '$createdAt' }, year] },
+                { $eq: [{ $month: '$createdAt' }, 2] },
+              ],
+            },
+          })
+          .sort({
+            _id: -1,
+          })
+          .then((feb) => {
+            MODEL.scheduleDropModel
+              .find({
+                completionStatus: "completed",
+                $expr: {
+                  $and: [
+                    { $eq: [{ $year: '$createdAt' }, year] },
+                    { $eq: [{ $month: '$createdAt' }, 3] },
+                  ],
+                },
+              })
+              .sort({
+                _id: -1,
+              })
+              .then((march) => {
+                MODEL.scheduleDropModel
+                  .find({
+                    completionStatus: "completed",
+                    $expr: {
+                      $and: [
+                        { $eq: [{ $year: '$createdAt' }, year] },
+                        { $eq: [{ $month: '$createdAt' }, 4] },
+                      ],
+                    },
+                  })
+                  .sort({
+                    _id: -1,
+                  })
+                  .then((april) => {
+                    MODEL.scheduleDropModel
+                      .find({
+                        completionStatus: "completed",
+                        $expr: {
+                          $and: [
+                            { $eq: [{ $year: '$createdAt' }, year] },
+                            { $eq: [{ $month: '$createdAt' }, 5] },
+                          ],
+                        },
+                      })
+                      .sort({
+                        _id: -1,
+                      })
+                      .then((may) => {
+                        MODEL.scheduleDropModel
+                          .find({
+                            completionStatus: "completed",
+                            $expr: {
+                              $and: [
+                                { $eq: [{ $year: '$createdAt' }, year] },
+                                { $eq: [{ $month: '$createdAt' }, 6] },
+                              ],
+                            },
+                          })
+                          .sort({
+                            _id: -1,
+                          })
+                          .then((june) => {
+                            MODEL.scheduleDropModel
+                              .find({
+                                completionStatus: "completed",
+                                $expr: {
+                                  $and: [
+                                    { $eq: [{ $year: '$createdAt' }, year] },
+                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                  ],
+                                },
+                              })
+                              .sort({
+                                _id: -1,
+                              })
+                              .then((july) => {
+                                MODEL.scheduleDropModel
+                                  .find({
+                                    completionStatus: "completed",
+                                    $expr: {
+                                      $and: [
+                                        {
+                                          $eq: [{ $year: '$createdAt' }, year],
+                                        },
+                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                      ],
+                                    },
+                                  })
+                                  .sort({
+                                    _id: -1,
+                                  })
+                                  .then((Aug) => {
+                                    MODEL.scheduleDropModel
+                                      .find({
+                                        completionStatus: "completed",
+                                        $expr: {
+                                          $and: [
+                                            {
+                                              $eq: [
+                                                { $year: '$createdAt' },
+                                                year,
+                                              ],
+                                            },
+                                            {
+                                              $eq: [
+                                                { $month: '$createdAt' },
+                                                9,
+                                              ],
+                                            },
+                                          ],
+                                        },
+                                      })
+                                      .sort({
+                                        _id: -1,
+                                      })
+                                      .then((sept) => {
+                                        MODEL.scheduleDropModel
+                                          .find({
+                                            completionStatus: "completed",
+                                            $expr: {
+                                              $and: [
+                                                {
+                                                  $eq: [
+                                                    { $year: '$createdAt' },
+                                                    year,
+                                                  ],
+                                                },
+                                                {
+                                                  $eq: [
+                                                    { $month: '$createdAt' },
+                                                    10,
+                                                  ],
+                                                },
+                                              ],
+                                            },
+                                          })
+                                          .sort({
+                                            _id: -1,
+                                          })
+                                          .then((Oct) => {
+                                            MODEL.scheduleDropModel
+                                              .find({
+                                                completionStatus: "completed",
+                                                $expr: {
+                                                  $and: [
+                                                    {
+                                                      $eq: [
+                                                        { $year: '$createdAt' },
+                                                        year,
+                                                      ],
+                                                    },
+                                                    {
+                                                      $eq: [
+                                                        {
+                                                          $month: '$createdAt',
+                                                        },
+                                                        11,
+                                                      ],
+                                                    },
+                                                  ],
+                                                },
+                                              })
+                                              .sort({
+                                                _id: -1,
+                                              })
+                                              .then((Nov) => {
+                                                MODEL.scheduleDropModel
+                                                  .find({
+                                                    completionStatus: "completed",
+                                                    $expr: {
+                                                      $and: [
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $year:
+                                                                '$createdAt',
+                                                            },
+                                                            year,
+                                                          ],
+                                                        },
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $month:
+                                                                '$createdAt',
+                                                            },
+                                                            12,
+                                                          ],
+                                                        },
+                                                      ],
+                                                    },
+                                                  })
+                                                  .sort({
+                                                    _id: -1,
+                                                  })
+                                                  .then((Dec) => {
+                                                    MODEL.scheduleDropModel
+                                                      .find({ completionStatus: "completed",
+                                                    })
+                                                      .then((Analytics) => {
+                                                        RESPONSE.status(200).json({
+                                                          JANUARY: {
+                                                            amount: jan.length,
+                                                            schedules: jan,
+                                                          },
+                                                          FEBRUARY: {
+                                                            amount: feb.length,
+                                                            schedules: feb,
+                                                          },
+                                                          MARCH: {
+                                                            amount:
+                                                              march.length,
+                                                            schedules: march,
+                                                          },
+                                                          APRIL: {
+                                                            amount:
+                                                              april.length,
+                                                            schedules: april,
+                                                          },
+                                                          MAY: {
+                                                            amount: may.length,
+                                                            schedules: may,
+                                                          },
+                                                          JUNE: {
+                                                            amount: june.length,
+                                                            schedules: june,
+                                                          },
+                                                          JULY: {
+                                                            amount: july.length,
+                                                            schedules: july,
+                                                          },
+                                                          AUGUST: {
+                                                            amount: Aug.length,
+                                                            schedules: Aug,
+                                                          },
+                                                          SEPTEMBER: {
+                                                            amount: sept.length,
+                                                            schedules: sept,
+                                                          },
+                                                          OCTOBER: {
+                                                            amount: Oct.length,
+                                                            schedules: Oct,
+                                                          },
+                                                          NOVEMBER: {
+                                                            amount: Nov.length,
+                                                            schedules: Nov,
+                                                          },
+                                                          DECEMBER: {
+                                                            amount: Dec.length,
+                                                             schedules: Dec,
+                                                          },
+                                                          ALL: {
+                                                            amount:
+                                                              Analytics.length,
+                                                            schedules: Analytics,
+                                                          },
+                                                        });
+                                                      });
+                                                  });
+                                              });
+                                          });
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  } catch (err) {
+    return RESPONSE.status(500).json(err);
+  }
+}
+
 module.exports = scheduleDropController;

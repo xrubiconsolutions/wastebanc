@@ -41,7 +41,16 @@ module.exports = (APP) => {
         .get(
             auth.recyclerValidation,
             CONTROLLER.scheduleDropController.dropRequestRecycler);
+    
+    APP.route('/api/get/drop/pending')
+            .get(
+                auth.adminPakamValidation,
+                CONTROLLER.scheduleDropController.monthlyDropPending);
 
+    APP.route('/api/get/drop/completed')
+        .get(
+            auth.adminPakamValidation,
+            CONTROLLER.scheduleDropController.monthlyDropCompleted);
 
     APP.route('/api/get/completed/recycler/drop')
         .get(
