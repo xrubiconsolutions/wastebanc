@@ -125,14 +125,17 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/lawma/transaction/history').get(
+    auth.adminPakamValidation,
     CONTROLLER.organisationController.lawmaTransaction
   );
 
   APP.route('/api/all/transaction/history').get(
+    auth.adminPakamValidation,
     CONTROLLER.organisationController.adminTransaction
   );
 
   APP.route('/api/all/transaction/recycler/history').get(
+    auth.adminPakamValidation,
     CONTROLLER.organisationController.adminCompanyTransaction
   );
 
