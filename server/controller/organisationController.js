@@ -2789,7 +2789,7 @@ organisationController.weekChartData = (req, res) => {
 
   const organisationID = req.query.organisationID;
 
-  MODEL.scheduleModel
+  MODEL.transactionModel
     .find({
       organisationCollection: organisationID,
       completionStatus: "completed",
@@ -2802,7 +2802,7 @@ organisationController.weekChartData = (req, res) => {
       },
     })
     .then((jan) => {
-      MODEL.scheduleModel
+      MODEL.transactionModel
         .find({
           organisationCollection: organisationID,
           completionStatus: "completed",
@@ -2815,7 +2815,7 @@ organisationController.weekChartData = (req, res) => {
           },
         })
         .then((feb) => {
-          MODEL.scheduleModel
+          MODEL.transactionModel
             .find({
               organisationCollection: organisationID,
               completionStatus: "completed",
@@ -2828,7 +2828,7 @@ organisationController.weekChartData = (req, res) => {
               },
             })
             .then((march) => {
-              MODEL.scheduleModel
+              MODEL.transactionModel
                 .find({
                   organisationCollection: organisationID,
                   completionStatus: "completed",
@@ -2841,7 +2841,7 @@ organisationController.weekChartData = (req, res) => {
                   },
                 })
                 .then((april) => {
-                  MODEL.scheduleModel
+                  MODEL.transactionModel
                     .find({
                       organisationCollection: organisationID,
                       completionStatus: "completed",
@@ -2854,7 +2854,7 @@ organisationController.weekChartData = (req, res) => {
                       },
                     })
                     .then((may) => {
-                      MODEL.scheduleModel
+                      MODEL.transactionModel
                         .find({
                           organisationCollection: organisationID,
                           completionStatus: "completed",
@@ -2867,7 +2867,7 @@ organisationController.weekChartData = (req, res) => {
                           },
                         })
                         .then((june) => {
-                          MODEL.scheduleModel
+                          MODEL.transactionModel
                             .find({
                               organisationCollection: organisationID,
                               completionStatus: "completed",
@@ -2880,7 +2880,7 @@ organisationController.weekChartData = (req, res) => {
                               },
                             })
                             .then((july) => {
-                              MODEL.scheduleModel
+                              MODEL.transactionModel
                                 .find({
                                   organisationCollection: organisationID,
                                   completionStatus: "completed",
@@ -2893,7 +2893,7 @@ organisationController.weekChartData = (req, res) => {
                                   },
                                 })
                                 .then((Aug) => {
-                                  MODEL.scheduleModel
+                                  MODEL.transactionModel
                                     .find({
                                       organisationCollection: organisationID,
                                       completionStatus: "completed",
@@ -2913,7 +2913,7 @@ organisationController.weekChartData = (req, res) => {
                                       },
                                     })
                                     .then((sept) => {
-                                      MODEL.scheduleModel
+                                      MODEL.transactionModel
                                         .find({
                                           organisationCollection:
                                             organisationID,
@@ -2937,7 +2937,7 @@ organisationController.weekChartData = (req, res) => {
                                           },
                                         })
                                         .then((Oct) => {
-                                          MODEL.scheduleModel
+                                          MODEL.transactionModel
                                             .find({
                                               organisationCollection:
                                                 organisationID,
@@ -2961,7 +2961,7 @@ organisationController.weekChartData = (req, res) => {
                                               },
                                             })
                                             .then((Nov) => {
-                                              MODEL.scheduleModel
+                                              MODEL.transactionModel
                                                 .find({
                                                   organisationCollection:
                                                     organisationID,
@@ -2990,7 +2990,7 @@ organisationController.weekChartData = (req, res) => {
                                                   },
                                                 })
                                                 .then((Dec) => {
-                                                  MODEL.scheduleModel
+                                                  MODEL.transactionModel
                                                     .find({
                                                       organisationCollection:
                                                         organisationID,
