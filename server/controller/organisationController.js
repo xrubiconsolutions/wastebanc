@@ -5615,8 +5615,6 @@ organisationController.salesGrowth = (req, res) => {
   // var Mar
 
   var year = new Date().getFullYear();
-  console.log("<<<Year>>>", year);
-
   try {
     MODEL.transactionModel
       .find({
@@ -8032,6 +8030,229 @@ organisationController.getCharityPaymentOrganisation = (req, res) => {
     return res.status(500).json(err);
   }
 };
+organisationController.organisationWasteHistoryData = (req, res) => {
+  var year = new Date().getFullYear();
+  const id = req.query.organisationId;
+  try {
+    MODEL.transactionModel
+      .find({
+        organisationID: id,
+        $expr: {
+          $and: [
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
+          ],
+        },
+      })
+      .then((jan) => {
+        MODEL.transactionModel
+          .find({
+            organisationID: id,
+            $expr: {
+              $and: [
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
+              ],
+            },
+          })
+          .then((feb) => {
+            MODEL.transactionModel
+              .find({
+                organisationID: id,
+                $expr: {
+                  $and: [
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
+                  ],
+                },
+              })
+              .then((march) => {
+                MODEL.transactionModel
+                  .find({
+                    organisationID: id,
+                    $expr: {
+                      $and: [
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
+                      ],
+                    },
+                  })
+                  .then((april) => {
+                    MODEL.transactionModel
+                      .find({
+                        organisationID: id,
+                        $expr: {
+                          $and: [
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
+                          ],
+                        },
+                      })
+                      .then((may) => {
+                        MODEL.transactionModel
+                          .find({
+                            organisationID: id,
+                            $expr: {
+                              $and: [
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
+                              ],
+                            },
+                          })
+                          .then((june) => {
+                            MODEL.transactionModel
+                              .find({
+                                organisationID: id,
+                                $expr: {
+                                  $and: [
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
+                                  ],
+                                },
+                              })
+                              .then((july) => {
+                                MODEL.transactionModel
+                                  .find({
+                                    organisationID: id,
+                                    $expr: {
+                                      $and: [
+                                        {
+                                          $eq: [{ $year: "$createdAt" }, year],
+                                        },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
+                                      ],
+                                    },
+                                  })
+                                  .then((Aug) => {
+                                    MODEL.transactionModel
+                                      .find({
+                                        organisationID: id,
+                                        $expr: {
+                                          $and: [
+                                            {
+                                              $eq: [
+                                                { $year: "$createdAt" },
+                                                year,
+                                              ],
+                                            },
+                                            {
+                                              $eq: [
+                                                { $month: "$createdAt" },
+                                                9,
+                                              ],
+                                            },
+                                          ],
+                                        },
+                                      })
+                                      .then((sept) => {
+                                        MODEL.transactionModel
+                                          .find({
+                                            organisationID: id,
+                                            $expr: {
+                                              $and: [
+                                                {
+                                                  $eq: [
+                                                    { $year: "$createdAt" },
+                                                    year,
+                                                  ],
+                                                },
+                                                {
+                                                  $eq: [
+                                                    { $month: "$createdAt" },
+                                                    10,
+                                                  ],
+                                                },
+                                              ],
+                                            },
+                                          })
+                                          .then((Oct) => {
+                                            MODEL.transactionModel
+                                              .find({
+                                                organisationID: id,
+                                                $expr: {
+                                                  $and: [
+                                                    {
+                                                      $eq: [
+                                                        { $year: "$createdAt" },
+                                                        year,
+                                                      ],
+                                                    },
+                                                    {
+                                                      $eq: [
+                                                        {
+                                                          $month: "$createdAt",
+                                                        },
+                                                        11,
+                                                      ],
+                                                    },
+                                                  ],
+                                                },
+                                              })
+                                              .then((Nov) => {
+                                                MODEL.transactionModel
+                                                  .find({
+                                                    organisationID: id,
+                                                    $expr: {
+                                                      $and: [
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $year:
+                                                                "$createdAt",
+                                                            },
+                                                            year,
+                                                          ],
+                                                        },
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $month:
+                                                                "$createdAt",
+                                                            },
+                                                            12,
+                                                          ],
+                                                        },
+                                                      ],
+                                                    },
+                                                  })
+                                                  .then((Dec) => {
+                                                    MODEL.transactionModel
+                                                      .find({
+                                                        organisationID: id
+                                                      })
+                                                      .then((Analytics) => {
+                                                        res.status(200).json({
+                                                          JANUARY: jan,
+                                                          FEBRUARY: feb,
+                                                          MARCH: march,
+                                                          APRIL: april,
+                                                          MAY: may,
+                                                          JUNE: june,
+                                                          JULY: july,
+                                                          AUGUST: Aug,
+                                                          SEPTEMBER: sept,
+                                                          OCTOBER: Oct,
+                                                          NOVEMBER: Nov,
+                                                          DECEMBER: Dec,
+                                                          ALL: Analytics
+                                                        });
+                                                      });
+                                                  });
+                                              });
+                                          });
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+}
 
 /* export organisationControllers */
 module.exports = organisationController;

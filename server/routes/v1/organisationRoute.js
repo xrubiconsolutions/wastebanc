@@ -341,4 +341,10 @@ module.exports = (APP) => {
     CONTROLLER.organisationController.getCharityPaymentOrganisation
   );
 
+  APP.route('/api/organisation/transactions/details').get(
+    auth.companyValidation,
+    CONTROLLER.organisationController.organisationWasteHistoryData
+  );
+
+
 };
