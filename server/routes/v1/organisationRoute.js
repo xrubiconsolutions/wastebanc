@@ -112,6 +112,7 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/organisation/week/chart').get(
+    auth.companyValidation,
     CONTROLLER.organisationController.weekChartData
   );
 

@@ -102,6 +102,9 @@ const schedulePick = new Schema({
         type: Number,
         required: true
     },
+    recycler: {
+        type: String
+    },
     createdAt : {
         type : Date,
         default: Date.now()

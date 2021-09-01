@@ -2791,8 +2791,8 @@ organisationController.weekChartData = (req, res) => {
 
   MODEL.transactionModel
     .find({
-      organisationCollection: organisationID,
-      completionStatus: "completed",
+      organisationID: organisationID,
+
 
       $expr: {
         $and: [
@@ -2804,8 +2804,8 @@ organisationController.weekChartData = (req, res) => {
     .then((jan) => {
       MODEL.transactionModel
         .find({
-          organisationCollection: organisationID,
-          completionStatus: "completed",
+          organisationID: organisationID,
+
 
           $expr: {
             $and: [
@@ -2817,8 +2817,8 @@ organisationController.weekChartData = (req, res) => {
         .then((feb) => {
           MODEL.transactionModel
             .find({
-              organisationCollection: organisationID,
-              completionStatus: "completed",
+              organisationID: organisationID,
+
 
               $expr: {
                 $and: [
@@ -2830,8 +2830,8 @@ organisationController.weekChartData = (req, res) => {
             .then((march) => {
               MODEL.transactionModel
                 .find({
-                  organisationCollection: organisationID,
-                  completionStatus: "completed",
+                  organisationID: organisationID,
+
 
                   $expr: {
                     $and: [
@@ -2843,8 +2843,8 @@ organisationController.weekChartData = (req, res) => {
                 .then((april) => {
                   MODEL.transactionModel
                     .find({
-                      organisationCollection: organisationID,
-                      completionStatus: "completed",
+                      organisationID: organisationID,
+
 
                       $expr: {
                         $and: [
@@ -2856,8 +2856,8 @@ organisationController.weekChartData = (req, res) => {
                     .then((may) => {
                       MODEL.transactionModel
                         .find({
-                          organisationCollection: organisationID,
-                          completionStatus: "completed",
+                          organisationID: organisationID,
+
 
                           $expr: {
                             $and: [
@@ -2869,8 +2869,8 @@ organisationController.weekChartData = (req, res) => {
                         .then((june) => {
                           MODEL.transactionModel
                             .find({
-                              organisationCollection: organisationID,
-                              completionStatus: "completed",
+                              organisationID: organisationID,
+
 
                               $expr: {
                                 $and: [
@@ -2882,8 +2882,8 @@ organisationController.weekChartData = (req, res) => {
                             .then((july) => {
                               MODEL.transactionModel
                                 .find({
-                                  organisationCollection: organisationID,
-                                  completionStatus: "completed",
+                                  organisationID: organisationID,
+
 
                                   $expr: {
                                     $and: [
@@ -2895,8 +2895,8 @@ organisationController.weekChartData = (req, res) => {
                                 .then((Aug) => {
                                   MODEL.transactionModel
                                     .find({
-                                      organisationCollection: organisationID,
-                                      completionStatus: "completed",
+                                      organisationID: organisationID,
+
 
                                       $expr: {
                                         $and: [
@@ -2915,9 +2915,9 @@ organisationController.weekChartData = (req, res) => {
                                     .then((sept) => {
                                       MODEL.transactionModel
                                         .find({
-                                          organisationCollection:
+                                          organisationID:
                                             organisationID,
-                                          completionStatus: "completed",
+
 
                                           $expr: {
                                             $and: [
@@ -2939,9 +2939,9 @@ organisationController.weekChartData = (req, res) => {
                                         .then((Oct) => {
                                           MODEL.transactionModel
                                             .find({
-                                              organisationCollection:
+                                              organisationID:
                                                 organisationID,
-                                              completionStatus: "completed",
+
 
                                               $expr: {
                                                 $and: [
@@ -2963,9 +2963,9 @@ organisationController.weekChartData = (req, res) => {
                                             .then((Nov) => {
                                               MODEL.transactionModel
                                                 .find({
-                                                  organisationCollection:
+                                                  organisationID:
                                                     organisationID,
-                                                  completionStatus: "completed",
+
 
                                                   $expr: {
                                                     $and: [
@@ -2992,10 +2992,9 @@ organisationController.weekChartData = (req, res) => {
                                                 .then((Dec) => {
                                                   MODEL.transactionModel
                                                     .find({
-                                                      organisationCollection:
+                                                      organisationID:
                                                         organisationID,
-                                                      completionStatus:
-                                                        "completed",
+
 
                                                       $expr: {
                                                         $and: [
@@ -3021,6 +3020,7 @@ organisationController.weekChartData = (req, res) => {
                                                       },
                                                     })
                                                     .then((Analytics) => {
+
                                                       var januaryCan = jan
                                                         .filter(
                                                           (x) =>
@@ -3028,7 +3028,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3042,7 +3042,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3056,7 +3056,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3070,7 +3070,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3084,7 +3084,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3097,7 +3097,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category == "glassBottle" ||
                                                             x.Category == "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3112,7 +3112,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3127,7 +3127,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3142,7 +3142,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3156,7 +3156,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3172,7 +3172,7 @@ organisationController.weekChartData = (req, res) => {
                                                               "petBottle"
                                                           )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -3187,7 +3187,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3201,7 +3201,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3215,7 +3215,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3228,7 +3228,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category == "glassBottle" ||
                                                             x.Category == "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3243,7 +3243,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3258,7 +3258,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3273,7 +3273,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3287,7 +3287,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3301,7 +3301,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3315,7 +3315,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3329,7 +3329,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3343,7 +3343,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3355,7 +3355,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category == "glassBottle" ||
                                                             x.Category == "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3370,7 +3370,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3385,7 +3385,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3400,7 +3400,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3414,7 +3414,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3428,7 +3428,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3442,7 +3442,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3456,7 +3456,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3470,7 +3470,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3483,7 +3483,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category == "glassBottle" ||
                                                             x.Category == "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3498,7 +3498,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3513,7 +3513,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3528,7 +3528,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3542,7 +3542,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3556,7 +3556,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3570,7 +3570,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3584,7 +3584,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3598,7 +3598,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3611,7 +3611,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category == "glassBottle" ||
                                                             x.Category == "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3626,7 +3626,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3641,7 +3641,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3656,7 +3656,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3670,7 +3670,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3684,7 +3684,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3698,7 +3698,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3712,7 +3712,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3726,7 +3726,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3739,7 +3739,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category == "glassBottle" ||
                                                             x.Category == "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3754,7 +3754,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3769,7 +3769,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3784,7 +3784,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3798,7 +3798,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3812,7 +3812,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3826,7 +3826,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3840,7 +3840,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3854,7 +3854,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3867,7 +3867,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category == "glassBottle" ||
                                                             x.Category == "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3882,7 +3882,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3897,7 +3897,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3912,7 +3912,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3924,7 +3924,7 @@ organisationController.weekChartData = (req, res) => {
                                                           x.Category == "Can" ||
                                                           x.Category == "can"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -3939,7 +3939,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "petBottle"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -3955,7 +3955,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Carton"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -3971,7 +3971,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "rubber"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -3987,7 +3987,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "plastic"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4001,7 +4001,7 @@ organisationController.weekChartData = (req, res) => {
                                                           "glass" ||
                                                           x.Category == "Glass"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4014,7 +4014,7 @@ organisationController.weekChartData = (req, res) => {
                                                           "metal" ||
                                                           x.Category == "Metal"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4028,7 +4028,7 @@ organisationController.weekChartData = (req, res) => {
                                                           x.Category ==
                                                           "nylonSachet"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4044,7 +4044,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "e-waste"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4059,7 +4059,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4073,7 +4073,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4087,7 +4087,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4101,7 +4101,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4115,7 +4115,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4128,7 +4128,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category == "glassBottle" ||
                                                             x.Category == "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4143,7 +4143,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4158,7 +4158,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4173,7 +4173,7 @@ organisationController.weekChartData = (req, res) => {
                                                             x.Category ==
                                                             "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4185,7 +4185,7 @@ organisationController.weekChartData = (req, res) => {
                                                           x.Category == "Can" ||
                                                           x.Category == "can"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4200,7 +4200,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "petBottle"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4216,7 +4216,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Carton"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4232,7 +4232,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "rubber"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4248,7 +4248,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "plastic"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4262,7 +4262,7 @@ organisationController.weekChartData = (req, res) => {
                                                           "glass" ||
                                                           x.Category == "Glass"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4275,7 +4275,7 @@ organisationController.weekChartData = (req, res) => {
                                                           "metal" ||
                                                           x.Category == "Metal"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4289,7 +4289,7 @@ organisationController.weekChartData = (req, res) => {
                                                           x.Category ==
                                                           "nylonSachet"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4305,7 +4305,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "e-waste"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4318,7 +4318,7 @@ organisationController.weekChartData = (req, res) => {
                                                           x.Category == "Can" ||
                                                           x.Category == "can"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4333,7 +4333,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "petBottle"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4349,7 +4349,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Carton"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4365,7 +4365,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "rubber"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4381,7 +4381,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "plastic"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4395,7 +4395,7 @@ organisationController.weekChartData = (req, res) => {
                                                           "glass" ||
                                                           x.Category == "Glass"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4408,7 +4408,7 @@ organisationController.weekChartData = (req, res) => {
                                                           "metal" ||
                                                           x.Category == "Metal"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4422,7 +4422,7 @@ organisationController.weekChartData = (req, res) => {
                                                           x.Category ==
                                                           "nylonSachet"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4438,7 +4438,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "e-waste"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4451,7 +4451,7 @@ organisationController.weekChartData = (req, res) => {
                                                           x.Category == "Can" ||
                                                           x.Category == "can"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4466,7 +4466,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "petBottle"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4482,7 +4482,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "Carton"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4498,7 +4498,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "rubber"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4514,7 +4514,7 @@ organisationController.weekChartData = (req, res) => {
                                                             "plastic"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -4528,7 +4528,7 @@ organisationController.weekChartData = (req, res) => {
                                                           "glass" ||
                                                           x.Category == "Glass"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4541,7 +4541,7 @@ organisationController.weekChartData = (req, res) => {
                                                           "metal" ||
                                                           x.Category == "Metal"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4555,7 +4555,7 @@ organisationController.weekChartData = (req, res) => {
                                                           x.Category ==
                                                           "nylonSachet"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -4571,14 +4571,13 @@ organisationController.weekChartData = (req, res) => {
                                                             "e-waste"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
                                                               acc + curr,
                                                             0
                                                           );
-
                                                       return res
                                                         .status(200)
                                                         .json({
