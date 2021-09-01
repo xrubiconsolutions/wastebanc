@@ -192,6 +192,7 @@ cron.schedule('01 7 * * *', function(){
   })
 });
 
+
 // MODEL.scheduleModel.find({"collectorStatus": "accept" , "completionStatus": "pending", "organisation": "Pakam Test"}).then((data)=>{
 //   console.log("data", data)
 //   for (let i = 0; i < data.length ; i++){
