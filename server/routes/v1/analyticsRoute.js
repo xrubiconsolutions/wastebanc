@@ -18,7 +18,7 @@ module.exports = (APP) => {
   );
 
   APP.route('/api/filter/schedules').get(
-    auth.userCollectorData,
+    // auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlySchedules
   );
 

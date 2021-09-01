@@ -632,8 +632,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$expiryDuration' }, year] },
-            { $eq: [{ $month: '$expiryDuration' }, 1] },
+            { $eq: [{ $year: '$createdAt' }, year] },
+            { $eq: [{ $month: '$createdAt' }, 1] },
           ],
         },
       })
@@ -645,8 +645,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$expiryDuration' }, year] },
-                { $eq: [{ $month: '$expiryDuration' }, 2] },
+                { $eq: [{ $year: '$createdAt' }, year] },
+                { $eq: [{ $month: '$createdAt' }, 2] },
               ],
             },
           })
@@ -658,8 +658,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$expiryDuration' }, year] },
-                    { $eq: [{ $month: '$expiryDuration' }, 3] },
+                    { $eq: [{ $year: '$createdAt' }, year] },
+                    { $eq: [{ $month: '$createdAt' }, 3] },
                   ],
                 },
               })
@@ -671,8 +671,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$expiryDuration' }, year] },
-                        { $eq: [{ $month: '$expiryDuration' }, 4] },
+                        { $eq: [{ $year: '$createdAt' }, year] },
+                        { $eq: [{ $month: '$createdAt' }, 4] },
                       ],
                     },
                   })
@@ -684,8 +684,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$expiryDuration' }, year] },
-                            { $eq: [{ $month: '$expiryDuration' }, 5] },
+                            { $eq: [{ $year: '$createdAt' }, year] },
+                            { $eq: [{ $month: '$createdAt' }, 5] },
                           ],
                         },
                       })
@@ -697,8 +697,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$expiryDuration' }, year] },
-                                { $eq: [{ $month: '$expiryDuration' }, 6] },
+                                { $eq: [{ $year: '$createdAt' }, year] },
+                                { $eq: [{ $month: '$createdAt' }, 6] },
                               ],
                             },
                           })
@@ -710,8 +710,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$expiryDuration' }, year] },
-                                    { $eq: [{ $month: '$expiryDuration' }, 7] },
+                                    { $eq: [{ $year: '$createdAt' }, year] },
+                                    { $eq: [{ $month: '$createdAt' }, 7] },
                                   ],
                                 },
                               })
@@ -724,9 +724,9 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$expiryDuration' }, year],
+                                          $eq: [{ $year: '$createdAt' }, year],
                                         },
-                                        { $eq: [{ $month: '$expiryDuration' }, 8] },
+                                        { $eq: [{ $month: '$createdAt' }, 8] },
                                       ],
                                     },
                                   })
@@ -740,13 +740,13 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$expiryDuration' },
+                                                { $year: '$createdAt' },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$expiryDuration' },
+                                                { $month: '$createdAt' },
                                                 9,
                                               ],
                                             },
@@ -763,13 +763,13 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$expiryDuration' },
+                                                    { $year: '$createdAt' },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$expiryDuration' },
+                                                    { $month: '$createdAt' },
                                                     10,
                                                   ],
                                                 },
@@ -786,14 +786,14 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$expiryDuration' },
+                                                        { $year: '$createdAt' },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$expiryDuration',
+                                                          $month: '$createdAt',
                                                         },
                                                         11,
                                                       ],
@@ -813,7 +813,7 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$expiryDuration',
+                                                                '$createdAt',
                                                             },
                                                             year,
                                                           ],
@@ -822,7 +822,7 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$expiryDuration',
+                                                                '$createdAt',
                                                             },
                                                             12,
                                                           ],
