@@ -308,6 +308,7 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
                     collectedBy: results._id,
                     organisation: results.organisation,
                     organisationCollection: results.approvedBy,
+                    recycler: results.fullname
                   },
                 }
               )
@@ -385,6 +386,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
                   organisation: result.organisation,
                   collectedBy: result._id,
                   organisationCollection: result.approvedBy,
+                  recycler: result.recycler
                 },
               },
 
@@ -609,7 +611,8 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                   $set: {
                                     completionStatus: 'completed',
                                     collectedBy: collectorID,
-                                    quantity: quantity
+                                    quantity: quantity,
+                                    completionDate: new Date()
                                   },
                                 },
                                 (err, res) => {

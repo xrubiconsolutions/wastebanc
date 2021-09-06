@@ -67,6 +67,27 @@ var sendNotification = function (data) {
 };
 
 
+// MODEL.scheduleModel.find({
+//     collectorStatus: "accept",
+//     completionStatus: "completed"
+// }).then((schedules)=>{
+//       for(let i = 0; i < schedules.length; i++){
+//         MODEL.collectorModel.findOne({
+//           _id: schedules[i].collectedBy
+//         }).then(val=>{
+//             MODEL.scheduleModel.updateOne({
+//               _id: schedules[i]._id
+//             },{
+//               $set: {
+//                      recycler: val?.fullname
+//               }
+//             },(err,result)=>{
+//               console.log('name',result)
+//             })
+//         })
+//       }     
+// })
+
 //'01 7 * * *'
 cron.schedule('0 7 * * *', function(){
   const active_today = new Date();
