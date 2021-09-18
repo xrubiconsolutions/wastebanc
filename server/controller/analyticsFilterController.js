@@ -1,30 +1,30 @@
-'use strict';
+"use strict";
 
 /**************************************************
  ***** Organisation controller for organisation logic ****
  **************************************************/
 
 let analyticsFilterController = {};
-let MODEL = require('../models');
-let COMMON_FUN = require('../util/commonFunction');
-let SERVICE = require('../services/commonService');
-let CONSTANTS = require('../util/constants');
-let FS = require('fs');
-const { Response } = require('aws-sdk');
-var request = require('request');
-const https = require('https');
+let MODEL = require("../models");
+let COMMON_FUN = require("../util/commonFunction");
+let SERVICE = require("../services/commonService");
+let CONSTANTS = require("../util/constants");
+let FS = require("fs");
+const { Response } = require("aws-sdk");
+var request = require("request");
+const https = require("https");
 
 analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
     MODEL.userModel
       .find({
-        verified : true,
+        verified: true,
         roles: "client",
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createAt' }, year] },
-            { $eq: [{ $month: '$createAt' }, 1] },
+            { $eq: [{ $year: "$createAt" }, year] },
+            { $eq: [{ $month: "$createAt" }, 1] },
           ],
         },
       })
@@ -35,11 +35,11 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
         MODEL.userModel
           .find({
             roles: "client",
-            verified : true,
+            verified: true,
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createAt' }, year] },
-                { $eq: [{ $month: '$createAt' }, 2] },
+                { $eq: [{ $year: "$createAt" }, year] },
+                { $eq: [{ $month: "$createAt" }, 2] },
               ],
             },
           })
@@ -50,11 +50,11 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
             MODEL.userModel
               .find({
                 roles: "client",
-                verified : true,
+                verified: true,
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createAt' }, year] },
-                    { $eq: [{ $month: '$createAt' }, 3] },
+                    { $eq: [{ $year: "$createAt" }, year] },
+                    { $eq: [{ $month: "$createAt" }, 3] },
                   ],
                 },
               })
@@ -65,11 +65,11 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                 MODEL.userModel
                   .find({
                     roles: "client",
-                    verified : true,
+                    verified: true,
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createAt' }, year] },
-                        { $eq: [{ $month: '$createAt' }, 4] },
+                        { $eq: [{ $year: "$createAt" }, year] },
+                        { $eq: [{ $month: "$createAt" }, 4] },
                       ],
                     },
                   })
@@ -80,11 +80,11 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                     MODEL.userModel
                       .find({
                         roles: "client",
-                        verified : true,
+                        verified: true,
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createAt' }, year] },
-                            { $eq: [{ $month: '$createAt' }, 5] },
+                            { $eq: [{ $year: "$createAt" }, year] },
+                            { $eq: [{ $month: "$createAt" }, 5] },
                           ],
                         },
                       })
@@ -95,11 +95,11 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                         MODEL.userModel
                           .find({
                             roles: "client",
-                            verified : true,
+                            verified: true,
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createAt' }, year] },
-                                { $eq: [{ $month: '$createAt' }, 6] },
+                                { $eq: [{ $year: "$createAt" }, year] },
+                                { $eq: [{ $month: "$createAt" }, 6] },
                               ],
                             },
                           })
@@ -110,11 +110,11 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                             MODEL.userModel
                               .find({
                                 roles: "client",
-                                verified : true,
+                                verified: true,
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createAt' }, year] },
-                                    { $eq: [{ $month: '$createAt' }, 7] },
+                                    { $eq: [{ $year: "$createAt" }, year] },
+                                    { $eq: [{ $month: "$createAt" }, 7] },
                                   ],
                                 },
                               })
@@ -125,11 +125,11 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                 MODEL.userModel
                                   .find({
                                     roles: "client",
-                                    verified : true,
+                                    verified: true,
                                     $expr: {
                                       $and: [
-                                        { $eq: [{ $year: '$createAt' }, year] },
-                                        { $eq: [{ $month: '$createAt' }, 8] },
+                                        { $eq: [{ $year: "$createAt" }, year] },
+                                        { $eq: [{ $month: "$createAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -140,17 +140,17 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                     MODEL.userModel
                                       .find({
                                         roles: "client",
-                                        verified : true,
+                                        verified: true,
                                         $expr: {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createAt' },
+                                                { $year: "$createAt" },
                                                 year,
                                               ],
                                             },
                                             {
-                                              $eq: [{ $month: '$createAt' }, 9],
+                                              $eq: [{ $month: "$createAt" }, 9],
                                             },
                                           ],
                                         },
@@ -162,18 +162,18 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                         MODEL.userModel
                                           .find({
                                             roles: "client",
-                                            verified : true,
+                                            verified: true,
                                             $expr: {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createAt' },
+                                                    { $year: "$createAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createAt' },
+                                                    { $month: "$createAt" },
                                                     10,
                                                   ],
                                                 },
@@ -187,18 +187,18 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                             MODEL.userModel
                                               .find({
                                                 roles: "client",
-                                                verified : true,
+                                                verified: true,
                                                 $expr: {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createAt' },
+                                                        { $year: "$createAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
-                                                        { $month: '$createAt' },
+                                                        { $month: "$createAt" },
                                                         11,
                                                       ],
                                                     },
@@ -212,14 +212,14 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                                 MODEL.userModel
                                                   .find({
                                                     roles: "client",
-                                                    verified : true,
+                                                    verified: true,
                                                     $expr: {
                                                       $and: [
                                                         {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createAt',
+                                                                "$createAt",
                                                             },
                                                             year,
                                                           ],
@@ -228,7 +228,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createAt',
+                                                                "$createAt",
                                                             },
                                                             12,
                                                           ],
@@ -241,62 +241,226 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                                   })
                                                   .then((Dec) => {
                                                     MODEL.userModel
-                                                      .find({ 
+                                                      .find({
                                                         roles: "client",
-                                                        verified : true,
+                                                        verified: true,
                                                       })
                                                       .then((Analytics) => {
-                                                        RESPONSE.status(200).json({
+                                                        return RESPONSE.status(
+                                                          200
+                                                        ).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                             users: jan,
                                                           },
                                                           FEBRUARY: {
-                                                            amount: feb.length + jan.length,
-                                                            users: [...feb, ...jan ],
+                                                            amount:
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           MARCH: {
                                                             amount:
-                                                              march.length + feb.length + jan.length,
-                                                            users: [...march, ...feb , ...jan]
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           APRIL: {
                                                             amount:
-                                                              april.length  + march.length + feb.length + jan.length,
-                                                            users: [...april, ...march , ...feb , ...jan]
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           MAY: {
-                                                            amount: may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...may, ...april , ...march , ...feb , ...jan] 
+                                                            amount:
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           JUNE: {
-                                                            amount: june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           JULY: {
-                                                            amount: july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           AUGUST: {
-                                                            amount: Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              Aug.length +
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...Aug,
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           SEPTEMBER: {
-                                                            amount: sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              sept.length +
+                                                              Aug.length +
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...sept,
+                                                              ...Aug,
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           OCTOBER: {
-                                                            amount: Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              Oct.length +
+                                                              sept.length +
+                                                              Aug.length +
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...Oct,
+                                                              ...sept,
+                                                              ...Aug,
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           NOVEMBER: {
-                                                            amount: Nov.length+Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...Nov,...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              Nov.length +
+                                                              Oct.length +
+                                                              sept.length +
+                                                              Aug.length +
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...Nov,
+                                                              ...Oct,
+                                                              ...sept,
+                                                              ...Aug,
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           DECEMBER: {
-                                                            amount: Dec.length+Nov.length+Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...Dec,...Nov,...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
-                          
+                                                            amount:
+                                                              Dec.length +
+                                                              Nov.length +
+                                                              Oct.length +
+                                                              sept.length +
+                                                              Aug.length +
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...Dec,
+                                                              ...Nov,
+                                                              ...Oct,
+                                                              ...sept,
+                                                              ...Aug,
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           ALL: {
                                                             amount:
@@ -327,11 +491,11 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
   try {
     MODEL.collectorModel
       .find({
-        verified : true,
+        verified: true,
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -341,11 +505,11 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
       .then((jan) => {
         MODEL.collectorModel
           .find({
-            verified : true,
+            verified: true,
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -355,11 +519,11 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
           .then((feb) => {
             MODEL.collectorModel
               .find({
-                verified : true,
+                verified: true,
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -369,11 +533,11 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
               .then((march) => {
                 MODEL.collectorModel
                   .find({
-                    verified : true,
+                    verified: true,
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -383,11 +547,11 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                   .then((april) => {
                     MODEL.collectorModel
                       .find({
-                        verified : true,
+                        verified: true,
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -397,11 +561,11 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                       .then((may) => {
                         MODEL.collectorModel
                           .find({
-                            verified : true,
+                            verified: true,
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -411,11 +575,11 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                           .then((june) => {
                             MODEL.collectorModel
                               .find({
-                                verified : true,
+                                verified: true,
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -425,13 +589,13 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                               .then((july) => {
                                 MODEL.collectorModel
                                   .find({
-                                    verified : true,
+                                    verified: true,
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -441,18 +605,18 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                   .then((Aug) => {
                                     MODEL.collectorModel
                                       .find({
-                                        verified : true,
+                                        verified: true,
                                         $expr: {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -465,18 +629,18 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                       .then((sept) => {
                                         MODEL.collectorModel
                                           .find({
-                                            verified : true,
+                                            verified: true,
                                             $expr: {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -489,19 +653,19 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                           .then((Oct) => {
                                             MODEL.collectorModel
                                               .find({
-                                                verified : true,
+                                                verified: true,
                                                 $expr: {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -515,14 +679,14 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                               .then((Nov) => {
                                                 MODEL.collectorModel
                                                   .find({
-                                                    verified : true,
+                                                    verified: true,
                                                     $expr: {
                                                       $and: [
                                                         {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -531,7 +695,7 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -544,59 +708,223 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
                                                   })
                                                   .then((Dec) => {
                                                     MODEL.collectorModel
-                                                      .find({ verified : true })
+                                                      .find({ verified: true })
                                                       .then((Analytics) => {
-                                                        RESPONSE.status(200).json({
+                                                        RESPONSE.status(
+                                                          200
+                                                        ).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                             users: jan,
                                                           },
                                                           FEBRUARY: {
-                                                            amount: feb.length + jan.length,
-                                                            users: [...feb, ...jan ],
+                                                            amount:
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           MARCH: {
                                                             amount:
-                                                              march.length + feb.length + jan.length,
-                                                            users: [...march, ...feb , ...jan]
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           APRIL: {
                                                             amount:
-                                                              april.length  + march.length + feb.length + jan.length,
-                                                            users: [...april, ...march , ...feb , ...jan]
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           MAY: {
-                                                            amount: may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...may, ...april , ...march , ...feb , ...jan] 
+                                                            amount:
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           JUNE: {
-                                                            amount: june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           JULY: {
-                                                            amount: july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           AUGUST: {
-                                                            amount: Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              Aug.length +
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...Aug,
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           SEPTEMBER: {
-                                                            amount: sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              sept.length +
+                                                              Aug.length +
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...sept,
+                                                              ...Aug,
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           OCTOBER: {
-                                                            amount: Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              Oct.length +
+                                                              sept.length +
+                                                              Aug.length +
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...Oct,
+                                                              ...sept,
+                                                              ...Aug,
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           NOVEMBER: {
-                                                            amount: Nov.length+Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...Nov,...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
+                                                            amount:
+                                                              Nov.length +
+                                                              Oct.length +
+                                                              sept.length +
+                                                              Aug.length +
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...Nov,
+                                                              ...Oct,
+                                                              ...sept,
+                                                              ...Aug,
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           DECEMBER: {
-                                                            amount: Dec.length+Nov.length+Oct.length+ sept.length+Aug.length + july.length+ june.length + may.length + april.length + march.length + feb.length + jan.length,
-                                                            users: [...Dec,...Nov,...Oct,...sept,...Aug,...july, ...june,...may, ...april , ...march , ...feb , ...jan]
-                          
+                                                            amount:
+                                                              Dec.length +
+                                                              Nov.length +
+                                                              Oct.length +
+                                                              sept.length +
+                                                              Aug.length +
+                                                              july.length +
+                                                              june.length +
+                                                              may.length +
+                                                              april.length +
+                                                              march.length +
+                                                              feb.length +
+                                                              jan.length,
+                                                            users: [
+                                                              ...Dec,
+                                                              ...Nov,
+                                                              ...Oct,
+                                                              ...sept,
+                                                              ...Aug,
+                                                              ...july,
+                                                              ...june,
+                                                              ...may,
+                                                              ...april,
+                                                              ...march,
+                                                              ...feb,
+                                                              ...jan,
+                                                            ],
                                                           },
                                                           ALL: {
                                                             amount:
@@ -622,9 +950,6 @@ analyticsFilterController.monthlyRecyclers = (REQUEST, RESPONSE) => {
   }
 };
 
-
-
-
 analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
@@ -632,8 +957,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -645,8 +970,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -658,8 +983,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -671,8 +996,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -684,8 +1009,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -697,8 +1022,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -710,8 +1035,8 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -724,9 +1049,9 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -740,13 +1065,13 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -763,13 +1088,13 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -786,14 +1111,14 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -813,7 +1138,7 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -822,7 +1147,7 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -837,7 +1162,9 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                                     MODEL.scheduleModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                        RESPONSE.status(200).json({
+                                                        RESPONSE.status(
+                                                          200
+                                                        ).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                             schedules: jan,
@@ -886,12 +1213,13 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
                                                           },
                                                           DECEMBER: {
                                                             amount: Dec.length,
-                                                             schedules: Dec,
+                                                            schedules: Dec,
                                                           },
                                                           ALL: {
                                                             amount:
                                                               Analytics.length,
-                                                            schedules: Analytics,
+                                                            schedules:
+                                                              Analytics,
                                                           },
                                                         });
                                                       });
@@ -912,8 +1240,6 @@ analyticsFilterController.monthlySchedules = (REQUEST, RESPONSE) => {
   }
 };
 
-
-
 analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
@@ -921,8 +1247,8 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -934,8 +1260,8 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -947,8 +1273,8 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -960,8 +1286,8 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -973,8 +1299,8 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -986,8 +1312,8 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -999,8 +1325,8 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -1013,9 +1339,9 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -1029,13 +1355,13 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -1052,13 +1378,13 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -1075,14 +1401,14 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -1102,7 +1428,7 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -1111,7 +1437,7 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -1126,61 +1452,63 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
                                                     MODEL.advertModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                        RESPONSE.status(200).json({
+                                                        RESPONSE.status(
+                                                          200
+                                                        ).json({
                                                           JANUARY: {
                                                             amount: jan.length,
-                                                           adverts: jan,
+                                                            adverts: jan,
                                                           },
                                                           FEBRUARY: {
                                                             amount: feb.length,
-                                                           adverts: feb,
+                                                            adverts: feb,
                                                           },
                                                           MARCH: {
                                                             amount:
                                                               march.length,
-                                                           adverts: march,
+                                                            adverts: march,
                                                           },
                                                           APRIL: {
                                                             amount:
                                                               april.length,
-                                                           adverts: april,
+                                                            adverts: april,
                                                           },
                                                           MAY: {
                                                             amount: may.length,
-                                                           adverts: may,
+                                                            adverts: may,
                                                           },
                                                           JUNE: {
                                                             amount: june.length,
-                                                           adverts: june,
+                                                            adverts: june,
                                                           },
                                                           JULY: {
                                                             amount: july.length,
-                                                           adverts: july,
+                                                            adverts: july,
                                                           },
                                                           AUGUST: {
                                                             amount: Aug.length,
-                                                           adverts: Aug,
+                                                            adverts: Aug,
                                                           },
                                                           SEPTEMBER: {
                                                             amount: sept.length,
-                                                           adverts: sept,
+                                                            adverts: sept,
                                                           },
                                                           OCTOBER: {
                                                             amount: Oct.length,
-                                                           adverts: Oct,
+                                                            adverts: Oct,
                                                           },
                                                           NOVEMBER: {
                                                             amount: Nov.length,
-                                                           adverts: Nov,
+                                                            adverts: Nov,
                                                           },
                                                           DECEMBER: {
                                                             amount: Dec.length,
-                                                           adverts: Dec,
+                                                            adverts: Dec,
                                                           },
                                                           ALL: {
                                                             amount:
                                                               Analytics.length,
-                                                           adverts: Analytics,
+                                                            adverts: Analytics,
                                                           },
                                                         });
                                                       });
@@ -1201,9 +1529,6 @@ analyticsFilterController.monthlyAdverts = (REQUEST, RESPONSE) => {
   }
 };
 
-
-
-
 analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
@@ -1211,8 +1536,8 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -1224,8 +1549,8 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -1237,8 +1562,8 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -1250,8 +1575,8 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -1263,8 +1588,8 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -1276,8 +1601,8 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -1289,8 +1614,8 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -1303,9 +1628,9 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -1319,13 +1644,13 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -1342,13 +1667,13 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -1365,14 +1690,14 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -1392,7 +1717,7 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -1401,7 +1726,7 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -1416,61 +1741,63 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
                                                     MODEL.reportLogModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                        RESPONSE.status(200).json({
+                                                        RESPONSE.status(
+                                                          200
+                                                        ).json({
                                                           JANUARY: {
                                                             amount: jan.length,
-                                                           reports: jan,
+                                                            reports: jan,
                                                           },
                                                           FEBRUARY: {
                                                             amount: feb.length,
-                                                           reports: feb,
+                                                            reports: feb,
                                                           },
                                                           MARCH: {
                                                             amount:
                                                               march.length,
-                                                           reports: march,
+                                                            reports: march,
                                                           },
                                                           APRIL: {
                                                             amount:
                                                               april.length,
-                                                           reports: april,
+                                                            reports: april,
                                                           },
                                                           MAY: {
                                                             amount: may.length,
-                                                           reports: may,
+                                                            reports: may,
                                                           },
                                                           JUNE: {
                                                             amount: june.length,
-                                                           reports: june,
+                                                            reports: june,
                                                           },
                                                           JULY: {
                                                             amount: july.length,
-                                                           reports: july,
+                                                            reports: july,
                                                           },
                                                           AUGUST: {
                                                             amount: Aug.length,
-                                                           reports: Aug,
+                                                            reports: Aug,
                                                           },
                                                           SEPTEMBER: {
                                                             amount: sept.length,
-                                                           reports: sept,
+                                                            reports: sept,
                                                           },
                                                           OCTOBER: {
                                                             amount: Oct.length,
-                                                           reports: Oct,
+                                                            reports: Oct,
                                                           },
                                                           NOVEMBER: {
                                                             amount: Nov.length,
-                                                           reports: Nov,
+                                                            reports: Nov,
                                                           },
                                                           DECEMBER: {
                                                             amount: Dec.length,
-                                                           reports: Dec,
+                                                            reports: Dec,
                                                           },
                                                           ALL: {
                                                             amount:
                                                               Analytics.length,
-                                                           reports: Analytics,
+                                                            reports: Analytics,
                                                           },
                                                         });
                                                       });
@@ -1491,7 +1818,6 @@ analyticsFilterController.monthlyReports = (REQUEST, RESPONSE) => {
   }
 };
 
-
 analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
@@ -1499,8 +1825,8 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createAt' }, year] },
-            { $eq: [{ $month: '$createAt' }, 1] },
+            { $eq: [{ $year: "$createAt" }, year] },
+            { $eq: [{ $month: "$createAt" }, 1] },
           ],
         },
       })
@@ -1512,8 +1838,8 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createAt' }, year] },
-                { $eq: [{ $month: '$createAt' }, 2] },
+                { $eq: [{ $year: "$createAt" }, year] },
+                { $eq: [{ $month: "$createAt" }, 2] },
               ],
             },
           })
@@ -1525,8 +1851,8 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createAt' }, year] },
-                    { $eq: [{ $month: '$createAt' }, 3] },
+                    { $eq: [{ $year: "$createAt" }, year] },
+                    { $eq: [{ $month: "$createAt" }, 3] },
                   ],
                 },
               })
@@ -1538,8 +1864,8 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createAt' }, year] },
-                        { $eq: [{ $month: '$createAt' }, 4] },
+                        { $eq: [{ $year: "$createAt" }, year] },
+                        { $eq: [{ $month: "$createAt" }, 4] },
                       ],
                     },
                   })
@@ -1551,8 +1877,8 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createAt' }, year] },
-                            { $eq: [{ $month: '$createAt' }, 5] },
+                            { $eq: [{ $year: "$createAt" }, year] },
+                            { $eq: [{ $month: "$createAt" }, 5] },
                           ],
                         },
                       })
@@ -1564,8 +1890,8 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createAt' }, year] },
-                                { $eq: [{ $month: '$createAt' }, 6] },
+                                { $eq: [{ $year: "$createAt" }, year] },
+                                { $eq: [{ $month: "$createAt" }, 6] },
                               ],
                             },
                           })
@@ -1577,8 +1903,8 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createAt' }, year] },
-                                    { $eq: [{ $month: '$createAt' }, 7] },
+                                    { $eq: [{ $year: "$createAt" }, year] },
+                                    { $eq: [{ $month: "$createAt" }, 7] },
                                   ],
                                 },
                               })
@@ -1591,9 +1917,9 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createAt' }, year],
+                                          $eq: [{ $year: "$createAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createAt' }, 8] },
+                                        { $eq: [{ $month: "$createAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -1607,15 +1933,12 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createAt' },
+                                                { $year: "$createAt" },
                                                 year,
                                               ],
                                             },
                                             {
-                                              $eq: [
-                                                { $month: '$createAt' },
-                                                9,
-                                              ],
+                                              $eq: [{ $month: "$createAt" }, 9],
                                             },
                                           ],
                                         },
@@ -1630,13 +1953,13 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createAt' },
+                                                    { $year: "$createAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createAt' },
+                                                    { $month: "$createAt" },
                                                     10,
                                                   ],
                                                 },
@@ -1653,14 +1976,14 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createAt' },
+                                                        { $year: "$createAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createAt',
+                                                          $month: "$createAt",
                                                         },
                                                         11,
                                                       ],
@@ -1680,7 +2003,7 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createAt',
+                                                                "$createAt",
                                                             },
                                                             year,
                                                           ],
@@ -1689,7 +2012,7 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createAt',
+                                                                "$createAt",
                                                             },
                                                             12,
                                                           ],
@@ -1704,61 +2027,64 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
                                                     MODEL.organisationModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                        RESPONSE.status(200).json({
+                                                        RESPONSE.status(
+                                                          200
+                                                        ).json({
                                                           JANUARY: {
                                                             amount: jan.length,
-                                                           companies: jan,
+                                                            companies: jan,
                                                           },
                                                           FEBRUARY: {
                                                             amount: feb.length,
-                                                           companies: feb,
+                                                            companies: feb,
                                                           },
                                                           MARCH: {
                                                             amount:
                                                               march.length,
-                                                           companies: march,
+                                                            companies: march,
                                                           },
                                                           APRIL: {
                                                             amount:
                                                               april.length,
-                                                           companies: april,
+                                                            companies: april,
                                                           },
                                                           MAY: {
                                                             amount: may.length,
-                                                           companies: may,
+                                                            companies: may,
                                                           },
                                                           JUNE: {
                                                             amount: june.length,
-                                                           companies: june,
+                                                            companies: june,
                                                           },
                                                           JULY: {
                                                             amount: july.length,
-                                                           companies: july,
+                                                            companies: july,
                                                           },
                                                           AUGUST: {
                                                             amount: Aug.length,
-                                                           companies: Aug,
+                                                            companies: Aug,
                                                           },
                                                           SEPTEMBER: {
                                                             amount: sept.length,
-                                                           companies: sept,
+                                                            companies: sept,
                                                           },
                                                           OCTOBER: {
                                                             amount: Oct.length,
-                                                           companies: Oct,
+                                                            companies: Oct,
                                                           },
                                                           NOVEMBER: {
                                                             amount: Nov.length,
-                                                           companies: Nov,
+                                                            companies: Nov,
                                                           },
                                                           DECEMBER: {
                                                             amount: Dec.length,
-                                                           companies: Dec,
+                                                            companies: Dec,
                                                           },
                                                           ALL: {
                                                             amount:
                                                               Analytics.length,
-                                                           companies: Analytics,
+                                                            companies:
+                                                              Analytics,
                                                           },
                                                         });
                                                       });
@@ -1779,8 +2105,6 @@ analyticsFilterController.monthlyCompanies = (REQUEST, RESPONSE) => {
   }
 };
 
-
-
 analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
@@ -1788,8 +2112,8 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -1801,8 +2125,8 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -1814,8 +2138,8 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -1827,8 +2151,8 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -1840,8 +2164,8 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -1853,8 +2177,8 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -1866,8 +2190,8 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -1880,9 +2204,9 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -1896,13 +2220,13 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -1919,13 +2243,13 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -1942,14 +2266,14 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -1969,7 +2293,7 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -1978,7 +2302,7 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -1993,50 +2317,142 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
                                                     MODEL.transactionModel
                                                       .find({})
                                                       .then((Analytics) => {
-                                                
-                                                        RESPONSE.status(200).json({
+                                                        RESPONSE.status(
+                                                          200
+                                                        ).json({
                                                           JANUARY: {
-                                                            amount: jan.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0)
-                                                          
+                                                            amount: jan
+                                                              .map(
+                                                                (x) => x.weight
+                                                              )
+                                                              .reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
                                                           },
                                                           FEBRUARY: {
-                                                            amount: feb.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0)
+                                                            amount: feb
+                                                              .map(
+                                                                (x) => x.weight
+                                                              )
+                                                              .reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
                                                           },
                                                           MARCH: {
-                                                            amount:
-                                                              march.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0)
+                                                            amount: march
+                                                              .map(
+                                                                (x) => x.weight
+                                                              )
+                                                              .reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
                                                           },
                                                           APRIL: {
-                                                            amount:
-                                                              april.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0),
+                                                            amount: april
+                                                              .map(
+                                                                (x) => x.weight
+                                                              )
+                                                              .reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
                                                           },
                                                           MAY: {
-                                                            amount: may.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0),
+                                                            amount: may
+                                                              .map(
+                                                                (x) => x.weight
+                                                              )
+                                                              .reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
                                                           },
                                                           JUNE: {
-                                                            amount: june.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0),
+                                                            amount: june
+                                                              .map(
+                                                                (x) => x.weight
+                                                              )
+                                                              .reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
                                                           },
                                                           JULY: {
-                                                            amount: july.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0),
+                                                            amount: july
+                                                              .map(
+                                                                (x) => x.weight
+                                                              )
+                                                              .reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
                                                           },
                                                           AUGUST: {
-                                                            amount: Aug.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0),
+                                                            amount: Aug.map(
+                                                              (x) => x.weight
+                                                            ).reduce(
+                                                              (acc, curr) =>
+                                                                acc + curr,
+                                                              0
+                                                            ),
                                                           },
                                                           SEPTEMBER: {
-                                                            amount: sept.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0),
+                                                            amount: sept
+                                                              .map(
+                                                                (x) => x.weight
+                                                              )
+                                                              .reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
                                                           },
                                                           OCTOBER: {
-                                                            amount: Oct.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0),
+                                                            amount: Oct.map(
+                                                              (x) => x.weight
+                                                            ).reduce(
+                                                              (acc, curr) =>
+                                                                acc + curr,
+                                                              0
+                                                            ),
                                                           },
                                                           NOVEMBER: {
-                                                            amount: Nov.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0),
+                                                            amount: Nov.map(
+                                                              (x) => x.weight
+                                                            ).reduce(
+                                                              (acc, curr) =>
+                                                                acc + curr,
+                                                              0
+                                                            ),
                                                           },
                                                           DECEMBER: {
-                                                            amount: Dec.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0),
+                                                            amount: Dec.map(
+                                                              (x) => x.weight
+                                                            ).reduce(
+                                                              (acc, curr) =>
+                                                                acc + curr,
+                                                              0
+                                                            ),
                                                           },
                                                           ALL: {
                                                             amount:
-                                                              Analytics.map(x=>x.weight).reduce((acc,curr)=>acc+curr,0),
+                                                              Analytics.map(
+                                                                (x) => x.weight
+                                                              ).reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
                                                           },
                                                         });
                                                       });
@@ -2057,24 +2473,19 @@ analyticsFilterController.monthlyWasteCollected = (REQUEST, RESPONSE) => {
   }
 };
 
-
-analyticsFilterController.advertsRequest = (REQUEST,RESPONSE)=>{
-  try{
-    MODEL.advertModel.find({
-      authenticated: false
-    }).then((adverts)=>{
-      return RESPONSE.status(200).json(adverts)
-    })
+analyticsFilterController.advertsRequest = (REQUEST, RESPONSE) => {
+  try {
+    MODEL.advertModel
+      .find({
+        authenticated: false,
+      })
+      .then((adverts) => {
+        return RESPONSE.status(200).json(adverts);
+      });
+  } catch (err) {
+    return RESPONSE.status(500).json(err);
   }
-  catch(err){
-        return RESPONSE.status(500).json(err)
-  }
-}
-
-
-
-
-
+};
 
 /* export analyticsFilterController */
 module.exports = analyticsFilterController;
