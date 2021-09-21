@@ -13,12 +13,12 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/filter/paginated/users").get(
-    //auth.userCollectorData,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlyFilterPaginated
   );
 
   APP.route("/api/filter/paginated/schedules").get(
-    //auth.userCollectorData,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlyFilterSchedulesPaginated
   );
 
@@ -28,7 +28,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/filter/schedules").get(
-    // auth.userCollectorData,
+    auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlySchedules
   );
 
