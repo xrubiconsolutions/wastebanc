@@ -16,6 +16,14 @@ const https = require("https");
 
 analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
+  // const page = parseInt(req.query.page);
+  // const limit = parseInt(req.query.limit);
+  // const startIndex = (page - 1) * limit;
+  // const endIndex = page * limit;
+
+  // const limitValue = req.query.limit || 2;
+  // const skipValue = req.query.skip || 0;
+  // const posts = await postModel.find().limit(limitValue).skip(skipValue);
   try {
     MODEL.userModel
       .find({
@@ -46,6 +54,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
           .sort({
             _id: -1,
           })
+
           .then((feb) => {
             MODEL.userModel
               .find({
@@ -61,6 +70,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
               .sort({
                 _id: -1,
               })
+
               .then((march) => {
                 MODEL.userModel
                   .find({
@@ -91,6 +101,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                       .sort({
                         _id: -1,
                       })
+
                       .then((may) => {
                         MODEL.userModel
                           .find({
@@ -158,6 +169,7 @@ analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
                                       .sort({
                                         _id: -1,
                                       })
+
                                       .then((sept) => {
                                         MODEL.userModel
                                           .find({
@@ -2484,6 +2496,622 @@ analyticsFilterController.advertsRequest = (REQUEST, RESPONSE) => {
       });
   } catch (err) {
     return RESPONSE.status(500).json(err);
+  }
+};
+
+analyticsFilterController.monthlyFilterPaginated = (req, res) => {
+  var year = new Date().getFullYear();
+  var page = req.query.page;
+  const limit = 20;
+  var skip;
+  if (page === 1) {
+    skip = 0;
+  }
+  skip = (page - 1) * limit;
+  try {
+    MODEL.userModel
+      .find({
+        roles: "client",
+        $expr: {
+          $and: [
+            { $eq: [{ $year: "$createAt" }, year] },
+            { $eq: [{ $month: "$createAt" }, 1] },
+          ],
+        },
+      })
+      .sort({
+        _id: -1,
+      })
+      .skip(skip)
+      .limit(limit)
+      .then((jan) => {
+        MODEL.userModel
+          .find({
+            roles: "client",
+            $expr: {
+              $and: [
+                { $eq: [{ $year: "$createAt" }, year] },
+                { $eq: [{ $month: "$createAt" }, 2] },
+              ],
+            },
+          })
+          .sort({
+            _id: -1,
+          })
+          .skip(skip)
+          .limit(limit)
+          .then((feb) => {
+            MODEL.userModel
+              .find({
+                roles: "client",
+                $expr: {
+                  $and: [
+                    { $eq: [{ $year: "$createAt" }, year] },
+                    { $eq: [{ $month: "$createAt" }, 3] },
+                  ],
+                },
+              })
+              .sort({
+                _id: -1,
+              })
+              .skip(skip)
+              .limit(limit)
+              .then((march) => {
+                MODEL.userModel
+                  .find({
+                    roles: "client",
+                    $expr: {
+                      $and: [
+                        { $eq: [{ $year: "$createAt" }, year] },
+                        { $eq: [{ $month: "$createAt" }, 4] },
+                      ],
+                    },
+                  })
+                  .sort({
+                    _id: -1,
+                  })
+                  .skip(skip)
+                  .limit(limit)
+                  .then((april) => {
+                    MODEL.userModel
+                      .find({
+                        roles: "client",
+                        $expr: {
+                          $and: [
+                            { $eq: [{ $year: "$createAt" }, year] },
+                            { $eq: [{ $month: "$createAt" }, 5] },
+                          ],
+                        },
+                      })
+                      .sort({
+                        _id: -1,
+                      })
+                      .skip(skip)
+                      .limit(limit)
+                      .then((may) => {
+                        MODEL.userModel
+                          .find({
+                            roles: "client",
+                            $expr: {
+                              $and: [
+                                { $eq: [{ $year: "$createAt" }, year] },
+                                { $eq: [{ $month: "$createAt" }, 6] },
+                              ],
+                            },
+                          })
+                          .sort({
+                            _id: -1,
+                          })
+                          .skip(skip)
+                          .limit(limit)
+                          .then((june) => {
+                            MODEL.userModel
+                              .find({
+                                roles: "client",
+                                $expr: {
+                                  $and: [
+                                    { $eq: [{ $year: "$createAt" }, year] },
+                                    { $eq: [{ $month: "$createAt" }, 7] },
+                                  ],
+                                },
+                              })
+                              .sort({
+                                _id: -1,
+                              })
+                              .skip(skip)
+                              .limit(limit)
+                              .then((july) => {
+                                MODEL.userModel
+                                  .find({
+                                    roles: "client",
+                                    $expr: {
+                                      $and: [
+                                        {
+                                          $eq: [{ $year: "$createAt" }, year],
+                                        },
+                                        { $eq: [{ $month: "$createAt" }, 8] },
+                                      ],
+                                    },
+                                  })
+                                  .sort({
+                                    _id: -1,
+                                  })
+                                  .skip(skip)
+                                  .limit(limit)
+                                  .then((Aug) => {
+                                    MODEL.userModel
+                                      .find({
+                                        roles: "client",
+                                        $expr: {
+                                          $and: [
+                                            {
+                                              $eq: [
+                                                { $year: "$createAt" },
+                                                year,
+                                              ],
+                                            },
+                                            {
+                                              $eq: [{ $month: "$createAt" }, 9],
+                                            },
+                                          ],
+                                        },
+                                      })
+                                      .sort({
+                                        _id: -1,
+                                      })
+                                      .skip(skip)
+                                      .limit(limit)
+                                      .then((sept) => {
+                                        MODEL.userModel
+                                          .find({
+                                            roles: "client",
+                                            $expr: {
+                                              $and: [
+                                                {
+                                                  $eq: [
+                                                    { $year: "$createAt" },
+                                                    year,
+                                                  ],
+                                                },
+                                                {
+                                                  $eq: [
+                                                    { $month: "$createAt" },
+                                                    20,
+                                                  ],
+                                                },
+                                              ],
+                                            },
+                                          })
+                                          .sort({
+                                            _id: -1,
+                                          })
+                                          .skip(skip)
+                                          .limit(limit)
+                                          .then((Oct) => {
+                                            MODEL.userModel
+                                              .find({
+                                                roles: "client",
+                                                $expr: {
+                                                  $and: [
+                                                    {
+                                                      $eq: [
+                                                        { $year: "$createAt" },
+                                                        year,
+                                                      ],
+                                                    },
+                                                    {
+                                                      $eq: [
+                                                        {
+                                                          $month: "$createAt",
+                                                        },
+                                                        11,
+                                                      ],
+                                                    },
+                                                  ],
+                                                },
+                                              })
+                                              .sort({
+                                                _id: -1,
+                                              })
+                                              .skip(skip)
+                                              .limit(limit)
+                                              .then((Nov) => {
+                                                MODEL.userModel
+                                                  .find({
+                                                    roles: "client",
+                                                    $expr: {
+                                                      $and: [
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $year:
+                                                                "$createAt",
+                                                            },
+                                                            year,
+                                                          ],
+                                                        },
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $month:
+                                                                "$createAt",
+                                                            },
+                                                            12,
+                                                          ],
+                                                        },
+                                                      ],
+                                                    },
+                                                  })
+                                                  .sort({
+                                                    _id: -1,
+                                                  })
+                                                  .skip(skip)
+                                                  .limit(limit)
+                                                  .then((Dec) => {
+                                                    MODEL.userModel
+                                                      .find({
+                                                        roles: "client",
+                                                        $expr: {
+                                                          $and: [
+                                                            {
+                                                              $eq: [
+                                                                {
+                                                                  $year:
+                                                                    "$createAt",
+                                                                },
+                                                                year,
+                                                              ],
+                                                            },
+                                                            {
+                                                              $eq: [
+                                                                {
+                                                                  $month:
+                                                                    "$createAt",
+                                                                },
+                                                                11,
+                                                              ],
+                                                            },
+                                                          ],
+                                                        },
+                                                      })
+                                                      .sort({
+                                                        _id: -1,
+                                                      })
+                                                      .skip(skip)
+                                                      .limit(limit)
+                                                      .then((Analytics) => {
+                                                        res.status(200).json({
+                                                          JANUARY: jan,
+                                                          FEBRUARY: feb,
+                                                          MARCH: march,
+                                                          APRIL: april,
+                                                          MAY: may,
+                                                          JUNE: june,
+                                                          JULY: july,
+                                                          AUGUST: Aug,
+                                                          SEPTEMBER: sept,
+                                                          OCTOBER: Oct,
+                                                          NOVEMBER: Nov,
+                                                          DECEMBER: Dec,
+                                                        });
+                                                      });
+                                                  });
+                                              });
+                                          });
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+analyticsFilterController.monthlyFilterSchedulesPaginated = (req, res) => {
+  var year = new Date().getFullYear();
+  var page = req.query.page;
+  const limit = 20;
+  var skip;
+  if (page === 1) {
+    skip = 0;
+  }
+  skip = (page - 1) * limit;
+  try {
+    MODEL.scheduleModel
+      .find({
+        $expr: {
+          $and: [
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
+          ],
+        },
+      })
+      .sort({
+        _id: -1,
+      })
+      .skip(skip)
+      .limit(limit)
+      .then((jan) => {
+        MODEL.scheduleModel
+          .find({
+            $expr: {
+              $and: [
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
+              ],
+            },
+          })
+          .sort({
+            _id: -1,
+          })
+          .skip(skip)
+          .limit(limit)
+          .then((feb) => {
+            MODEL.scheduleModel
+              .find({
+                $expr: {
+                  $and: [
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
+                  ],
+                },
+              })
+              .sort({
+                _id: -1,
+              })
+              .skip(skip)
+              .limit(limit)
+              .then((march) => {
+                MODEL.scheduleModel
+                  .find({
+                    $expr: {
+                      $and: [
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
+                      ],
+                    },
+                  })
+                  .sort({
+                    _id: -1,
+                  })
+                  .skip(skip)
+                  .limit(limit)
+                  .then((april) => {
+                    MODEL.scheduleModel
+                      .find({
+                        $expr: {
+                          $and: [
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
+                          ],
+                        },
+                      })
+                      .sort({
+                        _id: -1,
+                      })
+                      .skip(skip)
+                      .limit(limit)
+                      .then((may) => {
+                        MODEL.scheduleModel
+                          .find({
+                            $expr: {
+                              $and: [
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
+                              ],
+                            },
+                          })
+                          .sort({
+                            _id: -1,
+                          })
+                          .skip(skip)
+                          .limit(limit)
+                          .then((june) => {
+                            MODEL.scheduleModel
+                              .find({
+                                $expr: {
+                                  $and: [
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
+                                  ],
+                                },
+                              })
+                              .sort({
+                                _id: -1,
+                              })
+                              .skip(skip)
+                              .limit(limit)
+                              .then((july) => {
+                                MODEL.scheduleModel
+                                  .find({
+                                    $expr: {
+                                      $and: [
+                                        {
+                                          $eq: [{ $year: "$createdAt" }, year],
+                                        },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
+                                      ],
+                                    },
+                                  })
+                                  .sort({
+                                    _id: -1,
+                                  })
+                                  .skip(skip)
+                                  .limit(limit)
+                                  .then((Aug) => {
+                                    MODEL.scheduleModel
+                                      .find({
+                                        $expr: {
+                                          $and: [
+                                            {
+                                              $eq: [
+                                                { $year: "$createdAt" },
+                                                year,
+                                              ],
+                                            },
+                                            {
+                                              $eq: [
+                                                { $month: "$createdAt" },
+                                                9,
+                                              ],
+                                            },
+                                          ],
+                                        },
+                                      })
+                                      .sort({
+                                        _id: -1,
+                                      })
+                                      .skip(skip)
+                                      .limit(limit)
+                                      .then((sept) => {
+                                        MODEL.scheduleModel
+                                          .find({
+                                            $expr: {
+                                              $and: [
+                                                {
+                                                  $eq: [
+                                                    { $year: "$createdAt" },
+                                                    year,
+                                                  ],
+                                                },
+                                                {
+                                                  $eq: [
+                                                    { $month: "$createdAt" },
+                                                    20,
+                                                  ],
+                                                },
+                                              ],
+                                            },
+                                          })
+                                          .sort({
+                                            _id: -1,
+                                          })
+                                          .skip(skip)
+                                          .limit(limit)
+                                          .then((Oct) => {
+                                            MODEL.scheduleModel
+                                              .find({
+                                                $expr: {
+                                                  $and: [
+                                                    {
+                                                      $eq: [
+                                                        { $year: "$createdAt" },
+                                                        year,
+                                                      ],
+                                                    },
+                                                    {
+                                                      $eq: [
+                                                        {
+                                                          $month: "$createdAt",
+                                                        },
+                                                        11,
+                                                      ],
+                                                    },
+                                                  ],
+                                                },
+                                              })
+                                              .sort({
+                                                _id: -1,
+                                              })
+                                              .skip(skip)
+                                              .limit(limit)
+                                              .then((Nov) => {
+                                                MODEL.scheduleModel
+                                                  .find({
+                                                    $expr: {
+                                                      $and: [
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $year:
+                                                                "$createdAt",
+                                                            },
+                                                            year,
+                                                          ],
+                                                        },
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $month:
+                                                                "$createdAt",
+                                                            },
+                                                            12,
+                                                          ],
+                                                        },
+                                                      ],
+                                                    },
+                                                  })
+                                                  .sort({
+                                                    _id: -1,
+                                                  })
+                                                  .skip(skip)
+                                                  .limit(limit)
+                                                  .then((Dec) => {
+                                                    MODEL.scheduleModel
+                                                      .find({
+                                                        $expr: {
+                                                          $and: [
+                                                            {
+                                                              $eq: [
+                                                                {
+                                                                  $year:
+                                                                    "$createdAt",
+                                                                },
+                                                                year,
+                                                              ],
+                                                            },
+                                                            {
+                                                              $eq: [
+                                                                {
+                                                                  $month:
+                                                                    "$createdAt",
+                                                                },
+                                                                11,
+                                                              ],
+                                                            },
+                                                          ],
+                                                        },
+                                                      })
+                                                      .sort({
+                                                        _id: -1,
+                                                      })
+                                                      .skip(skip)
+                                                      .limit(limit)
+                                                      .then((Analytics) => {
+                                                        res.status(200).json({
+                                                          JANUARY: jan,
+                                                          FEBRUARY: feb,
+                                                          MARCH: march,
+                                                          APRIL: april,
+                                                          MAY: may,
+                                                          JUNE: june,
+                                                          JULY: july,
+                                                          AUGUST: Aug,
+                                                          SEPTEMBER: sept,
+                                                          OCTOBER: Oct,
+                                                          NOVEMBER: Nov,
+                                                          DECEMBER: Dec,
+                                                        });
+                                                      });
+                                                  });
+                                              });
+                                          });
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  } catch (err) {
+    return res.status(500).json(err);
   }
 };
 
