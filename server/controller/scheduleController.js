@@ -1,35 +1,35 @@
-'use strict';
+"use strict";
 
 let scheduleController = {};
-let MODEL = require('../models');
-let COMMON_FUN = require('../util/commonFunction');
-let CONSTANTS = require('../util/constants');
+let MODEL = require("../models");
+let COMMON_FUN = require("../util/commonFunction");
+let CONSTANTS = require("../util/constants");
 
-var request = require('request');
+var request = require("request");
 
-const OneSignal = require('onesignal-node');
+const OneSignal = require("onesignal-node");
 
 var sendNotification = function (data) {
   var headers = {
-    'Content-Type': 'application/json; charset=utf-8',
+    "Content-Type": "application/json; charset=utf-8",
   };
 
   var options = {
-    host: 'onesignal.com',
+    host: "onesignal.com",
     port: 443,
-    path: '/api/v1/notifications',
-    method: 'POST',
+    path: "/api/v1/notifications",
+    method: "POST",
     headers: headers,
   };
 
-  var https = require('https');
+  var https = require("https");
   var req = https.request(options, function (res) {
-    res.on('data', function (data) {
+    res.on("data", function (data) {
       console.log(JSON.parse(data));
     });
   });
 
-  req.on('error', function (e) {
+  req.on("error", function (e) {
     console.log(e);
   });
 
@@ -53,7 +53,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
       { email: REQUEST.body.client },
       { last_logged_in: new Date() },
       (res) => {
-        console.log('Logged date updated', new Date());
+        console.log("Logged date updated", new Date());
       }
     );
 
@@ -81,7 +81,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
         };
         if (!RESULT.lat || !RESULT.long) {
           return RESPONSE.status(400).json({
-            message: 'Location Invalid',
+            message: "Location Invalid",
           });
         }
         const lcd = UserData.lcd;
@@ -92,12 +92,12 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
               $match: {
                 areaOfAccess: { $in: [lcd] },
               },
-            }
-          ]).then(recycler => {
+            },
+          ])
+          .then((recycler) => {
             for (let i = 0; i < recycler.length; i++) {
-
               var message = {
-                app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+                app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
                 contents: {
                   en: `A user in ${lcd} just created a schedule`,
                 },
@@ -106,15 +106,15 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
               sendNotification(message);
               const datum = {
                 title: "Schedule made",
-                lcd : lcd,
+                lcd: lcd,
                 message: `A schedule was made in ${lcd}`,
-                recycler_id: recycler[i]._id
-              }
+                recycler_id: recycler[i]._id,
+              };
               MODEL.notificationModel(datum).save({}, (err, data) => {
-                console.log("-->", data)
-              })
+                console.log("-->", data);
+              });
             }
-          })
+          });
         return RESPONSE.status(200).jsonp(
           COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData)
         );
@@ -128,37 +128,41 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
 scheduleController.scheduleNotifications = (req, res) => {
   const id = req.query.id;
   try {
-    console.log("-->", id)
-    MODEL.notificationModel.find({
-      recycler_id: id,
-      seenNotification: false
-    }).then(notif=>{
-        return res.status(200).json(notif)
+    console.log("-->", id);
+    MODEL.notificationModel
+      .find({
+        recycler_id: id,
+        seenNotification: false,
       })
+      .then((notif) => {
+        return res.status(200).json(notif);
+      });
+  } catch (err) {
+    return res.status(500).json(err);
   }
-  catch(err){
-        return res.status(500).json(err);
-  }
-}
+};
 
 /* Update Notification */
 scheduleController.updateScheduleNotifications = (req, res) => {
   const id = req.query.id;
   try {
-    MODEL.notificationModel.updateOne({
-      _id: id
-    },{
-      $set: { seenNotification: true }
-    }, (err,result)=>{
-          return res.status(200).json({
-            message: "Notification message seen"
-          })
-    })
+    MODEL.notificationModel.updateOne(
+      {
+        _id: id,
+      },
+      {
+        $set: { seenNotification: true },
+      },
+      (err, result) => {
+        return res.status(200).json({
+          message: "Notification message seen",
+        });
+      }
+    );
+  } catch (err) {
+    return res.status(500).json(err);
   }
-  catch(err){
-        return res.status(500).json(err);
-  }
-}
+};
 
 scheduleController.getSchedule = (REQUEST, RESPONSE) => {
   let CRITERIA = { $or: [{ client: REQUEST.query.username }] },
@@ -218,7 +222,7 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE) => {
             .then((SUCCESS) => {
               MODEL.scheduleModel.updateOne(
                 { _id: schedule._id },
-                { $set: { completionStatus: 'completed' } },
+                { $set: { completionStatus: "completed" } },
                 (res) => {
                   return RESPONSE.status(200).jsonp(
                     COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.UPDATED)
@@ -293,9 +297,9 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
           .findOne({ _id: REQUEST.body._id })
           .then((result, err) => {
             if (err) return RESPONSE.status(400).json(err);
-            if (result.collectorStatus == 'accept') {
+            if (result.collectorStatus == "accept") {
               return RESPONSE.status(400).json({
-                message: 'This schedule had been accepted by another collector',
+                message: "This schedule had been accepted by another collector",
               });
             }
 
@@ -304,11 +308,11 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
                 { _id: REQUEST.body._id },
                 {
                   $set: {
-                    collectorStatus: 'accept',
+                    collectorStatus: "accept",
                     collectedBy: results._id,
                     organisation: results.organisation,
                     organisationCollection: results.approvedBy,
-                    recycler: results.fullname
+                    recycler: results.fullname,
                   },
                 }
               )
@@ -322,9 +326,9 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
                       .findOne({ email: result.client })
                       .then((result, err) => {
                         var message = {
-                          app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+                          app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
                           contents: {
-                            en: 'A collector just accepted your schedule',
+                            en: "A collector just accepted your schedule",
                           },
                           include_player_ids: [`${result.onesignal_id}`],
                         };
@@ -332,13 +336,17 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
                         sendNotification(message);
                       });
 
-                    MODEL.collectorModel.updateOne({
-                      _id: results._id
-                    }, {
-                      $set: {
-                        busy: true
+                    MODEL.collectorModel.updateOne(
+                      {
+                        _id: results._id,
                       },
-                    }, (err, resp) => console.log("collector updated"))
+                      {
+                        $set: {
+                          busy: true,
+                        },
+                      },
+                      (err, resp) => console.log("collector updated")
+                    );
 
                     return RESPONSE.status(200).jsonp(
                       COMMON_FUN.sendSuccess(
@@ -353,7 +361,7 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
               });
           });
       } else {
-        errors.message = 'Only a collector can accept or decline an offer';
+        errors.message = "Only a collector can accept or decline an offer";
         return RESPONSE.status(400).jsonp(errors);
       }
     })
@@ -382,16 +390,16 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
               { _id: test[i]._id },
               {
                 $set: {
-                  collectorStatus: 'accept',
+                  collectorStatus: "accept",
                   organisation: result.organisation,
                   collectedBy: result._id,
                   organisationCollection: result.approvedBy,
-                  recycler: result.recycler
+                  recycler: result.recycler,
                 },
               },
 
               (err, res) => {
-                console.log('data', test[0]);
+                console.log("data", test[0]);
               }
             );
 
@@ -402,9 +410,9 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
                   .findOne({ email: credential.client })
                   .then((result, err) => {
                     var message = {
-                      app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+                      app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
                       contents: {
-                        en: 'A collector just accepted your schedule',
+                        en: "A collector just accepted your schedule",
                       },
                       include_player_ids: [`${result.onesignal_id}`],
                     };
@@ -415,7 +423,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
           }
 
           return RESPONSE.status(200).jsonp({
-            message: 'All schedules accepted successfully',
+            message: "All schedules accepted successfully",
           });
         }
       }
@@ -427,7 +435,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
 
 scheduleController.allMissedSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: 'missed', client: REQUEST.query.client })
+    .find({ completionStatus: "missed", client: REQUEST.query.client })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -439,7 +447,7 @@ scheduleController.allMissedSchedules = (REQUEST, RESPONSE) => {
 scheduleController.allUserMissedSchedules = (REQUEST, RESPONSE) => {
   var user = REQUEST.query.email;
   MODEL.scheduleModel
-    .find({ completionStatus: 'completed', client: user })
+    .find({ completionStatus: "completed", client: user })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -465,7 +473,7 @@ scheduleController.viewAllSchedules = (REQUEST, RESPONSE) => {
 
 scheduleController.allPendingSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: 'pending', client: REQUEST.query.client })
+    .find({ completionStatus: "pending", client: REQUEST.query.client })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -476,7 +484,7 @@ scheduleController.allPendingSchedules = (REQUEST, RESPONSE) => {
 
 scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: 'completed', client: REQUEST.query.client })
+    .find({ completionStatus: "completed", client: REQUEST.query.client })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -487,7 +495,7 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
 
 scheduleController.dashboardCompleted = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ completionStatus: 'completed' })
+    .find({ completionStatus: "completed" })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -501,14 +509,14 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
   const quantity = REQUEST.body.quantity;
   if (!quantity)
     return RESPONSE.status(400).json({
-      message: 'Enter a valid input for the quantity',
+      message: "Enter a valid input for the quantity",
     });
 
   try {
     MODEL.scheduleModel.find({ _id: REQUEST.body._id }).then((schedule) => {
       if (!schedule[0])
         return RESPONSE.status(400).json({
-          message: 'This schedule is invalid',
+          message: "This schedule is invalid",
         });
       MODEL.userModel.findOne({ email: schedule[0].client }).then((result) => {
         if (result.cardID == null)
@@ -521,7 +529,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
             if (transaction) {
               return RESPONSE.status(400).jsonp({
                 message:
-                  'This transaction had been completed by another recycler',
+                  "This transaction had been completed by another recycler",
               });
             } else {
               //100g is equivalent to 1 coin i.e 1kg is equivalent to 10 coins
@@ -536,34 +544,39 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                       _id: recycler.approvedBy,
                     })
                     .then((organisation) => {
-                      var category = schedule[0].Category === "nylonSachet" ? "nylon"
-                        :
-                        schedule[0].Category === "glassBottle" ? "glass"
-                          :
-                          schedule[0].Category.length < 4
-                            ? schedule[0].Category.substring(
+                      var category =
+                        schedule[0].Category === "nylonSachet"
+                          ? "nylon"
+                          : schedule[0].Category === "glassBottle"
+                          ? "glass"
+                          : schedule[0].Category.length < 4
+                          ? schedule[0].Category.substring(
                               0,
                               schedule[0].Category.length
                             )
-                            : schedule[0].Category.substring(
+                          : schedule[0].Category.substring(
                               0,
                               schedule[0].Category.length - 1
                             );
 
-                      var organisationCheck = JSON.parse(JSON.stringify(organisation));
+                      var organisationCheck = JSON.parse(
+                        JSON.stringify(organisation)
+                      );
                       console.log("organisation check here", organisationCheck);
                       for (let val in organisationCheck) {
                         console.log("category check here", category);
                         if (val.includes(category)) {
-                          const equivalent = !!organisationCheck[val] ? organisationCheck[val] : 1
-                          console.log("equivalent here", equivalent)
+                          const equivalent = !!organisationCheck[val]
+                            ? organisationCheck[val]
+                            : 1;
+                          console.log("equivalent here", equivalent);
 
                           const pricing = quantity * equivalent;
                           MODEL.collectorModel.updateOne(
                             { email: recycler.email },
                             { last_logged_in: new Date() },
                             (res) => {
-                              console.log('Logged date updated', new Date());
+                              console.log("Logged date updated", new Date());
                             }
                           );
                           var dataToSave = {
@@ -579,7 +592,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
 
                             Category: schedule[0].Category,
 
-                            fullname: result.firstname + ' ' + result.lastname,
+                            fullname: result.firstname + " " + result.lastname,
 
                             recycler: recycler.fullname,
 
@@ -593,10 +606,9 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                             {},
                             (ERR, RESULT) => {
                               var message = {
-                                app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+                                app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
                                 contents: {
-                                  en:
-                                    'You just received a payout for your schedule',
+                                  en: "You just received a payout for your schedule",
                                 },
                                 include_player_ids: [`${result.onesignal_id}`],
                               };
@@ -609,37 +621,48 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                 { _id: schedule[0]._id },
                                 {
                                   $set: {
-                                    completionStatus: 'completed',
+                                    completionStatus: "completed",
                                     collectedBy: collectorID,
                                     quantity: quantity,
-                                    completionDate: new Date()
+                                    completionDate: new Date(),
                                   },
                                 },
                                 (err, res) => {
-                                  if (err) return RESPONSE.status(400).json(err);
+                                  if (err)
+                                    return RESPONSE.status(400).json(err);
                                   MODEL.userModel.updateOne(
                                     { email: result.email },
                                     {
                                       $set: {
-                                        availablePoints: result.availablePoints + pricing,
-                                        schedulePoints: result.schedulePoints + 1
+                                        availablePoints:
+                                          result.availablePoints + pricing,
+                                        schedulePoints:
+                                          result.schedulePoints + 1,
                                       },
-                                    }, (err, res) => {
-                                      console.log("update user", err, res)
-                                    });
+                                    },
+                                    (err, res) => {
+                                      console.log("update user", err, res);
+                                    }
+                                  );
                                   MODEL.collectorModel.updateOne(
                                     { _id: collectorID },
                                     {
                                       $set: {
-                                        totalCollected: recycler.totalCollected + Number(quantity),
-                                        numberOfTripsCompleted: recycler.numberOfTripsCompleted + 1,
-                                        busy: false
+                                        totalCollected:
+                                          recycler.totalCollected +
+                                          Number(quantity),
+                                        numberOfTripsCompleted:
+                                          recycler.numberOfTripsCompleted + 1,
+                                        busy: false,
                                       },
-                                    }, (err, res) => {
-                                      console.log("update", err, res)
-                                    });
+                                    },
+                                    (err, res) => {
+                                      console.log("update", err, res);
+                                    }
+                                  );
                                   return RESPONSE.status(200).json({
-                                    message: 'Transaction Completed Successfully',
+                                    message:
+                                      "Transaction Completed Successfully",
                                   });
                                 }
                               );
@@ -664,19 +687,19 @@ scheduleController.allAgentTransaction = (req, res) => {
 
   request(
     {
-      url: 'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
-      method: 'POST',
+      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+      method: "POST",
       json: true,
-      body: { data: { username: 'xrubicon', password: 'xrubicon1234' } },
+      body: { data: { username: "xrubicon", password: "xrubicon1234" } },
     },
     function (error, response, body) {
       request(
         {
           url: `https://apis.touchandpay.me/lawma-backend/v1/agent/get/agent/transactions`,
-          method: 'GET',
+          method: "GET",
           headers: {
-            Accept: 'application/json',
-            'Accept-Charset': 'utf-8',
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
             Token: response.headers.token,
           },
           json: true,
@@ -694,19 +717,19 @@ scheduleController.getBalance = (req, res) => {
 
   request(
     {
-      url: 'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
-      method: 'POST',
+      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+      method: "POST",
       json: true,
-      body: { data: { username: 'xrubicon', password: 'xrubicon1234' } },
+      body: { data: { username: "xrubicon", password: "xrubicon1234" } },
     },
     function (error, response, body) {
       request(
         {
           url: `https://apis.touchandpay.me/lawma-backend/v1/agent/get/customer/card/${cardID}`,
-          method: 'GET',
+          method: "GET",
           headers: {
-            Accept: 'application/json',
-            'Accept-Charset': 'utf-8',
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
             Token: response.headers.token,
           },
           json: true,
@@ -720,7 +743,6 @@ scheduleController.getBalance = (req, res) => {
 };
 
 scheduleController.allWeight = (req, res) => {
-
   try {
     MODEL.transactionModel
       .find({})
@@ -737,12 +759,9 @@ scheduleController.allWeight = (req, res) => {
         );
       })
       .catch((err) => res.status(400).jsonp(COMMON_FUN.sendError(err)));
-
+  } catch (err) {
+    return res.status(500).json(err);
   }
-  catch (err) {
-    return res.status(500).json(err)
-  }
-
 };
 
 scheduleController.allCoins = (req, res) => {
@@ -815,15 +834,15 @@ scheduleController.allCoins = (req, res) => {
   //         )
   //       );
   //   });
-  // } 
+  // }
   var year = new Date().getFullYear();
   try {
     MODEL.transactionModel
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -835,8 +854,8 @@ scheduleController.allCoins = (req, res) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -848,8 +867,8 @@ scheduleController.allCoins = (req, res) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -861,8 +880,8 @@ scheduleController.allCoins = (req, res) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -874,8 +893,8 @@ scheduleController.allCoins = (req, res) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -887,8 +906,8 @@ scheduleController.allCoins = (req, res) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -900,8 +919,8 @@ scheduleController.allCoins = (req, res) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -914,9 +933,9 @@ scheduleController.allCoins = (req, res) => {
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -930,13 +949,13 @@ scheduleController.allCoins = (req, res) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -953,13 +972,13 @@ scheduleController.allCoins = (req, res) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -976,14 +995,14 @@ scheduleController.allCoins = (req, res) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -1003,7 +1022,7 @@ scheduleController.allCoins = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -1012,7 +1031,7 @@ scheduleController.allCoins = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -1027,51 +1046,144 @@ scheduleController.allCoins = (req, res) => {
                                                     MODEL.transactionModel
                                                       .find({})
                                                       .then((Analytics) => {
-
-                                                        return res.status(200).json({
-                                                          JANUARY: {
-                                                            amount: jan.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          FEBRUARY: {
-                                                            amount: feb.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          MARCH: {
-                                                            amount:
-                                                              march.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          APRIL: {
-                                                            amount:
-                                                              april.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          MAY: {
-                                                            amount: may.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          JUNE: {
-                                                            amount: june.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          JULY: {
-                                                            amount: july.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          AUGUST: {
-                                                            amount: Aug.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          SEPTEMBER: {
-                                                            amount: sept.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          OCTOBER: {
-                                                            amount: Oct.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          NOVEMBER: {
-                                                            amount: Nov.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          DECEMBER: {
-                                                            amount: Dec.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                          ALL: {
-                                                            amount:
-                                                              Analytics.map((x) => x.coin).reduce((acc, curr) => acc + curr, 0)
-                                                          },
-                                                        });
+                                                        return res
+                                                          .status(200)
+                                                          .json({
+                                                            JANUARY: {
+                                                              amount: jan
+                                                                .map(
+                                                                  (x) => x.coin
+                                                                )
+                                                                .reduce(
+                                                                  (acc, curr) =>
+                                                                    acc + curr,
+                                                                  0
+                                                                ),
+                                                            },
+                                                            FEBRUARY: {
+                                                              amount: feb
+                                                                .map(
+                                                                  (x) => x.coin
+                                                                )
+                                                                .reduce(
+                                                                  (acc, curr) =>
+                                                                    acc + curr,
+                                                                  0
+                                                                ),
+                                                            },
+                                                            MARCH: {
+                                                              amount: march
+                                                                .map(
+                                                                  (x) => x.coin
+                                                                )
+                                                                .reduce(
+                                                                  (acc, curr) =>
+                                                                    acc + curr,
+                                                                  0
+                                                                ),
+                                                            },
+                                                            APRIL: {
+                                                              amount: april
+                                                                .map(
+                                                                  (x) => x.coin
+                                                                )
+                                                                .reduce(
+                                                                  (acc, curr) =>
+                                                                    acc + curr,
+                                                                  0
+                                                                ),
+                                                            },
+                                                            MAY: {
+                                                              amount: may
+                                                                .map(
+                                                                  (x) => x.coin
+                                                                )
+                                                                .reduce(
+                                                                  (acc, curr) =>
+                                                                    acc + curr,
+                                                                  0
+                                                                ),
+                                                            },
+                                                            JUNE: {
+                                                              amount: june
+                                                                .map(
+                                                                  (x) => x.coin
+                                                                )
+                                                                .reduce(
+                                                                  (acc, curr) =>
+                                                                    acc + curr,
+                                                                  0
+                                                                ),
+                                                            },
+                                                            JULY: {
+                                                              amount: july
+                                                                .map(
+                                                                  (x) => x.coin
+                                                                )
+                                                                .reduce(
+                                                                  (acc, curr) =>
+                                                                    acc + curr,
+                                                                  0
+                                                                ),
+                                                            },
+                                                            AUGUST: {
+                                                              amount: Aug.map(
+                                                                (x) => x.coin
+                                                              ).reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
+                                                            },
+                                                            SEPTEMBER: {
+                                                              amount: sept
+                                                                .map(
+                                                                  (x) => x.coin
+                                                                )
+                                                                .reduce(
+                                                                  (acc, curr) =>
+                                                                    acc + curr,
+                                                                  0
+                                                                ),
+                                                            },
+                                                            OCTOBER: {
+                                                              amount: Oct.map(
+                                                                (x) => x.coin
+                                                              ).reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
+                                                            },
+                                                            NOVEMBER: {
+                                                              amount: Nov.map(
+                                                                (x) => x.coin
+                                                              ).reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
+                                                            },
+                                                            DECEMBER: {
+                                                              amount: Dec.map(
+                                                                (x) => x.coin
+                                                              ).reduce(
+                                                                (acc, curr) =>
+                                                                  acc + curr,
+                                                                0
+                                                              ),
+                                                            },
+                                                            ALL: {
+                                                              amount:
+                                                                Analytics.map(
+                                                                  (x) => x.coin
+                                                                ).reduce(
+                                                                  (acc, curr) =>
+                                                                    acc + curr,
+                                                                  0
+                                                                ),
+                                                            },
+                                                          });
                                                       });
                                                   });
                                               });
@@ -1085,19 +1197,14 @@ scheduleController.allCoins = (req, res) => {
               });
           });
       });
-  }
-
-
-
-
-  catch (err) {
+  } catch (err) {
     return res.status(500).json(err);
   }
 };
 
 scheduleController.allAccepted = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ collectorStatus: 'accept' })
+    .find({ collectorStatus: "accept" })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -1119,7 +1226,7 @@ scheduleController.userComplete = (req, resp) => {
           { _id: scheduleID },
           {
             $set: {
-              completionStatus: 'completed',
+              completionStatus: "completed",
               rating: rating,
               comment: comment,
             },
@@ -1130,12 +1237,12 @@ scheduleController.userComplete = (req, resp) => {
               { email: result.email },
               { last_logged_in: new Date() },
               (res) => {
-                console.log('Logged date updated', new Date());
+                console.log("Logged date updated", new Date());
               }
             );
             return resp
               .status(200)
-              .jsonp({ message: 'Your schedule update was successful' });
+              .jsonp({ message: "Your schedule update was successful" });
           }
         );
       });
@@ -1156,7 +1263,7 @@ scheduleController.userDelete = (req, resp) => {
           if (err) return resp.status(400).jsonp(response.body.error);
           return resp
             .status(200)
-            .jsonp({ message: 'Your schedule delete was successful' });
+            .jsonp({ message: "Your schedule delete was successful" });
         });
       });
     });
@@ -1171,23 +1278,44 @@ scheduleController.userCancel = (req, resp) => {
   var reason = req.body.reason;
 
   try {
-    MODEL.scheduleModel.find({ _id: scheduleID }).then((schedule) => {
+    MODEL.scheduleModel.findOne({ _id: scheduleID }).then((schedule) => {
+      if (!!!schedule) {
+        MODEL.scheduleDropModel.findOne({ _id: scheduleID }).then((drop) => {
+          MODEL.scheduleDropModel.updateOne(
+            {
+              _id: scheduleID,
+            },
+            {
+              $set: {
+                completionStatus: "cancelled",
+                cancelReason: reason,
+              },
+            },
+            (err, response) => {
+              if (err) return resp.status(400).jsonp(response.body.error);
+              return resp.status(200).json({
+                message: "Your schedule drop cancellation was successful",
+              });
+            }
+          );
+        });
+      }
       MODEL.userModel.findOne({ _id: userID }).then((result) => {
         MODEL.scheduleModel.updateOne(
           { _id: scheduleID },
-          { $set: { completionStatus: 'cancelled', cancelReason: reason } },
+          { $set: { completionStatus: "cancelled", cancelReason: reason } },
           (err, res) => {
             if (err) return resp.status(400).jsonp(response.body.error);
             MODEL.userModel.updateOne(
               { email: result.email },
               { last_logged_in: new Date() },
               (res) => {
-                console.log('Logged date updated', new Date());
+                console.log("Logged date updated", new Date());
               }
             );
             return resp
               .status(200)
-              .jsonp({ message: 'Your schedule cancellation was successful' });
+              .jsonp({ message: "Your schedule cancellation was successful" });
           }
         );
       });
@@ -1199,7 +1327,7 @@ scheduleController.userCancel = (req, resp) => {
 
 scheduleController.allDeclined = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
-    .find({ collectorStatus: 'decline' })
+    .find({ collectorStatus: "decline" })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -1227,22 +1355,22 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
         $and: [
           {
             pickUpDate: {
-              $gte: active_today
+              $gte: active_today,
             },
             pickUpDate: {
-              $lt: tomorrow
+              $lt: tomorrow,
             },
-          }
+          },
         ],
       })
       .sort({ _id: -1 })
       .then((schedules) => {
         schedules.forEach((schedule, index) => {
-          var test = schedule.address.split(', ');
+          var test = schedule.address.split(", ");
           (function route() {
             for (let i = 0; i < accessArea.length; i++) {
               if (schedule.lcd === accessArea[i]) {
-                need.push(schedule['lcd']);
+                need.push(schedule["lcd"]);
                 geofencedSchedules.push(schedule);
                 count++;
               }
@@ -1257,7 +1385,12 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
             return !!need;
           })();
         });
-        var geoSchedules = geofencedSchedules.filter(x => (x.completionStatus !== "completed" && x.completionStatus !== "cancelled" && x.completionStatus !== "missed") || (x.completionStatus == 'pending' && x.collectorStatus == "accept")
+        var geoSchedules = geofencedSchedules.filter(
+          (x) =>
+            (x.completionStatus !== "completed" &&
+              x.completionStatus !== "cancelled" &&
+              x.completionStatus !== "missed") ||
+            (x.completionStatus == "pending" && x.collectorStatus == "accept")
         );
         const referenceSchedules = [...new Set(geoSchedules)];
         RESPONSE.jsonp(
@@ -1276,11 +1409,11 @@ scheduleController.afterCompletion = (REQUEST, RESPONSE) => {
 
   MODEL.collectorModel.findOne({ _id: collectorID }).then((collector) => {
     if (!collector) {
-      return RESPONSE.status(400).json({ message: 'Not a valid collector ID' });
+      return RESPONSE.status(400).json({ message: "Not a valid collector ID" });
     }
 
     MODEL.scheduleModel
-      .find({ collectedBy: collectorID, completionStatus: 'pending' })
+      .find({ collectedBy: collectorID, completionStatus: "pending" })
       .then((result, err) => {
         if (err) return RESPONSE.status(400).json(err);
 
@@ -1297,7 +1430,7 @@ scheduleController.collectorMissed = (req, res) => {
     MODEL.scheduleModel.findOne({ _id: scheduleID }).then((result) => {
       if (!result)
         return res.status(400).json({
-          message: 'This schedule is invalid',
+          message: "This schedule is invalid",
         });
 
       if (result.collectedBy !== collectorID)
@@ -1308,17 +1441,16 @@ scheduleController.collectorMissed = (req, res) => {
       MODEL.scheduleModel
         .updateOne(
           { _id: result._id },
-          { $set: { completionStatus: 'missed' } }
+          { $set: { completionStatus: "missed" } }
         )
         .then((resp, err) => {
-
           MODEL.userModel
             .findOne({ email: result.client })
             .then((result, err) => {
               var message = {
-                app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+                app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
                 contents: {
-                  en: 'A collector just missed your schedule. Kindly reschedule this pickup',
+                  en: "A collector just missed your schedule. Kindly reschedule this pickup",
                 },
                 include_player_ids: [`${result.onesignal_id}`],
               };
@@ -1326,7 +1458,7 @@ scheduleController.collectorMissed = (req, res) => {
               sendNotification(message);
             });
           return res.status(200).json({
-            message: 'You missed this schedule',
+            message: "You missed this schedule",
           });
         });
     });
@@ -1358,7 +1490,7 @@ scheduleController.getScheduleCollector = (req, res) => {
 
   if (!recyclerID) {
     return res.status(400).json({
-      message: 'You need a valid recycler ID',
+      message: "You need a valid recycler ID",
     });
   }
 
@@ -1367,7 +1499,7 @@ scheduleController.getScheduleCollector = (req, res) => {
     .then((result) => {
       if (!result) {
         return res.status(400).json({
-          message: 'No recycler data available',
+          message: "No recycler data available",
         });
       }
       return res.status(200).json(result);
