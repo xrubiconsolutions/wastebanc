@@ -1299,26 +1299,29 @@ scheduleController.userCancel = (req, resp) => {
             }
           );
         });
+      } else {
+        MODEL.userModel.findOne({ _id: userID }).then((result) => {
+          MODEL.scheduleModel.updateOne(
+            { _id: scheduleID },
+            { $set: { completionStatus: "cancelled", cancelReason: reason } },
+            (err, res) => {
+              if (err) return resp.status(400).jsonp(response.body.error);
+              MODEL.userModel.updateOne(
+                { email: result.email },
+                { last_logged_in: new Date() },
+                (res) => {
+                  console.log("Logged date updated", new Date());
+                }
+              );
+              return resp
+                .status(200)
+                .jsonp({
+                  message: "Your schedule cancellation was successful",
+                });
+            }
+          );
+        });
       }
-      MODEL.userModel.findOne({ _id: userID }).then((result) => {
-        MODEL.scheduleModel.updateOne(
-          { _id: scheduleID },
-          { $set: { completionStatus: "cancelled", cancelReason: reason } },
-          (err, res) => {
-            if (err) return resp.status(400).jsonp(response.body.error);
-            MODEL.userModel.updateOne(
-              { email: result.email },
-              { last_logged_in: new Date() },
-              (res) => {
-                console.log("Logged date updated", new Date());
-              }
-            );
-            return resp
-              .status(200)
-              .jsonp({ message: "Your schedule cancellation was successful" });
-          }
-        );
-      });
     });
   } catch (err) {
     return resp.status(404), jsonp(err);
