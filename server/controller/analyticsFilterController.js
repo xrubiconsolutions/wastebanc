@@ -14,6 +14,86 @@ const { Response } = require("aws-sdk");
 var request = require("request");
 const https = require("https");
 
+analyticsFilterController.monthlyNewUsers = (req, res) => {
+  var year = new Date().getFullYear();
+  var month = Number(req.query.month);
+  var page = req.query.page;
+  const limit = 20;
+  var skip;
+  if (page === 1) {
+    skip = 0;
+  }
+  skip = (page - 1) * limit;
+  try {
+    if (isNaN(month)) {
+      MODEL.userModel
+        .countDocuments({ roles: "client", verified: true })
+        .exec((err, count) => {
+          if (err) {
+            res.send(err);
+            return;
+          }
+          MODEL.userModel
+            .find({
+              verified: true,
+              roles: "client",
+            })
+            .skip(skip)
+            .limit(limit)
+            .sort({ _id: -1 })
+            .then((users) => {
+              return res.status(200).json({
+                total: count,
+                maxPages: Math.floor(count / limit),
+                data: users,
+              });
+            });
+        });
+    } else {
+      MODEL.userModel
+        .countDocuments({
+          roles: "client",
+          verified: true,
+          $expr: {
+            $and: [
+              { $eq: [{ $year: "$createAt" }, year] },
+              { $eq: [{ $month: "$createAt" }, month] },
+            ],
+          },
+        })
+        .exec((err, count) => {
+          if (err) {
+            res.send(err);
+            return;
+          }
+          MODEL.userModel
+            .find({
+              verified: true,
+              roles: "client",
+              $expr: {
+                $and: [
+                  { $eq: [{ $year: "$createAt" }, year] },
+                  { $eq: [{ $month: "$createAt" }, month] },
+                ],
+              },
+            })
+            .skip(skip)
+            .limit(limit)
+            .sort({ _id: -1 })
+            .then((users) => {
+              return res.status(200).json({
+                total: count,
+                maxPages: Math.floor(count / limit),
+                data: users,
+              });
+            });
+        });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
 analyticsFilterController.monthlyUsers = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   // const page = parseInt(req.query.page);

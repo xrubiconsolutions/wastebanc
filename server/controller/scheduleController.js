@@ -1313,11 +1313,9 @@ scheduleController.userCancel = (req, resp) => {
                   console.log("Logged date updated", new Date());
                 }
               );
-              return resp
-                .status(200)
-                .jsonp({
-                  message: "Your schedule cancellation was successful",
-                });
+              return resp.status(200).jsonp({
+                message: "Your schedule cancellation was successful",
+              });
             }
           );
         });

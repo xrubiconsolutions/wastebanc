@@ -17,6 +17,11 @@ module.exports = (APP) => {
     CONTROLLER.analyticsFilterController.monthlyFilterPaginated
   );
 
+  APP.route("/api/filter/month/users").get(
+    auth.userCollectorData,
+    CONTROLLER.analyticsFilterController.monthlyNewUsers
+  );
+
   APP.route("/api/filter/paginated/schedules").get(
     auth.userCollectorData,
     CONTROLLER.analyticsFilterController.monthlyFilterSchedulesPaginated
