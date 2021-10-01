@@ -8230,29 +8230,23 @@ organisationController.organisationWasteHistoryData = (req, res) => {
 };
 
 organisationController.getOrganisationCompletedPerMonth = (req, res) => {
-  const year = new Date().getFullYear();
-  const month = 9;
-  const groupBy = (items, key) =>
-    items.reduce(
-      (result, item) => ({
-        ...result,
-        [item[key]]: [...(result[item[key][item[key]["weight"]]] || []), item],
-      }),
-      []
-    );
+  var start = new Date(2021, 8, 2);
+  var end = new Date(2021, 8, 30);
   try {
     MODEL.transactionModel
-      .find({
-        $expr: {
-          $and: [
-            { $eq: [{ $year: "$createdAt" }, year] },
-            { $eq: [{ $month: "$createdAt" }, month] },
-          ],
+      .aggregate([
+        {
+          $match: {
+            createdAt: { $gte: start, $lte: end },
+          },
         },
-      })
+        {
+          $group: { _id: "$organisation", total: { $sum: "$weight" } },
+        },
+      ])
       .then((data) => {
-        var test = groupBy(data, "organisation");
-        return res.status(200).json(test);
+        console.log("data", data);
+        return res.status(200).json(data);
       });
   } catch (err) {
     return res.status(500).json(err);
