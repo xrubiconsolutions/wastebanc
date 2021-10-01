@@ -346,6 +346,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/lawma/reward/organisation").get(
+    auth.userCollectorData,
     CONTROLLER.organisationController.getOrganisationCompletedPerMonth
   );
 };
