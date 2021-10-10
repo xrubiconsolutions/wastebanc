@@ -1,27 +1,26 @@
-'use strict';
+"use strict";
 
 /**************************************************
  ***** Organisation controller for organisation logic ****
  **************************************************/
 
 let payController = {};
-let MODEL = require('../models');
-let COMMON_FUN = require('../util/commonFunction');
-let SERVICE = require('../services/commonService');
-let CONSTANTS = require('../util/constants');
-var request = require('request');
-const payModel = require('../models/payModel');
-var ObjectId = require('mongodb').ObjectID;
-
+let MODEL = require("../models");
+let COMMON_FUN = require("../util/commonFunction");
+let SERVICE = require("../services/commonService");
+let CONSTANTS = require("../util/constants");
+var request = require("request");
+const payModel = require("../models/payModel");
+var ObjectId = require("mongodb").ObjectID;
 
 payController.getBanks = (req, res) => {
   request(
     {
-      url: 'https://api.paystack.co/bank',
-      method: 'GET',
+      url: "https://api.paystack.co/bank",
+      method: "GET",
       headers: {
-        Accept: 'application/json',
-        'Accept-Charset': 'utf-8',
+        Accept: "application/json",
+        "Accept-Charset": "utf-8",
         Authorization: `Bearer sk_test_a9fa4b3ea294cde982654ac464b9f3e20e90a24c`,
       },
       json: true,
@@ -40,16 +39,16 @@ payController.resolveAccount = (req, res) => {
   request(
     {
       url: `https://api.paystack.co/bank/resolve?account_number=${account_number}&bank_code=${bank_code}`,
-      method: 'GET',
+      method: "GET",
       headers: {
-        Accept: 'application/json',
-        'Accept-Charset': 'utf-8',
+        Accept: "application/json",
+        "Accept-Charset": "utf-8",
         Authorization: `Bearer sk_test_a9fa4b3ea294cde982654ac464b9f3e20e90a24c`,
       },
       json: true,
     },
     (err, result) => {
-      console.log('err=>', err);
+      console.log("err=>", err);
       if (err) return res.status(400).json(err);
       return res.status(200).json(result.body.data);
     }
@@ -69,7 +68,7 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
 
   MODEL.userModel.findOne({ cardID: cardID }).then((result, err) => {
     if (!result)
-      return RESPONSE.status(400).json({ message: 'Enter a valid card ID' });
+      return RESPONSE.status(400).json({ message: "Enter a valid card ID" });
     if (result) {
       balance = result.availablePoints - amount;
       if (balance < 0) {
@@ -91,11 +90,11 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
               (err, resp) => {
                 MODEL.payModel({
                   ...receipt,
-                  aggregatorName: unpaidFees[i].recycler || ' ',
-                  aggregatorId: unpaidFees[i].aggregatorId || ' ',
-                  aggregatorOrganisation: unpaidFees[i].organisation || ' ',
-                  scheduleId: unpaidFees[i].scheduleId || ' ',
-                  quantityOfWaste: unpaidFees[i].weight || ' ',
+                  aggregatorName: unpaidFees[i].recycler || " ",
+                  aggregatorId: unpaidFees[i].aggregatorId || " ",
+                  aggregatorOrganisation: unpaidFees[i].organisation || " ",
+                  scheduleId: unpaidFees[i].scheduleId || " ",
+                  quantityOfWaste: unpaidFees[i].weight || " ",
                   amount: unpaidFees[i].coin,
                   organisation: unpaidFees[i].organisationID,
                 }).save({}, (err, results) => {
@@ -107,37 +106,46 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
                       },
                     },
                     (err, res) => {
-                      console.log('updated here', err);
+                      console.log("updated here", err);
                     }
                   );
-                  var phoneNo = String(result.phone).substring(1, 11);
-                  var data = {
-                    to: `234${phoneNo}`,
-                    from: 'N-Alert',
-                    sms: `Dear ${unpaidFees[i].organisation}, a user named ${receipt.fullname} just requested for a payout of ${unpaidFees[i].coin}, kindly attend to the payment.`,
-                    type: 'plain',
-                    api_key:
-                      'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
-                    channel: 'dnd',
-                  };
-        
-                  var options = {
-                    method: 'POST',
-                    url: 'https://termii.com/api/sms/send',
-                    headers: {
-                      'Content-Type': ['application/json', 'application/json'],
-                    },
-                    body: JSON.stringify(data),
-                  };
-        
-                  request(options, function (error, response) {
-                    if (error) throw new Error(error);
-                    console.log(response.body);
-                  });
+                  MODEL.organisationModel
+                    .findOne({
+                      companyName: unpaidFees[i].organisation,
+                    })
+                    .then((organisation) => {
+                      var phoneNo = String(organisation.phone);
+                      var data = {
+                        to: `234${phoneNo}`,
+                        from: "N-Alert",
+                        sms: `Dear ${unpaidFees[i].organisation}, a user named ${receipt.fullname} just requested for a payout of ${unpaidFees[i].coin}, kindly attend to the payment.`,
+                        type: "plain",
+                        api_key:
+                          "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+                        channel: "dnd",
+                      };
 
-                  if (err)
-                    return RESPONSE.status(400).json({
-                      message: 'Could not save receipt',
+                      var options = {
+                        method: "POST",
+                        url: "https://termii.com/api/sms/send",
+                        headers: {
+                          "Content-Type": [
+                            "application/json",
+                            "application/json",
+                          ],
+                        },
+                        body: JSON.stringify(data),
+                      };
+
+                      request(options, function (error, response) {
+                        if (error) throw new Error(error);
+                        console.log(response.body);
+                      });
+
+                      if (err)
+                        return RESPONSE.status(400).json({
+                          message: "Could not save receipt",
+                        });
                     });
                 });
               }
@@ -149,8 +157,6 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
   });
 };
 
-
-
 payController.charityPayment = (REQUEST, RESPONSE) => {
   let errors = {};
   const receipt = { ...REQUEST.body };
@@ -160,7 +166,7 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
 
   MODEL.userModel.findOne({ cardID: cardID }).then((result, err) => {
     if (!result)
-      return RESPONSE.status(400).json({ message: 'Enter a valid card ID' });
+      return RESPONSE.status(400).json({ message: "Enter a valid card ID" });
     if (result) {
       balance = result.availablePoints - amount;
       if (balance < 0) {
@@ -182,32 +188,32 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
               (err, resp) => {
                 MODEL.charityModel({
                   ...receipt,
-                  aggregatorName: unpaidFees[i].recycler || ' ',
-                  aggregatorId: unpaidFees[i].aggregatorId || ' ',
-                  aggregatorOrganisation: unpaidFees[i].organisation || ' ',
-                  scheduleId: unpaidFees[i].scheduleId || ' ',
-                  quantityOfWaste: unpaidFees[i].weight || ' ',
+                  aggregatorName: unpaidFees[i].recycler || " ",
+                  aggregatorId: unpaidFees[i].aggregatorId || " ",
+                  aggregatorOrganisation: unpaidFees[i].organisation || " ",
+                  scheduleId: unpaidFees[i].scheduleId || " ",
+                  quantityOfWaste: unpaidFees[i].weight || " ",
                   amount: unpaidFees[i].coin,
                   organisation: unpaidFees[i].organisationID,
                 }).save({}, (err, result) => {
-                  if (err) {return RESPONSE.status(400).json({
-                    message: 'Could not save receipt',
-                  });
-                }
-                console.log("Charity saved here", result)
+                  if (err) {
+                    return RESPONSE.status(400).json({
+                      message: "Could not save receipt",
+                    });
+                  }
+                  console.log("Charity saved here", result);
                   MODEL.transactionModel.updateOne(
                     { _id: unpaidFees[i]._id },
                     {
                       $set: {
                         requestedForPayment: true,
-                        paymentResolution: 'charity'
+                        paymentResolution: "charity",
                       },
                     },
                     (err, res) => {
-                      console.log('updated here', err);
+                      console.log("updated here", err);
                     }
                   );
-                
                 });
               }
             );
@@ -266,20 +272,21 @@ payController.paymentUpdate = (req, res) => {
   const id = req.body.id;
   try {
     MODEL.payModel.updateOne(
-      { 'scheduleId' : ObjectId(id) },
-      { $set: { paid : true } },
+      { scheduleId: ObjectId(id) },
+      { $set: { paid: true } },
       (_e, _res) => {
         MODEL.transactionModel.updateOne(
-          { 'scheduleId' : ObjectId(id) },
-      { $set: { paid : true } },
-      (err, resp) => {
-        if (err) {
-          return res.status(400).jsonp(err);
-        }
-        return res.status(200).json({
-          message: 'Payment status successfully updated!',
-        });
-      })
+          { scheduleId: ObjectId(id) },
+          { $set: { paid: true } },
+          (err, resp) => {
+            if (err) {
+              return res.status(400).jsonp(err);
+            }
+            return res.status(200).json({
+              message: "Payment status successfully updated!",
+            });
+          }
+        );
       }
     );
   } catch (err) {

@@ -608,7 +608,7 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                               var message = {
                                 app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
                                 contents: {
-                                  en: "You just received a payout for your schedule",
+                                  en: "You have just been credited for your schedule",
                                 },
                                 include_player_ids: [`${result.onesignal_id}`],
                               };

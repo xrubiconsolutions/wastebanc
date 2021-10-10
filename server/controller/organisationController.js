@@ -9,7 +9,7 @@ let MODEL = require("../models");
 let COMMON_FUN = require("../util/commonFunction");
 let SERVICE = require("../services/commonService");
 let CONSTANTS = require("../util/constants");
-let FS = require("fs");
+let fs = require("fs");
 const { Response } = require("aws-sdk");
 var request = require("request");
 const sgMail = require("@sendgrid/mail");
@@ -8248,6 +8248,52 @@ organisationController.getOrganisationCompletedPerMonth = (req, res) => {
         console.log("data", data);
         return res.status(200).json(data);
       });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+organisationController.sendCustomer = (req, res) => {
+  var pathToAttachment = `${__dirname}/CustomerService.jpg`;
+  var attachment = fs.readFileSync(pathToAttachment).toString("base64");
+  try {
+    sgMail.setApiKey(
+      "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"
+    );
+    MODEL.organisationModel.find({}).then((org) => {
+      for (let i = 0; i < org.length; i++) {
+        console.log("--->", org[i].email);
+
+        const msg = {
+          to: `${org[i].email}`,
+          from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+          subject: "Thank You!",
+          html: '<img src="cid:Logo" alt="image" width="800px" height="600px" />',
+          attachments: [
+            {
+              filename: "image",
+              type: "image/png",
+              content_id: "Logo",
+              content: attachment,
+              disposition: "inline",
+            },
+          ],
+        };
+        //ES6
+        sgMail.send(msg).then(
+          () => {},
+          (error) => {
+            console.error(error);
+            if (error.response) {
+              console.error(error.response.body);
+            }
+          }
+        );
+      }
+      return res.status(200).json({
+        message: "Email sent",
+      });
+    });
   } catch (err) {
     return res.status(500).json(err);
   }

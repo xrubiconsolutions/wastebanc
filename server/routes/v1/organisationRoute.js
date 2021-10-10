@@ -349,4 +349,8 @@ module.exports = (APP) => {
     auth.userCollectorData,
     CONTROLLER.organisationController.getOrganisationCompletedPerMonth
   );
+
+  APP.route("/api/send/email").post(
+    CONTROLLER.organisationController.sendCustomer
+  );
 };
