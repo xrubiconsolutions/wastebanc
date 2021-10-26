@@ -8230,8 +8230,11 @@ organisationController.organisationWasteHistoryData = (req, res) => {
 };
 
 organisationController.getOrganisationCompletedPerMonth = (req, res) => {
-  var start = new Date(2021, 8, 2);
-  var end = new Date(2021, 8, 30);
+  var startMonth = new Date().getMonth();
+  var startYear = new Date().getFullYear();
+  var daysInMonth = new Date(startYear, startMonth + 1 , 0).getDate();
+  var start = new Date(startYear, startMonth, 0);
+  var end = new Date(startYear, startMonth, daysInMonth);
   try {
     MODEL.transactionModel
       .aggregate([
@@ -8262,8 +8265,6 @@ organisationController.sendCustomer = (req, res) => {
     );
     MODEL.organisationModel.find({}).then((org) => {
       for (let i = 0; i < org.length; i++) {
-        console.log("--->", org[i].email);
-
         const msg = {
           to: `${org[i].email}`,
           from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
