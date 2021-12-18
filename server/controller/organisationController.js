@@ -827,9 +827,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
 
   const organisationID = req.query.organisationID;
 
-  MODEL.scheduleModel
+  MODEL.transactionModel
     .find({
-      completionStatus: "completed",
 
       $expr: {
         $and: [
@@ -839,10 +838,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
       },
     })
     .then((jan) => {
-      MODEL.scheduleModel
+      MODEL.transactionModel
         .find({
-          completionStatus: "completed",
-
+    
           $expr: {
             $and: [
               { $eq: [{ $year: "$createdAt" }, year] },
@@ -851,10 +849,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
           },
         })
         .then((feb) => {
-          MODEL.scheduleModel
+          MODEL.transactionModel
             .find({
-              completionStatus: "completed",
-
+        
               $expr: {
                 $and: [
                   { $eq: [{ $year: "$createdAt" }, year] },
@@ -863,10 +860,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
               },
             })
             .then((march) => {
-              MODEL.scheduleModel
+              MODEL.transactionModel
                 .find({
-                  completionStatus: "completed",
-
+            
                   $expr: {
                     $and: [
                       { $eq: [{ $year: "$createdAt" }, year] },
@@ -875,10 +871,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                   },
                 })
                 .then((april) => {
-                  MODEL.scheduleModel
+                  MODEL.transactionModel
                     .find({
-                      completionStatus: "completed",
-
+                
                       $expr: {
                         $and: [
                           { $eq: [{ $year: "$createdAt" }, year] },
@@ -887,10 +882,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                       },
                     })
                     .then((may) => {
-                      MODEL.scheduleModel
+                      MODEL.transactionModel
                         .find({
-                          completionStatus: "completed",
-
+                    
                           $expr: {
                             $and: [
                               { $eq: [{ $year: "$createdAt" }, year] },
@@ -899,10 +893,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                           },
                         })
                         .then((june) => {
-                          MODEL.scheduleModel
+                          MODEL.transactionModel
                             .find({
-                              completionStatus: "completed",
-
+                        
                               $expr: {
                                 $and: [
                                   { $eq: [{ $year: "$createdAt" }, year] },
@@ -911,10 +904,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                               },
                             })
                             .then((july) => {
-                              MODEL.scheduleModel
+                              MODEL.transactionModel
                                 .find({
-                                  completionStatus: "completed",
-
+                            
                                   $expr: {
                                     $and: [
                                       { $eq: [{ $year: "$createdAt" }, year] },
@@ -923,10 +915,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                   },
                                 })
                                 .then((Aug) => {
-                                  MODEL.scheduleModel
+                                  MODEL.transactionModel
                                     .find({
-                                      completionStatus: "completed",
-
+                                
                                       $expr: {
                                         $and: [
                                           {
@@ -942,10 +933,9 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                       },
                                     })
                                     .then((sept) => {
-                                      MODEL.scheduleModel
+                                      MODEL.transactionModel
                                         .find({
-                                          completionStatus: "completed",
-
+                                    
                                           $expr: {
                                             $and: [
                                               {
@@ -964,12 +954,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                           },
                                         })
                                         .then((Oct) => {
-                                          MODEL.scheduleModel
+                                          MODEL.transactionModel
                                             .find({
-                                              organisationCollection:
-                                                organisationID,
-                                              completionStatus: "completed",
-
                                               $expr: {
                                                 $and: [
                                                   {
@@ -988,9 +974,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                               },
                                             })
                                             .then((Nov) => {
-                                              MODEL.scheduleModel
+                                              MODEL.transactionModel
                                                 .find({
-                                                  completionStatus: "completed",
 
                                                   $expr: {
                                                     $and: [
@@ -1015,10 +1000,8 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                   },
                                                 })
                                                 .then((Dec) => {
-                                                  MODEL.scheduleModel
+                                                  MODEL.transactionModel
                                                     .find({
-                                                      completionStatus:
-                                                        "completed",
                                                     })
                                                     .then((Analytics) => {
                                                       console.log("--->>><<<<");
@@ -1029,7 +1012,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1043,7 +1026,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1057,7 +1040,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1071,7 +1054,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1085,7 +1068,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1100,7 +1083,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1115,7 +1098,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1130,7 +1113,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1145,7 +1128,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1159,7 +1142,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1175,7 +1158,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                                 "petBottle"
                                                           )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -1190,7 +1173,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1204,7 +1187,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1218,7 +1201,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1233,7 +1216,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1248,7 +1231,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1263,7 +1246,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1278,7 +1261,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1292,7 +1275,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1306,7 +1289,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1320,7 +1303,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1334,7 +1317,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1348,7 +1331,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1362,7 +1345,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1377,7 +1360,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1392,7 +1375,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1407,7 +1390,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1421,7 +1404,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1435,7 +1418,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1449,7 +1432,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1463,7 +1446,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1477,7 +1460,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1492,7 +1475,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1507,7 +1490,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1522,7 +1505,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1537,7 +1520,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1551,7 +1534,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1565,7 +1548,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1579,7 +1562,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1593,7 +1576,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1607,7 +1590,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1622,7 +1605,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1637,7 +1620,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1652,7 +1635,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1667,7 +1650,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1681,7 +1664,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1695,7 +1678,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1709,7 +1692,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1723,7 +1706,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1737,7 +1720,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1752,7 +1735,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1767,7 +1750,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1782,7 +1765,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1797,7 +1780,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1811,7 +1794,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1825,7 +1808,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1839,7 +1822,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1853,7 +1836,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1867,7 +1850,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1882,7 +1865,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1897,7 +1880,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1912,7 +1895,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1927,7 +1910,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1939,7 +1922,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                           x.Category == "Can" ||
                                                           x.Category == "can"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -1954,7 +1937,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "petBottle"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -1970,7 +1953,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Carton"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -1986,7 +1969,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "rubber"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2002,7 +1985,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "plastic"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2016,7 +1999,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             "glassBottle" ||
                                                           x.Category == "glass"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2029,7 +2012,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             "metal" ||
                                                           x.Category == "Metal"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2043,7 +2026,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                           x.Category ==
                                                             "nylonSachet"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2059,7 +2042,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "e-waste"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2074,7 +2057,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Can" ||
                                                             x.Category == "can"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2088,7 +2071,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "petBottle"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2102,7 +2085,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Carton"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2116,7 +2099,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "rubber"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2130,7 +2113,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "plastic"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2145,7 +2128,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "glass"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2160,7 +2143,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "Metal"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2175,7 +2158,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "nylonSachet"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2190,7 +2173,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             x.Category ==
                                                               "e-waste"
                                                         )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2202,7 +2185,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                           x.Category == "Can" ||
                                                           x.Category == "can"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2217,7 +2200,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "petBottle"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2233,7 +2216,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Carton"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2249,7 +2232,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "rubber"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2265,7 +2248,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "plastic"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2279,7 +2262,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             "glassBottle" ||
                                                           x.Category == "glass"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2292,7 +2275,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             "metal" ||
                                                           x.Category == "Metal"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2306,7 +2289,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                           x.Category ==
                                                             "nylonSachet"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2322,7 +2305,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "e-waste"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2335,7 +2318,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                           x.Category == "Can" ||
                                                           x.Category == "can"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2350,7 +2333,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "petBottle"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2366,7 +2349,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Carton"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2382,7 +2365,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "rubber"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2398,7 +2381,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "plastic"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2412,7 +2395,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             "glassBottle" ||
                                                           x.Category == "glass"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2425,7 +2408,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             "metal" ||
                                                           x.Category == "Metal"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2439,7 +2422,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                           x.Category ==
                                                             "nylonSachet"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2455,7 +2438,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "e-waste"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2468,7 +2451,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                           x.Category == "Can" ||
                                                           x.Category == "can"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2483,7 +2466,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "petBottle"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2499,7 +2482,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "Carton"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2515,7 +2498,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "rubber"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2531,7 +2514,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "plastic"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>
@@ -2545,7 +2528,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             "glassBottle" ||
                                                           x.Category == "glass"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2558,7 +2541,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                             "metal" ||
                                                           x.Category == "Metal"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2572,7 +2555,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                           x.Category ==
                                                             "nylonSachet"
                                                       )
-                                                        .map((x) => x.quantity)
+                                                        .map((x) => x.weight)
                                                         .reduce(
                                                           (acc, curr) =>
                                                             acc + curr,
@@ -2588,7 +2571,7 @@ organisationController.weekChartDataPriorityLawma = (req, res) => {
                                                               "e-waste"
                                                         )
                                                           .map(
-                                                            (x) => x.quantity
+                                                            (x) => x.weight
                                                           )
                                                           .reduce(
                                                             (acc, curr) =>

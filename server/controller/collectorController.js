@@ -1,17 +1,17 @@
-'use strict';
+"use strict";
 
 /**************************************************
  ***** User controller for user business logic ****
  **************************************************/
 let collectorController = {};
-let MODEL = require('../models');
-let COMMON_FUN = require('../util/commonFunction');
-let SERVICE = require('../services/commonService');
-let CONSTANTS = require('../util/constants');
-let FS = require('fs');
-const { Response } = require('aws-sdk');
-var request = require('request');
-const userController = require('./userController');
+let MODEL = require("../models");
+let COMMON_FUN = require("../util/commonFunction");
+let SERVICE = require("../services/commonService");
+let CONSTANTS = require("../util/constants");
+let FS = require("fs");
+const { Response } = require("aws-sdk");
+var request = require("request");
+const userController = require("./userController");
 
 collectorController.registerCollector = (REQUEST, RESPONSE) => {
   var need = {};
@@ -35,7 +35,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
         })
         .then((user) => {
           if (user) {
-            errors.message = 'User already exists';
+            errors.message = "User already exists";
             RESPONSE.status(400).jsonp(errors);
           } else {
             MODEL.collectorModel(dataToSave).save({}, (ERR, RESULT) => {
@@ -44,24 +44,24 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
                 var phoneNo = String(RESULT.phone).substring(1, 11);
                 var data = {
                   api_key:
-                    'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
-                  message_type: 'NUMERIC',
+                    "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+                  message_type: "NUMERIC",
                   to: `+234${phoneNo}`,
-                  from: 'N-Alert',
-                  channel: 'dnd',
+                  from: "N-Alert",
+                  channel: "dnd",
                   pin_attempts: 10,
                   pin_time_to_live: 5,
                   pin_length: 4,
-                  pin_placeholder: '< 1234 >',
+                  pin_placeholder: "< 1234 >",
                   message_text:
-                    'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
-                  pin_type: 'NUMERIC',
+                    "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+                  pin_type: "NUMERIC",
                 };
                 var options = {
-                  method: 'POST',
-                  url: 'https://termii.com/api/sms/otp/send',
+                  method: "POST",
+                  url: "https://termii.com/api/sms/otp/send",
                   headers: {
-                    'Content-Type': ['application/json', 'application/json'],
+                    "Content-Type": ["application/json", "application/json"],
                   },
                   body: JSON.stringify(data),
                 };
@@ -80,45 +80,40 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
 
                     var data = {
                       api_key:
-                        'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+                        "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
                       phone_number: `+234${phoneNo}`,
-                      country_code: 'NG',
+                      country_code: "NG",
                     };
                     var options = {
-                      method: 'GET',
-                      url: ' https://termii.com/api/insight/number/query',
+                      method: "GET",
+                      url: " https://termii.com/api/insight/number/query",
                       headers: {
-                        'Content-Type': [
-                          'application/json',
-                          'application/json',
+                        "Content-Type": [
+                          "application/json",
+                          "application/json",
                         ],
                       },
                       body: JSON.stringify(data),
                     };
                     request(options, function (error, response) {
                       if (error) throw new Error(error);
-                      var mobileData = JSON.parse(response.body);
-                      var mobile_carrier =
-                        mobileData.result[0].operatorDetail.operatorName;
+                      //var mobileData = JSON.parse(response.body);
+                      //var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
                       MODEL.collectorModel.updateOne(
                         { email: RESULT.email },
                         {
                           $set: {
                             fullname: RESULT.fullname,
-                            mobile_carrier: mobile_carrier,
+                            //mobile_carrier: mobile_carrier,
                           },
                         },
                         (res) => {
-                          return RESPONSE.status(200).jsonp(
+                          return RESPONSE.status(200).json(
                             COMMON_FUN.sendSuccess(
                               CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
                               UserData
                             )
                           );
-
-                          // return RESPONSE.status(200).jsonp(
-                          //   UserData
-                          //  );
                         }
                       );
                     });
@@ -156,15 +151,14 @@ collectorController.loginCollector = (REQUEST, RESPONSE) => {
                   )
                 );
               else {
-                var jwtToken = COMMON_FUN.createToken(
-                  USER
-                ); /** creating jwt token */
+                var jwtToken =
+                  COMMON_FUN.createToken(USER); /** creating jwt token */
 
                 MODEL.collectorModel.updateOne(
                   { phone: REQUEST.body.phone },
                   { last_logged_in: new Date() },
                   (res) => {
-                    console.log('Logged date updated', new Date());
+                    console.log("Logged date updated", new Date());
                   }
                 );
 
@@ -174,7 +168,7 @@ collectorController.loginCollector = (REQUEST, RESPONSE) => {
             }
           )
         : RESPONSE.status(400).jsonp({
-            message: ' Invalid phone number',
+            message: " Invalid phone number",
           });
     })
     .catch((err) => {
@@ -185,7 +179,7 @@ collectorController.loginCollector = (REQUEST, RESPONSE) => {
 collectorController.checkAccepted = (REQUEST, RESPONSE) => {
   const collectorID = REQUEST.query.ID;
   MODEL.scheduleModel
-    .find({ collectorStatus: 'accept', collectedBy: collectorID })
+    .find({ collectorStatus: "accept", collectedBy: collectorID })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -197,7 +191,7 @@ collectorController.checkAccepted = (REQUEST, RESPONSE) => {
 collectorController.checkTotalAccepted = (REQUEST, RESPONSE) => {
   const collectorID = REQUEST.query.ID;
   MODEL.scheduleModel
-    .find({ collectorStatus: 'accept', collectedBy: collectorID })
+    .find({ collectorStatus: "accept", collectedBy: collectorID })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(
@@ -213,7 +207,7 @@ collectorController.checkCompleted = (REQUEST, RESPONSE) => {
   const collectorID = REQUEST.query.ID;
 
   MODEL.scheduleModel
-    .find({ completionStatus: 'completed', collectedBy: collectorID })
+    .find({ completionStatus: "completed", collectedBy: collectorID })
     .sort({ _id: -1 })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
@@ -235,17 +229,17 @@ collectorController.collectorAnalysis = (REQUEST, RESPONSE) => {
     { _id: REQUEST.query.ID },
     { last_logged_in: new Date() },
     (res) => {
-      console.log('Logged date updated', new Date());
+      console.log("Logged date updated", new Date());
     }
   );
 
   MODEL.scheduleModel
-    .find({ completionStatus: 'completed', collectedBy: collectorID })
+    .find({ completionStatus: "completed", collectedBy: collectorID })
     .sort({ _id: -1 })
     .then((schedules) => {
       completed = schedules.length;
       MODEL.scheduleModel
-        .find({ completionStatus: 'missed', collectedBy: collectorID })
+        .find({ completionStatus: "missed", collectedBy: collectorID })
         .then((schedules) => {
           missed = schedules.length;
           MODEL.transactionModel
@@ -255,7 +249,7 @@ collectorController.collectorAnalysis = (REQUEST, RESPONSE) => {
 
               // res.status(200).jsonp(transaction)
               MODEL.scheduleModel
-                .find({ collectorStatus: 'accept', collectedBy: collectorID })
+                .find({ collectorStatus: "accept", collectedBy: collectorID })
                 .then((schedules) => {
                   accepted = schedules.length;
                   RESPONSE.status(200).jsonp(
@@ -293,7 +287,7 @@ collectorController.checkTotalCompleted = (REQUEST, RESPONSE) => {
   const collectorID = REQUEST.query.ID;
 
   MODEL.scheduleModel
-    .find({ completionStatus: 'completed', collectedBy: collectorID })
+    .find({ completionStatus: "completed", collectedBy: collectorID })
     .sort({ _id: -1 })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
@@ -310,7 +304,7 @@ collectorController.checkMissed = (REQUEST, RESPONSE) => {
   const collectorID = REQUEST.query.ID;
 
   MODEL.scheduleModel
-    .find({ completionStatus: 'missed', collectedBy: collectorID })
+    .find({ completionStatus: "missed", collectedBy: collectorID })
     .sort({ _id: -1 })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
@@ -324,7 +318,7 @@ collectorController.checkTotalMissed = (REQUEST, RESPONSE) => {
   const collectorID = REQUEST.query.ID;
 
   MODEL.scheduleModel
-    .find({ completionStatus: 'missed', collectedBy: collectorID })
+    .find({ completionStatus: "missed", collectedBy: collectorID })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(
@@ -368,7 +362,7 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
               fullname: REQUEST.body.fullname,
               state: REQUEST.body.state,
               place: REQUEST.body.place,
-              aggregatorId: REQUEST.body.aggregatorId || '',
+              aggregatorId: REQUEST.body.aggregatorId || "",
               organisation: REQUEST.body.organisation,
               localGovernment: REQUEST.body.localGovernment,
               profile_picture: REQUEST.body.profile_picture,
@@ -381,7 +375,7 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
             .then((user) => {
               if (!user) {
                 return RESPONSE.status(400).json({
-                  message: 'User not found',
+                  message: "User not found",
                 });
               }
 
@@ -419,29 +413,30 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
   }
 };
 
-collectorController.updateCollectorSignal = (req,res)=>{
+collectorController.updateCollectorSignal = (req, res) => {
   const phone = req.body.phone;
-  const signal = req.body.signal_id
+  const signal = req.body.signal_id;
 
-  try{
-      MODEL.collectorModel.updateOne({
-        phone : phone
+  try {
+    MODEL.collectorModel.updateOne(
+      {
+        phone: phone,
       },
       {
-        $set:{
-            onesignal_id: signal
-        }
-      }, (err,result)=>{
+        $set: {
+          onesignal_id: signal,
+        },
+      },
+      (err, result) => {
         return res.status(200).json({
-          message: "Signal id updated"
-        })
-      })
+          message: "Signal id updated",
+        });
+      }
+    );
+  } catch (err) {
+    return res.status(500).json(err);
   }
-  catch(err){
-      return res.status(500).json(err);
-
-  }
-}
+};
 
 collectorController.verifyPhone = (REQUEST, RESPONSE) => {
   var error = {};
@@ -450,15 +445,15 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
   var pin_id = REQUEST.body.pin_id;
 
   var data = {
-    api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+    api_key: "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
     pin_id: pin_id,
     pin: token,
   };
   var options = {
-    method: 'POST',
-    url: 'https://termii.com/api/sms/otp/verify',
+    method: "POST",
+    url: "https://termii.com/api/sms/otp/verify",
     headers: {
-      'Content-Type': ['application/json', 'application/json'],
+      "Content-Type": ["application/json", "application/json"],
     },
     body: JSON.stringify(data),
   };
@@ -473,9 +468,8 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
           MODEL.collectorModel.findOne({ phone: phone }, (err, USER) => {
             var test = JSON.parse(JSON.stringify(USER));
             if (err) return RESPONSE.status(400).jsonp(error);
-            var jwtToken = COMMON_FUN.createToken(
-              test
-            ); /** creating jwt token */
+            var jwtToken =
+              COMMON_FUN.createToken(test); /** creating jwt token */
             test.token = jwtToken;
             return RESPONSE.jsonp(test);
           });
@@ -483,7 +477,7 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
       );
     } else {
       return RESPONSE.status(400).json({
-        message: 'Invalid token, retry',
+        message: "Invalid token, retry",
       });
     }
 
@@ -533,24 +527,24 @@ collectorController.resendVerification = (REQUEST, RESPONSE) => {
   try {
     var phoneNo = String(phone).substring(1, 11);
     var data = {
-      api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
-      message_type: 'NUMERIC',
+      api_key: "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+      message_type: "NUMERIC",
       to: `+234${phoneNo}`,
-      from: 'N-Alert',
-      channel: 'dnd',
+      from: "N-Alert",
+      channel: "dnd",
       pin_attempts: 10,
       pin_time_to_live: 5,
       pin_length: 4,
-      pin_placeholder: '< 1234 >',
+      pin_placeholder: "< 1234 >",
       message_text:
-        'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
-      pin_type: 'NUMERIC',
+        "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+      pin_type: "NUMERIC",
     };
     var options = {
-      method: 'POST',
-      url: 'https://termii.com/api/sms/otp/send',
+      method: "POST",
+      url: "https://termii.com/api/sms/otp/send",
       headers: {
-        'Content-Type': ['application/json', 'application/json'],
+        "Content-Type": ["application/json", "application/json"],
       },
       body: JSON.stringify(data),
     };
@@ -584,7 +578,7 @@ collectorController.updatePosition = (req, resp) => {
       { $set: { lat: lat, long: long } },
       (res) => {
         return resp.status(200).json({
-          message: 'Position Updated Successfully',
+          message: "Position Updated Successfully",
         });
       }
     );
@@ -604,7 +598,7 @@ collectorController.updatePhoneSpecifications = async (REQUEST, RESPONSE) => {
       { email: REQUEST.body.email },
       { last_logged_in: new Date() },
       (res) => {
-        console.log('Logged date updated', new Date());
+        console.log("Logged date updated", new Date());
       }
     );
 
@@ -626,7 +620,7 @@ collectorController.updatePhoneSpecifications = async (REQUEST, RESPONSE) => {
             .then((user) => {
               if (!user) {
                 return RESPONSE.status(400).json({
-                  message: 'User not found',
+                  message: "User not found",
                 });
               }
               return RESPONSE.jsonp(
@@ -660,7 +654,7 @@ collectorController.deleteRecycler = (req, res) => {
       })
       .then((result) => {
         return res.status(200).json({
-          message: 'User deleted successfully',
+          message: "User deleted successfully",
         });
       });
   } catch (err) {
@@ -715,8 +709,8 @@ collectorController.monthFiltering = (req, res) => {
       .find({
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -725,8 +719,8 @@ collectorController.monthFiltering = (req, res) => {
           .find({
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -735,8 +729,8 @@ collectorController.monthFiltering = (req, res) => {
               .find({
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -745,8 +739,8 @@ collectorController.monthFiltering = (req, res) => {
                   .find({
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -755,8 +749,8 @@ collectorController.monthFiltering = (req, res) => {
                       .find({
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -765,8 +759,8 @@ collectorController.monthFiltering = (req, res) => {
                           .find({
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -775,8 +769,8 @@ collectorController.monthFiltering = (req, res) => {
                               .find({
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -786,9 +780,9 @@ collectorController.monthFiltering = (req, res) => {
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -799,13 +793,13 @@ collectorController.monthFiltering = (req, res) => {
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -819,13 +813,13 @@ collectorController.monthFiltering = (req, res) => {
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -839,14 +833,14 @@ collectorController.monthFiltering = (req, res) => {
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -863,7 +857,7 @@ collectorController.monthFiltering = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -872,7 +866,7 @@ collectorController.monthFiltering = (req, res) => {
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -889,7 +883,7 @@ collectorController.monthFiltering = (req, res) => {
                                                               $eq: [
                                                                 {
                                                                   $year:
-                                                                    '$createdAt',
+                                                                    "$createdAt",
                                                                 },
                                                                 year,
                                                               ],
@@ -898,7 +892,7 @@ collectorController.monthFiltering = (req, res) => {
                                                               $eq: [
                                                                 {
                                                                   $month:
-                                                                    '$createdAt',
+                                                                    "$createdAt",
                                                                 },
                                                                 11,
                                                               ],
@@ -977,7 +971,7 @@ collectorController.monthFiltering = (req, res) => {
   }
 };
 
-var ObjectID = require('mongodb').ObjectID;
+var ObjectID = require("mongodb").ObjectID;
 
 collectorController.triggerActivity = (req, res) => {
   const userID = req.body.userID;
@@ -987,9 +981,9 @@ collectorController.triggerActivity = (req, res) => {
       { _id: ObjectID(userID) },
       { $set: { last_logged_in: today } },
       (err, resp) => {
-        console.log('<<<', resp);
+        console.log("<<<", resp);
         return res.status(200).json({
-          message: 'Activity',
+          message: "Activity",
         });
       }
     );
@@ -1071,24 +1065,24 @@ collectorController.resetMobile = (REQUEST, RESPONSE) => {
   var phoneNo = String(phone).substring(1, 11);
 
   var data = {
-    api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
-    message_type: 'NUMERIC',
+    api_key: "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+    message_type: "NUMERIC",
     to: `+234${phoneNo}`,
-    from: 'N-Alert',
-    channel: 'dnd',
+    from: "N-Alert",
+    channel: "dnd",
     pin_attempts: 10,
     pin_time_to_live: 5,
     pin_length: 4,
-    pin_placeholder: '< 1234 >',
+    pin_placeholder: "< 1234 >",
     message_text:
-      'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
-    pin_type: 'NUMERIC',
+      "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+    pin_type: "NUMERIC",
   };
   var options = {
-    method: 'POST',
-    url: 'https://termii.com/api/sms/otp/send',
+    method: "POST",
+    url: "https://termii.com/api/sms/otp/send",
     headers: {
-      'Content-Type': ['application/json', 'application/json'],
+      "Content-Type": ["application/json", "application/json"],
     },
     body: JSON.stringify(data),
   };
@@ -1096,15 +1090,15 @@ collectorController.resetMobile = (REQUEST, RESPONSE) => {
     if (error) throw new Error(error);
 
     var data = {
-      api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
+      api_key: "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
       pin_id: pin_id,
       pin: token,
     };
     var options = {
-      method: 'POST',
-      url: 'https://termii.com/api/sms/otp/verify',
+      method: "POST",
+      url: "https://termii.com/api/sms/otp/verify",
       headers: {
-        'Content-Type': ['application/json', 'application/json'],
+        "Content-Type": ["application/json", "application/json"],
       },
       body: JSON.stringify(data),
     };
@@ -1118,9 +1112,8 @@ collectorController.resetMobile = (REQUEST, RESPONSE) => {
           MODEL.collectorModel.findOne({ phone: phone }, (err, USER) => {
             var test = JSON.parse(JSON.stringify(USER));
             if (err) return RESPONSE.status(400).jsonp(error);
-            var jwtToken = COMMON_FUN.createToken(
-              test
-            ); /** creating jwt token */
+            var jwtToken =
+              COMMON_FUN.createToken(test); /** creating jwt token */
             test.token = jwtToken;
             return RESPONSE.jsonp(test);
           });
@@ -1135,7 +1128,7 @@ collectorController.resetMobilePassword = (REQUEST, RESPONSE) => {
   MODEL.collectorModel.findOne({ phone: phone }).then((result) => {
     if (!result) {
       return RESPONSE.status(400).json({
-        message: ' This account is not verified ',
+        message: " This account is not verified ",
       });
     }
 

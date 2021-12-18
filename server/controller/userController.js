@@ -1,84 +1,79 @@
-'use strict';
+"use strict";
 
 /**************************************************
  ***** User controller for user business logic ****
  **************************************************/
 let userController = {};
-let MODEL = require('../models');
-let COMMON_FUN = require('../util/commonFunction');
-let SERVICE = require('../services/commonService');
-let CONSTANTS = require('../util/constants');
+let MODEL = require("../models");
+let COMMON_FUN = require("../util/commonFunction");
+let SERVICE = require("../services/commonService");
+let CONSTANTS = require("../util/constants");
 // const { Response } = require('aws-sdk');
-var request = require('request');
-const streamifier = require('streamifier');
+var request = require("request");
+const streamifier = require("streamifier");
 
-const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const fileUpload = multer();
 
 cloudinary.config({
-  cloud_name: 'pakam',
-  api_key: '865366333135586',
-  api_secret: 'ONCON8EsT1bNyhCGlXLJwH2lsy8',
+  cloud_name: "pakam",
+  api_key: "865366333135586",
+  api_secret: "ONCON8EsT1bNyhCGlXLJwH2lsy8",
 });
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'Pakam',
+    folder: "Pakam",
   },
 });
-
 
 const parser = multer({ storage: storage });
 
-var nodemailer = require('nodemailer');
+var nodemailer = require("nodemailer");
 
-const io = require('socket.io')();
-
+const io = require("socket.io")();
 
 var transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-    user: 'pakambusiness@gmail.com',
-    pass: 'pakambusiness-2000',
+    user: "pakambusiness@gmail.com",
+    pass: "pakambusiness-2000",
   },
 });
 
-
 var sendNotification = function (data) {
-  
   var headers = {
-    'Content-Type': 'application/json; charset=utf-8',
+    "Content-Type": "application/json; charset=utf-8",
   };
 
   var options = {
-    host: 'onesignal.com',
+    host: "onesignal.com",
     port: 443,
-    path: '/api/v1/notifications',
-    method: 'POST',
+    path: "/api/v1/notifications",
+    method: "POST",
     headers: headers,
   };
 
-  var https = require('https');
+  var https = require("https");
   var req = https.request(options, function (res) {
-    res.on('data', function (data) {
-      console.log('Response:');
+    res.on("data", function (data) {
+      console.log("Response:");
       console.log(JSON.parse(data));
     });
   });
 
-  req.on('error', function (e) {
-    console.log('ERROR:');
+  req.on("error", function (e) {
+    console.log("ERROR:");
     console.log(e);
   });
 
   req.write(JSON.stringify(data));
   req.end();
 };
-
 
 userController.upload = (REQUEST, RESPONSE) => {
   /** Stream
@@ -124,108 +119,111 @@ userController.registerUser = (REQUEST, RESPONSE) => {
         })
         .then((user) => {
           if (user) {
-            errors.message = 'User already exists';
+            errors.message = "User already exists";
             RESPONSE.status(400).jsonp(errors);
           } else {
             MODEL.userModel(dataToSave).save({}, (ERR, RESULT) => {
               if (ERR) RESPONSE.status(400).jsonp(ERR);
               else {
-
                 var test = JSON.parse(JSON.stringify(RESULT));
-                                    var jwtToken = COMMON_FUN.createToken(
-                                      test
-                                    ); /** creating jwt token */
-                                    test.token = jwtToken;
+                var jwtToken =
+                  COMMON_FUN.createToken(test); /** creating jwt token */
+                test.token = jwtToken;
 
-                                    MODEL.userModel.updateOne(
-                                                    { email: RESULT.email },
-                                                    {
-                                                      $set: {
-                                                        cardID: RESULT._id
-                                                      },
-                                                    },
-                                                    (res) => { 
-                                                      var phoneNo = String(RESULT.phone).substring(1,11);
-                                                      var data = {
-                                                        api_key:'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
-                                                        message_type: 'NUMERIC',
-                                                        to: `+234${phoneNo}`,
-                                                        from: 'N-Alert',
-                                                        channel: 'dnd',
-                                                        pin_attempts: 10,
-                                                        pin_time_to_live: 5,
-                                                        pin_length: 4,
-                                                        pin_placeholder: '< 1234 >',
-                                                        message_text: 'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
-                                                        pin_type: 'NUMERIC',
-                                                      };
-                                                      var options = {
-                                                        method: 'POST',
-                                                        url: 'https://termii.com/api/sms/otp/send',
-                                                        headers: {
-                                                          'Content-Type': ['application/json', 'application/json'],
-                                                        },
-                                                        body: JSON.stringify(data),
-                                                      };
-                                                      request(options, function (error, response) {
-                                                        const iden = JSON.parse(response.body)
-                                                        if (error) {
-                                                          throw new Error(error);
-                                                        } else {
-                                                          // let UserData = {
-                                                          //   email: RESULT.email,
-                                                          //   phone: RESULT.phone,
-                                                          //   username: RESULT.username,
-                                                          //   roles: RESULT.roles,
-                                                          //   pin_id: response.body.pin_id
-                                                          // };
-                                                          let UserData = {
-                                                            ...test , pin_id: iden.pinId
-                                                          }
+                MODEL.userModel.updateOne(
+                  { email: RESULT.email },
+                  {
+                    $set: {
+                      cardID: RESULT._id,
+                    },
+                  },
+                  (res) => {
+                    var phoneNo = String(RESULT.phone).substring(1, 11);
+                    var data = {
+                      api_key:
+                        "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+                      message_type: "NUMERIC",
+                      to: `+234${phoneNo}`,
+                      from: "N-Alert",
+                      channel: "dnd",
+                      pin_attempts: 10,
+                      pin_time_to_live: 5,
+                      pin_length: 4,
+                      pin_placeholder: "< 1234 >",
+                      message_text:
+                        "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+                      pin_type: "NUMERIC",
+                    };
+                    var options = {
+                      method: "POST",
+                      url: "https://termii.com/api/sms/otp/send",
+                      headers: {
+                        "Content-Type": [
+                          "application/json",
+                          "application/json",
+                        ],
+                      },
+                      body: JSON.stringify(data),
+                    };
+                    request(options, function (error, response) {
+                      const iden = JSON.parse(response.body);
+                      if (error) {
+                        throw new Error(error);
+                      } else {
+                        // let UserData = {
+                        //   email: RESULT.email,
+                        //   phone: RESULT.phone,
+                        //   username: RESULT.username,
+                        //   roles: RESULT.roles,
+                        //   pin_id: response.body.pin_id
+                        // };
+                        let UserData = {
+                          ...test,
+                          pin_id: iden.pinId,
+                        };
 
-                                              var data = {
-                                                            "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-                                                            "phone_number": `+234${phoneNo}`,
-                                                            "country_code": "NG"
-                                                          };
-                                              var options = {
-                                                'method': 'GET',
-                                                'url': ' https://termii.com/api/insight/number/query',
-                                                'headers': {
-                                                  'Content-Type': ['application/json', 'application/json']
-                                                },
-                                                body: JSON.stringify(data)
-                                              
-                                              };
-                                              request(options, function (error, response) { 
-                                                if (error) throw new Error(error);
-                                                var mobileData = JSON.parse(response.body);
-                                                var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
-                                              MODEL.userModel.updateOne(
-                                                              { email: RESULT.email },
-                                                              {
-                                                                $set: {
-                                                                  fullname: RESULT.username.split(' ')[0] + " " + RESULT.username.split(' ')[1],
-                                                                  mobile_carrier: mobile_carrier,
-                                                                },
-                                                              },
-                                                              (res) => {
-
-                                                          return RESPONSE.status(200).jsonp(
-                                                            UserData
-                                                           );
-
-                                                              })
-
-                                                            })
-
-
-
-                                                        }
-                                                      })
-
-                                                    })
-                            
+                        var data = {
+                          api_key:
+                            "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+                          phone_number: `+234${phoneNo}`,
+                          country_code: "NG",
+                        };
+                        var options = {
+                          method: "GET",
+                          url: " https://termii.com/api/insight/number/query",
+                          headers: {
+                            "Content-Type": [
+                              "application/json",
+                              "application/json",
+                            ],
+                          },
+                          body: JSON.stringify(data),
+                        };
+                        request(options, function (error, response) {
+                          if (error) throw new Error(error);
+                          var mobileData = JSON.parse(response.body);
+                          // var mobile_carrier =
+                          //   mobileData.result[0].operatorDetail.operatorName;
+                          MODEL.userModel.updateOne(
+                            { email: RESULT.email },
+                            {
+                              $set: {
+                                fullname:
+                                  RESULT.username.split(" ")[0] +
+                                  " " +
+                                  RESULT.username.split(" ")[1],
+                                //mobile_carrier: mobile_carrier,
+                              },
+                            },
+                            (res) => {
+                              return RESPONSE.status(200).jsonp(UserData);
+                            }
+                          );
+                        });
+                      }
+                    });
+                  }
+                );
 
                 // request(
                 //   {
@@ -266,12 +264,11 @@ userController.registerUser = (REQUEST, RESPONSE) => {
                 //         let card_id = res.body.content.data.cardID;
                 //         need = { cardID: card_id, ...RESULT };
 
-                //         // TERMII IMPLEMENTATION 
+                //         // TERMII IMPLEMENTATION
 
                 //         const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
                 //         const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
                 //         const client = require('twilio')(accountSid, authToken);
-
 
                 //         client.verify
                 //           .services('VAeaa492de9598c3dcce55fd9243461ab3')
@@ -369,15 +366,14 @@ userController.loginUser = (REQUEST, RESPONSE) => {
                   )
                 );
               else {
-                var jwtToken = COMMON_FUN.createToken(
-                  USER
-                ); /** creating jwt token */
+                var jwtToken =
+                  COMMON_FUN.createToken(USER); /** creating jwt token */
 
                 MODEL.userModel.updateOne(
                   { phone: REQUEST.body.phone },
                   { last_logged_in: new Date() },
                   (res) => {
-                    console.log('Logged date updated', new Date());
+                    console.log("Logged date updated", new Date());
                   }
                 );
 
@@ -387,7 +383,7 @@ userController.loginUser = (REQUEST, RESPONSE) => {
             }
           )
         : RESPONSE.status(400).jsonp({
-            message: 'Invalid phone number',
+            message: "Invalid phone number",
           });
     })
     .catch((err) => {
@@ -403,17 +399,17 @@ userController.forgotPassword = (REQUEST, RESPONSE) => {
     PROJECTION = { __v: 0, createAt: 0 };
   /** check if user exists or not */
   var mailOptions = {
-    from: 'pakambusiness@gmail.com',
+    from: "pakambusiness@gmail.com",
     to: `${REQUEST.body.email}`,
-    subject: 'FORGOT PASSWORD MAIL',
-    text: 'Forgot password?',
+    subject: "FORGOT PASSWORD MAIL",
+    text: "Forgot password?",
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
     } else {
-      console.log('Email sent: ' + info.response);
+      console.log("Email sent: " + info.response);
     }
   });
 
@@ -490,7 +486,7 @@ userController.updateUser = async (REQUEST, RESPONSE) => {
       { lean: true }
     );
 
-    console.log('<<<<<>>>>', checkUserExist);
+    console.log("<<<<<>>>>", checkUserExist);
     if (checkUserExist) {
       /********** encrypt password ********/
       // COMMON_FUN.encryptPswrd(REQUEST.body.password, (ERR, HASH) => {
@@ -528,7 +524,7 @@ userController.updateUser = async (REQUEST, RESPONSE) => {
             .then((user) => {
               if (!user) {
                 return RESPONSE.status(400).json({
-                  message: 'User not found',
+                  message: "User not found",
                 });
               }
               return RESPONSE.jsonp(
@@ -647,33 +643,32 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
   // }
   var error = {};
   var phone = REQUEST.body.phone;
-  var phoneNo = String(phone).substring(1,11);
+  var phoneNo = String(phone).substring(1, 11);
 
-
-  const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
-  const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
-  const client = require('twilio')(accountSid, authToken);
+  const accountSid = "AC21bbc8152a9b9d981d6c86995d0bb806";
+  const authToken = "3c53aeab8e3420f00e7b05777e7413a9";
+  const client = require("twilio")(accountSid, authToken);
 
   try {
     var data = {
-      api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
-      message_type: 'NUMERIC',
+      api_key: "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+      message_type: "NUMERIC",
       to: `+234${phoneNo}`,
-      from: 'N-Alert',
-      channel: 'dnd',
+      from: "N-Alert",
+      channel: "dnd",
       pin_attempts: 10,
       pin_time_to_live: 5,
       pin_length: 4,
-      pin_placeholder: '< 1234 >',
+      pin_placeholder: "< 1234 >",
       message_text:
-        'Your Pakam Verification code is < 1234 >. It expires in 5 minutes',
-      pin_type: 'NUMERIC',
+        "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+      pin_type: "NUMERIC",
     };
     var options = {
-      method: 'POST',
-      url: 'https://termii.com/api/sms/otp/send',
+      method: "POST",
+      url: "https://termii.com/api/sms/otp/send",
       headers: {
-        'Content-Type': ['application/json', 'application/json'],
+        "Content-Type": ["application/json", "application/json"],
       },
       body: JSON.stringify(data),
     };
@@ -700,137 +695,129 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
 };
 
 userController.verifyPhone = (REQUEST, RESPONSE) => {
-//   var error = {};
-//   var token = REQUEST.body.token;
-//   var phone = REQUEST.body.phone;
-//   const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
-//   const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
-//   const client = require('twilio')(accountSid, authToken);
+  //   var error = {};
+  //   var token = REQUEST.body.token;
+  //   var phone = REQUEST.body.phone;
+  //   const accountSid = 'AC21bbc8152a9b9d981d6c86995d0bb806';
+  //   const authToken = '3c53aeab8e3420f00e7b05777e7413a9';
+  //   const client = require('twilio')(accountSid, authToken);
 
+  //   // TERMII VERIFICATION
 
-//   // TERMII VERIFICATION
+  // //   var data = {
+  // //     "api_key": "Your API key",
+  // //     "pin_id": "c8dcd048-5e7f-4347-8c89-4470c3af0b",
+  // //     "pin": "195558"
+  // // };
+  // // var options = {
+  // // 'method': 'POST',
+  // // 'url': 'https://termii.com/api/sms/otp/verify',
+  // // 'headers': {
+  // // 'Content-Type': ['application/json', 'application/json']
+  // // },
+  // // body: JSON.stringify(data)
 
+  // // };
+  // // request(options, function (error, response) {
+  // // if (error) throw new Error(error);
+  // // console.log(response.body);
+  // // });
 
-// //   var data = {
-// //     "api_key": "Your API key",
-// //     "pin_id": "c8dcd048-5e7f-4347-8c89-4470c3af0b",
-// //     "pin": "195558"
-// // };
-// // var options = {
-// // 'method': 'POST',
-// // 'url': 'https://termii.com/api/sms/otp/verify',
-// // 'headers': {
-// // 'Content-Type': ['application/json', 'application/json']
-// // },
-// // body: JSON.stringify(data)
+  //   try {
+  //     client.verify
+  //       .services('VAeaa492de9598c3dcce55fd9243461ab3')
+  //       .verificationChecks.create({
+  //         to: `+234${phone}`,
+  //         code: `${token}`,
+  //       })
+  //       .then((verification_check) => {
+  //         if (verification_check.status == 'approved') {
+  //           console.log(verification_check.status);
+  //           MODEL.userModel.updateOne(
+  //             { phone: phone },
+  //             { verified: true },
+  //             (res) => {
+  //               MODEL.userModel.findOne({ phone: phone }, (err, USER) => {
+  //                 var test = JSON.parse(JSON.stringify(USER));
 
-// // };
-// // request(options, function (error, response) { 
-// // if (error) throw new Error(error);
-// // console.log(response.body);
-// // });
+  //                 if (err) return RESPONSE.status(400).jsonp(error);
+  //                 console.log('user here at all', USER);
+  //                 var jwtToken = COMMON_FUN.createToken(
+  //                   test
+  //                 ); /** creating jwt token */
+  //                 console.log('user token here at all', test, jwtToken);
+  //                 test.token = jwtToken;
+  //                 return RESPONSE.status(200).json(test);
+  //               });
+  //             }
+  //           );
+  //         } else {
+  //           return RESPONSE.status(404).json({
+  //             message: 'Wrong OTP !',
+  //           });
+  //         }
+  //       })
+  //       .catch((err) =>
+  //         RESPONSE.status(404).json({
+  //           message: 'Wrong OTP !',
+  //         })
+  //       );
+  //   } catch (err) {
+  //     return RESPONSE.status(404).json({
+  //       err,
+  //     });
+  //   }
 
+  var error = {};
+  var phone = REQUEST.body.phone;
+  var token = REQUEST.body.token;
+  var pin_id = REQUEST.body.pin_id;
 
-//   try {
-//     client.verify
-//       .services('VAeaa492de9598c3dcce55fd9243461ab3')
-//       .verificationChecks.create({
-//         to: `+234${phone}`,
-//         code: `${token}`,
-//       })
-//       .then((verification_check) => {
-//         if (verification_check.status == 'approved') {
-//           console.log(verification_check.status);
-//           MODEL.userModel.updateOne(
-//             { phone: phone },
-//             { verified: true },
-//             (res) => {
-//               MODEL.userModel.findOne({ phone: phone }, (err, USER) => {
-//                 var test = JSON.parse(JSON.stringify(USER));
+  var data = {
+    api_key: "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+    pin_id: pin_id,
+    pin: token,
+  };
+  var options = {
+    method: "POST",
+    url: "https://termii.com/api/sms/otp/verify",
+    headers: {
+      "Content-Type": ["application/json", "application/json"],
+    },
+    body: JSON.stringify(data),
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
 
-//                 if (err) return RESPONSE.status(400).jsonp(error);
-//                 console.log('user here at all', USER);
-//                 var jwtToken = COMMON_FUN.createToken(
-//                   test
-//                 ); /** creating jwt token */
-//                 console.log('user token here at all', test, jwtToken);
-//                 test.token = jwtToken;
-//                 return RESPONSE.status(200).json(test);
-//               });
-//             }
-//           );
-//         } else {
-//           return RESPONSE.status(404).json({
-//             message: 'Wrong OTP !',
-//           });
-//         }
-//       })
-//       .catch((err) =>
-//         RESPONSE.status(404).json({
-//           message: 'Wrong OTP !',
-//         })
-//       );
-//   } catch (err) {
-//     return RESPONSE.status(404).json({
-//       err,
-//     });
-//   }
-
-var error = {};
-var phone = REQUEST.body.phone;
-var token = REQUEST.body.token;
-var pin_id = REQUEST.body.pin_id;
-
-var data = {
-  api_key: 'TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63',
-  pin_id: pin_id,
-  pin: token,
-};
-var options = {
-  method: 'POST',
-  url: 'https://termii.com/api/sms/otp/verify',
-  headers: {
-    'Content-Type': ['application/json', 'application/json'],
-  },
-  body: JSON.stringify(data),
-};
-request(options, function (error, response) {
-  if (error) throw new Error(error);
-
-  const verified = JSON.parse(response.body);
-  if(verified.verified == true){
-  MODEL.userModel.updateOne(
-      { phone: phone },
-      { verified: true },
-      (res) => {
+    const verified = JSON.parse(response.body);
+    if (verified.verified == true) {
+      MODEL.userModel.updateOne({ phone: phone }, { verified: true }, (res) => {
         MODEL.userModel.findOne({ phone: phone }, (err, USER) => {
           var test = JSON.parse(JSON.stringify(USER));
 
           if (err) return RESPONSE.status(400).jsonp(error);
-          console.log('user here at all', USER);
-          var jwtToken = COMMON_FUN.createToken(
-            test
-          ); /** creating jwt token */
-          console.log('user token here at all', USER);
+          console.log("user here at all", USER);
+          var jwtToken = COMMON_FUN.createToken(test); /** creating jwt token */
+          console.log("user token here at all", USER);
           test.token = jwtToken;
           return RESPONSE.jsonp(test);
         });
-      }
-    );  
-  }
-  else {
-    return RESPONSE.status(400).json({
-      message: "Invalid token, retry"
-    })
-  }
-  console.log(response.body);
-});
+      });
+    } else {
+      return RESPONSE.status(400).json({
+        message: "Invalid token, retry",
+      });
+    }
+    console.log(response.body);
+  });
 };
 
 userController.getAllClients = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
-    let users = await MODEL.userModel.find({ roles: 'client', verified: true }).sort({ _id : -1});
+    let users = await MODEL.userModel
+      .find({ roles: "client", verified: true })
+      .sort({ _id: -1 });
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);
@@ -840,10 +827,10 @@ userController.getAllClients = async (REQUEST, RESPONSE) => {
 userController.getWalletBalance = (req, res) => {
   request(
     {
-      url: 'https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent',
-      method: 'POST',
+      url: "https://apis.touchandpay.me/lawma-backend/v1/agent/login/agent",
+      method: "POST",
       json: true,
-      body: { data: { username: 'xrubicon', password: 'xrubicon1234' } },
+      body: { data: { username: "xrubicon", password: "xrubicon1234" } },
     },
     function (error, response, body) {
       response.headers.token;
@@ -851,10 +838,10 @@ userController.getWalletBalance = (req, res) => {
       request(
         {
           url: `https://apis.touchandpay.me/lawma-backend/v1/agent/get/customer/card/${req.query.cardID}`,
-          method: 'GET',
+          method: "GET",
           headers: {
-            Accept: 'application/json',
-            'Accept-Charset': 'utf-8',
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
             Token: response.headers.token,
           },
           json: true,
@@ -870,7 +857,9 @@ userController.getWalletBalance = (req, res) => {
 userController.getAllCollectors = async (REQUEST, RESPONSE) => {
   try {
     /* check user exist or not*/
-    let users = await MODEL.collectorModel.find({ verified : true}).sort({_id:-1});
+    let users = await MODEL.collectorModel
+      .find({ verified: true })
+      .sort({ _id: -1 });
     RESPONSE.jsonp(users);
   } catch (err) {
     RESPONSE.status(400).jsonp(err);
@@ -882,71 +871,59 @@ userController.resetMobile = (REQUEST, RESPONSE) => {
   const token = REQUEST.body.token;
   const pin_id = REQUEST.body.pin_id;
 
-  var phoneNo = String(phone).substring(1,11);
-
+  var phoneNo = String(phone).substring(1, 11);
 
   var data = {
-    "api_key" : "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-    "message_type" : "NUMERIC",
-    "to" : `+234${phoneNo}`,
-    "from" : "N-Alert",
-    "channel" : "dnd",
-    "pin_attempts" : 10,
-    "pin_time_to_live" :  5,
-    "pin_length" : 4,
-    "pin_placeholder" : "< 1234 >",
-    "message_text" : "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
-    "pin_type" : "NUMERIC"
- };
+    api_key: "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+    message_type: "NUMERIC",
+    to: `+234${phoneNo}`,
+    from: "N-Alert",
+    channel: "dnd",
+    pin_attempts: 10,
+    pin_time_to_live: 5,
+    pin_length: 4,
+    pin_placeholder: "< 1234 >",
+    message_text:
+      "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+    pin_type: "NUMERIC",
+  };
 
+  var data = {
+    api_key: "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+    pin_id: pin_id,
+    pin: token,
+  };
+  var options = {
+    method: "POST",
+    url: "https://termii.com/api/sms/otp/verify",
+    headers: {
+      "Content-Type": ["application/json", "application/json"],
+    },
+    body: JSON.stringify(data),
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
 
-var data = {
-  "api_key": "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-  "pin_id": pin_id,
-  "pin": token
-};
-var options = {
-'method': 'POST',
-'url': 'https://termii.com/api/sms/otp/verify',
-'headers': {
-'Content-Type': ['application/json', 'application/json']
-},
-body: JSON.stringify(data)
-};
-request(options, function (error, response) { 
-if (error) throw new Error(error);
-
-MODEL.userModel.updateOne(
-  { phone: phone },
-  { verified: true },
-  (res) => {
-    MODEL.userModel
-      .findOne({ "phone": phone }, (err,USER) => {
-        var test = JSON.parse(JSON.stringify(USER))
-        if (err) return RESPONSE.status(400).jsonp(error)
-        console.log("user here at all", USER)
-        var jwtToken = COMMON_FUN.createToken(
-          test
-        ); /** creating jwt token */
-        console.log("user token here at all", USER)
+    MODEL.userModel.updateOne({ phone: phone }, { verified: true }, (res) => {
+      MODEL.userModel.findOne({ phone: phone }, (err, USER) => {
+        var test = JSON.parse(JSON.stringify(USER));
+        if (err) return RESPONSE.status(400).jsonp(error);
+        console.log("user here at all", USER);
+        var jwtToken = COMMON_FUN.createToken(test); /** creating jwt token */
+        console.log("user token here at all", USER);
         test.token = jwtToken;
         return RESPONSE.jsonp(test);
-          
-      })
-  }
-);
-
-})
-
-}
-
+      });
+    });
+  });
+};
 
 userController.resetMobilePassword = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
   MODEL.userModel.findOne({ phone: phone }).then((result) => {
     if (!result) {
       return RESPONSE.status(400).json({
-        message: ' This account is not verified ',
+        message: " This account is not verified ",
       });
     }
 
@@ -1043,7 +1020,7 @@ userController.uploadProfile = (req, res) => {
 userController.dailyActive = (req, res) => {
   const today = new Date();
   const active_today = new Date();
-  active_today.setHours(0,0,0,0)
+  active_today.setHours(0, 0, 0, 0);
 
   try {
     MODEL.userModel
@@ -1111,62 +1088,56 @@ userController.expiryDateFilter = (req, res) => {
 };
 
 userController.advertControl = (req, res) => {
-  const advert = { ...req.body}
-  
-  try{
-  
+  const advert = { ...req.body };
+
+  try {
     MODEL.advertModel(advert).save({}, (ERR, RESULT) => {
-  
-        return res.status(200).json({
-          message: "Advert Posted Successfully"
-        })
-  
-    })
+      return res.status(200).json({
+        message: "Advert Posted Successfully",
+      });
+    });
+  } catch (err) {
+    return res.status(500).json(err);
   }
-  catch(err){
-    return res.status(500).json(err)
-  }
-}
+};
 
 userController.updateAdvert = (req, res) => {
-  const advert = { ...req.body}
-  
-  try{
+  const advert = { ...req.body };
 
+  try {
     MODEL.advertModel.updateOne(
       { _id: req.body._id },
       {
         $set: {
           title: req.body.title,
           advert_url: req.body.advert_url,
-          duration : req.body.duration,
-          start_date:req.body.start_date,
-          thumbnail_url:req.body.thumbnail_url
-      }
+          duration: req.body.duration,
+          start_date: req.body.start_date,
+          thumbnail_url: req.body.thumbnail_url,
         },
-      (resp) => { 
+      },
+      (resp) => {
         return res.status(200).json({
-        message: "Advert Updated Successfully"
-      }) })
-  
+          message: "Advert Updated Successfully",
+        });
+      }
+    );
+  } catch (err) {
+    return res.status(500).json(err);
   }
-  catch(err){
-    return res.status(500).json(err)
-  }
-}
-
+};
 
 userController.adsLook = (REQUEST, RESPONSE) => {
   var today = new Date();
-  MODEL.advertModel.find({
-    authenticated : true
-  }).then((advert) => {
-
-    const test = advert.filter(x=>x.duration-today>0)
-    return RESPONSE.status(200).json(test);
-  });
+  MODEL.advertModel
+    .find({
+      authenticated: true,
+    })
+    .then((advert) => {
+      const test = advert.filter((x) => x.duration - today > 0);
+      return RESPONSE.status(200).json(test);
+    });
 };
-
 
 userController.updatePhoneSpecifications = async (REQUEST, RESPONSE) => {
   try {
@@ -1180,7 +1151,7 @@ userController.updatePhoneSpecifications = async (REQUEST, RESPONSE) => {
       { email: REQUEST.body.email },
       { last_logged_in: new Date() },
       (res) => {
-        console.log('Logged date updated', new Date());
+        console.log("Logged date updated", new Date());
       }
     );
 
@@ -1192,7 +1163,7 @@ userController.updatePhoneSpecifications = async (REQUEST, RESPONSE) => {
             $set: {
               phone_type: REQUEST.body.phone_type,
               phone_OS: REQUEST.body.phone_OS,
-              internet_provider: REQUEST.body.internet_provider
+              internet_provider: REQUEST.body.internet_provider,
             },
           }
         )
@@ -1202,7 +1173,7 @@ userController.updatePhoneSpecifications = async (REQUEST, RESPONSE) => {
             .then((user) => {
               if (!user) {
                 return RESPONSE.status(400).json({
-                  message: 'User not found',
+                  message: "User not found",
                 });
               }
               return RESPONSE.jsonp(
@@ -1232,722 +1203,856 @@ userController.androidUsers = (req, res) => {
     MODEL.userModel
       .find({
         verified: true,
-        phone_OS: 'android',
-      }).sort({
-        _id : -1
+        phone_OS: "android",
       })
-        .then((result) => {
-      
-          MODEL.collectorModel.find({      verified: true,
-            phone_OS:"android"}).sort({
-            _id : -1
-          }).then(recycler=>{
-            var data = [...result, ...recycler]
+      .sort({
+        _id: -1,
+      })
+      .then((result) => {
+        MODEL.collectorModel
+          .find({ verified: true, phone_OS: "android" })
+          .sort({
+            _id: -1,
+          })
+          .then((recycler) => {
+            var data = [...result, ...recycler];
             return res.status(200).json({
-           data: data
-  });
-  
-  }   )
-        })   
-      } catch (err) {
+              data: data,
+            });
+          });
+      });
+  } catch (err) {
     res.status(500).json(err);
   }
 };
-
-
 
 userController.iosUsers = (req, res) => {
   try {
     MODEL.userModel
       .find({
         verified: true,
-        phone_OS: 'ios',
-      }).sort({
-        _id : -1
+        phone_OS: "ios",
+      })
+      .sort({
+        _id: -1,
       })
       .then((result) => {
-
-        MODEL.collectorModel.find({
-          verified: true,
-          phone_OS:"ios"}).sort({
-          _id : -1
-        }).then(recycler=>{
-          var data = [...result, ...recycler]
-          return res.status(200).json({
-         data: data
-});
-
-}   )
-      })   
+        MODEL.collectorModel
+          .find({
+            verified: true,
+            phone_OS: "ios",
+          })
+          .sort({
+            _id: -1,
+          })
+          .then((recycler) => {
+            var data = [...result, ...recycler];
+            return res.status(200).json({
+              data: data,
+            });
+          });
+      });
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
-
-
 userController.desktopUsers = (req, resp) => {
-
   try {
     request(
       {
-        url:
-          'https://pakam-business.herokuapp.com/api/getAllClients',
-        method: 'GET',
+        url: "https://pakam-business.herokuapp.com/api/getAllClients",
+        method: "GET",
         headers: {
-          Accept: 'application/json',
-          'Accept-Charset': 'utf-8',
+          Accept: "application/json",
+          "Accept-Charset": "utf-8",
         },
       },
-      function (err, res){
+      function (err, res) {
         let result = JSON.parse(res.body).reverse();
 
-       return resp.status(200).json(result)
-       })
+        return resp.status(200).json(result);
+      }
+    );
   } catch (err) {
     return resp.status(500).json(err);
   }
 };
 
-
-
-userController.deviceAnalytics  = (REQUEST,RESPONSE)=>{
-
+userController.deviceAnalytics = (REQUEST, RESPONSE) => {
   try {
     MODEL.userModel
-    .find({
-      verified: true,
-      phone_OS: 'android',
-    }).sort({ _id : -1})
-    .then((android) => {
-      MODEL.collectorModel.find({  verified: true,
-        phone_OS: 'android' }).then((android_re)=>{
-            MODEL.collectorModel.find({
-              verified: true,
-              phone_OS: "ios"
-            }).then((ios_re)=>{
-      MODEL.userModel.find({
+      .find({
         verified: true,
-        phone_OS: "ios"
-      }).sort({ _id : -1}).then((ios)=>{
-
-        request(
-          {
-            url:
-              'https://pakam-business.herokuapp.com/api/getAllClients',
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-              'Accept-Charset': 'utf-8',
-            },
-          },
-          function (err, resp){
-            var desktop = JSON.parse(resp.body);
-            console.log("<ios re>", ios_re.length);
-            console.log("<ios us>", ios.length)
-            return RESPONSE.status(200).json({
-              android: android.length + android_re.length,
-              ios: ios.length + ios_re.length,
-              desktop: desktop.length
-            })
-
-        })
-
+        phone_OS: "android",
       })
-            })
+      .sort({ _id: -1 })
+      .then((android) => {
+        MODEL.collectorModel
+          .find({ verified: true, phone_OS: "android" })
+          .then((android_re) => {
+            MODEL.collectorModel
+              .find({
+                verified: true,
+                phone_OS: "ios",
+              })
+              .then((ios_re) => {
+                MODEL.userModel
+                  .find({
+                    verified: true,
+                    phone_OS: "ios",
+                  })
+                  .sort({ _id: -1 })
+                  .then((ios) => {
+                    request(
+                      {
+                        url: "https://pakam-business.herokuapp.com/api/getAllClients",
+                        method: "GET",
+                        headers: {
+                          Accept: "application/json",
+                          "Accept-Charset": "utf-8",
+                        },
+                      },
+                      function (err, resp) {
+                        var desktop = JSON.parse(resp.body);
+                        console.log("<ios re>", ios_re.length);
+                        console.log("<ios us>", ios.length);
+                        return RESPONSE.status(200).json({
+                          android: android.length + android_re.length,
+                          ios: ios.length + ios_re.length,
+                          desktop: desktop.length,
+                        });
+                      }
+                    );
+                  });
+              });
+          });
+      });
+  } catch (err) {
+    RESPONSE.status(500).json(err);
+  }
+};
 
-        })
-
-    });
-} catch (err) {
-  RESPONSE.status(500).json(err);
-}
-  
-}
-
-userController.deleteUser = (req,res)=>{
-
-  const userID = req.body.userID
+userController.deleteUser = (req, res) => {
+  const userID = req.body.userID;
   try {
-    MODEL.userModel.deleteOne({
-      _id: userID
-    }).then((result)=>{
-      return res.status(200).json({
-        message: "User deleted successfully"
+    MODEL.userModel
+      .deleteOne({
+        _id: userID,
       })
-    })
-
+      .then((result) => {
+        return res.status(200).json({
+          message: "User deleted successfully",
+        });
+      });
+  } catch (err) {
+    return res.status(500).json(err);
   }
-  catch(err){
-    return res.status(500).json(err)
-  }
-}
+};
 
-
-userController.userAnalytics = (req,res)=>{
+userController.userAnalytics = (req, res) => {
   const active_today = new Date();
-  active_today.setHours(0,0,0,0);
+  active_today.setHours(0, 0, 0, 0);
 
-  active_today.setHours(0,0,0,0)
-  active_today.setHours(active_today.getHours() + 1)
+  active_today.setHours(0, 0, 0, 0);
+  active_today.setHours(active_today.getHours() + 1);
 
   const yesterday = new Date();
 
-
-  yesterday.setDate(yesterday.getDate()-1);
-  yesterday.setHours(0,0,0,0)
+  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
   yesterday.setHours(yesterday.getHours() + 1);
 
- 
-
-
   try {
-  MODEL.userModel.find({
-    verified: true, 
-    roles: "client"
-  }).then((allUser)=>{
     MODEL.userModel
       .find({
         verified: true,
         roles: "client",
-         createAt: {
-          $gte: yesterday
-        },
       })
-      .sort({ _id: -1 })
-      .then((newUser) => {
-          MODEL.userModel
-            .find({
-              roles: "client",
-              verified: true,
-              $or: [
-                {
-                last_logged_in: {
-                  $gte: active_today,
-                }
-              }, {
-                createAt: {
-                  $gte: active_today
-                }
-              }
-              
-              ],
-            })
-            .sort({ _id: -1 })
-            .then((activeTodayUser) => {
-              MODEL.userModel.find({
-                verified: true,                                   
-                roles: "client",  
+      .then((allUser) => {
+        MODEL.userModel
+          .find({
+            verified: true,
+            roles: "client",
+            createAt: {
+              $gte: yesterday,
+            },
+          })
+          .sort({ _id: -1 })
+          .then((newUser) => {
+            MODEL.userModel
+              .find({
+                roles: "client",
+                verified: true,
                 $or: [
                   {
                     last_logged_in: {
-                      $lte: active_today,
-                    }
-                }, {
-                  last_logged_in: {
-                    $exists: false,
-                    $eq: null
-                   }
-                }
-                
-                ]
-              }).sort({ _id : -1}).then((InactiveUser)=>{
-                return res.status(200).json({
-                  allUsers: { allUsers: allUser.length },
-                  newUsers: { newUsers: newUser.length },
-                  activeTodayUsers: { activeTodayUsers : activeTodayUser.length},
-                  inactiveUsers: { inactiveUsers : InactiveUser.length }
-                })
-             })
+                      $gte: active_today,
+                    },
+                  },
+                  {
+                    createAt: {
+                      $gte: active_today,
+                    },
+                  },
+                ],
+              })
+              .sort({ _id: -1 })
+              .then((activeTodayUser) => {
+                MODEL.userModel
+                  .find({
+                    verified: true,
+                    roles: "client",
+                    $or: [
+                      {
+                        last_logged_in: {
+                          $lte: active_today,
+                        },
+                      },
+                      {
+                        last_logged_in: {
+                          $exists: false,
+                          $eq: null,
+                        },
+                      },
+                    ],
+                  })
+                  .sort({ _id: -1 })
+                  .then((InactiveUser) => {
+                    return res.status(200).json({
+                      allUsers: { allUsers: allUser.length },
+                      newUsers: { newUsers: newUser.length },
+                      activeTodayUsers: {
+                        activeTodayUsers: activeTodayUser.length,
+                      },
+                      inactiveUsers: { inactiveUsers: InactiveUser.length },
+                    });
+                  });
+              });
+          });
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
 
-                 
-
-
-            })
-  
-
-     
-      })
-
-
-
-  })
-} catch(err){
-  return res.status(500).json(err)
-}
-}
-
-
-userController.totalSalesAdvert = (req,res)=>{
-  try{
-
-    MODEL.advertModel.find({}).then((adverts)=>{
+userController.totalSalesAdvert = (req, res) => {
+  try {
+    MODEL.advertModel.find({}).then((adverts) => {
       return res.status(200).json({
-        totalSalesAdvert: adverts.length
-      })
-    })
-
-  }catch(err){
-
-    return res.status(200).json(err)
-
-  }
-}
-
-
-userController.usageGrowth = (req,res)=>{
-
-  var year = new Date().getFullYear()
-  console.log("<<<Year>>>", year)
-
-
-
-  try{
-
-    MODEL.userModel.find({
-      verified: true,
-      "$expr": {
-        "$and": [
-          {"$eq": [{ "$year": "$createAt" }, year]},
-          {"$eq": [{ "$month": "$createAt" }, 1]}
-        ]
-      }
-    }).then((jan) => {
-      MODEL.userModel.find({
-        verified: true,
-        "$expr": {
-          "$and": [
-            {"$eq": [{ "$year": "$createAt" }, year]},
-            {"$eq": [{ "$month": "$createAt" }, 2]}
-          ]
-        }
-      }).then((feb)=>{
-
-        MODEL.userModel.find({
-          verified: true,
-          "$expr": {
-            "$and": [
-              {"$eq": [{ "$year": "$createAt" }, year]},
-              {"$eq": [{ "$month": "$createAt" }, 3]}
-            ]
-          }
-        }).then((march)=>{
-
-          MODEL.userModel.find({
-            verified: true,
-            "$expr": {
-              "$and": [
-                {"$eq": [{ "$year": "$createAt" }, year]},
-                {"$eq": [{ "$month": "$createAt" }, 4]}
-              ]
-            }
-          }).then((april)=>{
-
-            MODEL.userModel.find({
-              verified: true,
-              "$expr": {
-                "$and": [
-                  {"$eq": [{ "$year": "$createAt" }, year]},
-                  {"$eq": [{ "$month": "$createAt" }, 5]}
-                ]
-              }
-            }).then((may)=>{
-
-              MODEL.userModel.find({
-                verified: true,
-                "$expr": {
-                  "$and": [
-                    {"$eq": [{ "$year": "$createAt" }, year]},
-                    {"$eq": [{ "$month": "$createAt" }, 6]}
-                  ]
-                }
-              }).then((june)=>{
-
-                MODEL.userModel.find({
-                  verified: true,
-                  "$expr": {
-                    "$and": [
-                      {"$eq": [{ "$year": "$createAt" }, year]},
-                      {"$eq": [{ "$month": "$createAt" }, 7]}
-                    ]
-                  }
-                }).then((july)=>{
-
-                  MODEL.userModel.find({
-                    verified: true,
-                    "$expr": {
-                      "$and": [
-                        {"$eq": [{ "$year": "$createAt" }, year]},
-                        {"$eq": [{ "$month": "$createAt" }, 8]}
-                      ]
-                    }
-                  }).then((Aug)=>{
-
-                    MODEL.userModel.find({
-                      verified: true,
-                      "$expr": {
-                        "$and": [
-                          {"$eq": [{ "$year": "$createAt" }, year]},
-                          {"$eq": [{ "$month": "$createAt" }, 9]}
-                        ]
-                      }
-                    }).then((sept)=>{
-
-
-                      MODEL.userModel.find({
-                        verified: true,
-                        "$expr": {
-                          "$and": [
-                            {"$eq": [{ "$year": "$createAt" }, year]},
-                            {"$eq": [{ "$month": "$createAt" }, 10]}
-                          ]
-                        }
-                      }).then((Oct)=>{
-
-                        MODEL.userModel.find({
-                          verified: true,
-                          "$expr": {
-                            "$and": [
-                              {"$eq": [{ "$year": "$createAt" }, year]},
-                              {"$eq": [{ "$month": "$createAt" }, 11]}
-                            ]
-                          }
-                        }).then((Nov)=>{
-
-                          MODEL.userModel.find({
-                            verified: true,
-                            "$expr": {
-                              "$and": [
-                                {"$eq": [{ "$year": "$createAt" }, year]},
-                                {"$eq": [{ "$month": "$createAt" }, 12]}
-                              ]
-                            }
-                          }).then((Dec)=>{
-
-                            MODEL.userModel.find({
-                              verified: true,
-                              "$expr": {
-                                "$and": [
-                                  {"$eq": [{ "$year": "$createAt" }, year]},
-                                  {"$eq": [{ "$month": "$createAt" }, 11]}
-                                ]
-                              }
-                            }).then((Analytics)=>{
-                              res.status(200).json({
-                                JANUARY: jan.length,
-                                FEBRUARY: feb.length,
-                                MARCH: march.length,
-                                APRIL: april.length,
-                                MAY: may.length,
-                                JUNE: june.length,
-                                JULY: july.length,
-                                AUGUST: Aug.length,
-                                SEPTEMBER: sept.length,
-                                OCTOBER: Oct.length,
-                                NOVEMBER: Nov.length,
-                                DECEMBER: Dec.length
-                              })
-                               
-
-                            })
-
-
-                          })
-
-                        })
-
-                      })
-
-                    })
-
-                  })
-
-                })
-
-
-              })
-
-            })
-
-
-
-          })
-
-
-        })
-
-      })
-
-
+        totalSalesAdvert: adverts.length,
+      });
     });
-  
-
-
+  } catch (err) {
+    return res.status(200).json(err);
   }
-  catch(err){
-    return res.status(500).json(err)
+};
 
-  }
+userController.usageGrowth = (req, res) => {
+  var year = new Date().getFullYear();
+  console.log("<<<Year>>>", year);
 
-}
-
-
-userController.mobileCarrierAnalytics = (REQUEST,RESPONSE)=>{
-  try{
-      MODEL.userModel.find({
+  try {
+    MODEL.userModel
+      .find({
         verified: true,
-        mobile_carrier: "MTN Nigeria"
-      }).then((mtn)=>{
-          MODEL.collectorModel.find({
-            verified: true,
-            mobile_carrier:"MTN Nigeria"
-          }).then((recycler_mtn)=>{
-            var mtn_users = [...mtn, ...recycler_mtn];
-              MODEL.userModel.find({
-                verified: true,
-                mobile_carrier:"Airtel Nigeria"
-              }).then((airtel)=>{
-                  MODEL.collectorModel.find({
-                    verified: true,
-                    mobile_carrier:"Airtel Nigeria"
-                  }).then((recycler_airtel)=>{
-                    var airtel_users = [...airtel, ...recycler_airtel];
-                      MODEL.userModel.find({
-                        verified: true,
-                        mobile_carrier:"GLO Nigeria"
-                      }).then((glo)=>{
-                          MODEL.collectorModel.find({
-                            verified: true,
-                            mobile_carrier: "GLO Nigeria"
-                          }).then((recycler_glo)=>{
-                              var glo_users = [...glo, ...recycler_glo];
-                                MODEL.userModel.find({
-                                  verified: true,
-                                  mobile_carrier:"9Mobile"
-                                }).then((etisalat)=>{
-                                    MODEL.collectorModel.find({
-                                      verified: true,
-                                      mobile_carrier:"9Mobile"
-                                    }).then((recycler_etisalat)=>{
-                                        var etisalat_users = [...etisalat, ...recycler_etisalat];
-                                         return RESPONSE.status(200).json({
-                                           MTN: { amount: mtn_users.length, data : mtn_users },
-                                           AIRTEL: { amount:  airtel_users.length, data : airtel_users  },
-                                           GLO: { amount: glo_users.length, data: glo_users },
-                                           ETISALAT:{amount: etisalat_users.length , data: etisalat_users }
-                                         })
-                                    })
-                                })
-                          })
-                      })
-                  })
-              })
-          })
+        $expr: {
+          $and: [
+            { $eq: [{ $year: "$createAt" }, year] },
+            { $eq: [{ $month: "$createAt" }, 1] },
+          ],
+        },
       })
-  } catch(err){
+      .then((jan) => {
+        MODEL.userModel
+          .find({
+            verified: true,
+            $expr: {
+              $and: [
+                { $eq: [{ $year: "$createAt" }, year] },
+                { $eq: [{ $month: "$createAt" }, 2] },
+              ],
+            },
+          })
+          .then((feb) => {
+            MODEL.userModel
+              .find({
+                verified: true,
+                $expr: {
+                  $and: [
+                    { $eq: [{ $year: "$createAt" }, year] },
+                    { $eq: [{ $month: "$createAt" }, 3] },
+                  ],
+                },
+              })
+              .then((march) => {
+                MODEL.userModel
+                  .find({
+                    verified: true,
+                    $expr: {
+                      $and: [
+                        { $eq: [{ $year: "$createAt" }, year] },
+                        { $eq: [{ $month: "$createAt" }, 4] },
+                      ],
+                    },
+                  })
+                  .then((april) => {
+                    MODEL.userModel
+                      .find({
+                        verified: true,
+                        $expr: {
+                          $and: [
+                            { $eq: [{ $year: "$createAt" }, year] },
+                            { $eq: [{ $month: "$createAt" }, 5] },
+                          ],
+                        },
+                      })
+                      .then((may) => {
+                        MODEL.userModel
+                          .find({
+                            verified: true,
+                            $expr: {
+                              $and: [
+                                { $eq: [{ $year: "$createAt" }, year] },
+                                { $eq: [{ $month: "$createAt" }, 6] },
+                              ],
+                            },
+                          })
+                          .then((june) => {
+                            MODEL.userModel
+                              .find({
+                                verified: true,
+                                $expr: {
+                                  $and: [
+                                    { $eq: [{ $year: "$createAt" }, year] },
+                                    { $eq: [{ $month: "$createAt" }, 7] },
+                                  ],
+                                },
+                              })
+                              .then((july) => {
+                                MODEL.userModel
+                                  .find({
+                                    verified: true,
+                                    $expr: {
+                                      $and: [
+                                        { $eq: [{ $year: "$createAt" }, year] },
+                                        { $eq: [{ $month: "$createAt" }, 8] },
+                                      ],
+                                    },
+                                  })
+                                  .then((Aug) => {
+                                    MODEL.userModel
+                                      .find({
+                                        verified: true,
+                                        $expr: {
+                                          $and: [
+                                            {
+                                              $eq: [
+                                                { $year: "$createAt" },
+                                                year,
+                                              ],
+                                            },
+                                            {
+                                              $eq: [{ $month: "$createAt" }, 9],
+                                            },
+                                          ],
+                                        },
+                                      })
+                                      .then((sept) => {
+                                        MODEL.userModel
+                                          .find({
+                                            verified: true,
+                                            $expr: {
+                                              $and: [
+                                                {
+                                                  $eq: [
+                                                    { $year: "$createAt" },
+                                                    year,
+                                                  ],
+                                                },
+                                                {
+                                                  $eq: [
+                                                    { $month: "$createAt" },
+                                                    10,
+                                                  ],
+                                                },
+                                              ],
+                                            },
+                                          })
+                                          .then((Oct) => {
+                                            MODEL.userModel
+                                              .find({
+                                                verified: true,
+                                                $expr: {
+                                                  $and: [
+                                                    {
+                                                      $eq: [
+                                                        { $year: "$createAt" },
+                                                        year,
+                                                      ],
+                                                    },
+                                                    {
+                                                      $eq: [
+                                                        { $month: "$createAt" },
+                                                        11,
+                                                      ],
+                                                    },
+                                                  ],
+                                                },
+                                              })
+                                              .then((Nov) => {
+                                                MODEL.userModel
+                                                  .find({
+                                                    verified: true,
+                                                    $expr: {
+                                                      $and: [
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $year:
+                                                                "$createAt",
+                                                            },
+                                                            year,
+                                                          ],
+                                                        },
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $month:
+                                                                "$createAt",
+                                                            },
+                                                            12,
+                                                          ],
+                                                        },
+                                                      ],
+                                                    },
+                                                  })
+                                                  .then((Dec) => {
+                                                    MODEL.userModel
+                                                      .find({
+                                                        verified: true,
+                                                        $expr: {
+                                                          $and: [
+                                                            {
+                                                              $eq: [
+                                                                {
+                                                                  $year:
+                                                                    "$createAt",
+                                                                },
+                                                                year,
+                                                              ],
+                                                            },
+                                                            {
+                                                              $eq: [
+                                                                {
+                                                                  $month:
+                                                                    "$createAt",
+                                                                },
+                                                                11,
+                                                              ],
+                                                            },
+                                                          ],
+                                                        },
+                                                      })
+                                                      .then((Analytics) => {
+                                                        res.status(200).json({
+                                                          JANUARY: jan.length,
+                                                          FEBRUARY: feb.length,
+                                                          MARCH: march.length,
+                                                          APRIL: april.length,
+                                                          MAY: may.length,
+                                                          JUNE: june.length,
+                                                          JULY: july.length,
+                                                          AUGUST: Aug.length,
+                                                          SEPTEMBER:
+                                                            sept.length,
+                                                          OCTOBER: Oct.length,
+                                                          NOVEMBER: Nov.length,
+                                                          DECEMBER: Dec.length,
+                                                        });
+                                                      });
+                                                  });
+                                              });
+                                          });
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+userController.mobileCarrierAnalytics = (REQUEST, RESPONSE) => {
+  try {
+    MODEL.userModel
+      .find({
+        verified: true,
+        mobile_carrier: "MTN Nigeria",
+      })
+      .then((mtn) => {
+        MODEL.collectorModel
+          .find({
+            verified: true,
+            mobile_carrier: "MTN Nigeria",
+          })
+          .then((recycler_mtn) => {
+            var mtn_users = [...mtn, ...recycler_mtn];
+            MODEL.userModel
+              .find({
+                verified: true,
+                mobile_carrier: "Airtel Nigeria",
+              })
+              .then((airtel) => {
+                MODEL.collectorModel
+                  .find({
+                    verified: true,
+                    mobile_carrier: "Airtel Nigeria",
+                  })
+                  .then((recycler_airtel) => {
+                    var airtel_users = [...airtel, ...recycler_airtel];
+                    MODEL.userModel
+                      .find({
+                        verified: true,
+                        mobile_carrier: "GLO Nigeria",
+                      })
+                      .then((glo) => {
+                        MODEL.collectorModel
+                          .find({
+                            verified: true,
+                            mobile_carrier: "GLO Nigeria",
+                          })
+                          .then((recycler_glo) => {
+                            var glo_users = [...glo, ...recycler_glo];
+                            MODEL.userModel
+                              .find({
+                                verified: true,
+                                mobile_carrier: "9Mobile",
+                              })
+                              .then((etisalat) => {
+                                MODEL.collectorModel
+                                  .find({
+                                    verified: true,
+                                    mobile_carrier: "9Mobile",
+                                  })
+                                  .then((recycler_etisalat) => {
+                                    var etisalat_users = [
+                                      ...etisalat,
+                                      ...recycler_etisalat,
+                                    ];
+                                    return RESPONSE.status(200).json({
+                                      MTN: {
+                                        amount: mtn_users.length,
+                                        data: mtn_users,
+                                      },
+                                      AIRTEL: {
+                                        amount: airtel_users.length,
+                                        data: airtel_users,
+                                      },
+                                      GLO: {
+                                        amount: glo_users.length,
+                                        data: glo_users,
+                                      },
+                                      ETISALAT: {
+                                        amount: etisalat_users.length,
+                                        data: etisalat_users,
+                                      },
+                                    });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  } catch (err) {
     return RESPONSE.status(500).json(err);
   }
-}
+};
 
+userController.monthFiltering = (req, res) => {
+  var year = new Date().getFullYear();
 
-userController.monthFiltering = (req,res)=>{
-
-  var year = new Date().getFullYear()
-
-  try{
-
-    MODEL.userModel.find({
-      "$expr": {
-        "$and": [
-          {"$eq": [{ "$year": "$createAt" }, year]},
-          {"$eq": [{ "$month": "$createAt" }, 1]}
-        ]
-      }
-    }).then((jan) => {
-      MODEL.userModel.find({
-        "$expr": {
-          "$and": [
-            {"$eq": [{ "$year": "$createAt" }, year]},
-            {"$eq": [{ "$month": "$createAt" }, 2]}
-          ]
-        }
-      }).then((feb)=>{
-
-        MODEL.userModel.find({
-          "$expr": {
-            "$and": [
-              {"$eq": [{ "$year": "$createAt" }, year]},
-              {"$eq": [{ "$month": "$createAt" }, 3]}
-            ]
-          }
-        }).then((march)=>{
-
-          MODEL.userModel.find({
-            "$expr": {
-              "$and": [
-                {"$eq": [{ "$year": "$createAt" }, year]},
-                {"$eq": [{ "$month": "$createAt" }, 4]}
-              ]
-            }
-          }).then((april)=>{
-
-            MODEL.userModel.find({
-              "$expr": {
-                "$and": [
-                  {"$eq": [{ "$year": "$createAt" }, year]},
-                  {"$eq": [{ "$month": "$createAt" }, 5]}
-                ]
-              }
-            }).then((may)=>{
-
-              MODEL.userModel.find({
-                "$expr": {
-                  "$and": [
-                    {"$eq": [{ "$year": "$createAt" }, year]},
-                    {"$eq": [{ "$month": "$createAt" }, 6]}
-                  ]
-                }
-              }).then((june)=>{
-
-                MODEL.userModel.find({
-                  "$expr": {
-                    "$and": [
-                      {"$eq": [{ "$year": "$createAt" }, year]},
-                      {"$eq": [{ "$month": "$createAt" }, 7]}
-                    ]
-                  }
-                }).then((july)=>{
-
-                  MODEL.userModel.find({
-                    "$expr": {
-                      "$and": [
-                        {"$eq": [{ "$year": "$createAt" }, year]},
-                        {"$eq": [{ "$month": "$createAt" }, 8]}
-                      ]
-                    }
-                  }).then((Aug)=>{
-
-                    MODEL.userModel.find({
-                      "$expr": {
-                        "$and": [
-                          {"$eq": [{ "$year": "$createAt" }, year]},
-                          {"$eq": [{ "$month": "$createAt" }, 9]}
-                        ]
-                      }
-                    }).then((sept)=>{
-
-
-                      MODEL.userModel.find({
-                        "$expr": {
-                          "$and": [
-                            {"$eq": [{ "$year": "$createAt" }, year]},
-                            {"$eq": [{ "$month": "$createAt" }, 10]}
-                          ]
-                        }
-                      }).then((Oct)=>{
-
-                        MODEL.userModel.find({
-                          "$expr": {
-                            "$and": [
-                              {"$eq": [{ "$year": "$createAt" }, year]},
-                              {"$eq": [{ "$month": "$createAt" }, 11]}
-                            ]
-                          }
-                        }).then((Nov)=>{
-
-                          MODEL.userModel.find({
-                            "$expr": {
-                              "$and": [
-                                {"$eq": [{ "$year": "$createAt" }, year]},
-                                {"$eq": [{ "$month": "$createAt" }, 12]}
-                              ]
-                            }
-                          }).then((Dec)=>{
-
-                            MODEL.userModel.find({
-                              "$expr": {
-                                "$and": [
-                                  {"$eq": [{ "$year": "$createAt" }, year]},
-                                  {"$eq": [{ "$month": "$createAt" }, 11]}
-                                ]
-                              }
-                            }).then((Analytics)=>{
-                              res.status(200).json({
-                                JANUARY:{ amount: jan.length, data : jan },
-                                FEBRUARY: { amount:feb.length, data:feb },
-                                MARCH: { amount: march.length, data : march},
-                                APRIL: { amount: april.length, data : april},
-                                MAY: { amount: may.length, data: may },
-                                JUNE: { amount:june.length, data: june },
-                                JULY: { amount: july.length, data: july },
-                                AUGUST: {amount: Aug.length, data: Aug },
-                                SEPTEMBER: { amount: sept.length, data: sept},
-                                OCTOBER:{amount: Oct.length, data: Oct},
-                                NOVEMBER:{ amount: Nov.length, data: Nov},
-                                DECEMBER: { amount: Dec.length, data : Dec}
-                              })
-                               
-
-                            })
-
-
-                          })
-
-                        })
-
-                      })
-
-                    })
-
-                  })
-
-                })
-
-
-              })
-
-            })
-
-
-
-          })
-
-
-        })
-
+  try {
+    MODEL.userModel
+      .find({
+        $expr: {
+          $and: [
+            { $eq: [{ $year: "$createAt" }, year] },
+            { $eq: [{ $month: "$createAt" }, 1] },
+          ],
+        },
       })
+      .then((jan) => {
+        MODEL.userModel
+          .find({
+            $expr: {
+              $and: [
+                { $eq: [{ $year: "$createAt" }, year] },
+                { $eq: [{ $month: "$createAt" }, 2] },
+              ],
+            },
+          })
+          .then((feb) => {
+            MODEL.userModel
+              .find({
+                $expr: {
+                  $and: [
+                    { $eq: [{ $year: "$createAt" }, year] },
+                    { $eq: [{ $month: "$createAt" }, 3] },
+                  ],
+                },
+              })
+              .then((march) => {
+                MODEL.userModel
+                  .find({
+                    $expr: {
+                      $and: [
+                        { $eq: [{ $year: "$createAt" }, year] },
+                        { $eq: [{ $month: "$createAt" }, 4] },
+                      ],
+                    },
+                  })
+                  .then((april) => {
+                    MODEL.userModel
+                      .find({
+                        $expr: {
+                          $and: [
+                            { $eq: [{ $year: "$createAt" }, year] },
+                            { $eq: [{ $month: "$createAt" }, 5] },
+                          ],
+                        },
+                      })
+                      .then((may) => {
+                        MODEL.userModel
+                          .find({
+                            $expr: {
+                              $and: [
+                                { $eq: [{ $year: "$createAt" }, year] },
+                                { $eq: [{ $month: "$createAt" }, 6] },
+                              ],
+                            },
+                          })
+                          .then((june) => {
+                            MODEL.userModel
+                              .find({
+                                $expr: {
+                                  $and: [
+                                    { $eq: [{ $year: "$createAt" }, year] },
+                                    { $eq: [{ $month: "$createAt" }, 7] },
+                                  ],
+                                },
+                              })
+                              .then((july) => {
+                                MODEL.userModel
+                                  .find({
+                                    $expr: {
+                                      $and: [
+                                        { $eq: [{ $year: "$createAt" }, year] },
+                                        { $eq: [{ $month: "$createAt" }, 8] },
+                                      ],
+                                    },
+                                  })
+                                  .then((Aug) => {
+                                    MODEL.userModel
+                                      .find({
+                                        $expr: {
+                                          $and: [
+                                            {
+                                              $eq: [
+                                                { $year: "$createAt" },
+                                                year,
+                                              ],
+                                            },
+                                            {
+                                              $eq: [{ $month: "$createAt" }, 9],
+                                            },
+                                          ],
+                                        },
+                                      })
+                                      .then((sept) => {
+                                        MODEL.userModel
+                                          .find({
+                                            $expr: {
+                                              $and: [
+                                                {
+                                                  $eq: [
+                                                    { $year: "$createAt" },
+                                                    year,
+                                                  ],
+                                                },
+                                                {
+                                                  $eq: [
+                                                    { $month: "$createAt" },
+                                                    10,
+                                                  ],
+                                                },
+                                              ],
+                                            },
+                                          })
+                                          .then((Oct) => {
+                                            MODEL.userModel
+                                              .find({
+                                                $expr: {
+                                                  $and: [
+                                                    {
+                                                      $eq: [
+                                                        { $year: "$createAt" },
+                                                        year,
+                                                      ],
+                                                    },
+                                                    {
+                                                      $eq: [
+                                                        { $month: "$createAt" },
+                                                        11,
+                                                      ],
+                                                    },
+                                                  ],
+                                                },
+                                              })
+                                              .then((Nov) => {
+                                                MODEL.userModel
+                                                  .find({
+                                                    $expr: {
+                                                      $and: [
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $year:
+                                                                "$createAt",
+                                                            },
+                                                            year,
+                                                          ],
+                                                        },
+                                                        {
+                                                          $eq: [
+                                                            {
+                                                              $month:
+                                                                "$createAt",
+                                                            },
+                                                            12,
+                                                          ],
+                                                        },
+                                                      ],
+                                                    },
+                                                  })
+                                                  .then((Dec) => {
+                                                    MODEL.userModel
+                                                      .find({
+                                                        $expr: {
+                                                          $and: [
+                                                            {
+                                                              $eq: [
+                                                                {
+                                                                  $year:
+                                                                    "$createAt",
+                                                                },
+                                                                year,
+                                                              ],
+                                                            },
+                                                            {
+                                                              $eq: [
+                                                                {
+                                                                  $month:
+                                                                    "$createAt",
+                                                                },
+                                                                11,
+                                                              ],
+                                                            },
+                                                          ],
+                                                        },
+                                                      })
+                                                      .then((Analytics) => {
+                                                        res.status(200).json({
+                                                          JANUARY: {
+                                                            amount: jan.length,
+                                                            data: jan,
+                                                          },
+                                                          FEBRUARY: {
+                                                            amount: feb.length,
+                                                            data: feb,
+                                                          },
+                                                          MARCH: {
+                                                            amount:
+                                                              march.length,
+                                                            data: march,
+                                                          },
+                                                          APRIL: {
+                                                            amount:
+                                                              april.length,
+                                                            data: april,
+                                                          },
+                                                          MAY: {
+                                                            amount: may.length,
+                                                            data: may,
+                                                          },
+                                                          JUNE: {
+                                                            amount: june.length,
+                                                            data: june,
+                                                          },
+                                                          JULY: {
+                                                            amount: july.length,
+                                                            data: july,
+                                                          },
+                                                          AUGUST: {
+                                                            amount: Aug.length,
+                                                            data: Aug,
+                                                          },
+                                                          SEPTEMBER: {
+                                                            amount: sept.length,
+                                                            data: sept,
+                                                          },
+                                                          OCTOBER: {
+                                                            amount: Oct.length,
+                                                            data: Oct,
+                                                          },
+                                                          NOVEMBER: {
+                                                            amount: Nov.length,
+                                                            data: Nov,
+                                                          },
+                                                          DECEMBER: {
+                                                            amount: Dec.length,
+                                                            data: Dec,
+                                                          },
+                                                        });
+                                                      });
+                                                  });
+                                              });
+                                          });
+                                      });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
 
-
+userController.userReportLog = (req, res) => {
+  try {
+    MODEL.reportLogModel.find({}).then((logs) => {
+      return res.status(200).json(logs);
     });
-  
-
-
+  } catch (err) {
+    return res.status(500).json(err);
   }
-  catch(err){
-    return res.status(500).json(err)
+};
 
-  }
-
-}
-
-
-userController.userReportLog = (req,res)=>{
-  try{
-
-    MODEL.reportLogModel.find({}).then((logs)=>{
-      return res.status(200).json(logs)
-    })
-
-  }
-  catch(err){
-    return res.status(500).json(err)
-
-  }
-}
-
-userController.internet_providerAnalytics = (req,res)=>{
-  try{
-      MODEL.userModel.find({
+userController.internet_providerAnalytics = (req, res) => {
+  try {
+    MODEL.userModel
+      .find({
         verified: true,
         $or: [
           {
@@ -1956,15 +2061,17 @@ userController.internet_providerAnalytics = (req,res)=>{
           {
             internet_provider: "MTN",
           },
-                          {
-                            internet_provider: "STAY SAFE",
-                          },
-                          {
-                            internet_provider: "Stay Safe",
-                          }
-        ]
-      }).then((mtn)=>{
-          MODEL.collectorModel.find({
+          {
+            internet_provider: "STAY SAFE",
+          },
+          {
+            internet_provider: "Stay Safe",
+          },
+        ],
+      })
+      .then((mtn) => {
+        MODEL.collectorModel
+          .find({
             verified: true,
             $or: [
               {
@@ -1973,16 +2080,18 @@ userController.internet_providerAnalytics = (req,res)=>{
               {
                 internet_provider: "MTN",
               },
-                          {
-                            internet_provider: "STAY SAFE",
-                          },
-                          {
-                            internet_provider: "Stay Safe",
-                          }
-            ]
-          }).then((recycler_mtn)=>{
+              {
+                internet_provider: "STAY SAFE",
+              },
+              {
+                internet_provider: "Stay Safe",
+              },
+            ],
+          })
+          .then((recycler_mtn) => {
             var mtn_users = [...mtn, ...recycler_mtn];
-              MODEL.userModel.find({
+            MODEL.userModel
+              .find({
                 verified: true,
                 $or: [
                   {
@@ -1994,9 +2103,11 @@ userController.internet_providerAnalytics = (req,res)=>{
                   {
                     internet_provider: "BeSafe Airtel",
                   },
-                ]
-              }).then((airtel)=>{
-                  MODEL.collectorModel.find({
+                ],
+              })
+              .then((airtel) => {
+                MODEL.collectorModel
+                  .find({
                     verified: true,
                     $or: [
                       {
@@ -2008,10 +2119,12 @@ userController.internet_providerAnalytics = (req,res)=>{
                       {
                         internet_provider: "BeSafe Airtel",
                       },
-                    ]
-                  }).then((recycler_airtel)=>{
+                    ],
+                  })
+                  .then((recycler_airtel) => {
                     var airtel_users = [...airtel, ...recycler_airtel];
-                      MODEL.userModel.find({
+                    MODEL.userModel
+                      .find({
                         verified: true,
                         $or: [
                           {
@@ -2019,10 +2132,12 @@ userController.internet_providerAnalytics = (req,res)=>{
                           },
                           {
                             internet_provider: "glo ng",
-                          }
-                        ]
-                      }).then((glo)=>{
-                          MODEL.collectorModel.find({
+                          },
+                        ],
+                      })
+                      .then((glo) => {
+                        MODEL.collectorModel
+                          .find({
                             verified: true,
                             $or: [
                               {
@@ -2030,56 +2145,74 @@ userController.internet_providerAnalytics = (req,res)=>{
                               },
                               {
                                 internet_provider: "glo ng",
-                              }
-                              
-                            ]
-                          }).then((recycler_glo)=>{
-                              var glo_users = [...glo, ...recycler_glo];
-                                MODEL.userModel.find({
-                                  verified: true,
-                                  $or: [
-                                    {
-                                      internet_provider:"9mobile"
-                                    },
-                                    {
-                                      internet_provider: "9Mobile",
-                                    }
-                                  ]
-                                }).then((etisalat)=>{
-                                    MODEL.collectorModel.find({
-                                      verified: true,
-                                      $or: [
-                                        {
-                                          internet_provider:"9mobile"
-                                        },
-                                        {
-                                          internet_provider: "9Mobile",
-                                        }
-                                      ]                                    }).then((recycler_etisalat)=>{
-                                        var etisalat_users = [...etisalat, ...recycler_etisalat];
-                                         return res.status(200).json({
-                                           MTN: { amount: mtn_users.length, data : mtn_users },
-                                           AIRTEL: { amount:  airtel_users.length, data : airtel_users  },
-                                           GLO: { amount: glo_users.length, data: glo_users },
-                                           ETISALAT:{amount: etisalat_users.length , data: etisalat_users }
-                                         })
-                                    })
-                                })
+                              },
+                            ],
                           })
-                      })
-                  })
-              })
-          })
-      })
-  } catch(err){
+                          .then((recycler_glo) => {
+                            var glo_users = [...glo, ...recycler_glo];
+                            MODEL.userModel
+                              .find({
+                                verified: true,
+                                $or: [
+                                  {
+                                    internet_provider: "9mobile",
+                                  },
+                                  {
+                                    internet_provider: "9Mobile",
+                                  },
+                                ],
+                              })
+                              .then((etisalat) => {
+                                MODEL.collectorModel
+                                  .find({
+                                    verified: true,
+                                    $or: [
+                                      {
+                                        internet_provider: "9mobile",
+                                      },
+                                      {
+                                        internet_provider: "9Mobile",
+                                      },
+                                    ],
+                                  })
+                                  .then((recycler_etisalat) => {
+                                    var etisalat_users = [
+                                      ...etisalat,
+                                      ...recycler_etisalat,
+                                    ];
+                                    return res.status(200).json({
+                                      MTN: {
+                                        amount: mtn_users.length,
+                                        data: mtn_users,
+                                      },
+                                      AIRTEL: {
+                                        amount: airtel_users.length,
+                                        data: airtel_users,
+                                      },
+                                      GLO: {
+                                        amount: glo_users.length,
+                                        data: glo_users,
+                                      },
+                                      ETISALAT: {
+                                        amount: etisalat_users.length,
+                                        data: etisalat_users,
+                                      },
+                                    });
+                                  });
+                              });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  } catch (err) {
     return res.status(500).json(err);
   }
-}
+};
 
-
-userController.triggerActivity = (req,res)=>{
-
-  const user =  req.body.email 
+userController.triggerActivity = (req, res) => {
+  const user = req.body.email;
 
   try {
     MODEL.userModel.updateOne(
@@ -2087,82 +2220,81 @@ userController.triggerActivity = (req,res)=>{
       { last_logged_in: new Date() },
       (resp) => {
         return res.status(200).json({
-          message : "Activity triggered"
-        })
+          message: "Activity triggered",
+        });
       }
     );
-    
-
-  } catch(err){
-    return res.status(500).json(err)
+  } catch (err) {
+    return res.status(500).json(err);
   }
- 
-}
+};
 
-
-
-userController.sendPushNotification = (req,res)=>{
+userController.sendPushNotification = (req, res) => {
   const lga = req.body.lga;
   const messages = req.body.messages;
   const category = req.body.category || "";
   const phone = req.body.phone || "";
 
   //users , recyclers , companies , phone specific
-  try{
-
-    if(phone){
-      MODEL.userModel.findOne({
-        phone : phone
-      }).then((user)=>{
-        var message = {
-          app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
-          contents: {
-            en: `${messages}`,
-          },
-          include_player_ids: [`${user.onesignal_id}`],
-        };
-        sendNotification(message);
-        return res.status(200).json({
-          message: "Notification sent!"
+  try {
+    if (phone) {
+      MODEL.userModel
+        .findOne({
+          phone: phone,
         })
-      })
+        .then((user) => {
+          var message = {
+            app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+            contents: {
+              en: `${messages}`,
+            },
+            include_player_ids: [`${user.onesignal_id}`],
+          };
+          sendNotification(message);
+          return res.status(200).json({
+            message: "Notification sent!",
+          });
+        });
     }
-    if(category === "users"){
-      MODEL.userModel.find({
-          lcd : lga
-      }).then((users)=>{
-        const signals = [];
-        for(let i = 0 ; i < users.length ; i++){
-        signals.push(users[i].onesignal_id);
-         const ids = [... new Set(users[i].onesignal_id)];          
-        var signalled =  [... new Set(signals)];
-        } 
-        
-        for(let i = 0 ; i < signalled.length ; i++){
-          async function sender(){
-            var message = {
-              app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
-              contents: {
-                en: `${messages}`,
-              },
-              include_player_ids: [`${users[i].onesignal_id}`],
-            };
-            return sendNotification(message);  
+    if (category === "users") {
+      MODEL.userModel
+        .find({
+          lcd: lga,
+        })
+        .then((users) => {
+          const signals = [];
+          for (let i = 0; i < users.length; i++) {
+            signals.push(users[i].onesignal_id);
+            const ids = [...new Set(users[i].onesignal_id)];
+            var signalled = [...new Set(signals)];
           }
-          sender();   
-        } 
-        return res.status(200).json({
-          message: "Notification sent!"
+
+          for (let i = 0; i < signalled.length; i++) {
+            async function sender() {
+              var message = {
+                app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+                contents: {
+                  en: `${messages}`,
+                },
+                include_player_ids: [`${users[i].onesignal_id}`],
+              };
+              return sendNotification(message);
+            }
+            sender();
+          }
+          return res.status(200).json({
+            message: "Notification sent!",
+          });
+        });
+    } else if (category === "recyclers") {
+      MODEL.collectorModel
+        .find({
+          lcd: lga,
         })
-      })
-    }
-    else if(category === "recyclers"){
-        MODEL.collectorModel.find({
-          lcd : lga
-        }).then((recyclers)=>{
-          for(let i = 0 ; i < recyclers.length ; i++){
+        .then((recyclers) => {
+          for (let i = 0; i < recyclers.length; i++) {
             var message = {
-              app_id: '8d939dc2-59c5-4458-8106-1e6f6fbe392d',
+              app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
               contents: {
                 en: `${messages}`,
               },
@@ -2171,43 +2303,39 @@ userController.sendPushNotification = (req,res)=>{
             sendNotification(message);
           }
           return res.status(200).json({
-            message: "Notification sent!"
-          })
+            message: "Notification sent!",
+          });
+        });
+    } else if (category === "companies") {
+      MODEL.organisationModel
+        .find({
+          lcd: lga,
         })
-    }
-
-    else if (category === "companies"){
-      MODEL.organisationModel.find({
-        lcd: lga
-      }).then((companies)=>{
-        // Companies don't have one signal ids yet
+        .then((companies) => {
+          // Companies don't have one signal ids yet
           return res.status(200).json({
-            message: "Notification sent!"
-          })
-      })
-
+            message: "Notification sent!",
+          });
+        });
     }
+  } catch (err) {
+    return res.status(500).json(err);
   }
-  catch(err){
-    return res.status(500).json(err)
-  }
-}
+};
 
-
-userController.userInactivity = (req,res)=>{
+userController.userInactivity = (req, res) => {
   const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate()-1);
-  yesterday.setHours(0,0,0,0)
+  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
   yesterday.setHours(yesterday.getHours() + 1);
 
   const active_today = new Date();
-  active_today.setHours(0,0,0,0);
+  active_today.setHours(0, 0, 0, 0);
 
-  active_today.setHours(0,0,0,0)
-  active_today.setHours(active_today.getHours() + 1)
+  active_today.setHours(0, 0, 0, 0);
+  active_today.setHours(active_today.getHours() + 1);
 
-  console.log(">><<", active_today)
-
+  console.log(">><<", active_today);
 
   $or: [
     {
@@ -2215,56 +2343,55 @@ userController.userInactivity = (req,res)=>{
     },
     {
       internet_provider: "glo ng",
-    }
-  ]
+    },
+  ];
 
-  try{
-    MODEL.userModel.find({
-      verified: true,
-      roles:"client",
-      last_logged_in: {
-        $lte: active_today,
-      }
-    }).sort({ _id : -1}).then((InactiveUser)=>{
-      console.log(InactiveUser.length);
-      return res.status(200).json({
-        inactiveUsers : InactiveUser 
+  try {
+    MODEL.userModel
+      .find({
+        verified: true,
+        roles: "client",
+        last_logged_in: {
+          $lte: active_today,
+        },
       })
-   })
-    
-  }catch(err){
+      .sort({ _id: -1 })
+      .then((InactiveUser) => {
+        console.log(InactiveUser.length);
+        return res.status(200).json({
+          inactiveUsers: InactiveUser,
+        });
+      });
+  } catch (err) {}
+};
 
-  }
-}
-
-userController.updateOneSignal = (REQUEST,RESPONSE)=>{
+userController.updateOneSignal = (REQUEST, RESPONSE) => {
   const phone = REQUEST.body.phone;
   const renewedSignal = REQUEST.body.renewedSignal;
-  try{
-    MODEL.userModel.findOne({
-      phone: phone
-    }).then((user)=>{
-      MODEL.userModel.updateOne(
-        { email: user.email },
-        {
-          $set: {
-            onesignal_id: renewedSignal
+  try {
+    MODEL.userModel
+      .findOne({
+        phone: phone,
+      })
+      .then((user) => {
+        MODEL.userModel.updateOne(
+          { email: user.email },
+          {
+            $set: {
+              onesignal_id: renewedSignal,
+            },
           },
-        },
-        (res) => { 
-          return RESPONSE.status(200).json({
-            message: "Signal ID updated successfully"
-          })
-        })
-        
-    })
-
-
+          (res) => {
+            return RESPONSE.status(200).json({
+              message: "Signal ID updated successfully",
+            });
+          }
+        );
+      });
+  } catch (err) {
+    return RESPONSE.status(500).json(err);
   }
-  catch(err){
-      return RESPONSE.status(500).json(err);
-  }
-}
+};
 
 /* export userControllers */
 module.exports = userController;
