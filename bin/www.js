@@ -444,7 +444,7 @@ app.set("swagger_views", __dirname + "../swagger_views");
 app.set("view engine", "jade");
 app.use(EXPRESS.static("client"));
 app.use(BODY_PARSER.json({ limit: "50mb" }));
-app.use(BODY_PARSER.urlencoded({ limit: "50mb", extended: false }));
+app.use(BODY_PARSER.urlencoded({ limit: "100mb", extended: false }));
 
 /** middleware for api's logging with deployment mode */
 let apiLooger = (req, res, next) => {

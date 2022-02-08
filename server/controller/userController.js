@@ -11,12 +11,43 @@ let CONSTANTS = require("../util/constants");
 // const { Response } = require('aws-sdk');
 var request = require("request");
 const streamifier = require("streamifier");
+const { validationResult, body } = require('express-validator');
 
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-const fileUpload = multer();
+const ustorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./client/");
+  },
+  filename: function (req, file, cb) {
+    // let fileName = file.originalname.split(".");
+    // let fileExtension = fileName[fileName.length - 1];
+    cb(null, Date.now() + "." + file.originalname);
+  },
+});
+
+const bodyValidate = (req, res) => {
+  // 1. Validate the request coming in
+  // console.log(req.body);
+  const result = validationResult(req);
+
+  const hasErrors = !result.isEmpty();
+
+  if (hasErrors) {
+    //   debugLog('user body', req.body);
+    // 2. Throw a 422 if the body is invalid
+    return res.status(422).json({
+      error: true,
+      statusCode: 422,
+      message: "Invalid body request",
+      errors: result.array({ onlyFirstError: true }),
+    });
+  }
+};
+
+const fileUpload = multer({ storage: ustorage });
 
 cloudinary.config({
   cloud_name: "pakam",
@@ -2391,6 +2422,42 @@ userController.updateOneSignal = (REQUEST, RESPONSE) => {
   } catch (err) {
     return RESPONSE.status(500).json(err);
   }
+};
+
+userController.totalGender = async (REQUEST, RESPONSE) => {
+  try {
+    const totalMales = await MODEL.userModel
+      .find({
+        gender: "male",
+      })
+      .countDocuments();
+    const totalFemales = await MODEL.userModel
+      .find({
+        gender: "female",
+      })
+      .countDocuments();
+    return RESPONSE.status(200).json({
+      message: "Total users",
+      data: {
+        male: totalMales,
+        female: totalFemales,
+      },
+    });
+  } catch (error) {
+    console.log("error", error);
+    return RESPONSE.status(500).json(error);
+  }
+};
+
+userController.uploadResume = async (req, res) => {
+  bodyValidate(req, res);
+  SERVICE.resumeUpload(req, res).then((result) => {
+    return RESPONSE.jsonp({ status: true, message: result });
+  });
+  // const firstname = REQUEST.body.firstname;
+  // const lastname = REQUEST.body.lastname;
+  // const resume = REQUEST.file;
+  // console.log("resume", resume);
 };
 
 /* export userControllers */
