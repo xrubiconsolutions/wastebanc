@@ -455,7 +455,11 @@ let apiLooger = (req, res, next) => {
   next();
 };
 
-app.use(fileUpload());
+app.use(
+  fileUpload({
+    createParentPath: true,
+  })
+);
 
 /** Used logger middleware for each api call **/
 app.use(apiLooger);
