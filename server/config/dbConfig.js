@@ -13,7 +13,7 @@ let serverConfig = {
         port        : 27017,
         name        : "mongodb",
         connector   : "mongodb", 
-        url         : process.env.dbUrl || "mongodb://pakamXrubicon:me202010*@pakam-shard-00-00.wcabw.mongodb.net:27017,pakam-shard-00-01.wcabw.mongodb.net:27017,pakam-shard-00-02.wcabw.mongodb.net:27017/pakam-staging?ssl=true&replicaSet=atlas-13j6g2-shard-0&authSource=admin&retryWrites=true&w=majority",
+        url         : process.env.dbUrl || "mongodb://pakamXrubicon:me202010*@pakam-shard-00-00.wcabw.mongodb.net:27017,pakam-shard-00-01.wcabw.mongodb.net:27017,pakam-shard-00-02.wcabw.mongodb.net:27017/demo?ssl=true&replicaSet=atlas-13j6g2-shard-0&authSource=admin&retryWrites=true&w=majority",
         database    : "demo_dev",
         user        : "",
         password    : "",
