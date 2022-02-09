@@ -169,7 +169,7 @@ module.exports = (APP) => {
       check("fullname", "fullname is required").isString(),
       check("phonenumber", "phonenumber is required").isString(),
       check("email", "email is required").isEmail(),
-      check("location", "location is required").isString(),
+      check("location", "location is required").isString().optional(),
       check("jobtitle", "jobtitle is required").isString(),
     ],
     CONTROLLER.userController.uploadResume

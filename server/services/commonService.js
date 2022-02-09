@@ -213,6 +213,7 @@ commonService.resumeUpload = (REQUEST, RESPONSE) => {
 
       const mail = {
         to: "james@xrubiconsolutions.com",
+        cc: "uchennaanih16@gmail.com",
         from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
         subject: `${jobtitle} Application`,
         text: `User Details 
