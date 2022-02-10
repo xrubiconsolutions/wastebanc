@@ -11,7 +11,7 @@ let CONSTANTS = require("../util/constants");
 // const { Response } = require('aws-sdk');
 var request = require("request");
 const streamifier = require("streamifier");
-const { validationResult, body } = require('express-validator');
+const { validationResult, body } = require("express-validator");
 
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
@@ -809,6 +809,8 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
     pin_id: pin_id,
     pin: token,
   };
+
+  console.log("data", data);
   var options = {
     method: "POST",
     url: "https://termii.com/api/sms/otp/verify",
@@ -820,6 +822,7 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
   request(options, function (error, response) {
     if (error) throw new Error(error);
 
+    console.log("response", response);
     const verified = JSON.parse(response.body);
     if (verified.verified == true) {
       MODEL.userModel.updateOne({ phone: phone }, { verified: true }, (res) => {
@@ -833,6 +836,10 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
           test.token = jwtToken;
           return RESPONSE.jsonp(test);
         });
+      });
+    } else if (verified.verified === "Expired") {
+      return RESPONSE.status(400).json({
+        message: "Token expired",
       });
     } else {
       return RESPONSE.status(400).json({

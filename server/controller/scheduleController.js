@@ -4,7 +4,9 @@ let scheduleController = {};
 let MODEL = require("../models");
 let COMMON_FUN = require("../util/commonFunction");
 let CONSTANTS = require("../util/constants");
+const moment = require("moment-timezone");
 
+moment().tz("Africa/Lagos", false);
 var request = require("request");
 
 const OneSignal = require("onesignal-node");
@@ -48,6 +50,8 @@ var sendNotification = function (data) {
 scheduleController.schedule = (REQUEST, RESPONSE) => {
   var data = { ...REQUEST.body };
 
+  console.log("data", data);
+
   MODEL.userModel.findOne({ email: REQUEST.body.client }).then((result) => {
     MODEL.userModel.updateOne(
       { email: REQUEST.body.client },
@@ -62,6 +66,9 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
         message: "You don't have a valid card ID, contact support for help",
       });
     }
+
+    const expireDate = moment(data.pickUpDate, "YYYY-MM-DD").add(8, "days");
+    data.expiryDuration = expireDate;
 
     MODEL.scheduleModel(data).save({}, (ERR, RESULT) => {
       try {
