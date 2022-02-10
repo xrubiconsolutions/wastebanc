@@ -67,7 +67,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
       });
     }
 
-    const expireDate = moment(data.pickUpDate, "YYYY-MM-DD").add(8, "days");
+    const expireDate = moment(data.pickUpDate, "YYYY-MM-DD").add(7, "days");
     data.expiryDuration = expireDate;
 
     MODEL.scheduleModel(data).save({}, (ERR, RESULT) => {
