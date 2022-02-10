@@ -52,6 +52,13 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
 
   console.log("data", data);
 
+  if(moment(data.pickUpDate)< moment()){
+    return RESPONSE.status(400).json({
+      statusCode:400,
+      customMessage:'Invalid date'
+    })
+  }
+
   MODEL.userModel.findOne({ email: REQUEST.body.client }).then((result) => {
     MODEL.userModel.updateOne(
       { email: REQUEST.body.client },

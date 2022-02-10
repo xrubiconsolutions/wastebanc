@@ -105,8 +105,7 @@ var sendNotification = function (data) {
 cron.schedule("0 7 * * *", function () {
   const active_today = new Date();
   active_today.setHours(0, 0, 0, 0);
-  const messages =
-    "Your pick up schedule was missed yesterday. Kindly reschedule"; //Custom schedule missed message
+  const messages = "Your pick up schedule was missed. Kindly reschedule"; //Custom schedule missed message
   console.log("<<SCHEDULE JOB CHECK>>>");
   MODEL.scheduleModel
     .find({
