@@ -4,10 +4,33 @@ let scheduleDropController = {};
 let MODEL = require("../models");
 let COMMON_FUN = require("../util/commonFunction");
 let CONSTANTS = require("../util/constants");
+const moment = require("moment-timezone");
 
+moment().tz("Africa/Lagos", false);
+
+const { validationResult, body } = require("express-validator");
 var request = require("request");
 
 const OneSignal = require("onesignal-node");
+
+const bodyValidate = (req, res) => {
+  // 1. Validate the request coming in
+  // console.log(req.body);
+  const result = validationResult(req);
+
+  const hasErrors = !result.isEmpty();
+
+  if (hasErrors) {
+    //   debugLog('user body', req.body);
+    // 2. Throw a 422 if the body is invalid
+    return res.status(422).json({
+      error: true,
+      statusCode: 422,
+      message: "Invalid body request",
+      errors: result.array({ onlyFirstError: true }),
+    });
+  }
+};
 
 var sendNotification = function (data) {
   var headers = {
@@ -37,8 +60,15 @@ var sendNotification = function (data) {
   req.end();
 };
 scheduleDropController.schedule = (REQUEST, RESPONSE) => {
+  //bodyValidate(REQUEST, RESPONSE)
   var data = { ...REQUEST.body };
 
+  if (moment(data.dropOffDate) < moment()) {
+    return RESPONSE.status(400).json({
+      statusCode: 400,
+      customMessage: "Invalid date",
+    });
+  }
   MODEL.userModel.findOne({ email: REQUEST.body.client }).then((result) => {
     MODEL.userModel.updateOne(
       { email: REQUEST.body.scheduleCreator },
@@ -47,6 +77,9 @@ scheduleDropController.schedule = (REQUEST, RESPONSE) => {
         console.log("Logged date updated", new Date());
       }
     );
+
+    const expireDate = moment(data.dropOffDate, "YYYY-MM-DD").add(7, "days");
+    data.expiryDuration = expireDate;
 
     MODEL.scheduleDropModel(data).save({}, (ERR, RESULT) => {
       try {

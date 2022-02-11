@@ -24,4 +24,5 @@ module.exports = {
   scheduleDropModel: require("./scheduleDropModel"),
   notificationModel: require("./notificationModel"),
   localGovernmentModel: require("./localGovernmentModel"),
+  categoryModel: require("./categoryModel"),
 };

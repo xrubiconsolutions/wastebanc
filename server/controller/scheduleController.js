@@ -7,6 +7,7 @@ let CONSTANTS = require("../util/constants");
 const moment = require("moment-timezone");
 
 moment().tz("Africa/Lagos", false);
+const { validationResult, body } = require("express-validator");
 var request = require("request");
 
 const OneSignal = require("onesignal-node");
@@ -39,6 +40,26 @@ var sendNotification = function (data) {
   req.end();
 };
 
+const bodyValidate = (req, res) => {
+  // 1. Validate the request coming in
+  // console.log(req.body);
+  const result = validationResult(req);
+
+  const hasErrors = !result.isEmpty();
+
+  if (hasErrors) {
+    //   debugLog('user body', req.body);
+    // 2. Throw a 422 if the body is invalid
+    return res.status(422).json({
+      error: true,
+      statusCode: 422,
+      message: "Invalid body request",
+      errors: result.array({ onlyFirstError: true }),
+    });
+  }
+  return;
+};
+
 // var message = {
 //   app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
 //   contents: {"en": "English Message"},
@@ -52,11 +73,11 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
 
   console.log("data", data);
 
-  if(moment(data.pickUpDate)< moment()){
+  if (moment(data.pickUpDate) < moment()) {
     return RESPONSE.status(400).json({
-      statusCode:400,
-      customMessage:'Invalid date'
-    })
+      statusCode: 400,
+      customMessage: "Invalid date",
+    });
   }
 
   MODEL.userModel.findOne({ email: REQUEST.body.client }).then((result) => {

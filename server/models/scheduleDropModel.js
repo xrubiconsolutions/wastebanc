@@ -43,7 +43,7 @@ const scheduleDrop = new Schema({
   },
   expiryDuration: {
     type: Date,
-    default: () => Date.now() + 7 * 24 * 60 * 60 * 1000,
+    //default: () => Date.now() + 7 * 24 * 60 * 60 * 1000,
   },
   completionStatus: {
     type: String,

@@ -1,6 +1,7 @@
 "use strict";
 let CONTROLLER = require("../../controller");
 let auth = require("../../util/auth");
+const { body, query, check, param } = require("express-validator");
 
 /****************************************
  ***** Managing User Routes here ********

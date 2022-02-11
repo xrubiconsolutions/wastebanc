@@ -3,6 +3,7 @@
 let CONTROLLER = require("../../controller");
 let auth = require("../../util/auth");
 const express = require("express");
+const { body, query, check, param } = require("express-validator");
 
 const ProtectedRoutes = express.Router();
 
@@ -44,7 +45,8 @@ const ProtectedRoutes = express.Router();
 module.exports = (APP) => {
   APP.route("/api/schedule").post(
     auth.userValidation,
-    CONTROLLER.scheduleController.schedule);
+    CONTROLLER.scheduleController.schedule
+  );
 
   APP.route("/api/getSchedule").get(CONTROLLER.scheduleController.getSchedule);
 
@@ -65,7 +67,8 @@ module.exports = (APP) => {
     CONTROLLER.scheduleController.smartRoute
   );
 
-  APP.route("/api/geofenced/schedule/refresh").get(auth.recyclerValidation,
+  APP.route("/api/geofenced/schedule/refresh").get(
+    auth.recyclerValidation,
     CONTROLLER.scheduleController.afterCompletion
   );
 
@@ -101,7 +104,10 @@ module.exports = (APP) => {
     CONTROLLER.scheduleController.dashboardCompleted
   );
 
-  APP.route("/api/rewardUser").post(auth.recyclerValidation, CONTROLLER.scheduleController.rewardSystem);
+  APP.route("/api/rewardUser").post(
+    auth.recyclerValidation,
+    CONTROLLER.scheduleController.rewardSystem
+  );
 
   APP.route("/api/user/completed").post(
     CONTROLLER.scheduleController.userComplete
@@ -123,8 +129,9 @@ module.exports = (APP) => {
 
   APP.route("/api/getBalance").get(CONTROLLER.scheduleController.getBalance);
 
-  APP.route("/api/schedule/recycler").get(CONTROLLER.scheduleController.getScheduleCollector);
-
+  APP.route("/api/schedule/recycler").get(
+    CONTROLLER.scheduleController.getScheduleCollector
+  );
 
   APP.route("/api/allCoins").get(CONTROLLER.scheduleController.allCoins);
 
@@ -136,16 +143,13 @@ module.exports = (APP) => {
     res.jsonp("cool");
   });
 
-  APP.route('/api/get/notifications').get(
+  APP.route("/api/get/notifications").get(
     auth.recyclerValidation,
     CONTROLLER.scheduleController.scheduleNotifications
   );
 
-  APP.route('/api/seen/notification').get(
+  APP.route("/api/seen/notification").get(
     auth.recyclerValidation,
     CONTROLLER.scheduleController.updateScheduleNotifications
   );
-
-
-
 };
