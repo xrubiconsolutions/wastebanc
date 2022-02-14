@@ -369,7 +369,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
 /**************************************************
  ******************* Login User *******************
  **************************************************/
-userController.loginUser = (REQUEST, RESPONSE) => {
+userController.loginUser = async (REQUEST, RESPONSE) => {
   let CRITERIA = {
       $or: [{ phone: REQUEST.body.phone }, { email: REQUEST.body.email }],
     },
@@ -380,6 +380,11 @@ userController.loginUser = (REQUEST, RESPONSE) => {
   // DANGER! This is insecure. See http://twil.io/secure
 
   /** find user is exists or not */
+  // const user = await MODEL.userModel.findOne(CRITERIA);
+  // console.log("user", user);
+  // return RESPONSE.json({
+  //   data: user,
+  // });
   MODEL.userModel
     .findOne(CRITERIA, PROJECTION, { lean: true })
     .then((USER) => {
@@ -409,6 +414,7 @@ userController.loginUser = (REQUEST, RESPONSE) => {
                 );
 
                 USER.token = jwtToken;
+
                 return RESPONSE.jsonp(USER);
               }
             }
