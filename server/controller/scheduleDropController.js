@@ -100,6 +100,7 @@ scheduleDropController.getPendingSchedule = (REQUEST, RESPONSE) => {
     .find({
       completionStatus: "pending",
     })
+    .populate("categories")
     .then((schedules) => {
       return RESPONSE.json(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -115,6 +116,7 @@ scheduleDropController.getPendingScheduleUser = (REQUEST, RESPONSE) => {
       completionStatus: "pending",
       phone: phone,
     })
+    .populate("categories")
     .then((schedules) => {
       return RESPONSE.json(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -130,6 +132,7 @@ scheduleDropController.getCompletedScheduleUser = (REQUEST, RESPONSE) => {
       completionStatus: "completed",
       phone: phone,
     })
+    .populate("categories")
     .then((schedules) => {
       return RESPONSE.json(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -143,6 +146,7 @@ scheduleDropController.getCompletedSchedule = (REQUEST, RESPONSE) => {
     .find({
       completionStatus: "completed",
     })
+    .populate("categories")
     .then((schedules) => {
       return RESPONSE.json(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -338,6 +342,7 @@ scheduleDropController.dropRequestRecycler = (req, res) => {
         organisationCollection: organisationId,
         completionStatus: "pending",
       })
+      .populate("categories")
       .then((drop) => {
         return res.status(200).json(drop);
       });
@@ -346,26 +351,27 @@ scheduleDropController.dropRequestRecycler = (req, res) => {
   }
 };
 
-scheduleDropController.getScheduleDropCompletedRecycler = (req,res)=>{
+scheduleDropController.getScheduleDropCompletedRecycler = (req, res) => {
   const recyclerId = req.query.recyclerId;
-  try{
-
-      MODEL.scheduleDropModel.find({
+  try {
+    MODEL.scheduleDropModel
+      .find({
         completionStatus: "completed",
-        collectedBy : recyclerId
-      }).sort({
-        _id : -1
-      }).then((drop)=>{
-        return res.status(200).json(drop)
+        collectedBy: recyclerId,
       })
-
+      .sort({
+        _id: -1,
+      })
+      .populate("categories")
+      .then((drop) => {
+        return res.status(200).json(drop);
+      });
+  } catch (err) {
+    return res.status(500).json(err);
   }
-  catch(err){
-        return res.status(500).json(err);
-  }
-}
+};
 
-scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
+scheduleDropController.monthlyDropPending = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
     MODEL.scheduleDropModel
@@ -373,22 +379,23 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
         completionStatus: "pending",
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
       .sort({
         _id: -1,
       })
+
       .then((jan) => {
         MODEL.scheduleDropModel
           .find({
             completionStatus: "pending",
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -401,8 +408,8 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                 completionStatus: "pending",
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -415,8 +422,8 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                     completionStatus: "pending",
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -429,8 +436,8 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                         completionStatus: "pending",
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -443,8 +450,8 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                             completionStatus: "pending",
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -457,8 +464,8 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                                 completionStatus: "pending",
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -472,9 +479,9 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -489,13 +496,13 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -513,13 +520,13 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -537,14 +544,14 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -565,7 +572,7 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -574,7 +581,7 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -587,10 +594,14 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                                                   })
                                                   .then((Dec) => {
                                                     MODEL.scheduleDropModel
-                                                      .find({ completionStatus: "pending",
-                                                    })
+                                                      .find({
+                                                        completionStatus:
+                                                          "pending",
+                                                      })
                                                       .then((Analytics) => {
-                                                        RESPONSE.status(200).json({
+                                                        RESPONSE.status(
+                                                          200
+                                                        ).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                             schedules: jan,
@@ -639,12 +650,13 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
                                                           },
                                                           DECEMBER: {
                                                             amount: Dec.length,
-                                                             schedules: Dec,
+                                                            schedules: Dec,
                                                           },
                                                           ALL: {
                                                             amount:
                                                               Analytics.length,
-                                                            schedules: Analytics,
+                                                            schedules:
+                                                              Analytics,
                                                           },
                                                         });
                                                       });
@@ -663,10 +675,9 @@ scheduleDropController.monthlyDropPending = (REQUEST,RESPONSE)=>{
   } catch (err) {
     return RESPONSE.status(500).json(err);
   }
-}
+};
 
-
-scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
+scheduleDropController.monthlyDropCompleted = (REQUEST, RESPONSE) => {
   var year = new Date().getFullYear();
   try {
     MODEL.scheduleDropModel
@@ -674,8 +685,8 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
         completionStatus: "completed",
         $expr: {
           $and: [
-            { $eq: [{ $year: '$createdAt' }, year] },
-            { $eq: [{ $month: '$createdAt' }, 1] },
+            { $eq: [{ $year: "$createdAt" }, year] },
+            { $eq: [{ $month: "$createdAt" }, 1] },
           ],
         },
       })
@@ -688,8 +699,8 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
             completionStatus: "completed",
             $expr: {
               $and: [
-                { $eq: [{ $year: '$createdAt' }, year] },
-                { $eq: [{ $month: '$createdAt' }, 2] },
+                { $eq: [{ $year: "$createdAt" }, year] },
+                { $eq: [{ $month: "$createdAt" }, 2] },
               ],
             },
           })
@@ -702,8 +713,8 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                 completionStatus: "completed",
                 $expr: {
                   $and: [
-                    { $eq: [{ $year: '$createdAt' }, year] },
-                    { $eq: [{ $month: '$createdAt' }, 3] },
+                    { $eq: [{ $year: "$createdAt" }, year] },
+                    { $eq: [{ $month: "$createdAt" }, 3] },
                   ],
                 },
               })
@@ -716,8 +727,8 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                     completionStatus: "completed",
                     $expr: {
                       $and: [
-                        { $eq: [{ $year: '$createdAt' }, year] },
-                        { $eq: [{ $month: '$createdAt' }, 4] },
+                        { $eq: [{ $year: "$createdAt" }, year] },
+                        { $eq: [{ $month: "$createdAt" }, 4] },
                       ],
                     },
                   })
@@ -730,8 +741,8 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                         completionStatus: "completed",
                         $expr: {
                           $and: [
-                            { $eq: [{ $year: '$createdAt' }, year] },
-                            { $eq: [{ $month: '$createdAt' }, 5] },
+                            { $eq: [{ $year: "$createdAt" }, year] },
+                            { $eq: [{ $month: "$createdAt" }, 5] },
                           ],
                         },
                       })
@@ -744,8 +755,8 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                             completionStatus: "completed",
                             $expr: {
                               $and: [
-                                { $eq: [{ $year: '$createdAt' }, year] },
-                                { $eq: [{ $month: '$createdAt' }, 6] },
+                                { $eq: [{ $year: "$createdAt" }, year] },
+                                { $eq: [{ $month: "$createdAt" }, 6] },
                               ],
                             },
                           })
@@ -758,8 +769,8 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                                 completionStatus: "completed",
                                 $expr: {
                                   $and: [
-                                    { $eq: [{ $year: '$createdAt' }, year] },
-                                    { $eq: [{ $month: '$createdAt' }, 7] },
+                                    { $eq: [{ $year: "$createdAt" }, year] },
+                                    { $eq: [{ $month: "$createdAt" }, 7] },
                                   ],
                                 },
                               })
@@ -773,9 +784,9 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                                     $expr: {
                                       $and: [
                                         {
-                                          $eq: [{ $year: '$createdAt' }, year],
+                                          $eq: [{ $year: "$createdAt" }, year],
                                         },
-                                        { $eq: [{ $month: '$createdAt' }, 8] },
+                                        { $eq: [{ $month: "$createdAt" }, 8] },
                                       ],
                                     },
                                   })
@@ -790,13 +801,13 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                                           $and: [
                                             {
                                               $eq: [
-                                                { $year: '$createdAt' },
+                                                { $year: "$createdAt" },
                                                 year,
                                               ],
                                             },
                                             {
                                               $eq: [
-                                                { $month: '$createdAt' },
+                                                { $month: "$createdAt" },
                                                 9,
                                               ],
                                             },
@@ -814,13 +825,13 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                                               $and: [
                                                 {
                                                   $eq: [
-                                                    { $year: '$createdAt' },
+                                                    { $year: "$createdAt" },
                                                     year,
                                                   ],
                                                 },
                                                 {
                                                   $eq: [
-                                                    { $month: '$createdAt' },
+                                                    { $month: "$createdAt" },
                                                     10,
                                                   ],
                                                 },
@@ -838,14 +849,14 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                                                   $and: [
                                                     {
                                                       $eq: [
-                                                        { $year: '$createdAt' },
+                                                        { $year: "$createdAt" },
                                                         year,
                                                       ],
                                                     },
                                                     {
                                                       $eq: [
                                                         {
-                                                          $month: '$createdAt',
+                                                          $month: "$createdAt",
                                                         },
                                                         11,
                                                       ],
@@ -859,14 +870,15 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                                               .then((Nov) => {
                                                 MODEL.scheduleDropModel
                                                   .find({
-                                                    completionStatus: "completed",
+                                                    completionStatus:
+                                                      "completed",
                                                     $expr: {
                                                       $and: [
                                                         {
                                                           $eq: [
                                                             {
                                                               $year:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             year,
                                                           ],
@@ -875,7 +887,7 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                                                           $eq: [
                                                             {
                                                               $month:
-                                                                '$createdAt',
+                                                                "$createdAt",
                                                             },
                                                             12,
                                                           ],
@@ -888,10 +900,14 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                                                   })
                                                   .then((Dec) => {
                                                     MODEL.scheduleDropModel
-                                                      .find({ completionStatus: "completed",
-                                                    })
+                                                      .find({
+                                                        completionStatus:
+                                                          "completed",
+                                                      })
                                                       .then((Analytics) => {
-                                                        RESPONSE.status(200).json({
+                                                        RESPONSE.status(
+                                                          200
+                                                        ).json({
                                                           JANUARY: {
                                                             amount: jan.length,
                                                             schedules: jan,
@@ -940,12 +956,13 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
                                                           },
                                                           DECEMBER: {
                                                             amount: Dec.length,
-                                                             schedules: Dec,
+                                                            schedules: Dec,
                                                           },
                                                           ALL: {
                                                             amount:
                                                               Analytics.length,
-                                                            schedules: Analytics,
+                                                            schedules:
+                                                              Analytics,
                                                           },
                                                         });
                                                       });
@@ -964,6 +981,6 @@ scheduleDropController.monthlyDropCompleted = (REQUEST,RESPONSE)=>{
   } catch (err) {
     return RESPONSE.status(500).json(err);
   }
-}
+};
 
 module.exports = scheduleDropController;
