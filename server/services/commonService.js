@@ -212,8 +212,8 @@ commonService.resumeUpload = (REQUEST, RESPONSE) => {
       );
 
       const mail = {
-        to: "hr@xrubiconsolutions.com",
-        cc: "info@xrubiconsolutions.com",
+        to: "james@xrubiconsolutions.com",
+        cc: "temidayo@xrubiconsolutions.com",
         from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
         subject: `${jobtitle} Application`,
         text: `User Details 

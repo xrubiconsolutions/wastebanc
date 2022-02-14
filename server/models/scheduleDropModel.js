@@ -28,6 +28,12 @@ const scheduleDrop = new Schema({
     // enum : ["plastic bottles", "cans", "rubber", "paper materials"],
     required: true,
   },
+  categories: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "categories",
+    },
+  ],
   quantity: {
     type: Number,
     default: 0,
