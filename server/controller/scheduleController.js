@@ -113,6 +113,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
           long: RESULT.long,
           lcd: RESULT.lcd || "",
           completionStatus: RESULT.completionStatus,
+          categories: RESULT.categories,
         };
         if (!RESULT.lat || !RESULT.long) {
           return RESPONSE.status(400).json({
@@ -205,7 +206,7 @@ scheduleController.getSchedule = (REQUEST, RESPONSE) => {
 
   MODEL.scheduleModel
     .findOne(CRITERIA, PROJECTION, { lean: true })
-    .populate("categories")
+
     .then((schedules) => {
       return RESPONSE.jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -220,7 +221,7 @@ scheduleController.getSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find(CRITERIA, PROJECTION, { lean: true })
     .sort({ _id: -1 })
-    .populate("categories")
+
     .then((schedules) => {
       RESPONSE.jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -236,7 +237,7 @@ scheduleController.collectorSchedule = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({})
     .sort({ _id: -1 })
-    .populate("categories")
+
     .then((schedules) => {
       // var collect = schedules.filter(x=>x.completionStatus !== "completed")
       RESPONSE.jsonp(
@@ -479,7 +480,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
 scheduleController.allMissedSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({ completionStatus: "missed", client: REQUEST.query.client })
-    .populate("categories")
+
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -492,7 +493,7 @@ scheduleController.allUserMissedSchedules = (REQUEST, RESPONSE) => {
   var user = REQUEST.query.email;
   MODEL.scheduleModel
     .find({ completionStatus: "completed", client: user })
-    .populate("categories")
+
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -508,7 +509,7 @@ scheduleController.viewAllSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({})
     .sort({ _id: -1 })
-    .populate("categories")
+
     .then((schedules) => {
       RESPONSE.jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -520,7 +521,7 @@ scheduleController.viewAllSchedules = (REQUEST, RESPONSE) => {
 scheduleController.allPendingSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({ completionStatus: "pending", client: REQUEST.query.client })
-    .populate("categories")
+
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -532,7 +533,7 @@ scheduleController.allPendingSchedules = (REQUEST, RESPONSE) => {
 scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({ completionStatus: "completed", client: REQUEST.query.client })
-    .populate("categories")
+
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -544,7 +545,7 @@ scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
 scheduleController.dashboardCompleted = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({ completionStatus: "completed" })
-    .populate("categories")
+
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -1254,7 +1255,7 @@ scheduleController.allCoins = (req, res) => {
 scheduleController.allAccepted = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({ collectorStatus: "accept" })
-    .populate("categories")
+
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -1379,7 +1380,7 @@ scheduleController.userCancel = (req, resp) => {
 scheduleController.allDeclined = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({ collectorStatus: "decline" })
-    .populate("categories")
+
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)

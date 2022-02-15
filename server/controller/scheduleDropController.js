@@ -100,7 +100,7 @@ scheduleDropController.getPendingSchedule = (REQUEST, RESPONSE) => {
     .find({
       completionStatus: "pending",
     })
-    .populate("categories")
+
     .then((schedules) => {
       return RESPONSE.json(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -116,7 +116,7 @@ scheduleDropController.getPendingScheduleUser = (REQUEST, RESPONSE) => {
       completionStatus: "pending",
       phone: phone,
     })
-    .populate("categories")
+
     .then((schedules) => {
       return RESPONSE.json(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -132,7 +132,7 @@ scheduleDropController.getCompletedScheduleUser = (REQUEST, RESPONSE) => {
       completionStatus: "completed",
       phone: phone,
     })
-    .populate("categories")
+
     .then((schedules) => {
       return RESPONSE.json(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -146,7 +146,7 @@ scheduleDropController.getCompletedSchedule = (REQUEST, RESPONSE) => {
     .find({
       completionStatus: "completed",
     })
-    .populate("categories")
+
     .then((schedules) => {
       return RESPONSE.json(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
@@ -342,7 +342,7 @@ scheduleDropController.dropRequestRecycler = (req, res) => {
         organisationCollection: organisationId,
         completionStatus: "pending",
       })
-      .populate("categories")
+
       .then((drop) => {
         return res.status(200).json(drop);
       });
@@ -362,7 +362,7 @@ scheduleDropController.getScheduleDropCompletedRecycler = (req, res) => {
       .sort({
         _id: -1,
       })
-      .populate("categories")
+
       .then((drop) => {
         return res.status(200).json(drop);
       });
