@@ -58,4 +58,4 @@ const advert_Schema = new Schema({
   }
 });
 
-module.exports = MONGOOSE.model('Advert', advert_Schema);
+module.exports = MONGOOSE.model('adverts', advert_Schema);
