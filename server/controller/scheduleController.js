@@ -5,6 +5,7 @@ let MODEL = require("../models");
 let COMMON_FUN = require("../util/commonFunction");
 let CONSTANTS = require("../util/constants");
 const moment = require("moment-timezone");
+const mongo = require("mongodb");
 
 moment().tz("Africa/Lagos", false);
 const { validationResult, body } = require("express-validator");
@@ -1303,23 +1304,35 @@ scheduleController.userComplete = (req, resp) => {
   }
 };
 
-scheduleController.userDelete = (req, resp) => {
-  var scheduleID = req.body._id;
-  var userID = req.body.userID;
+scheduleController.userDelete = async (req, resp) => {
+  const scheduleID = req.body._id;
+  //var userID = req.body.userID;
+  const { user } = req;
+  console.log("auth", user);
 
   try {
-    MODEL.scheduleModel.find({ _id: scheduleID }).then((schedule) => {
-      MODEL.userModel.find({ _id: userID }).then((result) => {
-        MODEL.scheduleModel.deleteOne({ _id: scheduleID }, (err, res) => {
-          if (err) return resp.status(400).jsonp(response.body.error);
-          return resp
-            .status(200)
-            .jsonp({ message: "Your schedule delete was successful" });
-        });
-      });
+    const remove = await MODEL.scheduleModel.findOneAndDelete({
+      _id: new mongo.ObjectId(scheduleID),
+      client: user.email,
     });
+    console.log("deleted remove", remove);
+    return resp.status(200).jsonp({
+      statusCode: 200,
+      message: "Your schedule delete was successful",
+    });
+    // MODEL.scheduleModel.find({ _id: scheduleID }).then((schedule) => {
+    //   MODEL.userModel.find({ _id: userID }).then((result) => {
+    //     MODEL.scheduleModel.deleteOne({ _id: scheduleID }, (err, res) => {
+    //       if (err) return resp.status(400).jsonp(response.body.error);
+    //       return resp
+    //         .status(200)
+    //         .jsonp({ message: "Your schedule delete was successful" });
+    //     });
+    //   });
+    // });
   } catch (err) {
-    return resp.status(404), jsonp(err);
+    console.log("err", err);
+    return resp.status(404).jsonp(err);
   }
 };
 
@@ -1391,6 +1404,7 @@ scheduleController.allDeclined = (REQUEST, RESPONSE) => {
 
 scheduleController.smartRoute = (REQUEST, RESPONSE) => {
   const collectorID = REQUEST.query.collectorID;
+
   var need = [];
   var count = 0;
   var geofencedSchedules = [];
@@ -1402,7 +1416,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
 
   MODEL.collectorModel.findOne({ _id: collectorID }).then((collector) => {
     var accessArea = collector.areaOfAccess;
-
+    console.log("accessArea", accessArea);
     MODEL.scheduleModel
       .find({
         $and: [
@@ -1413,13 +1427,17 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
             pickUpDate: {
               $lt: tomorrow,
             },
+            completionStatus: "pending",
+            //collectorStatus: "accept",
           },
         ],
       })
       .sort({ _id: -1 })
       .then((schedules) => {
+        //console.log("schedules", schedules);
         schedules.forEach((schedule, index) => {
           var test = schedule.address.split(", ");
+          console.log("test value", test);
           (function route() {
             for (let i = 0; i < accessArea.length; i++) {
               if (schedule.lcd === accessArea[i]) {

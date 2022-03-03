@@ -446,6 +446,7 @@ app.set("view engine", "jade");
 app.use(EXPRESS.static("client"));
 app.use(BODY_PARSER.json({ limit: "50mb" }));
 app.use(BODY_PARSER.urlencoded({ limit: "100mb", extended: false }));
+app.use(cors());
 
 /** middleware for api's logging with deployment mode */
 let apiLooger = (req, res, next) => {

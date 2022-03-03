@@ -4,6 +4,7 @@ let CONTROLLER = require("../../controller");
 let auth = require("../../util/auth");
 const express = require("express");
 const { body, query, check, param } = require("express-validator");
+const authorization = require("../../middleware/authorization");
 
 const ProtectedRoutes = express.Router();
 
@@ -113,7 +114,7 @@ module.exports = (APP) => {
     CONTROLLER.scheduleController.userComplete
   );
 
-  APP.route("/api/user/delete").post(CONTROLLER.scheduleController.userDelete);
+  APP.route("/api/user/delete").post(authorization(),CONTROLLER.scheduleController.userDelete);
 
   APP.route("/api/user/cancel").post(CONTROLLER.scheduleController.userCancel);
 

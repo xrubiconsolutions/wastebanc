@@ -25,4 +25,5 @@ module.exports = {
   notificationModel: require("./notificationModel"),
   localGovernmentModel: require("./localGovernmentModel"),
   categoryModel: require("./categoryModel"),
+  locationModel: require("./locationModel"),
 };

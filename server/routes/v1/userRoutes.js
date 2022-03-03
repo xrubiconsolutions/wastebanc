@@ -175,6 +175,21 @@ module.exports = (APP) => {
     CONTROLLER.userController.uploadResume
   );
 
+  APP.route("/api/v2/admin/login").post(
+    [
+      body("email", "email is required").isString(),
+      body("password", "password is required").isString(),
+    ],
+    CONTROLLER.userController.adminLogin
+  );
+
+  APP.route("/api/v2/user/login").post(
+    [
+      body("phone", "phone is required").isString(),
+      body("password", "password is required").isString(),
+    ],
+    CONTROLLER.userController.loginUserV2
+  );
   // APP.route("/api/lawma/get/transaction").get(CONTROLLER.userController.getTransactions);
 
   APP.route("/getUser").get((req, res) => {
