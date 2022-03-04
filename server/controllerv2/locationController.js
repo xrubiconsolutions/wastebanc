@@ -98,6 +98,6 @@ locationController.update = async (req, res) => {
   }
 };
 
-locationController
+
 
 module.exports = locationController;

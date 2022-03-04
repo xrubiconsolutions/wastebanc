@@ -367,6 +367,17 @@ userController.registerUser = (REQUEST, RESPONSE) => {
   });
 };
 
+userController.passwordEncrypt = async (req, res) => {
+  const password = await COMMON_FUN.encryptPassword(req.body.password);
+  return res.status(200).json({
+    data: {
+      password: req.body.password.trim(),
+      passwordHash: password,
+      email: req.email,
+    },
+  });
+};
+
 /**************************************************
  ******************* Login User *******************
  **************************************************/

@@ -1,16 +1,15 @@
-'use strict';
+"use strict";
 /************* Modules ***********/
-const MONGOOSE = require('mongoose');
+const MONGOOSE = require("mongoose");
 const Schema = MONGOOSE.Schema;
-const Constants = require('../util/constants');
+const Constants = require("../util/constants");
 
 /**************************************************
  ************* User Model or collection ***********
  **************************************************/
 
-var expiry = new Date()
-expiry.setDate(new Date().getDate() + 365 );
-
+var expiry = new Date();
+expiry.setDate(new Date().getDate() + 365);
 
 const user_Schema = new Schema({
   username: {
@@ -20,25 +19,25 @@ const user_Schema = new Schema({
   firstname: {
     type: String,
     required: true,
-    default: 'First',
+    default: "First",
   },
   lastname: {
     type: String,
     required: true,
-    default: 'Last',
+    default: "Last",
   },
   othernames: {
     type: String,
     required: true,
-    default: 'Other_names',
+    default: "Other_names",
   },
   address: {
     type: String,
     required: true,
-    default: 'Lagos',
+    default: "Lagos",
   },
   cardID: {
-    type: String
+    type: String,
   },
   fullname: {
     type: String,
@@ -64,13 +63,13 @@ const user_Schema = new Schema({
 
   roles: {
     type: String,
-    enum: ['client', 'collector', 'admin' , 'analytics-admin'],
+    enum: ["client", "collector", "admin", "analytics-admin"],
     required: true,
-    default: 'client',
+    default: "client",
   },
   countryCode: {
     type: String,
-    default: '+234',
+    default: "+234",
   },
   verified: {
     type: Boolean,
@@ -90,11 +89,11 @@ const user_Schema = new Schema({
   },
   rafflePoints: {
     type: Number,
-    default: 0
+    default: 0,
   },
-  schedulePoints:{
+  schedulePoints: {
     type: Number,
-    default: 0
+    default: 0,
   },
   gender: {
     type: String,
@@ -108,28 +107,36 @@ const user_Schema = new Schema({
   onesignal_id: {
     type: String,
   },
-  last_logged_in:{
-    type: Date
-  },
-  mobile_carrier:{
-    type:String
-  },
-  phone_type:{
-    type:String
-  },
-  phone_OS:{
-    type: String
-  },
-  expiry_licence:{
+  last_logged_in: {
     type: Date,
-    default: () => Date.now() + 365*24*60*60*1000
   },
-  profile_picture:{
-    type: String
+  mobile_carrier: {
+    type: String,
   },
-  internet_provider:{
-    type: String
-  }
+  phone_type: {
+    type: String,
+  },
+  phone_OS: {
+    type: String,
+  },
+  expiry_licence: {
+    type: Date,
+    default: () => Date.now() + 365 * 24 * 60 * 60 * 1000,
+  },
+  profile_picture: {
+    type: String,
+  },
+  internet_provider: {
+    type: String,
+  },
+  country: {
+    type: String,
+    default: "",
+  },
+  state: {
+    type: String,
+    default: "",
+  },
 });
 
-module.exports = MONGOOSE.model('User', user_Schema);
+module.exports = MONGOOSE.model("User", user_Schema);

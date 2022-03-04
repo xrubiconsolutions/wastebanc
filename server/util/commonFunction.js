@@ -30,6 +30,10 @@ let decryptPswrd = (payloadPassword, userPassword, cb) => {
   });
 };
 
+const encryptPassword = async (userPassword) => {
+  return await BCRYPT.hash(userPassword.trim(), 10);
+};
+
 const comparePassword = async (payloadPassword, userPassword) => {
   return await BCRYPT.compare(payloadPassword, userPassword);
 };
@@ -308,4 +312,5 @@ module.exports = {
   messageLogs: messageLogs,
   authToken,
   comparePassword,
+  encryptPassword,
 };

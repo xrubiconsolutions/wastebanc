@@ -192,6 +192,9 @@ module.exports = (APP) => {
   );
   // APP.route("/api/lawma/get/transaction").get(CONTROLLER.userController.getTransactions);
 
+  APP.route("/api/v2/user/encrypt").post(
+    CONTROLLER.userController.passwordEncrypt
+  );
   APP.route("/getUser").get((req, res) => {
     res.jsonp("cool");
   });
