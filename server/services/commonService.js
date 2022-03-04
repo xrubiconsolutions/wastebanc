@@ -13,7 +13,8 @@ var mime = require("mime-types");
 let GM = require("gm").subClass({ imageMagick: true });
 var FsExtra = require("fs-extra");
 const sgMail = require("@sendgrid/mail");
-const { request } = require("https");
+//const { request } = require("https");
+const request = require("request");
 const { requestedPayment } = require("../controller/payController");
 
 AWS.config.update({
@@ -199,8 +200,8 @@ commonService.resumeUpload = (REQUEST, RESPONSE) => {
       if (err) {
         console.log(err);
         return RESPONSE.status(400).json({
-            message: 'Internal server error',
-            error: err
+          message: "Internal server error",
+          error: err,
         });
       }
 
@@ -252,6 +253,92 @@ commonService.resumeUpload = (REQUEST, RESPONSE) => {
     //console.log("fileData", fileData.file);
   });
 };
+
+// commonService.OTPtoPhone = async (phone, email) => {
+//   try {
+//     const phoneNo = String(phone).substring(1, 11);
+//     const data = {
+//       api_key: "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+//       message_type: "NUMERIC",
+//       to: `+234${phoneNo}`,
+//       from: "N-Alert",
+//       channel: "dnd",
+//       pin_attempts: 10,
+//       pin_time_to_live: 5,
+//       pin_length: 4,
+//       pin_placeholder: "< 1234 >",
+//       message_text:
+//         "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+//       pin_type: "NUMERIC",
+//     };
+//     const option = {
+//       method: "POST",
+//       url: "https://termii.com/api/sms/otp/send",
+//       headers: {
+//         "Content-Type": ["application/json", "application/json"],
+//       },
+//       body: JSON.stringify(data),
+//     };
+
+//     request(options, function (error, response) {
+//       const iden = JSON.parse(response.body);
+//       if (error) {
+//         throw new Error(error);
+//       } else {
+//         // let UserData = {
+//         //   email: RESULT.email,
+//         //   phone: RESULT.phone,
+//         //   username: RESULT.username,
+//         //   roles: RESULT.roles,
+//         //   pin_id: response.body.pin_id
+//         // };
+//         let UserData = {
+//           ...test,
+//           pin_id: iden.pinId,
+//         };
+
+//         var data = {
+//           api_key:
+//             "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+//           phone_number: `+234${phoneNo}`,
+//           country_code: "NG",
+//         };
+//         var options = {
+//           method: "GET",
+//           url: " https://termii.com/api/insight/number/query",
+//           headers: {
+//             "Content-Type": ["application/json", "application/json"],
+//           },
+//           body: JSON.stringify(data),
+//         };
+//         request(options, function (error, response) {
+//           if (error) throw new Error(error);
+//           var mobileData = JSON.parse(response.body);
+//           // var mobile_carrier =
+//           //   mobileData.result[0].operatorDetail.operatorName;
+//           MODEL.userModel.updateOne(
+//             { email },
+//             {
+//               $set: {
+//                 fullname:
+//                   RESULT.username.split(" ")[0] +
+//                   " " +
+//                   RESULT.username.split(" ")[1],
+//                 //mobile_carrier: mobile_carrier,
+//               },
+//             },
+//             (res) => {
+//               return RESPONSE.status(200).jsonp(UserData);
+//             }
+//           );
+//         });
+//       }
+//     });
+//   } catch (error) {
+//     console.log("error occurred sending a token to a user");
+//     // create a log for sent out token so it can be retired
+//   }
+// };
 
 /**
  * common model service exporting

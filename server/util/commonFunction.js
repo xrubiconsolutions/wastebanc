@@ -249,8 +249,8 @@ let convertIdToMongooseId = (stringId) => {
 
 /** create jsonwebtoken **/
 let createToken = (objData) => {
-  return JWT.sign(objData, CONSTANTS.SERVER.JWT_SECRET_KEY, {
-    expiresIn: "365d",
+  return JWT.sign({ userId: objData._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
+    expiresIn: "7h",
   });
 };
 
