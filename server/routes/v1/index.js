@@ -16,4 +16,6 @@ module.exports = function (app) {
   require("./analyticsRoute")(app);
   require("./dropRoute")(app);
   require("./categoryRoute")(app);
+  require("./locationRoute")(app);
+  require("./claimRoute")(app);
 };

@@ -18,4 +18,6 @@ module.exports = {
   versionController: require("./versionController"),
   scheduleDropController: require("./scheduleDropController"),
   categoryController: require("./categoryController"),
+  locationController: require("./locationController"),
+  claimController: require("./claimsController"),
 };

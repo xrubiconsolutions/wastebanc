@@ -143,7 +143,7 @@ const user_Schema = new Schema({
     default: "",
   },
   status: {
-    typre: String,
+    type: String,
     default: "active",
   },
 });

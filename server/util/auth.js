@@ -219,7 +219,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
 /********************************
  ****** admin authentication ****
  ********************************/
-validateUser.adminValidation = (REQUEST, RESPONSE, NEXT) => {
+validateUser.adminValidation = async (REQUEST, RESPONSE, NEXT) => {
   if (!REQUEST.headers.authorization) {
     return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
@@ -270,7 +270,7 @@ validateUser.adminValidation = (REQUEST, RESPONSE, NEXT) => {
   //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.adminPakamValidation = (REQUEST, RESPONSE, NEXT) => {
+validateUser.adminPakamValidation = async (REQUEST, RESPONSE, NEXT) => {
   if (!REQUEST.headers.authorization) {
     return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
@@ -320,7 +320,7 @@ validateUser.adminPakamValidation = (REQUEST, RESPONSE, NEXT) => {
   //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.companyValidation = (REQUEST, RESPONSE, NEXT) => {
+validateUser.companyValidation = async (REQUEST, RESPONSE, NEXT) => {
   if (!REQUEST.headers.authorization) {
     return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
@@ -370,7 +370,7 @@ validateUser.companyValidation = (REQUEST, RESPONSE, NEXT) => {
   //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.lcdValidation = (REQUEST, RESPONSE, NEXT) => {
+validateUser.lcdValidation = async (REQUEST, RESPONSE, NEXT) => {
   if (!REQUEST.headers.authorization) {
     return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }

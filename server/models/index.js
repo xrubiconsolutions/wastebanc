@@ -26,4 +26,6 @@ module.exports = {
   localGovernmentModel: require("./localGovernmentModel"),
   categoryModel: require("./categoryModel"),
   locationModel: require("./locationModel"),
+  claimsModel: require("./claimsModel"),
+  roleModel: require("./roleModel"),
 };

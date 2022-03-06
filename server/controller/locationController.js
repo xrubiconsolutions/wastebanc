@@ -2,14 +2,14 @@
 
 let locationController = {};
 const MODEL = require("../models");
-const COMMON_FUN = require("../util/commonFunction");
-const SERVICE = require("../services/commonService");
-const CONSTANTS = require("../util/constants");
+// const COMMON_FUN = require("../util/commonFunction");
+// const SERVICE = require("../services/commonService");
+// const CONSTANTS = require("../util/constants");
 
 const { validationResult, body } = require("express-validator");
-const {
-  CountryContext,
-} = require("twilio/lib/rest/pricing/v1/phoneNumber/country");
+// const {
+//   CountryContext,
+// } = require("twilio/lib/rest/pricing/v1/phoneNumber/country");
 
 const bodyValidate = (req, res) => {
   // 1. Validate the request coming in
@@ -48,7 +48,7 @@ locationController.create = async (req, res) => {
 
     const location = await MODEL.locationModel.create({
       country: body.country,
-      state: body.state,
+      state: body.states,
     });
 
     return res.status(200).json({
@@ -57,9 +57,71 @@ locationController.create = async (req, res) => {
       data: location,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       error: true,
-      message: "Internal server error",
+      message: "An error occurred",
+    });
+  }
+};
+
+locationController.locations = async (req, res) => {
+  try {
+    const locations = await MODEL.locationModel.find(
+      {},
+      {
+        _id: 1,
+        country: 1,
+        states: 1,
+      }
+    );
+    if (locations.length == 0) {
+      return res.status(400).json({
+        error: true,
+        message: "No location in the system",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "Available Locations",
+      data: locations,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+locationController.getLocation = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const locationId = req.params.locationId;
+    const location = await MODEL.locationModel.findById(locationId, {
+      _id: 1,
+      country: 1,
+      states: 1,
+    });
+    if (!location) {
+      return res.status(400).json({
+        error: true,
+        message: "location not found",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: location,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
     });
   }
 };
@@ -69,8 +131,8 @@ locationController.update = async (req, res) => {
 
   try {
     const body = req.body;
-    const countryId = req.param.countryId;
-    const country = await MODEL.locationModel.findById(countryId);
+    const locationId = req.params.locationId;
+    const country = await MODEL.locationModel.findById(locationId);
     if (!country) {
       return res.status(400).json({
         error: true,
@@ -78,26 +140,64 @@ locationController.update = async (req, res) => {
       });
     }
 
-    await MODEL.locationModel.updateOne(country._id, {
-      country: body.country || country.country,
-      state: body.state || country.state,
-    });
+    await MODEL.locationModel.updateOne(
+      { _id: country._id },
+      {
+        country: body.country || country.country,
+        states: body.states || country.states,
+      }
+    );
 
     country.country = body.country || country.country;
-    CountryContext.state = body.state || body.state;
+    country.states = body.states || body.states;
     return res.status(200).json({
       error: false,
       message: "Location updated successfully",
       data: country,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       error: true,
-      message: "Internal server error",
+      message: "An error occurred",
     });
   }
 };
 
+locationController.remove = async (req, res) => {
+  bodyValidate(req, res);
 
+  try {
+    const locationId = req.params.locationId;
+    const location = await MODEL.locationModel.findById(locationId);
+    if (!location) {
+      return res.status(400).json({
+        error: true,
+        message: "Location not found",
+      });
+    }
 
+    const remove = await MODEL.locationModel.deleteOne({
+      _id: location._id,
+    });
+
+    if (!remove) {
+      return res.status(400).json({
+        error: true,
+        message: "Error removing location",
+      });
+    }
+
+    return res.status(200).json({
+      error: true,
+      message: "Location deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
 module.exports = locationController;
