@@ -20,4 +20,5 @@ module.exports = {
   categoryController: require("./categoryController"),
   locationController: require("./locationController"),
   claimController: require("./claimsController"),
+  roleController: require("./roleController"),
 };
