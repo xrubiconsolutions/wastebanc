@@ -11,10 +11,10 @@ const role_schema = new Schema({
       {
         claimId: { type: Schema.Types.ObjectId, ref: "claims" },
         permission: {
-          create: { type: boolean, default: false },
-          edit: { type: boolean, default: false },
-          delete: { type: boolean, default: false },
-          read: { type: boolean, default: false },
+          create: { type: Boolean, default: false },
+          edit: { type: Boolean, default: false },
+          delete: { type: Boolean, default: false },
+          read: { type: Boolean, default: false },
         },
       },
     ],
