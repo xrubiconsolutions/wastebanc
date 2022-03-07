@@ -440,135 +440,6 @@ userController.loginUser = async (REQUEST, RESPONSE) => {
     });
 };
 
-userController.loginUserV2 = async (req, res) => {
-  bodyValidate(req, res);
-  try {
-    const user = await MODEL.userModel.findOne({
-      phone: req.body.phone,
-    });
-    if (!user) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid credentials",
-        statusCode: 400,
-      });
-    }
-
-    if (!(await COMMON_FUN.comparePassword(req.body.password, user.password))) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid email or password",
-        statusCode: 400,
-      });
-    }
-
-    await MODEL.userModel.updateOne(
-      { _id: user._id },
-      { last_logged_in: new Date() }
-    );
-    const token = COMMON_FUN.authToken(user);
-    delete user.password;
-    return res.status(200).json({
-      error: false,
-      message: "Login successfull",
-      statusCode: 200,
-      data: {
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
-        phone: user.phone,
-        othernames: user.othernames,
-        address: user.address,
-        roles: user.roles,
-        countryCode: user.countryCode,
-        verified: user.verified,
-        availablePoints: user.availablePoints,
-        rafflePoints: user.rafflePoints,
-        schedulePoints: user.schedulePoints,
-        cardID: user.cardID,
-        lcd: user.lcd,
-        last_logged_in: user.last_logged_in,
-        token,
-      },
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      message: "Internal Server Error",
-      statusCode: 500,
-    });
-  }
-};
-
-userController.adminLogin = async (req, res) => {
-  bodyValidate(req, res);
-  const email = req.body.email;
-  try {
-    const user = await MODEL.userModel.findOne({
-      email,
-    });
-
-    if (!user) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid email or password",
-        statusCode: 400,
-      });
-    }
-
-    if (user.role === "client") {
-      return res.status(400).json({
-        error: true,
-        message: "Unauthorized",
-        statusCode: 401,
-      });
-    }
-
-    if (!(await COMMON_FUN.comparePassword(req.body.password, user.password))) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid email or password",
-        statusCode: 400,
-      });
-    }
-
-    await MODEL.userModel.updateOne(
-      { _id: user._id },
-      { last_logged_in: new Date() }
-    );
-    const token = COMMON_FUN.authToken(user);
-    delete user.password;
-    return res.status(200).json({
-      error: false,
-      message: "Login successfull",
-      statusCode: 200,
-      data: {
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
-        phone: user.phone,
-        othernames: user.othernames,
-        address: user.address,
-        roles: user.roles,
-        countryCode: user.countryCode,
-        verified: user.verified,
-        availablePoints: user.availablePoints,
-        rafflePoints: user.rafflePoints,
-        schedulePoints: user.schedulePoints,
-        cardID: user.cardID,
-        lcd: user.lcd,
-        last_logged_in: user.last_logged_in,
-        token,
-      },
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      message: "Internal Server Error",
-      statusCode: 500,
-    });
-  }
-};
 /**************************************************
  ******************* Forget Password **************
  **************************************************/
@@ -794,7 +665,7 @@ userController.changedlogedInPassword = (REQUEST, RESPONSE) => {
   });
 };
 
-userController.resendVerification = (REQUEST, RESPONSE) => {
+userController.resendVerification = async (REQUEST, RESPONSE) => {
   // var error = {};
   // var phone = REQUEST.body.phone;
 
@@ -821,10 +692,21 @@ userController.resendVerification = (REQUEST, RESPONSE) => {
   // }
   var error = {};
   var phone = REQUEST.body.phone;
+  const user = await MODEL.userModel.findOne({
+    phone,
+  });
+
+  if (!phone) {
+    return RESPONSE.status(400).json({
+      error: true,
+      message: "Phone does not exist",
+    });
+  }
   var phoneNo = String(phone).substring(1, 11);
 
   const accountSid = "AC21bbc8152a9b9d981d6c86995d0bb806";
   const authToken = "3c53aeab8e3420f00e7b05777e7413a9";
+
   const client = require("twilio")(accountSid, authToken);
 
   try {
@@ -998,14 +880,15 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
 };
 
 userController.getAllClients = async (REQUEST, RESPONSE) => {
+  console.log("here");
   try {
     /* check user exist or not*/
     let users = await MODEL.userModel
       .find({ roles: "client", verified: true })
       .sort({ _id: -1 });
-    RESPONSE.jsonp(users);
+    return RESPONSE.jsonp(users);
   } catch (err) {
-    RESPONSE.status(400).jsonp(err);
+    return RESPONSE.status(400).jsonp(err);
   }
 };
 
@@ -2615,5 +2498,134 @@ userController.uploadResume = async (req, res) => {
   // console.log("resume", resume);
 };
 
+userController.loginUserV2 = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const user = await MODEL.userModel.findOne({
+      phone: req.body.phone,
+    });
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid credentials",
+        statusCode: 400,
+      });
+    }
+
+    if (!(await COMMON_FUN.comparePassword(req.body.password, user.password))) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid email or password",
+        statusCode: 400,
+      });
+    }
+
+    await MODEL.userModel.updateOne(
+      { _id: user._id },
+      { last_logged_in: new Date() }
+    );
+    const token = COMMON_FUN.authToken(user);
+    delete user.password;
+    return res.status(200).json({
+      error: false,
+      message: "Login successfull",
+      statusCode: 200,
+      data: {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        phone: user.phone,
+        othernames: user.othernames,
+        address: user.address,
+        roles: user.roles,
+        countryCode: user.countryCode,
+        verified: user.verified,
+        availablePoints: user.availablePoints,
+        rafflePoints: user.rafflePoints,
+        schedulePoints: user.schedulePoints,
+        cardID: user.cardID,
+        lcd: user.lcd,
+        last_logged_in: user.last_logged_in,
+        token,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server Error",
+      statusCode: 500,
+    });
+  }
+};
+
+userController.adminLogin = async (req, res) => {
+  bodyValidate(req, res);
+  const email = req.body.email;
+  try {
+    const user = await MODEL.userModel.findOne({
+      email,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid email or password",
+        statusCode: 400,
+      });
+    }
+
+    if (user.role === "client") {
+      return res.status(400).json({
+        error: true,
+        message: "Unauthorized",
+        statusCode: 401,
+      });
+    }
+
+    if (!(await COMMON_FUN.comparePassword(req.body.password, user.password))) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid email or password",
+        statusCode: 400,
+      });
+    }
+
+    await MODEL.userModel.updateOne(
+      { _id: user._id },
+      { last_logged_in: new Date() }
+    );
+    const token = COMMON_FUN.authToken(user);
+    delete user.password;
+    return res.status(200).json({
+      error: false,
+      message: "Login successfull",
+      statusCode: 200,
+      data: {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        phone: user.phone,
+        othernames: user.othernames,
+        address: user.address,
+        roles: user.roles,
+        countryCode: user.countryCode,
+        verified: user.verified,
+        availablePoints: user.availablePoints,
+        rafflePoints: user.rafflePoints,
+        schedulePoints: user.schedulePoints,
+        cardID: user.cardID,
+        lcd: user.lcd,
+        last_logged_in: user.last_logged_in,
+        token,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server Error",
+      statusCode: 500,
+    });
+  }
+};
 /* export userControllers */
 module.exports = userController;

@@ -5,7 +5,7 @@ const Schema = MONGOOSE.Schema;
 
 const locationSchema = new Schema({
   country: { type: String, required: true },
-  state: { type: Array, required: true },
+  states: { type: Array, required: true },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -61,6 +61,11 @@ const user_Schema = new Schema({
     default: Date.now,
   },
 
+  role: {
+    type: String,
+    default: "",
+  },
+
   roles: {
     type: String,
     enum: ["client", "collector", "admin", "analytics-admin"],
@@ -136,6 +141,10 @@ const user_Schema = new Schema({
   state: {
     type: String,
     default: "",
+  },
+  status: {
+    type: String,
+    default: "active",
   },
 });
 
