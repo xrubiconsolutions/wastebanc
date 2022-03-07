@@ -10,9 +10,9 @@ module.exports = (APP) => {
     UserService.getClients
   );
 
-  //   APP.route("/api/v2/schedules/search").get(
-  //     scheduleValidators.searchSchedules,
-  //     checkRequestErrs,
-  //     ScheduleService.searchSchedules
-  //   );
+  APP.route("/api/v2/clients/search").get(
+    userValidator.search,
+    checkRequestErrs,
+    UserService.searchClients
+  );
 };

@@ -42,6 +42,49 @@ class UserService {
       sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
     }
   }
+
+  static async searchClients(req, res) {
+    let { state, page = 1, key, resultsPerPage = 20 } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    const criteria = {
+      roles: "client",
+      verified: true,
+      $or: [
+        { username: key },
+        { cardID: key },
+        { fullName: key },
+        { gender: key },
+        { phone: key },
+        { email: key },
+      ],
+    };
+    if (state) criteria.state = state;
+
+    try {
+      // get length of clients with completion status and provided field value
+      const totalResult = await userModel.countDocuments(criteria);
+
+      // get clients based on page
+      const clients = await userModel
+        .find(criteria)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
+        clients,
+        totalResult,
+        page,
+        resultsPerPage,
+      });
+    } catch (error) {
+      console.log(error);
+      sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+    }
+  }
 }
 
 module.exports = UserService;
