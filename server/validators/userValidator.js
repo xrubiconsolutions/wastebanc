@@ -1,7 +1,7 @@
 const { query } = require("express-validator");
 
 module.exports = {
-  filterSchedules: [
+  filter: [
     query("start", "Provide a range start date")
       .exists()
       .notEmpty()
@@ -21,7 +21,5 @@ module.exports = {
         return true;
       }),
   ],
-  searchSchedules: [
-    query("key", "search key cannot be empty").exists().notEmpty(),
-  ],
+  search: [query("key", "search key cannot be empty").exists().notEmpty()],
 };

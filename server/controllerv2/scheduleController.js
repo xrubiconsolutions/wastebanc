@@ -4,31 +4,27 @@ const { STATUS_MSG } = require("../util/constants");
 
 class ScheduleService {
   static async getSchedulesWithFilter(req, res) {
-    let { page = 1, resultsPerPage = 20, start, end } = req.query;
+    let { page = 1, resultsPerPage = 20, start, end, state } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
     const [startDate, endDate] = [new Date(start), new Date(end)];
-    console.log(new Date(start), new Date(end), new Date(start));
+    const criteria = {
+      createdAt: {
+        $gte: startDate,
+        $lt: endDate,
+      },
+    };
+    if (state) criteria.state = state;
 
     try {
       // get length of schedules within given date range
-      const totalResult = await scheduleModel.countDocuments({
-        createdAt: {
-          $gte: startDate,
-          $lt: endDate,
-        },
-      });
+      const totalResult = await scheduleModel.countDocuments(criteria);
 
-      //   get all schedules within range
+      // get all schedules within range
       const schedules = await scheduleModel
-        .find({
-          createdAt: {
-            $gte: startDate,
-            $lt: endDate,
-          },
-        })
+        .find(criteria)
         .sort({ createdAt: -1 })
         .skip((page - 1) * resultsPerPage)
         .limit(resultsPerPage);
@@ -47,7 +43,7 @@ class ScheduleService {
 
   static async searchSchedules(req, res) {
     let {
-      field,
+      state,
       page = 1,
       key,
       completionStatus = { $ne: "" },
@@ -68,6 +64,7 @@ class ScheduleService {
       ],
       completionStatus,
     };
+    if (state) criteria.state = state;
 
     try {
       // get length of schedules with completion status and provided field value
