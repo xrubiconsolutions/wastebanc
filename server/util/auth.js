@@ -171,7 +171,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
     return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
   var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
-  console.log("valid", validated);
+  console.log("valid", validated.userId);
 
   if (Date.now() >= validated.exp * 1000) {
     return RESPONSE.status(401).json({
@@ -181,7 +181,8 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  const user = await MODEL.userModel.findById(validated.userId);
+  const user = await MODEL.collectorModel.findById(validated.userId);
+  console.log("user", user);
   if (!user) {
     return RESPONSE.status(401).json({
       error: true,
@@ -334,7 +335,7 @@ validateUser.companyValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  const user = await MODEL.userModel.findById(validated.userId);
+  const user = await MODEL.collectorModel.findById(validated.userId);
   if (!user) {
     return RESPONSE.status(401).json({
       error: true,
@@ -401,7 +402,12 @@ validateUser.lcdValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if ((user.roles === "client") || (user.roles === 'company') || (user.roles === 'admin') || (user.roles === 'collector')) {
+  if (
+    user.roles === "client" ||
+    user.roles === "company" ||
+    user.roles === "admin" ||
+    user.roles === "collector"
+  ) {
     REQUEST.user = user;
     NEXT();
   } else {

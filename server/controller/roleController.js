@@ -125,7 +125,7 @@ roleController.update = async (req, res) => {
   }
 };
 
-roleController.disable = async (req, res) => {
+roleController.remove = async (req, res) => {
   bodyValidate(req, res);
   try {
     const roleId = req.params.roleId;
@@ -141,7 +141,7 @@ roleController.disable = async (req, res) => {
     // disable all users and companies using this role to prevent them gaining access to the system until their role is changed
     return res.status(200).json({
       error: false,
-      message: "Role ",
+      message: "Role deleted successfully",
     });
   } catch (error) {
     console.log(error);
