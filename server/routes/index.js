@@ -1,10 +1,10 @@
-
-'use strict';
+"use strict";
 
 /********************************
  **** Managing all the routes ***
  ********* independently ********
  ********************************/
-module.exports = function(app){
-    require("./v1")(app)
+module.exports = function (app) {
+  require("./v1")(app);
+  require("./v2")(app);
 };

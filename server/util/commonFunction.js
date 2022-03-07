@@ -7,6 +7,7 @@ const MONGOOSE = require("mongoose");
 const BCRYPT = require("bcryptjs");
 const JWT = require("jsonwebtoken");
 const randomstring = require("randomstring");
+const { validationResult } = require("express-validator");
 
 /**
  * incrypt password in case user login implementation
@@ -291,6 +292,18 @@ let messageLogs = (error, success) => {
   else console.log(`\x1b[32m` + success);
 };
 
+const checkRequestErrs = (req, res, next) => {
+  const errs = validationResult(req);
+  if (errs.isEmpty()) return next();
+  return res.status(422).jsonp(errs.array());
+};
+
+const sendResponse = (res, { statusCode, customMessage }, data, token) =>
+  res.status(statusCode).json({
+    message: customMessage,
+    data,
+    token,
+  });
 /*exporting all object from here*/
 module.exports = {
   sendError: sendError,
@@ -313,4 +326,6 @@ module.exports = {
   authToken,
   comparePassword,
   encryptPassword,
+  checkRequestErrs,
+  sendResponse,
 };
