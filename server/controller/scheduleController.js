@@ -1402,7 +1402,7 @@ scheduleController.allDeclined = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
-scheduleController.smartRoute = (REQUEST, RESPONSE) => {
+scheduleController.smartRoute = async (REQUEST, RESPONSE) => {
   const collectorID = REQUEST.query.collectorID;
 
   var need = [];
@@ -1413,10 +1413,69 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
   active_today.setMinutes(0);
   var tomorrow = new Date();
   tomorrow.setDate(new Date().getDate() + 7);
+  console.log("tomorrow", tomorrow);
+
+  // const collector = await MODEL.collectorModel.findOne({
+  //   _id: collectorID,
+  // });
+
+  // if (!collector) {
+  //   return RESPONSE.status(400).json({
+  //     error: true,
+  //     message: "collector not found",
+  //   });
+  // }
+
+  // const accessArea = collector.areaOfAccess;
+
+  // const pickupSchedule = await MODEL.scheduleModel
+  //   .find({
+  //     $and: [
+  //       {
+  //         pickUpDate: {
+  //           $gte: active_today,
+  //         },
+  //         pickUpDate: {
+  //           $lt: tomorrow,
+  //         },
+  //         completionStatus: "pending",
+  //         collectorStatus: "decline",
+  //       },
+  //     ],
+  //   })
+  //   .sort({ _id: -1 });
+
+  // console.log("schedules", pickupSchedule);
+
+  // pickupSchedule.map((schedule, index) => {
+  //   const saddress = schedule.address.split(", ");
+
+  //   for (let i = 0; i < accessArea.length; i++) {
+  //     // if (schedule.lcd === accessArea[i]) {
+  //     //   //need.push(schedule["lcd"]);
+  //     //   geofencedSchedules.push(schedule);
+  //     //   console.log(geofencedSchedules);
+  //     //   //count++;
+  //     // }
+  //     for (let j = 0; j < saddress.length; j++) {
+  //       console.log("saddress", saddress[j]);
+  //       console.log("accessArea", accessArea[i]);
+  //       // if (saddress[j].includes(accessArea[i])) {
+  //       //   //need.push(test[j]);
+  //       //   geofencedSchedules.push(schedule);
+  //       //   //count++;
+  //       // }
+
+  //       if (saddress[j] === accessArea[i]) {
+  //         geofencedSchedules.push(schedule);
+  //       }
+  //     }
+  //   }
+  // });
+  // return RESPONSE.status(200).json(geofencedSchedules);
 
   MODEL.collectorModel.findOne({ _id: collectorID }).then((collector) => {
     var accessArea = collector.areaOfAccess;
-    console.log("accessArea", accessArea);
     MODEL.scheduleModel
       .find({
         $and: [
@@ -1428,7 +1487,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
               $lt: tomorrow,
             },
             completionStatus: "pending",
-            //collectorStatus: "accept",
+            collectorStatus: "decline",
           },
         ],
       })
@@ -1461,7 +1520,7 @@ scheduleController.smartRoute = (REQUEST, RESPONSE) => {
             (x.completionStatus !== "completed" &&
               x.completionStatus !== "cancelled" &&
               x.completionStatus !== "missed") ||
-            (x.completionStatus == "pending" && x.collectorStatus == "accept")
+            (x.completionStatus == "pending" && x.collectorStatus == "decline")
         );
         const referenceSchedules = [...new Set(geoSchedules)];
         RESPONSE.jsonp(
