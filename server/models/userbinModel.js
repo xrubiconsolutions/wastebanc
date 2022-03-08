@@ -146,4 +146,4 @@ const user_Schema = new Schema({
   },
 });
 
-module.exports = MONGOOSE.model("User", user_Schema);
+module.exports = MONGOOSE.model("UserBin", user_Schema);

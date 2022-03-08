@@ -5,7 +5,7 @@ const Schema = MONGOOSE.Schema;
 
 const role_schema = new Schema({
   title: { type: String, required: true },
-  group: { type: String, required: true },
+  group: { type: String, default: "admin" },
   claims: [
     {
       claimId: { type: Schema.Types.ObjectId, ref: "claims" },

@@ -137,6 +137,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
     if (ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
     else {
       dataToSave.password = PASSWORD;
+      dataToSave.email = dataToSave.email.trim();
       var errors = {};
       MODEL.userModel
         .findOne({

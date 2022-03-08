@@ -14,8 +14,7 @@ module.exports = (APP) => {
         .isString()
         .withMessage("title must be string"),
       body("group")
-        .notEmpty()
-        .withMessage("group is required")
+        .optional({ default: "admin" })
         .isString()
         .withMessage("group must be string"),
       body("claims").notEmpty().isArray().withMessage("cliams should be array"),

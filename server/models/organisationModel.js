@@ -8,7 +8,7 @@ const Constants = require("../util/constants");
  ************* Organisation Model or collection ***********
  **************************************************/
 
-var expiry = Date.now
+var expiry = Date.now;
 // expiry.setDate(expiry.getDate() + 365 );
 
 const organisation_Schema = new Schema({
@@ -24,7 +24,7 @@ const organisation_Schema = new Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   rcNo: {
     type: String,
@@ -37,85 +37,96 @@ const organisation_Schema = new Schema({
   phone: {
     type: Number,
     required: true,
-    unique: true
+    unique: true,
   },
-  role : {
+  roles: {
     type: String,
-    default : "company"
+    default: "company",
   },
-  licence_active: { // Licence field
+  role: {
+    type: String,
+    default: "",
+  },
+  licence_active: {
+    // Licence field
     type: Boolean,
-    default:true,
+    default: true,
   },
-  expiry_date :{
-      type: Date,
-      default: () => Date.now() + 365*24*60*60*1000
-    },
-  totalAvailable :{
+  expiry_date: {
+    type: Date,
+    default: () => Date.now() + 365 * 24 * 60 * 60 * 1000,
+  },
+  totalAvailable: {
     type: Number,
-    default: 0
+    default: 0,
   },
   totalSpent: {
     type: Number,
-    default: 0
+    default: 0,
   },
-  resetToken:{
+  resetToken: {
     type: Number,
-    default: null
+    default: null,
   },
   location: {
     type: String,
-    required: true
+    required: true,
   },
-  areaOfAccess:{
+  areaOfAccess: {
     type: [String],
-    required: true
+    required: true,
   },
   streetOfAccess: {
     type: [String],
-    default: ""
+    default: "",
   },
-  canEquivalent:{
-    type: Number
+  categories: [
+    {
+      name: { type: String },
+      price: { type: String },
+    },
+  ],
+  canEquivalent: {
+    type: Number,
   },
-  cartonEquivalent : {
-    type : Number
+  cartonEquivalent: {
+    type: Number,
   },
-  petBottleEquivalent :{
-    type: Number
+  petBottleEquivalent: {
+    type: Number,
   },
-  rubberEquivalent:{
-    type: Number
+  rubberEquivalent: {
+    type: Number,
   },
-  plasticEquivalent:{
-    type: Number
+  plasticEquivalent: {
+    type: Number,
   },
-  woodEquivalent:{
-    type: Number
+  woodEquivalent: {
+    type: Number,
   },
-  glassEquivalent:{
-    type: Number
+  glassEquivalent: {
+    type: Number,
   },
-  nylonEquivalent:{
-    type: Number
+  nylonEquivalent: {
+    type: Number,
   },
-  metalEquivalent:{
-    type: Number
+  metalEquivalent: {
+    type: Number,
   },
 
-  eWasteEquivalent : {
-    type : Number
+  eWasteEquivalent: {
+    type: Number,
   },
   tyreEquivalent: {
-    type: Number
+    type: Number,
   },
   createAt: {
     type: Date,
     default: Date.now,
   },
-  wallet : {
+  wallet: {
     type: Number,
-    default: 0
-  }
+    default: 0,
+  },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);
