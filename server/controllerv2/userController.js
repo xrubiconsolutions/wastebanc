@@ -1,9 +1,9 @@
-const scheduleModel = require("../models/scheduleModel");
+const userModel = require("../models/userModel");
 const { sendResponse } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 
-class ScheduleService {
-  static async getSchedulesWithFilter(req, res) {
+class UserService {
+  static async getClients(req, res) {
     let { page = 1, resultsPerPage = 20, start, end, state } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
@@ -11,26 +11,28 @@ class ScheduleService {
 
     const [startDate, endDate] = [new Date(start), new Date(end)];
     const criteria = {
-      createdAt: {
+      createAt: {
         $gte: startDate,
         $lt: endDate,
       },
+      roles: "client",
+      verified: true,
     };
     if (state) criteria.state = state;
 
     try {
-      // get length of schedules within given date range
-      const totalResult = await scheduleModel.countDocuments(criteria);
+      // get length of users within given date range
+      const totalResult = await userModel.countDocuments(criteria);
 
-      // get all schedules within range
-      const schedules = await scheduleModel
+      // get all users meeting all criteria
+      const users = await userModel
         .find(criteria)
         .sort({ createdAt: -1 })
         .skip((page - 1) * resultsPerPage)
         .limit(resultsPerPage);
 
       return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
-        schedules,
+        users,
         totalResult,
         page,
         resultsPerPage,
@@ -41,44 +43,39 @@ class ScheduleService {
     }
   }
 
-  static async searchSchedules(req, res) {
-    let {
-      state,
-      page = 1,
-      key,
-      completionStatus = { $ne: "" },
-      resultsPerPage = 20,
-    } = req.query;
+  static async searchClients(req, res) {
+    let { state, page = 1, key, resultsPerPage = 20 } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
     const criteria = {
+      roles: "client",
+      verified: true,
       $or: [
-        { Category: key },
-        { organisation: key },
-        { schuduleCreator: key },
-        { collectorStatus: key },
-        { client: key },
+        { username: key },
+        { cardID: key },
+        { fullName: key },
+        { gender: key },
         { phone: key },
+        { email: key },
       ],
-      completionStatus,
     };
     if (state) criteria.state = state;
 
     try {
-      // get length of schedules with completion status and provided field value
-      const totalResult = await scheduleModel.countDocuments(criteria);
+      // get length of clients with completion status and provided field value
+      const totalResult = await userModel.countDocuments(criteria);
 
-      // get schedules based on page
-      const schedules = await scheduleModel
+      // get clients based on page
+      const clients = await userModel
         .find(criteria)
         .sort({ createdAt: -1 })
         .skip((page - 1) * resultsPerPage)
         .limit(resultsPerPage);
 
       return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
-        schedules,
+        clients,
         totalResult,
         page,
         resultsPerPage,
@@ -90,4 +87,4 @@ class ScheduleService {
   }
 }
 
-module.exports = ScheduleService;
+module.exports = UserService;
