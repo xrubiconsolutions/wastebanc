@@ -21,4 +21,5 @@ module.exports = {
   locationController: require("./locationController"),
   claimController: require("./claimsController"),
   roleController: require("./roleController"),
+  userAgenciesController: require("./userAgenciesController"),
 };
