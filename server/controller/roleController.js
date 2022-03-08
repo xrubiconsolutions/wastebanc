@@ -56,9 +56,11 @@ roleController.create = async (req, res) => {
 
 roleController.roles = async (req, res) => {
   try {
-    const roles = await MODEL.roleModel.find().populate({
-      path: "cliams.claim",
-    });
+    const roles = await MODEL.roleModel
+      .find({
+        active: true,
+      })
+      .populate("claims.claimId", "title");
 
     return res.status(200).json({
       error: false,
@@ -78,13 +80,13 @@ roleController.getRole = async (req, res) => {
   bodyValidate(req, res);
   try {
     const roleId = req.params.roleId;
-    const role = await MODEL.roleModel.findById(roleId).populate({
-      path: "cliams.claim",
-    });
+    const role = await MODEL.roleModel
+      .findById(roleId)
+      .populate("claims.claimId", "title");
     if (!role) {
       return res.status(400).json({
         error: true,
-        message: "",
+        message: "Role not found",
       });
     }
 
@@ -111,11 +113,22 @@ roleController.update = async (req, res) => {
     if (!role) {
       return res.status(400).json({
         error: true,
-        message: "",
+        message: "Role not found",
       });
     }
 
-    const update = await MODEL.roleModel.updateOne({ _id: role._id }, body);
+    const update = await MODEL.roleModel.updateOne({ _id: role._id }, body, {
+      new: true,
+    });
+    console.log(update);
+    role.title = body.title || role.body;
+    role.group = body.group || role.group;
+    role.claims = body.claims || role.claims;
+    return res.status(200).json({
+      error: false,
+      message: "Role updated successfully",
+      data: role,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -130,7 +143,7 @@ roleController.remove = async (req, res) => {
   try {
     const roleId = req.params.roleId;
     const remove = await MODEL.roleModel.findByIdAndDelete(roleId);
-
+    console.log(remove);
     if (!remove) {
       return res.status(400).json({
         error: true,

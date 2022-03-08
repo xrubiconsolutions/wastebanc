@@ -18,7 +18,7 @@ module.exports = (APP) => {
         .withMessage("group is required")
         .isString()
         .withMessage("group must be string"),
-      body("cliams").notEmpty().isArray().withMessage("cliams should be array"),
+      body("claims").notEmpty().isArray().withMessage("cliams should be array"),
     ],
     controller.roleController.create
   );
