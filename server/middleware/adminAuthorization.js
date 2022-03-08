@@ -33,10 +33,11 @@ async function AuthTokenVerify(req, res, next, canPass) {
   const token = req.headers.authorization.split(" ")[1];
 
   try {
-    const { userId, exp } = jwt.verify(
+    const { _id: userId, exp } = jwt.verify(
       token.trim(),
       CONSTANTS.SERVER.JWT_SECRET_KEY
     );
+
     console.log("user id", userId);
     console.log("expire in", exp);
 
