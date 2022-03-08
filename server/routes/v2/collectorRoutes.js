@@ -1,18 +1,18 @@
-const ScheduleService = require("../../controllerv2/scheduleController.js");
+const CollectorService = require("../../controllerv2/collectorController.js");
 const { userValidation } = require("../../util/auth");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 const commonValidator = require("../../validators/commonValidator.js");
 
 module.exports = (APP) => {
-  APP.route("/api/v2/schedules").get(
+  APP.route("/api/v2/collectors").get(
     commonValidator.filter,
     checkRequestErrs,
-    ScheduleService.getSchedulesWithFilter
+    CollectorService.getCollectors
   );
 
-  APP.route("/api/v2/schedules/search").get(
+  APP.route("/api/v2/collectors/search").get(
     commonValidator.search,
     checkRequestErrs,
-    ScheduleService.searchSchedules
+    CollectorService.searchCollectors
   );
 };

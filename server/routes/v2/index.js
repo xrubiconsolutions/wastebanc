@@ -8,4 +8,5 @@
 module.exports = function (app) {
   require("./scheduleRoutes.js")(app);
   require("./userRoutes.js")(app);
+  require("./collectorRoutes.js")(app);
 };
