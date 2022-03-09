@@ -19,4 +19,5 @@ module.exports = function (app) {
   require("./locationRoute")(app);
   require("./claimRoute")(app);
   require("./roleRoute")(app);
+  require("./activitesRoute")(app);
 };
