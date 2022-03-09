@@ -3,6 +3,7 @@
 let agenciesController = {};
 const MODEL = require("../models");
 const COMMON_FUN = require("../util/commonFunction");
+const mongodb = require("mongodb");
 
 const { validationResult, body } = require("express-validator");
 
@@ -39,7 +40,7 @@ agenciesController.create = async (req, res) => {
     }
 
     const role = await MODEL.roleModel.findOne({
-      title: body.title,
+      _id: new mongodb.ObjectId(body.role),
       active: true,
     });
     if (!role) {
@@ -52,9 +53,8 @@ agenciesController.create = async (req, res) => {
     const agency = await MODEL.userModel.create({
       countries: body.counties,
       states: body.states,
-      address: null,
       username: body.name.trim(),
-      role: role.title,
+      role: role._id,
       roles: role.group,
       email: body.email,
       password: await COMMON_FUN.encryptPassword("1234567"),

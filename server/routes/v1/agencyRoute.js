@@ -14,6 +14,21 @@ module.exports = (APP) => {
         .isString()
         .withMessage("name should be string"),
       body("email").notEmpty().withMessage("email is required"),
+      body("countries")
+        .notEmpty()
+        .withMessage("countries is required")
+        .isArray()
+        .withMessage("countries should be array"),
+      body("states")
+        .notEmpty()
+        .withMessage("states is required")
+        .isArray()
+        .withMessage("states should be array"),
+      body("role")
+        .notEmpty()
+        .withMessage("role is required")
+        .isString()
+        .withMessage("role should be string"),
     ],
     controller.userAgenciesController.create
   );
