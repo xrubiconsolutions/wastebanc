@@ -2609,6 +2609,7 @@ userController.adminLogin = async (req, res) => {
         othernames: user.othernames,
         address: user.address,
         roles: user.roles,
+        displayRole: user.displayRole,
         countryCode: user.countryCode,
         verified: user.verified,
         availablePoints: user.availablePoints,

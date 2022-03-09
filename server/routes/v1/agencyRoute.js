@@ -42,12 +42,12 @@ module.exports = (APP) => {
     [param("agencyId").notEmpty().withMessage("agencyId is required")],
     controller.userAgenciesController.findAgencies
   );
-  APP.route("/app/user/agencies/update/:agencyId").put(
+  APP.route("/api/user/agencies/update/:agencyId").put(
     auth.adminPakamValidation,
     [param("agencyId").notEmpty().withMessage("agencyId is required")],
     controller.userAgenciesController.updateAgencies
   );
-  APP.route("/app/user/agencies/remove/:agencyId").delete(
+  APP.route("/api/user/agencies/remove/:agencyId").delete(
     auth.adminPakamValidation,
     [param("agencyId").notEmpty().withMessage("agencyId is required")],
     controller.userAgenciesController.remove

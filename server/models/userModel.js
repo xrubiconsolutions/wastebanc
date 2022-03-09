@@ -63,6 +63,10 @@ const user_Schema = new Schema({
     type: String,
     default: "",
   },
+  displayRole: {
+    type: String,
+    default: "",
+  },
 
   roles: {
     type: String,
