@@ -200,4 +200,21 @@ locationController.remove = async (req, res) => {
     });
   }
 };
+
+locationController.worldlocations = async (req, res) => {
+  try {
+    const locations = await MODEL.worldlocationModel.find({});
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: locations,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
 module.exports = locationController;

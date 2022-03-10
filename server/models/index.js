@@ -30,4 +30,5 @@ module.exports = {
   roleModel: require("./roleModel"),
   userBinModel: require("./userbinModel"),
   activitesModel: require("./activitiesModel"),
+  worldlocationModel: require("./worldLocationModel"),
 };

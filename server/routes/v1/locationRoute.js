@@ -42,4 +42,8 @@ module.exports = (APP) => {
     [param("locationId").notEmpty().withMessage("locationId is required")],
     controller.locationController.remove
   );
+
+  APP.route("/api/world/locations").get(
+    controller.locationController.worldlocations
+  );
 };
