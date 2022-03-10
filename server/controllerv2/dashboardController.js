@@ -40,7 +40,7 @@ dashboardController.cardMapData = async (req, res) => {
     const [startDate, endDate] = [new Date(start), new Date(end)];
     console.log("startDate", startDate);
     console.log("endDate", endDate);
-    const criteria = {
+    let criteria = {
       createdAt: {
         $gte: startDate,
         $lt: endDate,
@@ -50,6 +50,8 @@ dashboardController.cardMapData = async (req, res) => {
 
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
+    const totalPayment = await totalpayout(criteria);
+    const totalOutstanding = await totaloutstanding(criteria);
     const totalDropOff = await dropOffs(criteria);
     const totalMissed = await missed(criteria);
     const totalCompleted = await completed(criteria);
@@ -66,6 +68,8 @@ dashboardController.cardMapData = async (req, res) => {
         totalCompleted,
         totalDropOff,
         totalWastes,
+        totalPayment,
+        totalOutstanding,
       },
     });
   } catch (error) {
@@ -85,7 +89,7 @@ dashboardController.companyCardMapData = async (req, res) => {
     const [startDate, endDate] = [new Date(start), new Date(end)];
     const { companyName: organisation } = req.user;
 
-    const criteria = {
+    let criteria = {
       createdAt: {
         $gte: startDate,
         $lt: endDate,
@@ -374,5 +378,25 @@ const totalWaste = async (criteria) => {
     .reduce((acc, curr) => acc + curr, 0);
 
   return totalWastes;
+};
+
+const totalpayout = async (criteria) => {
+  criteria.paid = true;
+  console.log("total payout", criteria);
+  const transactions = await transactionModel.find(criteria);
+  const totalpayouts = transactions
+    .map((x) => x.coin)
+    .reduce((acc, curr) => acc + curr, 0);
+  return totalpayouts;
+};
+
+const totaloutstanding = async (criteria) => {
+  criteria.paid = false;
+  console.log("total out", criteria);
+  const transactions = await transactionModel.find(criteria);
+  const totalpayouts = transactions
+    .map((x) => x.coin)
+    .reduce((acc, curr) => acc + curr, 0);
+  return totalpayouts;
 };
 module.exports = dashboardController;

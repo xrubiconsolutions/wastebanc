@@ -1,6 +1,6 @@
 const dashboardController = require("../../controllerv2/dashboardController.js");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
-const { adminPakamValidation } = require("../../util/auth");
+const { adminPakamValidation, recyclerValidation } = require("../../util/auth");
 const { body, query, check, param } = require("express-validator");
 const { filter: dateCheck } = require("../../validators/commonValidator");
 
@@ -14,7 +14,7 @@ module.exports = (APP) => {
     dashboardController.cardMapData
   );
   APP.route("/api/v2/dashboard/company/matrix").get(
-    auth.recyclerValidation,
+    recyclerValidation,
     dateCheck,
     dashboardController.companyCardMapData
   );
