@@ -12,4 +12,9 @@ module.exports = (APP) => {
     ],
     dashboardController.cardMapData
   );
+
+  APP.route("/api/v2/dashboard/recentpickup").get(
+    auth.adminPakamValidation,
+    dashboardController.recentPickups
+  );
 };
