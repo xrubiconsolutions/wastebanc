@@ -57,7 +57,7 @@ class ScheduleService {
       $or: [
         { Category: key },
         { organisation: key },
-        { scheduleCreator: key },
+        { schuduleCreator: key },
         { collectorStatus: key },
         { client: key },
         { phone: key },

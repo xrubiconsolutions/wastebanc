@@ -14,6 +14,21 @@ module.exports = (APP) => {
         .isString()
         .withMessage("name should be string"),
       body("email").notEmpty().withMessage("email is required"),
+      body("countries")
+        .notEmpty()
+        .withMessage("countries is required")
+        .isArray()
+        .withMessage("countries should be array"),
+      body("states")
+        .notEmpty()
+        .withMessage("states is required")
+        .isArray()
+        .withMessage("states should be array"),
+      body("role")
+        .notEmpty()
+        .withMessage("role is required")
+        .isString()
+        .withMessage("role should be string"),
     ],
     controller.userAgenciesController.create
   );
@@ -27,12 +42,12 @@ module.exports = (APP) => {
     [param("agencyId").notEmpty().withMessage("agencyId is required")],
     controller.userAgenciesController.findAgencies
   );
-  APP.route("/app/user/agencies/update/:agencyId").put(
+  APP.route("/api/user/agencies/update/:agencyId").put(
     auth.adminPakamValidation,
     [param("agencyId").notEmpty().withMessage("agencyId is required")],
     controller.userAgenciesController.updateAgencies
   );
-  APP.route("/app/user/agencies/remove/:agencyId").delete(
+  APP.route("/api/user/agencies/remove/:agencyId").delete(
     auth.adminPakamValidation,
     [param("agencyId").notEmpty().withMessage("agencyId is required")],
     controller.userAgenciesController.remove

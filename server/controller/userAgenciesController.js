@@ -3,6 +3,7 @@
 let agenciesController = {};
 const MODEL = require("../models");
 const COMMON_FUN = require("../util/commonFunction");
+const mongodb = require("mongodb");
 
 const { validationResult, body } = require("express-validator");
 
@@ -30,6 +31,7 @@ agenciesController.create = async (req, res) => {
   bodyValidate(req, res);
   try {
     const body = req.body;
+    console.log("body", body);
     const user = await MODEL.userModel.findOne({ email: body.email.trim() });
     if (user) {
       return res.status(400).json({
@@ -39,7 +41,7 @@ agenciesController.create = async (req, res) => {
     }
 
     const role = await MODEL.roleModel.findOne({
-      title: body.title,
+      _id: new mongodb.ObjectId(body.role),
       active: true,
     });
     if (!role) {
@@ -49,16 +51,31 @@ agenciesController.create = async (req, res) => {
       });
     }
 
+    const checkPhone = await MODEL.roleModel.findOne({
+      phone: body.phone,
+    });
+
+    if (checkPhone) {
+      return res.status(400).json({
+        error: true,
+        message: "Phone number already exist",
+      });
+    }
+
+    const password = body.email.split("@");
+    console.log(password[0]);
+
     const agency = await MODEL.userModel.create({
-      countries: body.counties,
+      countries: body.countries,
       states: body.states,
-      address: null,
       username: body.name.trim(),
-      role: role.title,
+      role: role._id,
+      displayRole: role.title,
       roles: role.group,
       email: body.email,
-      password: await COMMON_FUN.encryptPassword("1234567"),
+      password: await COMMON_FUN.encryptPassword(password[0]),
       verified: true,
+      phone: body.phone,
     });
 
     await MODEL.userModel.updateOne(
@@ -71,7 +88,15 @@ agenciesController.create = async (req, res) => {
     return res.status(200).json({
       error: false,
       message: "User agency created successfully",
-      data: agency,
+      data: {
+        name: agency.username,
+        countries: agency.countries,
+        states: agency.states,
+        role: agency.displayRole,
+        roles: agency.roles,
+        email: agency.email,
+        phone: agency.phone,
+      },
     });
   } catch (error) {
     console.log(error);
@@ -85,9 +110,11 @@ agenciesController.create = async (req, res) => {
 agenciesController.getAgencies = async (req, res) => {
   bodyValidate(req, res);
   try {
-    const agencies = await MODEL.userModel.find({
-      roles: "admin",
-    });
+    const agencies = await MODEL.userModel
+      .find({
+        roles: "admin",
+      })
+      .sort({ _id: -1 });
 
     return res.status(200).json({
       error: false,
@@ -119,7 +146,15 @@ agenciesController.findAgencies = async (req, res) => {
     return res.status(200).json({
       error: false,
       message: "User found",
-      data: agency,
+      data: {
+        name: agency.username,
+        countries: agency.countries,
+        states: agency.states,
+        role: agency.displayRole,
+        roles: agency.roles,
+        email: agency.email,
+        phone: agency.phone,
+      },
     });
   } catch (error) {
     console.log(error);
@@ -161,10 +196,10 @@ agenciesController.updateAgencies = async (req, res) => {
       role = agency.role;
       roles = agency.group;
     }
-    const update = await MODEL.userMode.updateOne(
+    const update = await MODEL.userModel.updateOne(
       { _id: agency._id },
       {
-        username: body.name || agency.name,
+        username: body.name || agency.userrname,
         email: body.email || agency.email,
         countries: body.countries || agency.countries,
         states: body.states || agency.states,
@@ -173,6 +208,14 @@ agenciesController.updateAgencies = async (req, res) => {
         status: body.status || agency.status,
       }
     );
+
+    agency.username = body.name || agency.name;
+    agency.email = body.email || agency.email;
+    agency.countries = body.countries || agency.countries;
+    agency.states = body.states || agency.states;
+    agency.role = body.role || agency.role;
+    agency.roles = body.roles || agency.roles;
+    agency.status = body.status || agency.status;
 
     if (!update) {
       return res.status(400).json({
@@ -184,6 +227,15 @@ agenciesController.updateAgencies = async (req, res) => {
     return res.status(200).json({
       error: false,
       message: "User updated successfully",
+      data: {
+        name: agency.username,
+        countries: agency.countries,
+        states: agency.states,
+        role: agency.displayRole,
+        roles: agency.roles,
+        email: agency.email,
+        phone: agency.phone,
+      },
     });
   } catch (error) {
     console.log(error);
@@ -206,13 +258,6 @@ agenciesController.remove = async (req, res) => {
       });
     }
 
-    const moveToBin = await MODEL.userBinModel.create(agency);
-    if (!moveToBin) {
-      return res.status(400).json({
-        error: true,
-        message: "An error occurred",
-      });
-    }
     await MODEL.userModel.deleteOne({ _id: agency._id });
     return res.status(200).json({
       error: false,

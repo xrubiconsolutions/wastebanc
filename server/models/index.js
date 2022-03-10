@@ -29,4 +29,5 @@ module.exports = {
   claimsModel: require("./claimsModel"),
   roleModel: require("./roleModel"),
   userBinModel: require("./userbinModel"),
+  activitesModel: require("./activitiesModel"),
 };

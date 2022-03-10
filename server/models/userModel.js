@@ -49,8 +49,6 @@ const user_Schema = new Schema({
   },
   phone: {
     type: String,
-    required: true,
-    unique: true,
   },
   password: {
     type: String,
@@ -62,6 +60,10 @@ const user_Schema = new Schema({
   },
 
   role: {
+    type: String,
+    default: "",
+  },
+  displayRole: {
     type: String,
     default: "",
   },
