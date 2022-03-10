@@ -75,6 +75,52 @@ dashboardController.cardMapData = async (req, res) => {
   }
 };
 
+dashboardController.companyCardMapData = async (req, res) => {
+  bodyValidate(req, res);
+
+  try {
+    const { start, end, state } = req.query;
+    const [startDate, endDate] = [new Date(start), new Date(end)];
+    const { companyName: organisation } = req.user;
+
+    const criteria = {
+      createdAt: {
+        $gte: startDate,
+        $lt: endDate,
+      },
+      organisation,
+    };
+    if (state) criteria.state = state;
+
+    const schedules = await allSchedules(criteria);
+    const totalWastes = await totalWaste(criteria);
+    const totalDropOff = await dropOffs(criteria);
+    const totalMissed = await missed(criteria);
+    const totalCompleted = await completed(criteria);
+    const totalPending = await pending(criteria);
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        schedules,
+        totalPending,
+        totalMissed,
+        totalPending,
+        totalCompleted,
+        totalDropOff,
+        totalWastes,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 dashboardController.recentPickups = async (req, res) => {
   bodyValidate(req, res);
   try {

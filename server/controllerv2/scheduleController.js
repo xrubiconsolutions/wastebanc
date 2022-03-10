@@ -94,8 +94,8 @@ class ScheduleService {
     let {
       page = 1,
       resultsPerPage = 20,
-      start = "",
-      end = "",
+      start,
+      end,
       completionStatus = { $ne: "" },
       key,
     } = req.query;
@@ -133,8 +133,6 @@ class ScheduleService {
           organisation,
           completionStatus,
         };
-
-    console.log("The company name is: ", organisation);
 
     try {
       // get length of schedules with criteria
