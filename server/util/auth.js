@@ -181,7 +181,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  const user = await MODEL.collectorModel.findById(validated.userId);
+  const user = await MODEL.organisationModel.findById(validated.userId);
   console.log("user", user);
   if (!user) {
     return RESPONSE.status(401).json({
@@ -199,7 +199,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.roles === "collector") {
+  if (user.roles === "company") {
     REQUEST.user = user;
     NEXT();
   } else {

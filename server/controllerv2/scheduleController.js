@@ -88,6 +88,56 @@ class ScheduleService {
       sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
     }
   }
+
+  static async getCompanySchedules(req, res) {
+    const { companyName: organisation } = req.user;
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      start,
+      end,
+      state,
+      completionStatus = { $ne: "" },
+    } = req.query;
+
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    const [startDate, endDate] = [new Date(start), new Date(end)];
+    const criteria = {
+      createdAt: {
+        $gte: startDate,
+        $lt: endDate,
+      },
+      organisation: "RecyclePoints Limited",
+      completionStatus,
+    };
+    if (state) criteria.state = state;
+
+    console.log("The company name is: ", organisation);
+
+    try {
+      // get length of schedules with completion status and provided field value
+      const totalResult = await scheduleModel.countDocuments(criteria);
+
+      const compnaySchedules = await scheduleModel
+        .find(criteria)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
+        compnaySchedules,
+        totalResult,
+        page,
+        resultsPerPage,
+      });
+    } catch (error) {
+      console.log(error);
+      sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+    }
+  }
 }
 
 module.exports = ScheduleService;
