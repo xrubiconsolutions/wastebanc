@@ -57,10 +57,10 @@ class ScheduleService {
       $or: [
         { Category: key },
         { organisation: key },
-        { schuduleCreator: key },
         { collectorStatus: key },
         { client: key },
         { phone: key },
+        { scheduleCreator: key },
       ],
       completionStatus,
     };
@@ -79,6 +79,75 @@ class ScheduleService {
 
       return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
         schedules,
+        totalResult,
+        page,
+        resultsPerPage,
+      });
+    } catch (error) {
+      console.log(error);
+      sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+    }
+  }
+
+  static async getCompanySchedules(req, res) {
+    const { companyName: organisation } = req.user;
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      start = "",
+      end = "",
+      completionStatus = { $ne: "" },
+      key,
+    } = req.query;
+
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    // return error if neither date range nor search key is provided
+    if (!key && (!start || !end))
+      return sendResponse(res, {
+        statusCode: 422,
+        customMessage: "Supply a date range (start and end) or key to search",
+      });
+
+    const [startDate, endDate] = [new Date(start), new Date(end)];
+    const criteria = key
+      ? {
+          $or: [
+            { Category: key },
+            { organisation: key },
+            { collectorStatus: key },
+            { client: key },
+            { phone: key },
+            { scheduleCreator: key },
+          ],
+          completionStatus,
+          organisation,
+        }
+      : {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          organisation,
+          completionStatus,
+        };
+
+    console.log("The company name is: ", organisation);
+
+    try {
+      // get length of schedules with criteria
+      const totalResult = await scheduleModel.countDocuments(criteria);
+
+      const companySchedules = await scheduleModel
+        .find(criteria)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
+        companySchedules,
         totalResult,
         page,
         resultsPerPage,
