@@ -20,7 +20,6 @@ module.exports = (APP) => {
 
   APP.route("/api/v2/company-schedules/").get(
     recyclerValidation,
-    commonValidator.filter,
     checkRequestErrs,
     ScheduleService.getCompanySchedules
   );
