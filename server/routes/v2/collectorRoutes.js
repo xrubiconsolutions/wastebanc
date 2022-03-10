@@ -8,7 +8,7 @@ module.exports = (APP) => {
   APP.route("/api/v2/collectors").get(
     auth.adminPakamValidation,
     commonValidator.filter,
-    checkRequestErrs,
+    //checkRequestErrs,
     CollectorService.getCollectors
   );
 

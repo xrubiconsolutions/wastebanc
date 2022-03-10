@@ -1,20 +1,21 @@
 const UserService = require("../../controllerv2/userController.js");
-const adminAuthorization = require("../../middleware/adminAuthorization.js");
+
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 const commonValidator = require("../../validators/commonValidator.js");
+const { adminPakamValidation } = require("../../util/auth");
 
 module.exports = (APP) => {
   APP.route("/api/v2/clients").get(
-    adminAuthorization(),
-    commonValidator.filter,
-    checkRequestErrs,
+    adminPakamValidation,
+    // commonValidator.filter,
+    // checkRequestErrs,
     UserService.getClients
   );
 
   APP.route("/api/v2/clients/search").get(
-    adminAuthorization(),
-    commonValidator.search,
-    checkRequestErrs,
+    adminPakamValidation,
+    // commonValidator.search,
+    // checkRequestErrs,
     UserService.searchClients
   );
 };

@@ -3,6 +3,7 @@ const {
   scheduleDropModel,
   transactionModel,
   userModel,
+  collectorModel,
 } = require("../models");
 
 const { sendResponse } = require("../util/commonFunction");
@@ -164,13 +165,86 @@ dashboardController.newUsers = async (req, res) => {
     if (key) {
       criteria = {
         $or: [
-          { Category: key },
-          { organisation: key },
-          { schuduleCreator: key },
-          { collectorStatus: key },
-          { client: key },
+          { username: key },
+          { cardID: key },
+          { fullName: key },
+          { gender: key },
           { phone: key },
-          { completionStatus: key },
+          { email: key },
+        ],
+        roles: "client",
+      };
+    } else {
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+        roles: "client",
+      };
+    }
+    if (state) criteria.state = state;
+
+    const totalResult = await userModel.countDocuments(criteria);
+
+    const projection = {
+      roles: 0,
+      password: 0,
+    };
+
+    const users = await userModel
+      .find(criteria, projection, { lean: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        users,
+        totalResult,
+        page,
+        resultsPerPage,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+dashboardController.newAggregators = async (req, res) => {
+  try {
+    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    if (!key) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
+    }
+
+    let criteria;
+    if (key) {
+      criteria = {
+        $or: [
+          { fullname: key },
+          { gender: key },
+          { phone: key },
+          { email: key },
+          { localGovernment: key },
+          { organisation: key },
+          { IDNumber: key },
         ],
       };
     } else {
@@ -184,10 +258,15 @@ dashboardController.newUsers = async (req, res) => {
     }
     if (state) criteria.state = state;
 
-    const totalResult = await userModel.countDocuments(criteria);
+    const totalResult = await collectorModel.countDocuments(criteria);
 
-    const users = await userModel
-      .find(criteria)
+    const projection = {
+      roles: 0,
+      password: 0,
+    };
+    // get collectors based on page
+    const collectors = await collectorModel
+      .find(criteria, projection, { lean: true })
       .sort({ createdAt: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);
@@ -196,7 +275,7 @@ dashboardController.newUsers = async (req, res) => {
       error: false,
       message: "success",
       data: {
-        users,
+        collectors,
         totalResult,
         page,
         resultsPerPage,
