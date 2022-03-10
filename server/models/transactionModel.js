@@ -38,7 +38,7 @@ const transaction_Schema = {
   },
   requestedForPayment: {
     type: Boolean,
-    default: false
+    default: false,
   },
   Category: {
     type: String,
@@ -57,16 +57,16 @@ const transaction_Schema = {
   },
   paymentResolution: {
     type: String,
-    enum: ['charity', 'gain'],
-    default: 'gain'
+    enum: ["charity", "gain"],
+    default: "gain",
   },
   aggregatorId: {
     type: String,
-    default: ""
+    default: "",
   },
-  organisation : {
-    type: String
-  }
+  organisation: {
+    type: String,
+  },
 };
 
 module.exports = MONGOOSE.model("transaction", transaction_Schema);

@@ -48,7 +48,7 @@ locationController.create = async (req, res) => {
 
     const location = await MODEL.locationModel.create({
       country: body.country,
-      state: body.states,
+      states: body.states,
     });
 
     return res.status(200).json({
