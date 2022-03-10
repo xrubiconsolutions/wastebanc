@@ -2,6 +2,7 @@ const {
   scheduleModel,
   scheduleDropModel,
   transactionModel,
+  userModel,
 } = require("../models");
 
 const { sendResponse } = require("../util/commonFunction");
@@ -76,7 +77,6 @@ dashboardController.cardMapData = async (req, res) => {
 };
 
 dashboardController.recentPickups = async (req, res) => {
-  bodyValidate(req, res);
   try {
     let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
@@ -91,14 +91,6 @@ dashboardController.recentPickups = async (req, res) => {
         });
       }
     }
-
-    // const criteria = {
-    //   createdAt: {
-    //     $gte: startDate,
-    //     $lt: endDate,
-    //   },
-    // };
-    //if (state) criteria.state = state;
 
     let criteria;
     if (key) {
@@ -138,6 +130,73 @@ dashboardController.recentPickups = async (req, res) => {
       message: "success",
       data: {
         schedules,
+        totalResult,
+        page,
+        resultsPerPage,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+dashboardController.newUsers = async (req, res) => {
+  try {
+    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    if (!key) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
+    }
+
+    let criteria;
+    if (key) {
+      criteria = {
+        $or: [
+          { Category: key },
+          { organisation: key },
+          { schuduleCreator: key },
+          { collectorStatus: key },
+          { client: key },
+          { phone: key },
+          { completionStatus: key },
+        ],
+      };
+    } else {
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+      };
+    }
+    if (state) criteria.state = state;
+
+    const totalResult = await userModel.countDocuments(criteria);
+
+    const users = await userModel
+      .find(criteria)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        users,
         totalResult,
         page,
         resultsPerPage,

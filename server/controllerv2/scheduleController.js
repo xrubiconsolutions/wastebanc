@@ -4,22 +4,55 @@ const { STATUS_MSG } = require("../util/constants");
 
 class ScheduleService {
   static async getSchedulesWithFilter(req, res) {
-    let { page = 1, resultsPerPage = 20, start, end, state } = req.query;
-    if (typeof page === "string") page = parseInt(page);
-    if (typeof resultsPerPage === "string")
-      resultsPerPage = parseInt(resultsPerPage);
-
-    const [startDate, endDate] = [new Date(start), new Date(end)];
-    const criteria = {
-      createdAt: {
-        $gte: startDate,
-        $lt: endDate,
-      },
-    };
-    if (state) criteria.state = state;
-
     try {
-      // get length of schedules within given date range
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        start,
+        end,
+        state,
+        key,
+        completionStatus = { $ne: "" },
+      } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      if (!key) {
+        if (!start || !end) {
+          return res.status(400).json({
+            error: true,
+            message: "Please pass a start and end date",
+          });
+        }
+      }
+
+      let criteria;
+      if (key) {
+        criteria = {
+          $or: [
+            { Category: key },
+            { organisation: key },
+            { schuduleCreator: key },
+            { collectorStatus: key },
+            { client: key },
+            { phone: key },
+            { completionStatus: key },
+          ],
+          completionStatus,
+        };
+      } else {
+        const [startDate, endDate] = [new Date(start), new Date(end)];
+        criteria = {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          completionStatus,
+        };
+      }
+      if (state) criteria.state = state;
+
       const totalResult = await scheduleModel.countDocuments(criteria);
 
       // get all schedules within range
@@ -29,16 +62,54 @@ class ScheduleService {
         .skip((page - 1) * resultsPerPage)
         .limit(resultsPerPage);
 
-      return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
-        schedules,
-        totalResult,
-        page,
-        resultsPerPage,
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          schedules,
+          totalResult,
+          page,
+          resultsPerPage,
+        },
       });
     } catch (error) {
       console.log(error);
-      sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
     }
+
+    // const [startDate, endDate] = [new Date(start), new Date(end)];
+    // const criteria = {
+    //   createdAt: {
+    //     $gte: startDate,
+    //     $lt: endDate,
+    //   },
+    // };
+    // if (state) criteria.state = state;
+
+    // try {
+    //   // get length of schedules within given date range
+    //   const totalResult = await scheduleModel.countDocuments(criteria);
+
+    //   // get all schedules within range
+    //   const schedules = await scheduleModel
+    //     .find(criteria)
+    //     .sort({ createdAt: -1 })
+    //     .skip((page - 1) * resultsPerPage)
+    //     .limit(resultsPerPage);
+
+    //   return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
+    //     schedules,
+    //     totalResult,
+    //     page,
+    //     resultsPerPage,
+    //   });
+    // } catch (error) {
+    //   console.log(error);
+    //   sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+    // }
   }
 
   static async searchSchedules(req, res) {
