@@ -2594,6 +2594,13 @@ userController.adminLogin = async (req, res) => {
       });
     }
 
+    if (user.status && user.status === "disable") {
+      return res.status(401).json({
+        error: true,
+        message: "Account disabled, Please contact support team",
+      });
+    }
+
     const claims = await MODEL.roleModel.findById(user.role).populate({
       path: "claims.claimId",
       populate: {
@@ -2665,7 +2672,7 @@ userController.adminLogin = async (req, res) => {
 userController.sendTokenAdmin = async (req, res) => {
   bodyValidate(req, res);
   try {
-    const resetToken = COMMON_FUN.generateRandomString();
+    const resetToken = COMMON_FUN.generateRandomString(4);
     const email = req.body.email;
     const user = await MODEL.userModel.findOne({
       email,
@@ -2678,10 +2685,13 @@ userController.sendTokenAdmin = async (req, res) => {
       });
     }
 
-    await MODEL.userModel.updateOne({ _id: user._id }, {
-      resetToken,
-      resetTimeOut: moment().add(3, 'hours')
-    });
+    await MODEL.userModel.updateOne(
+      { _id: user._id },
+      {
+        resetToken,
+        resetTimeOut: moment().add(3, "hours"),
+      }
+    );
 
     const emailTemplate = passwordResetTemplate(user, resetToken);
 
@@ -2711,5 +2721,48 @@ userController.sendTokenAdmin = async (req, res) => {
     });
   }
 };
+
+userController.confirmToken = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const token = req.body.token;
+    //const current = Date.now();
+    const user = await MODEL.userModel.findOne({
+      resetToken: token,
+      resetTimeOut: {
+        $lt: new Date(),
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Token time out",
+      });
+    }
+
+    await MODEL.userModel.updateOne(
+      { _id: user._id },
+      {
+        resetToken: "",
+        resetTimout: "",
+      }
+    );
+
+    return res.status(200).json({
+      error: false,
+      message: "token confirmed successfull",
+      data: {
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: "An error occurred",
+    });
+  }
+};
+
 /* export userControllers */
 module.exports = userController;

@@ -294,7 +294,9 @@ validateUser.adminPakamValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   const user = await MODEL.userModel.findById(validated.userId);
+  console.log("user", user);
   if (!user) {
+    console.log("here");
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -302,10 +304,10 @@ validateUser.adminPakamValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.status === "disabled") {
+  if (user.status === "disable") {
     return RESPONSE.status(401).json({
       error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+      message: "Account disabled, Please contact support team",
       statusCode: 403,
     });
   }
@@ -314,6 +316,7 @@ validateUser.adminPakamValidation = async (REQUEST, RESPONSE, NEXT) => {
     REQUEST.user = user;
     NEXT();
   } else {
+    console.log('here');
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,

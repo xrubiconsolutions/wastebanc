@@ -51,9 +51,11 @@ agenciesController.create = async (req, res) => {
       });
     }
 
-    const checkPhone = await MODEL.roleModel.findOne({
+    const checkPhone = await MODEL.userModel.findOne({
       phone: body.phone,
     });
+
+    console.log("c", checkPhone);
 
     if (checkPhone) {
       return res.status(400).json({
@@ -194,8 +196,9 @@ agenciesController.updateAgencies = async (req, res) => {
       roles = role.group;
     } else {
       role = agency.role;
-      roles = agency.group;
+      roles = agency.roles;
     }
+
     const update = await MODEL.userModel.updateOne(
       { _id: agency._id },
       {

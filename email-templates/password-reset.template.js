@@ -35,13 +35,13 @@ module.exports = (user, token) => {
          <div class="modalBackground">
             <div class="flex flex-col space-y-6 p-2">
                 <div class="flex items-center" style="margin-top: 10px;">
-                    <img src="/images/pakam-logo.svg">
+                    <img src="https://res.cloudinary.com/xrubicon/image/upload/v1647008507/pakam-logo_dvj93k.svg">
                     <div>
                       <strong style="color: green;">PAKAM</strong>
                     </div>
                     </div>
                     <hr style="margin-top: 10px"/>
-                <p>Hi ${user.username},</p>
+                <p>Hi ${user.fullname},</p>
                 <p>A password reset for your account was<br/> requested. </p>
                 <p>To reset your password, enter the code <br/> below  on the recovery password page:</p>
                 <span><strong> ${token}</strong></span>
