@@ -294,9 +294,8 @@ validateUser.adminPakamValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   const user = await MODEL.userModel.findById(validated.userId);
-  console.log("user", user);
+
   if (!user) {
-    console.log("here");
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -316,7 +315,7 @@ validateUser.adminPakamValidation = async (REQUEST, RESPONSE, NEXT) => {
     REQUEST.user = user;
     NEXT();
   } else {
-    console.log('here');
+    console.log("here");
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,

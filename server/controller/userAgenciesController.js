@@ -173,6 +173,8 @@ agenciesController.updateAgencies = async (req, res) => {
     const body = req.body;
     const agencyId = req.params.agencyId;
     const agency = await MODEL.userModel.findById(agencyId);
+    const { user } = req;
+
     if (!agency) {
       return res.status(400).json({
         error: true,
@@ -197,6 +199,15 @@ agenciesController.updateAgencies = async (req, res) => {
     } else {
       role = agency.role;
       roles = agency.roles;
+    }
+
+    if (body.status) {
+      if (user.email === agency.email) {
+        return res.status(400).json({
+          error: true,
+          message: "Action cannot be perform",
+        });
+      }
     }
 
     const update = await MODEL.userModel.updateOne(
