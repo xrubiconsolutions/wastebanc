@@ -16,6 +16,10 @@ const { validationResult, body } = require("express-validator");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const sgMail = require("@sendgrid/mail");
+const passwordResetTemplate = require("../../email-templates/password-reset.template");
+const moment = require("moment-timezone");
+moment().tz("Africa/Lagos", false);
 
 const ustorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -2583,6 +2587,32 @@ userController.adminLogin = async (req, res) => {
       });
     }
 
+    if (!user.role) {
+      return res.status(400).json({
+        error: true,
+        message: "Assign a claim to the user",
+      });
+    }
+
+    const claims = await MODEL.roleModel.findById(user.role).populate({
+      path: "claims.claimId",
+      populate: {
+        path: "children",
+        match: { show: true },
+        populate: {
+          path: "children",
+          match: { show: true },
+        },
+      },
+    });
+
+    if (!claims) {
+      return res.status(400).json({
+        error: true,
+        message: "User role not found",
+      });
+    }
+
     if (!(await COMMON_FUN.comparePassword(req.body.password, user.password))) {
       return res.status(400).json({
         error: true,
@@ -2596,7 +2626,7 @@ userController.adminLogin = async (req, res) => {
       { last_logged_in: new Date() }
     );
     const token = COMMON_FUN.authToken(user);
-    delete user.password;
+
     return res.status(200).json({
       error: false,
       message: "Login successfull",
@@ -2619,9 +2649,61 @@ userController.adminLogin = async (req, res) => {
         lcd: user.lcd,
         last_logged_in: user.last_logged_in,
         token,
+        claims,
       },
     });
   } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server Error",
+      statusCode: 500,
+    });
+  }
+};
+
+userController.sendTokenAdmin = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const resetToken = COMMON_FUN.generateRandomString();
+    const email = req.body.email;
+    const user = await MODEL.userModel.findOne({
+      email,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: false,
+        message: "User not found",
+      });
+    }
+
+    await MODEL.userModel.updateOne({ _id: user._id }, {
+      resetToken,
+      resetTimeOut: moment().add(3, 'hours')
+    });
+
+    const emailTemplate = passwordResetTemplate(user, resetToken);
+
+    sgMail.setApiKey(
+      "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"
+    );
+
+    const msg = {
+      to: `${email}`,
+      from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+      subject: "FORGOT PASSWORD",
+      html: emailTemplate,
+    };
+
+    await sgMail.send(msg);
+
+    return res.status(200).json({
+      error: true,
+      message: "Reset token sent",
+    });
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({
       error: true,
       message: "Internal Server Error",

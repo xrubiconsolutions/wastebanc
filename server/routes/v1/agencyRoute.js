@@ -29,6 +29,11 @@ module.exports = (APP) => {
         .withMessage("role is required")
         .isString()
         .withMessage("role should be string"),
+      body("phone")
+        .notEmpty()
+        .withMessage("phone is required")
+        .isNumeric()
+        .withMessage("phone is number"),
     ],
     controller.userAgenciesController.create
   );

@@ -195,6 +195,11 @@ module.exports = (APP) => {
   APP.route("/api/v2/user/encrypt").post(
     CONTROLLER.userController.passwordEncrypt
   );
+
+  APP.route("/api/v2/user/send/reset/token").post(
+    [body("email", " email is required").isEmail()],
+    CONTROLLER.userController.sendTokenAdmin
+  );
   APP.route("/getUser").get((req, res) => {
     res.jsonp("cool");
   });

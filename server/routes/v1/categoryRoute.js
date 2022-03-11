@@ -5,6 +5,7 @@ const { body, query, check, param } = require("express-validator");
 
 module.exports = (APP) => {
   APP.route("/api/category/add").post(
+    auth.adminPakamValidation,
     [check("name", "name is required").isString()],
     CONTROLLER.categoryController.addCategory
   );
@@ -26,6 +27,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/category/:catId").delete(
+    auth.adminPakamValidation,
     [param("catId", "catId is required")],
     CONTROLLER.categoryController.deleteCategory
   );

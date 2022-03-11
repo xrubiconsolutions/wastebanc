@@ -115,46 +115,54 @@ validateUser.userCollectorData = async (REQUEST, RESPONSE, NEXT) => {
 };
 
 validateUser.companyPakamDataValidation = async (REQUEST, RESPONSE, NEXT) => {
-  if (!REQUEST.headers.authorization) {
-    return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
-  }
+  try {
+    if (!REQUEST.headers.authorization) {
+      return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    }
 
-  var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
-  console.log("valid", validated);
+    var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
+    console.log("valid", validated);
 
-  if (Date.now() >= validated.exp * 1000) {
-    return RESPONSE.status(401).json({
+    if (Date.now() >= validated.exp * 1000) {
+      return RESPONSE.status(401).json({
+        error: true,
+        message: "Token time out. Login again",
+        statusCode: 401,
+      });
+    }
+
+    const user = await MODEL.userModel.findById(validated.userId);
+    if (!user) {
+      return RESPONSE.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+
+    if (user.status === "disabled") {
+      return RESPONSE.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 401,
+      });
+    }
+
+    if (user.roles === "admin" || user.roles === "company") {
+      REQUEST.user = user;
+      NEXT();
+    } else {
+      return RESPONSE.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 401,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    RESPONSE.status(500).json({
       error: true,
-      message: "Token time out. Login again",
-      statusCode: 401,
-    });
-  }
-
-  const user = await MODEL.userModel.findById(validated.userId);
-  if (!user) {
-    return RESPONSE.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
-    });
-  }
-
-  if (user.status === "disabled") {
-    return RESPONSE.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
-    });
-  }
-
-  if (user.roles === "admin" || user.roles === "company") {
-    REQUEST.user = user;
-    NEXT();
-  } else {
-    return RESPONSE.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
+      message: "An error occurred",
     });
   }
 

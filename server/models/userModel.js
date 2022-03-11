@@ -146,6 +146,12 @@ const user_Schema = new Schema({
     type: String,
     default: "active",
   },
+  resetToken: {
+    type: String,
+  },
+  resetTimeOut: {
+    type: Date,
+  },
 });
 
 module.exports = MONGOOSE.model("User", user_Schema);
