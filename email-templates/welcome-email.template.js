@@ -163,10 +163,10 @@ module.exports = (user, password) => {
                 </p>
                 <p>
                 <div class="salute">
-                  Your Login Details <br>
+                  Your Login Details 
                 </div>
-                Your Login Details <br>
-                <strong>Email: ${user.email}</strong> <br>
+                Your Login Details 
+                <strong>Email: ${user.email}</strong> 
                  <strong> Password: ${password} </strong>
                 </p>
             </div>
