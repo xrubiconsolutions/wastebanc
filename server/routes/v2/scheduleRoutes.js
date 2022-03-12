@@ -1,7 +1,11 @@
 const ScheduleService = require("../../controllerv2/scheduleController.js");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 const commonValidator = require("../../validators/commonValidator.js");
-const { adminPakamValidation, recyclerValidation } = require("../../util/auth");
+const {
+  adminPakamValidation,
+  recyclerValidation,
+  companyPakamDataValidation,
+} = require("../../util/auth");
 
 module.exports = (APP) => {
   APP.route("/api/v2/schedules").get(
@@ -19,7 +23,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/v2/company-schedules/").get(
-    recyclerValidation,
+    companyPakamDataValidation,
     checkRequestErrs,
     ScheduleService.getCompanySchedules
   );

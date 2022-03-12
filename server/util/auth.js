@@ -131,7 +131,7 @@ validateUser.companyPakamDataValidation = async (REQUEST, RESPONSE, NEXT) => {
       });
     }
 
-    const user = await MODEL.userModel.findById(validated.userId);
+    const user = await MODEL.organisationModel.findById(validated.userId);
     if (!user) {
       return RESPONSE.status(401).json({
         error: true,
@@ -189,7 +189,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  const user = await MODEL.organisationModel.findById(validated.userId);
+  const user = await MODEL.collectorModel.findById(validated.userId);
   console.log("user", user);
   if (!user) {
     return RESPONSE.status(401).json({
