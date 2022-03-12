@@ -162,7 +162,7 @@ module.exports = (user, password) => {
                      
                 </p>
                 <p>
-                <div class="salute>
+                <div class="salute">
                   Your Login Details <br>
                 </div>
                 Your Login Details 
