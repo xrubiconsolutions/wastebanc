@@ -103,8 +103,8 @@ agenciesController.create = async (req, res) => {
       html: emailTemplate,
     };
 
-    const send = await sgMail.send(msg);
-    console.log("send", send);
+     await sgMail.send(msg);
+    //console.log("send", send);
 
     return res.status(200).json({
       error: false,
