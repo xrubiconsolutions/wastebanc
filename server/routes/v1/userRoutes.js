@@ -197,8 +197,22 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/v2/user/send/reset/token").post(
-    [body("email", " email is required").isEmail()],
+    [body("email", "email is required").isEmail()],
     CONTROLLER.userController.sendTokenAdmin
+  );
+
+  APP.route("/api/v2/user/confirm/token").post(
+    [body("token", "token is required").isString()],
+    CONTROLLER.userController.confirmToken
+  );
+
+  APP.route("/api/v2/user/password/reset").post(
+    [
+      body("email", "email is required").isEmail(),
+      body("password", "password is required").isString(),
+      body("confirmPassword", "confirmPassword is required").isString(),
+    ],
+    CONTROLLER.userController.resetPassword
   );
   APP.route("/getUser").get((req, res) => {
     res.jsonp("cool");

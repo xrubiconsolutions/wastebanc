@@ -2639,6 +2639,7 @@ userController.adminLogin = async (req, res) => {
       message: "Login successfull",
       statusCode: 200,
       data: {
+        _id: user._id,
         firstname: user.firstname,
         lastname: user.lastname,
         email: user.email,
@@ -2726,11 +2727,12 @@ userController.confirmToken = async (req, res) => {
   bodyValidate(req, res);
   try {
     const token = req.body.token;
-    //const current = Date.now();
+    const current = new Date();
+    //console.log("current", current);
     const user = await MODEL.userModel.findOne({
       resetToken: token,
       resetTimeOut: {
-        $lt: new Date(),
+        $gte: new Date(),
       },
     });
 
@@ -2745,7 +2747,7 @@ userController.confirmToken = async (req, res) => {
       { _id: user._id },
       {
         resetToken: "",
-        resetTimout: "",
+        resetTimeOut: "",
       }
     );
 
@@ -2760,6 +2762,58 @@ userController.confirmToken = async (req, res) => {
     console.log(error);
     return res.status(500).json({
       error: "An error occurred",
+    });
+  }
+};
+
+userController.resetPassword = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const body = req.body;
+    const user = await MODEL.userModel.findOne({
+      email: body.email,
+    });
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid body request",
+      });
+    }
+
+    const password = body.password.trim();
+    const confirmPassword = body.confirmPassword.trim();
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        error: true,
+        message: "Password does not match",
+      });
+    }
+
+    const hash = await COMMON_FUN.encryptPassword(password);
+
+    const update = await MODEL.userModel.updateOne(
+      { _id: user._id },
+      {
+        password: hash,
+      }
+    );
+
+    if (!update) {
+      return res.status(400).json({
+        error: true,
+        message: "Error reset password",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
     });
   }
 };
