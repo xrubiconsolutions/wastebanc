@@ -192,29 +192,32 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
   const user = await MODEL.collectorModel.findById(validated.userId);
   console.log("user", user);
   if (!user) {
+    console.log("here 1");
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
+      statusCode: 401,
     });
   }
 
-  if (user.status === "disabled") {
+  if (user.status === "disable") {
+    console.log("here 2");
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
+      statusCode: 401,
     });
   }
 
-  if (user.roles === "company") {
+  if (user.roles === "collector") {
     REQUEST.user = user;
     NEXT();
   } else {
+    console.log("here 3");
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
+      statusCode: 401,
     });
   }
   //   let status = REQUEST.headers.authorization
