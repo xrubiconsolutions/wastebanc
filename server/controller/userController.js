@@ -2472,11 +2472,13 @@ userController.totalGender = async (REQUEST, RESPONSE) => {
     const totalMales = await MODEL.userModel
       .find({
         gender: "male",
+        roles: "client",
       })
       .countDocuments();
     const totalFemales = await MODEL.userModel
       .find({
         gender: "female",
+        roles: "client",
       })
       .countDocuments();
     return RESPONSE.status(200).json({
