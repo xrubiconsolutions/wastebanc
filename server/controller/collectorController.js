@@ -524,6 +524,17 @@ collectorController.resendVerification = (REQUEST, RESPONSE) => {
   var error = {};
   var phone = REQUEST.body.phone;
 
+  const user = await MODEL.collectorModel.findOne({
+    phone,
+  });
+
+  if (!user) {
+    return RESPONSE.status(400).json({
+      error: true,
+      message: "Phone does not exist",
+    });
+  }
+
   try {
     var phoneNo = String(phone).substring(1, 11);
     var data = {

@@ -10,4 +10,5 @@ module.exports = function (app) {
   require("./userRoutes.js")(app);
   require("./collectorRoutes.js")(app);
   require("./dashboardRoutes")(app);
+  require("./dropoffRoutes")(app);
 };

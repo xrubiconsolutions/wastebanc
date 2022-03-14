@@ -373,7 +373,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
 };
 
 userController.passwordEncrypt = async (req, res) => {
-  const password = await COMMON_FUN.encryptPassword(req.body.password);
+  const password = await COMMON_FUN.encryptPassword(req.body.password.trim());
   return res.status(200).json({
     data: {
       password: req.body.password.trim(),
@@ -701,7 +701,7 @@ userController.resendVerification = async (REQUEST, RESPONSE) => {
     phone,
   });
 
-  if (!phone) {
+  if (!user) {
     return RESPONSE.status(400).json({
       error: true,
       message: "Phone does not exist",
