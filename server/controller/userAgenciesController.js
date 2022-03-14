@@ -201,6 +201,19 @@ agenciesController.updateAgencies = async (req, res) => {
       });
     }
 
+    if (body.email) {
+      const checkemail = await MODEL.userModel.findOne({
+        email: body.email,
+      });
+
+      if (checkemail && checkemail._id != agency._id) {
+        return res.status(400).json({
+          error: true,
+          message: "Email already exist",
+        });
+      }
+    }
+
     let role;
     let roles;
     if (body.role) {
@@ -209,7 +222,7 @@ agenciesController.updateAgencies = async (req, res) => {
           _id: new mongodb.ObjectId("62273fc3844f40002318c978"),
           active: true,
         },
-        { group: 0, claims: 0 }
+        { claims: 0 }
       );
       console.log("role", role);
       if (!role) {
@@ -233,6 +246,9 @@ agenciesController.updateAgencies = async (req, res) => {
         });
       }
     }
+
+    console.log("role", role);
+    console.log("roles", roles);
 
     const update = await MODEL.userModel.updateOne(
       { _id: agency._id },
