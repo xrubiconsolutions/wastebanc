@@ -206,7 +206,9 @@ agenciesController.updateAgencies = async (req, res) => {
         email: body.email,
       });
 
-      if (checkemail && checkemail._id != agency._id) {
+      console.log(checkemail);
+
+      if (checkemail && checkemail._id.toString() != agency._id.toString()) {
         return res.status(400).json({
           error: true,
           message: "Email already exist",
