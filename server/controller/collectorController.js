@@ -520,7 +520,7 @@ collectorController.verifyPhone = (REQUEST, RESPONSE) => {
 //     }
 //   })
 
-collectorController.resendVerification = (REQUEST, RESPONSE) => {
+collectorController.resendVerification = async (REQUEST, RESPONSE) => {
   var error = {};
   var phone = REQUEST.body.phone;
 
