@@ -1418,31 +1418,48 @@ scheduleController.smartRoute = async (REQUEST, RESPONSE) => {
   MODEL.collectorModel.findOne({ _id: collectorID }).then((collector) => {
     var accessArea = collector.areaOfAccess;
     MODEL.scheduleModel
-      .find({
-        $and: [
-          {
-            pickUpDate: {
-              $gte: active_today,
-            },
-            pickUpDate: {
-              $lt: tomorrow,
-            },
-            completionStatus: "pending",
-            collectorStatus: "decline",
-          },
-        ],
-      })
-      .sort({ _id: -1 })
+      // .find({
+      //   $and: [
+      //     {
+      //       pickUpDate: {
+      //         $gte: active_today,
+      //       },
+      //       pickUpDate: {
+      //         $lt: tomorrow,
+      //       },
+      //       completionStatus: "pending",
+      //       collectorStatus: "decline",
+      //     },
+      //   ],
+      // })
       .aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                pickUpDate: {
+                  $gte: active_today,
+                },
+                pickUpDate: {
+                  $lt: tomorrow,
+                },
+                completionStatus: "pending",
+                collectorStatus: "decline",
+              },
+            ],
+          },
+        },
         {
           $lookup: {
             from: "users",
             localField: "client",
             foreignField: "email",
+            //pipeline: [{ $project: { password: 0 } }],
             as: "client",
           },
         },
       ])
+      .sort({ _id: -1 })
       .then((schedules) => {
         //console.log("schedules", schedules);
         schedules.forEach((schedule, index) => {
@@ -1481,7 +1498,7 @@ scheduleController.smartRoute = async (REQUEST, RESPONSE) => {
           )
         );
       })
-      .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+      .catch((err) => RESPONSE.status(400).jsonp(err));
   });
 };
 
