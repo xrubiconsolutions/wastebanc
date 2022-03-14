@@ -103,7 +103,7 @@ agenciesController.create = async (req, res) => {
       html: emailTemplate,
     };
 
-     await sgMail.send(msg);
+    await sgMail.send(msg);
     //console.log("send", send);
 
     return res.status(200).json({
@@ -204,10 +204,14 @@ agenciesController.updateAgencies = async (req, res) => {
     let role;
     let roles;
     if (body.role) {
-      role = await MODEL.roleModel.findOne({
-        title: body.title,
-        active: true,
-      });
+      role = await MODEL.roleModel.findOne(
+        {
+          _id: new mongodb.ObjectId("62273fc3844f40002318c978"),
+          active: true,
+        },
+        { group: 0, claims: 0 }
+      );
+      console.log("role", role);
       if (!role) {
         return res.status(400).json({
           error: true,
@@ -215,6 +219,7 @@ agenciesController.updateAgencies = async (req, res) => {
         });
       }
       roles = role.group;
+      role = role._id;
     } else {
       role = agency.role;
       roles = agency.roles;
