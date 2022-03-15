@@ -1,8 +1,26 @@
 const { collectorModel } = require("../models");
-const { sendResponse } = require("../util/commonFunction");
+const { sendResponse, bodyValidate } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
+const { validationResult, body } = require("express-validator");
 
 class CollectorService {
+  static bodyValidate(req, res) {
+    const result = validationResult(req);
+
+    const hasErrors = !result.isEmpty();
+    console.log(hasErrors);
+
+    if (hasErrors) {
+      //   debugLog('user body', req.body);
+      // 2. Throw a 422 if the body is invalid
+      return res.status(422).json({
+        error: true,
+        statusCode: 422,
+        message: "Invalid body request",
+        errors: result.array({ onlyFirstError: true }),
+      });
+    }
+  }
   static async getCollectors(req, res) {
     try {
       let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
@@ -115,6 +133,69 @@ class CollectorService {
       sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
     }
   }
+
+  // static async mapCardData(req, res) {
+  //   console.log("here");
+  //   bodyValidate(req, res);
+  //   try {
+  //     const { start, end, state } = req.query;
+  //     const [startDate, endDate] = [new Date(start), new Date(end)];
+
+  //     let criteria = {
+  //       createdAt: {
+  //         $gte: startDate,
+  //         $lt: endDate,
+  //       },
+  //     };
+  //     if (state) criteria.state = state;
+
+  //     const collectors = await collectorModel.find(criteria);
+  //     const totalFemale = await this.totalFemale(criteria);
+  //     const totalMale = await this.totalMale(criteria);
+  //     const totalVerified = await this.verified(criteria);
+
+  //     return res.status(200).json({
+  //       error: false,
+  //       message: "success",
+  //       data: {
+  //         collectors,
+  //         totalCollectors: collectors.length,
+  //         totalFemale,
+  //         totalMale,
+  //         totalVerified,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     return res.status(500).json({
+  //       error: true,
+  //       message: "An error occurred",
+  //     });
+  //   }
+  // }
+
+  // static async totalMale(criteria) {
+  //   delete criteria.female;
+  //   criteria.gender = "male";
+  //   return await collectorModel.countDocuments(criteria);
+  // }
+
+  // static async totalFemale(criteria) {
+  //   delete criteria.male;
+  //   criteria.gender = "female";
+  //   return await collectorModel.countDocuments(criteria);
+  // }
+
+  // static async verified(criteria) {
+  //   delete criteria.male;
+  //   delete criteria.female;
+  //   criteria.verified = true;
+  //   return await collectorModel.countDocuments(criteria);
+  // }
+
+  // static async allCollector(criteria) {
+  //   return await collectorModel.find(criteria);
+  // }
 }
 
 module.exports = CollectorService;

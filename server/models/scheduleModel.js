@@ -81,6 +81,9 @@ const schedulePick = new Schema({
   collectedBy: {
     type: String,
   },
+  collectedPhone: {
+    type: String,
+  },
   rating: {
     type: Number,
   },

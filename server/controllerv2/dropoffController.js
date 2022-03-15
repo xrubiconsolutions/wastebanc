@@ -120,7 +120,7 @@ dropoffController.companydropOffs = async (req, res) => {
           { organisation: key },
           { phone: key },
           { organisationPhone: key },
-          { quantity: key },
+          // { quantity: key },
           { categories: { $in: [key] } },
           { Category: key },
         ],

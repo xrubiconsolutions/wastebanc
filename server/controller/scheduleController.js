@@ -355,6 +355,7 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
                   $set: {
                     collectorStatus: "accept",
                     collectedBy: results._id,
+                    collectedPhone: results.phone,
                     organisation: results.organisation,
                     organisationCollection: results.approvedBy,
                     recycler: results.fullname,
@@ -438,6 +439,7 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
                   collectorStatus: "accept",
                   organisation: result.organisation,
                   collectedBy: result._id,
+                  collectedPhone: result.phone,
                   organisationCollection: result.approvedBy,
                   recycler: result.recycler,
                 },

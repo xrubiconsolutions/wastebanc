@@ -37,4 +37,13 @@ module.exports = (APP) => {
     adminPakamValidation,
     dashboardController.newAggregators
   );
+
+  APP.route("/api/v2/collectors/map/data").get(
+    adminPakamValidation,
+    [
+      query("start").notEmpty().withMessage("start is required"),
+      query("end").notEmpty().withMessage("end is required"),
+    ],
+    dashboardController.collectormapData
+  );
 };

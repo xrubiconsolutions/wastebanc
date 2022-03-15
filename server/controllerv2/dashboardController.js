@@ -347,6 +347,47 @@ dashboardController.newAggregators = async (req, res) => {
   }
 };
 
+dashboardController.collectormapData = async (req, res) => {
+  console.log("here");
+  bodyValidate(req, res);
+  try {
+    const { start, end, state } = req.query;
+    const [startDate, endDate] = [new Date(start), new Date(end)];
+
+    let criteria = {
+      createdAt: {
+        $gte: startDate,
+        $lt: endDate,
+      },
+    };
+    if (state) criteria.state = state;
+
+    const collectors = await allCollector(criteria);
+
+    const totalVerified = await verified(criteria);
+    const totalF = await totalFemale(criteria);
+    const totalM = await totalMale(criteria);
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        collectors,
+        totalCollectors: collectors.length,
+        totalFemale: totalF,
+        totalMale: totalM,
+        totalVerified,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 const allSchedules = async (criteria) => {
   // get length of schedules within given date range
   const schedules = await scheduleModel.find(criteria).sort({ createdAt: -1 });
@@ -420,4 +461,28 @@ const totaloutstanding = async (criteria) => {
     .reduce((acc, curr) => acc + curr, 0);
   return totalpayouts;
 };
+
+const totalMale = async (criteria) => {
+  delete criteria.female;
+  criteria.gender = "male";
+  return await collectorModel.countDocuments(criteria);
+};
+
+const totalFemale = async (criteria) => {
+  delete criteria.male;
+  criteria.gender = "female";
+  return await collectorModel.countDocuments(criteria);
+};
+
+const verified = async (criteria) => {
+  delete criteria.male;
+  delete criteria.female;
+  criteria.verified = true;
+  return await collectorModel.countDocuments(criteria);
+};
+
+const allCollector = async (criteria) => {
+  return await collectorModel.find(criteria);
+};
+
 module.exports = dashboardController;
