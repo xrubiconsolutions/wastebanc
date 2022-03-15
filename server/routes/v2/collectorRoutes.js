@@ -7,8 +7,6 @@ const auth = require("../../util/auth");
 module.exports = (APP) => {
   APP.route("/api/v2/collectors").get(
     auth.adminPakamValidation,
-    commonValidator.filter,
-    //checkRequestErrs,
     CollectorService.getCollectors
   );
 
@@ -17,5 +15,15 @@ module.exports = (APP) => {
     commonValidator.search,
     checkRequestErrs,
     CollectorService.searchCollectors
+  );
+
+  APP.route("/api/v2/collectors/geofence").get(
+    auth.recyclerValidation,
+    CollectorService.getGeoFencedCoordinates
+  );
+
+  APP.route("/api/v2/collectors/schedules/pending").get(
+    auth.recyclerValidation,
+    CollectorService.getOrganisationPendingSchedules
   );
 };
