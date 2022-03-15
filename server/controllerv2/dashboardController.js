@@ -38,8 +38,8 @@ dashboardController.cardMapData = async (req, res) => {
   try {
     const { start, end, state } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
-    console.log("startDate", startDate);
-    console.log("endDate", endDate);
+    // console.log("startDate", startDate);
+    // console.log("endDate", endDate);
     let criteria = {
       createdAt: {
         $gte: startDate,
@@ -56,24 +56,26 @@ dashboardController.cardMapData = async (req, res) => {
     const totalMissed = await missed(criteria);
     const totalCompleted = await completed(criteria);
     const totalPending = await pending(criteria);
+    const totalCancelled = await cancelled(criteria);
 
     return res.status(200).json({
       error: false,
       message: "success",
       data: {
         schedules,
+        totalSchedules: schedules.length,
         totalPending,
         totalMissed,
-        totalPending,
         totalCompleted,
+        totalCancelled,
         totalDropOff,
-        totalWastes,
-        totalPayment,
-        totalOutstanding,
+        totalWastes: Math.ceil(totalWastes),
+        totalPayment: Math.ceil(totalPayment),
+        totalOutstanding: Math.ceil(totalOutstanding),
       },
     });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).json({
       error: true,
       message: "An error occurred",
@@ -100,10 +102,13 @@ dashboardController.companyCardMapData = async (req, res) => {
 
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
+    const totalPayment = await totalpayout(criteria);
+    const totalOutstanding = await totaloutstanding(criteria);
     const totalDropOff = await dropOffs(criteria);
     const totalMissed = await missed(criteria);
     const totalCompleted = await completed(criteria);
     const totalPending = await pending(criteria);
+    const totalCancelled = await cancelled(criteria);
 
     return res.status(200).json({
       error: false,
@@ -112,10 +117,12 @@ dashboardController.companyCardMapData = async (req, res) => {
         schedules,
         totalPending,
         totalMissed,
-        totalPending,
         totalCompleted,
+        totalCancelled,
         totalDropOff,
-        totalWastes,
+        totalWastes: Math.ceil(totalWastes),
+        totalPayment: Math.ceil(totalPayment),
+        totalOutstanding: Math.ceil(totalOutstanding),
       },
     });
   } catch (error) {
@@ -354,6 +361,8 @@ const completed = async (criteria) => {
 
 const missed = async (criteria) => {
   criteria.completionStatus = "missed";
+  delete criteria.paid;
+  console.log("missed", criteria);
   const totalMissed = await scheduleModel.countDocuments(criteria);
   return totalMissed;
 };
@@ -361,16 +370,26 @@ const missed = async (criteria) => {
 const pending = async (criteria) => {
   //pending
   criteria.completionStatus = "pending";
+  console.log("pending", criteria);
   const totalPending = await scheduleModel.countDocuments(criteria);
   return totalPending;
 };
 
+const cancelled = async (criteria) => {
+  criteria.completionStatus = "cancelled";
+  console.log("cancelled", criteria);
+  const totalCancelled = await scheduleModel.countDocuments(criteria);
+  return totalCancelled;
+};
+
 const dropOffs = async (criteria) => {
+  console.log("dropoffs", criteria);
   const totalResult = await scheduleDropModel.countDocuments(criteria);
   return totalResult;
 };
 
 const totalWaste = async (criteria) => {
+  console.log("totalWaste", criteria);
   const transactions = await transactionModel.find(criteria);
 
   const totalWastes = transactions
@@ -382,7 +401,8 @@ const totalWaste = async (criteria) => {
 
 const totalpayout = async (criteria) => {
   criteria.paid = true;
-  console.log("total payout", criteria);
+  console.log("totalpayout", criteria);
+
   const transactions = await transactionModel.find(criteria);
   const totalpayouts = transactions
     .map((x) => x.coin)
@@ -392,7 +412,8 @@ const totalpayout = async (criteria) => {
 
 const totaloutstanding = async (criteria) => {
   criteria.paid = false;
-  console.log("total out", criteria);
+  console.log("totaloutstanding", criteria);
+
   const transactions = await transactionModel.find(criteria);
   const totalpayouts = transactions
     .map((x) => x.coin)

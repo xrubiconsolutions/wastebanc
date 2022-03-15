@@ -19,6 +19,7 @@ module.exports = {
   payOutModel: require("./payOutModel"),
   versionModel: require("./versionModel"),
   geofenceModel: require("./geofenceModel"),
+  
   dropOffModel: require("./dropOffModel"),
   charityModel: require("./charityModel"),
   scheduleDropModel: require("./scheduleDropModel"),

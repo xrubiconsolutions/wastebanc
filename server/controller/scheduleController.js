@@ -1415,82 +1415,50 @@ scheduleController.smartRoute = async (REQUEST, RESPONSE) => {
   tomorrow.setDate(new Date().getDate() + 7);
   console.log("tomorrow", tomorrow);
 
-  // const collector = await MODEL.collectorModel.findOne({
-  //   _id: collectorID,
-  // });
-
-  // if (!collector) {
-  //   return RESPONSE.status(400).json({
-  //     error: true,
-  //     message: "collector not found",
-  //   });
-  // }
-
-  // const accessArea = collector.areaOfAccess;
-
-  // const pickupSchedule = await MODEL.scheduleModel
-  //   .find({
-  //     $and: [
-  //       {
-  //         pickUpDate: {
-  //           $gte: active_today,
-  //         },
-  //         pickUpDate: {
-  //           $lt: tomorrow,
-  //         },
-  //         completionStatus: "pending",
-  //         collectorStatus: "decline",
-  //       },
-  //     ],
-  //   })
-  //   .sort({ _id: -1 });
-
-  // console.log("schedules", pickupSchedule);
-
-  // pickupSchedule.map((schedule, index) => {
-  //   const saddress = schedule.address.split(", ");
-
-  //   for (let i = 0; i < accessArea.length; i++) {
-  //     // if (schedule.lcd === accessArea[i]) {
-  //     //   //need.push(schedule["lcd"]);
-  //     //   geofencedSchedules.push(schedule);
-  //     //   console.log(geofencedSchedules);
-  //     //   //count++;
-  //     // }
-  //     for (let j = 0; j < saddress.length; j++) {
-  //       console.log("saddress", saddress[j]);
-  //       console.log("accessArea", accessArea[i]);
-  //       // if (saddress[j].includes(accessArea[i])) {
-  //       //   //need.push(test[j]);
-  //       //   geofencedSchedules.push(schedule);
-  //       //   //count++;
-  //       // }
-
-  //       if (saddress[j] === accessArea[i]) {
-  //         geofencedSchedules.push(schedule);
-  //       }
-  //     }
-  //   }
-  // });
-  // return RESPONSE.status(200).json(geofencedSchedules);
-
   MODEL.collectorModel.findOne({ _id: collectorID }).then((collector) => {
     var accessArea = collector.areaOfAccess;
     MODEL.scheduleModel
-      .find({
-        $and: [
-          {
-            pickUpDate: {
-              $gte: active_today,
-            },
-            pickUpDate: {
-              $lt: tomorrow,
-            },
-            completionStatus: "pending",
-            collectorStatus: "decline",
+      // .find({
+      //   $and: [
+      //     {
+      //       pickUpDate: {
+      //         $gte: active_today,
+      //       },
+      //       pickUpDate: {
+      //         $lt: tomorrow,
+      //       },
+      //       completionStatus: "pending",
+      //       collectorStatus: "decline",
+      //     },
+      //   ],
+      // })
+      .aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                pickUpDate: {
+                  $gte: active_today,
+                },
+                pickUpDate: {
+                  $lt: tomorrow,
+                },
+                completionStatus: "pending",
+                collectorStatus: "decline",
+              },
+            ],
           },
-        ],
-      })
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "client",
+            foreignField: "email",
+            //pipeline: [{ $project: { password: 0 } }],
+            as: "client",
+          },
+        },
+      ])
       .sort({ _id: -1 })
       .then((schedules) => {
         //console.log("schedules", schedules);
@@ -1530,7 +1498,7 @@ scheduleController.smartRoute = async (REQUEST, RESPONSE) => {
           )
         );
       })
-      .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+      .catch((err) => RESPONSE.status(400).jsonp(err));
   });
 };
 

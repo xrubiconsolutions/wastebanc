@@ -16,6 +16,10 @@ const { validationResult, body } = require("express-validator");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const sgMail = require("@sendgrid/mail");
+const passwordResetTemplate = require("../../email-templates/password-reset.template");
+const moment = require("moment-timezone");
+moment().tz("Africa/Lagos", false);
 
 const ustorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -369,7 +373,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
 };
 
 userController.passwordEncrypt = async (req, res) => {
-  const password = await COMMON_FUN.encryptPassword(req.body.password);
+  const password = await COMMON_FUN.encryptPassword(req.body.password.trim());
   return res.status(200).json({
     data: {
       password: req.body.password.trim(),
@@ -697,7 +701,7 @@ userController.resendVerification = async (REQUEST, RESPONSE) => {
     phone,
   });
 
-  if (!phone) {
+  if (!user) {
     return RESPONSE.status(400).json({
       error: true,
       message: "Phone does not exist",
@@ -2468,11 +2472,13 @@ userController.totalGender = async (REQUEST, RESPONSE) => {
     const totalMales = await MODEL.userModel
       .find({
         gender: "male",
+        roles: "client",
       })
       .countDocuments();
     const totalFemales = await MODEL.userModel
       .find({
         gender: "female",
+        roles: "client",
       })
       .countDocuments();
     return RESPONSE.status(200).json({
@@ -2583,6 +2589,39 @@ userController.adminLogin = async (req, res) => {
       });
     }
 
+    if (!user.role) {
+      return res.status(400).json({
+        error: true,
+        message: "Assign a claim to the user",
+      });
+    }
+
+    if (user.status && user.status === "disable") {
+      return res.status(401).json({
+        error: true,
+        message: "Account disabled, Please contact support team",
+      });
+    }
+
+    const claims = await MODEL.roleModel.findById(user.role).populate({
+      path: "claims.claimId",
+      populate: {
+        path: "children",
+        match: { show: true },
+        populate: {
+          path: "children",
+          match: { show: true },
+        },
+      },
+    });
+
+    if (!claims) {
+      return res.status(400).json({
+        error: true,
+        message: "User role not found",
+      });
+    }
+
     if (!(await COMMON_FUN.comparePassword(req.body.password, user.password))) {
       return res.status(400).json({
         error: true,
@@ -2596,12 +2635,13 @@ userController.adminLogin = async (req, res) => {
       { last_logged_in: new Date() }
     );
     const token = COMMON_FUN.authToken(user);
-    delete user.password;
+
     return res.status(200).json({
       error: false,
       message: "Login successfull",
       statusCode: 200,
       data: {
+        _id: user._id,
         firstname: user.firstname,
         lastname: user.lastname,
         email: user.email,
@@ -2619,9 +2659,11 @@ userController.adminLogin = async (req, res) => {
         lcd: user.lcd,
         last_logged_in: user.last_logged_in,
         token,
+        claims,
       },
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       error: true,
       message: "Internal Server Error",
@@ -2629,5 +2671,154 @@ userController.adminLogin = async (req, res) => {
     });
   }
 };
+
+userController.sendTokenAdmin = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const resetToken = COMMON_FUN.generateRandomString(4);
+    const email = req.body.email;
+    const user = await MODEL.userModel.findOne({
+      email,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: false,
+        message: "User not found",
+      });
+    }
+
+    await MODEL.userModel.updateOne(
+      { _id: user._id },
+      {
+        resetToken,
+        resetTimeOut: moment().add(3, "hours"),
+      }
+    );
+
+    const emailTemplate = passwordResetTemplate(user, resetToken);
+
+    sgMail.setApiKey(
+      "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"
+    );
+
+    const msg = {
+      to: `${email}`,
+      from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+      subject: "FORGOT PASSWORD",
+      html: emailTemplate,
+    };
+
+    await sgMail.send(msg);
+
+    return res.status(200).json({
+      error: true,
+      message: "Reset token sent",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server Error",
+      statusCode: 500,
+    });
+  }
+};
+
+userController.confirmToken = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const token = req.body.token;
+    const current = new Date();
+    //console.log("current", current);
+    const user = await MODEL.userModel.findOne({
+      resetToken: token,
+      resetTimeOut: {
+        $gte: new Date(),
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Token time out",
+      });
+    }
+
+    await MODEL.userModel.updateOne(
+      { _id: user._id },
+      {
+        resetToken: "",
+        resetTimeOut: "",
+      }
+    );
+
+    return res.status(200).json({
+      error: false,
+      message: "token confirmed successfull",
+      data: {
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: "An error occurred",
+    });
+  }
+};
+
+userController.resetPassword = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const body = req.body;
+    const user = await MODEL.userModel.findOne({
+      email: body.email,
+    });
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid body request",
+      });
+    }
+
+    const password = body.password.trim();
+    const confirmPassword = body.confirmPassword.trim();
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        error: true,
+        message: "Password does not match",
+      });
+    }
+
+    const hash = await COMMON_FUN.encryptPassword(password);
+
+    const update = await MODEL.userModel.updateOne(
+      { _id: user._id },
+      {
+        password: hash,
+      }
+    );
+
+    if (!update) {
+      return res.status(400).json({
+        error: true,
+        message: "Error reset password",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 /* export userControllers */
 module.exports = userController;

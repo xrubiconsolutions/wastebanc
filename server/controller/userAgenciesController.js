@@ -6,6 +6,8 @@ const COMMON_FUN = require("../util/commonFunction");
 const mongodb = require("mongodb");
 
 const { validationResult, body } = require("express-validator");
+const sgMail = require("@sendgrid/mail");
+const welcomeTemplate = require("../../email-templates/welcome-email.template");
 
 const bodyValidate = (req, res) => {
   // 1. Validate the request coming in
@@ -31,7 +33,7 @@ agenciesController.create = async (req, res) => {
   bodyValidate(req, res);
   try {
     const body = req.body;
-    console.log("body", body);
+
     const user = await MODEL.userModel.findOne({ email: body.email.trim() });
     if (user) {
       return res.status(400).json({
@@ -51,9 +53,11 @@ agenciesController.create = async (req, res) => {
       });
     }
 
-    const checkPhone = await MODEL.roleModel.findOne({
+    const checkPhone = await MODEL.userModel.findOne({
       phone: body.phone,
     });
+
+    console.log("c", checkPhone);
 
     if (checkPhone) {
       return res.status(400).json({
@@ -65,15 +69,17 @@ agenciesController.create = async (req, res) => {
     const password = body.email.split("@");
     console.log(password[0]);
 
+    const hash = await COMMON_FUN.encryptPassword(password[0]);
     const agency = await MODEL.userModel.create({
       countries: body.countries,
       states: body.states,
       username: body.name.trim(),
+      fullname: body.name.trim(),
       role: role._id,
       displayRole: role.title,
       roles: role.group,
       email: body.email,
-      password: await COMMON_FUN.encryptPassword(password[0]),
+      password: hash,
       verified: true,
       phone: body.phone,
     });
@@ -83,7 +89,22 @@ agenciesController.create = async (req, res) => {
       { cardID: agency._id }
     );
 
+    const emailTemplate = welcomeTemplate(agency, password);
+
     //send mail to the company holding the agencies password
+    sgMail.setApiKey(
+      "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"
+    );
+
+    const msg = {
+      to: `${agency.email}`,
+      from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+      subject: "WELCOME PAKAM",
+      html: emailTemplate,
+    };
+
+    await sgMail.send(msg);
+    //console.log("send", send);
 
     return res.status(200).json({
       error: false,
@@ -171,6 +192,8 @@ agenciesController.updateAgencies = async (req, res) => {
     const body = req.body;
     const agencyId = req.params.agencyId;
     const agency = await MODEL.userModel.findById(agencyId);
+    const { user } = req;
+
     if (!agency) {
       return res.status(400).json({
         error: true,
@@ -178,13 +201,32 @@ agenciesController.updateAgencies = async (req, res) => {
       });
     }
 
+    if (body.email) {
+      const checkemail = await MODEL.userModel.findOne({
+        email: body.email,
+      });
+
+      console.log(checkemail);
+
+      if (checkemail && checkemail._id.toString() != agency._id.toString()) {
+        return res.status(400).json({
+          error: true,
+          message: "Email already exist",
+        });
+      }
+    }
+
     let role;
     let roles;
     if (body.role) {
-      role = await MODEL.roleModel.findOne({
-        title: body.title,
-        active: true,
-      });
+      role = await MODEL.roleModel.findOne(
+        {
+          _id: new mongodb.ObjectId("62273fc3844f40002318c978"),
+          active: true,
+        },
+        { claims: 0 }
+      );
+      console.log("role", role);
       if (!role) {
         return res.status(400).json({
           error: true,
@@ -192,10 +234,24 @@ agenciesController.updateAgencies = async (req, res) => {
         });
       }
       roles = role.group;
+      role = role._id;
     } else {
       role = agency.role;
-      roles = agency.group;
+      roles = agency.roles;
     }
+
+    if (body.status) {
+      if (user.email === agency.email) {
+        return res.status(400).json({
+          error: true,
+          message: "Action cannot be perform",
+        });
+      }
+    }
+
+    console.log("role", role);
+    console.log("roles", roles);
+
     const update = await MODEL.userModel.updateOne(
       { _id: agency._id },
       {
