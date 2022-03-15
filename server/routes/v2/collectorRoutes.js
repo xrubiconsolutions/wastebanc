@@ -21,4 +21,9 @@ module.exports = (APP) => {
     auth.recyclerValidation,
     CollectorService.getGeoFencedCoordinates
   );
+
+  APP.route("/api/v2/collectors/schedules/pending").get(
+    auth.recyclerValidation,
+    CollectorService.getOrganisationPendingSchedules
+  );
 };
