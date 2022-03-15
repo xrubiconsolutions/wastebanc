@@ -1,4 +1,5 @@
 const { collectorModel } = require("../models");
+const geofenceModel = require("../models/geofenceModel");
 const { sendResponse } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 
@@ -113,6 +114,68 @@ class CollectorService {
     } catch (error) {
       console.log(error);
       sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+    }
+  }
+
+  static async getGeoFencedCoordinates(req, res) {
+    const { _id: organisationId } = req.user;
+    let { paginated = false, page = 1, resultsPerPage = 20 } = req.query;
+
+    // handle query param values conversion
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+    if (paginated) paginated = paginated === "true" ? true : false;
+
+    try {
+      // check existence of geofence data in db
+      const coordinateData = await geofenceModel.findOne({
+        organisationId,
+      });
+      // return error if data doesn't exist for company
+      if (!coordinateData)
+        return res.status(404).json({
+          error: true,
+          message: "Geo fence coordinates not found for organisation",
+        });
+
+      // handle pagination
+      if (paginated) {
+        // total results
+        const totalResult = await await geofenceModel.countDocuments({
+          organisationId,
+        });
+        // paginated result
+        const coordinateData = await geofenceModel
+          .find({
+            organisationId,
+          })
+          .sort({ createdAt: -1 })
+          .skip((page - 1) * resultsPerPage)
+          .limit(resultsPerPage);
+
+        // send paginated data
+        return res.status(200).json({
+          error: false,
+          message: "success",
+          data: { coordinateData, totalResult, page, resultsPerPage },
+        });
+      } else {
+        //send all coordinates
+        const coordinateData = await geofenceModel.find({
+          organisationId,
+        });
+
+        // send all data
+        return res.status(200).json({
+          error: false,
+          message: "success",
+          data: coordinateData,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: true });
     }
   }
 }

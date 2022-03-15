@@ -180,9 +180,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
       statusCode: 401,
     });
   }
-
-  const user = await MODEL.organisationModel.findById(validated.userId);
-  console.log("user", user);
+  const user = await MODEL.organisationModel.findById(validated._id);
   if (!user) {
     return RESPONSE.status(401).json({
       error: true,
