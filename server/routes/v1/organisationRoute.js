@@ -265,12 +265,12 @@ module.exports = (APP) => {
     CONTROLLER.organisationController.updateOrganisationProfile
   );
   APP.route("/api/organisation/rad/geofenced").get(
-    auth.companyValidation,
+    auth.recyclerValidation,
     CONTROLLER.organisationController.getGeofencedCoordinates
   );
 
   APP.route("/api/organisation/pending/geofenced").get(
-    auth.companyValidation,
+    auth.recyclerValidation,
     CONTROLLER.organisationController.organisationSchedulesPending
   );
 

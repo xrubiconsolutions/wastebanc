@@ -1,5 +1,8 @@
 const { collectorModel } = require("../models");
-const { sendResponse, bodyValidate } = require("../util/commonFunction");
+const geofenceModel = require("../models/geofenceModel");
+const organisationModel = require("../models/organisationModel");
+const scheduleModel = require("../models/scheduleModel");
+const { sendResponse } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
 
@@ -134,68 +137,126 @@ class CollectorService {
     }
   }
 
-  // static async mapCardData(req, res) {
-  //   console.log("here");
-  //   bodyValidate(req, res);
-  //   try {
-  //     const { start, end, state } = req.query;
-  //     const [startDate, endDate] = [new Date(start), new Date(end)];
+  static async getGeoFencedCoordinates(req, res) {
+    const { _id: organisationId } = req.user;
+    let { paginated = false, page = 1, resultsPerPage = 20 } = req.query;
 
-  //     let criteria = {
-  //       createdAt: {
-  //         $gte: startDate,
-  //         $lt: endDate,
-  //       },
-  //     };
-  //     if (state) criteria.state = state;
+    // handle query param values conversion
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+    if (paginated) paginated = paginated === "true" ? true : false;
 
-  //     const collectors = await collectorModel.find(criteria);
-  //     const totalFemale = await this.totalFemale(criteria);
-  //     const totalMale = await this.totalMale(criteria);
-  //     const totalVerified = await this.verified(criteria);
+    try {
+      // check existence of geofence data in db
+      const coordinateData = await geofenceModel.findOne({
+        organisationId,
+      });
+      // return error if data doesn't exist for company
+      if (!coordinateData)
+        return res.status(404).json({
+          error: true,
+          message: "Geo fence coordinates not found for organisation",
+        });
 
-  //     return res.status(200).json({
-  //       error: false,
-  //       message: "success",
-  //       data: {
-  //         collectors,
-  //         totalCollectors: collectors.length,
-  //         totalFemale,
-  //         totalMale,
-  //         totalVerified,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //     return res.status(500).json({
-  //       error: true,
-  //       message: "An error occurred",
-  //     });
-  //   }
-  // }
+      // handle pagination
+      if (paginated) {
+        // total results
+        const totalResult = await await geofenceModel.countDocuments({
+          organisationId,
+        });
+        // paginated result
+        const coordinateData = await geofenceModel
+          .find({
+            organisationId,
+          })
+          .sort({ createdAt: -1 })
+          .skip((page - 1) * resultsPerPage)
+          .limit(resultsPerPage);
 
-  // static async totalMale(criteria) {
-  //   delete criteria.female;
-  //   criteria.gender = "male";
-  //   return await collectorModel.countDocuments(criteria);
-  // }
+        // send paginated data
+        return res.status(200).json({
+          error: false,
+          message: "success",
+          data: { coordinateData, totalResult, page, resultsPerPage },
+        });
+      } else {
+        //send all coordinates
+        const coordinateData = await geofenceModel.find({
+          organisationId,
+        });
 
-  // static async totalFemale(criteria) {
-  //   delete criteria.male;
-  //   criteria.gender = "female";
-  //   return await collectorModel.countDocuments(criteria);
-  // }
+        // send all data
+        return res.status(200).json({
+          error: false,
+          message: "success",
+          data: coordinateData,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: true });
+    }
+  }
 
-  // static async verified(criteria) {
-  //   delete criteria.male;
-  //   delete criteria.female;
-  //   criteria.verified = true;
-  //   return await collectorModel.countDocuments(criteria);
-  // }
+  static async getOrganisationPendingSchedules(req, res) {
+    const { _id: organisationId } = req.user;
 
-  // static async allCollector(criteria) {
-  //   return await collectorModel.find(criteria);
-  // }
+    // set today from 12:00am
+    const active_today = new Date();
+    active_today.setHours(0);
+    active_today.setMinutes(0);
+
+    // a week time from today
+    let nextWeek = new Date();
+    nextWeek.setDate(new Date().getDate() + 7);
+
+    // constructs criteria to find schedules
+    const schedulesCriteria = {
+      pickUpDate: {
+        $gte: active_today,
+        $lt: nextWeek,
+      },
+      completionStatus: "pending",
+      collectorStatus: { $ne: "accept" },
+    };
+    try {
+      const company = await organisationModel.findById(organisationId);
+      // company access area
+      const accessArea = company.streetOfAccess;
+
+      // initial schedules
+      const initSchedules = await scheduleModel.find(schedulesCriteria);
+
+      // result schedules accumlation list
+      let schedules = [];
+
+      // for every area in company's access area, find schedules for which have
+      // the schedule's lcd matches the current area or the current area is
+      // included in the schedule's address
+      accessArea.forEach((area) => {
+        const matchSchedules = initSchedules.filter(
+          (schedule) =>
+            schedule.address.toLowerCase().indexOf(area.toLowerCase()) > -1 ||
+            schedule.lcd === area
+        );
+        schedules = schedules.concat(matchSchedules);
+      });
+
+      // remove duplicate schedules
+      schedules = [...new Set(schedules)];
+
+      // send response
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: schedules,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json(error);
+    }
+  }
 }
 
 module.exports = CollectorService;

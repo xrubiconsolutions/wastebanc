@@ -31,4 +31,14 @@ module.exports = (APP) => {
     checkRequestErrs,
     CollectorService.searchCollectors
   );
+
+  APP.route("/api/v2/collectors/geofence").get(
+    recyclerValidation,
+    CollectorService.getGeoFencedCoordinates
+  );
+
+  APP.route("/api/v2/collectors/schedules/pending").get(
+    recyclerValidation,
+    CollectorService.getOrganisationPendingSchedules
+  );
 };

@@ -20,6 +20,7 @@ module.exports = (APP) => {
   APP.route("/api/v2/dashboard/company/matrix").get(
     companyPakamDataValidation,
     dateCheck,
+    checkRequestErrs,
     dashboardController.companyCardMapData
   );
 

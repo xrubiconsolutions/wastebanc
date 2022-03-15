@@ -188,9 +188,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
       statusCode: 401,
     });
   }
-
-  const user = await MODEL.collectorModel.findById(validated.userId);
-  console.log("user", user);
+  const user = await MODEL.organisationModel.findById(validated._id);
   if (!user) {
     console.log("here 1");
     return RESPONSE.status(401).json({
@@ -209,7 +207,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.roles === "collector") {
+  if (user.roles === "collector" || user.roles === "company") {
     REQUEST.user = user;
     NEXT();
   } else {
@@ -263,7 +261,7 @@ validateUser.adminValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.roles === "analytics-admin") {
+  if (user.roles === "analytics-admin" || user.roles === "admin") {
     REQUEST.user = user;
     NEXT();
   } else {
