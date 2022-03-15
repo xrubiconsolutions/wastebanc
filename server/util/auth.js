@@ -133,6 +133,7 @@ validateUser.companyPakamDataValidation = async (REQUEST, RESPONSE, NEXT) => {
 
     const user = await MODEL.organisationModel.findById(validated.userId);
     if (!user) {
+      console.log('here')
       return RESPONSE.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -188,7 +189,8 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
       statusCode: 401,
     });
   }
-  const user = await MODEL.organisationModel.findById(validated._id);
+  
+  const user = await MODEL.collectorModel.findById(validated.userId);
   if (!user) {
     console.log("here 1");
     return RESPONSE.status(401).json({
@@ -207,7 +209,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.roles === "collector") {
+  if (user.roles === "collector" || user.roles === "company") {
     REQUEST.user = user;
     NEXT();
   } else {
@@ -261,7 +263,7 @@ validateUser.adminValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.roles === "analytics-admin") {
+  if (user.roles === "analytics-admin" || user.roles === "admin") {
     REQUEST.user = user;
     NEXT();
   } else {
@@ -346,7 +348,7 @@ validateUser.companyValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  const user = await MODEL.collectorModel.findById(validated.userId);
+  const user = await MODEL.organisationModel.findById(validated.userId);
   if (!user) {
     return RESPONSE.status(401).json({
       error: true,

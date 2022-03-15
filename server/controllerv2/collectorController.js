@@ -4,8 +4,26 @@ const organisationModel = require("../models/organisationModel");
 const scheduleModel = require("../models/scheduleModel");
 const { sendResponse } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
+const { validationResult, body } = require("express-validator");
 
 class CollectorService {
+  static bodyValidate(req, res) {
+    const result = validationResult(req);
+
+    const hasErrors = !result.isEmpty();
+    console.log(hasErrors);
+
+    if (hasErrors) {
+      //   debugLog('user body', req.body);
+      // 2. Throw a 422 if the body is invalid
+      return res.status(422).json({
+        error: true,
+        statusCode: 422,
+        message: "Invalid body request",
+        errors: result.array({ onlyFirstError: true }),
+      });
+    }
+  }
   static async getCollectors(req, res) {
     try {
       let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;

@@ -304,6 +304,27 @@ const sendResponse = (res, { statusCode, customMessage }, data, token) =>
     data,
     token,
   });
+
+const bodyValidate = (req, res) => {
+  // 1. Validate the request coming in
+  // console.log(req.body);
+  const result = validationResult(req);
+
+  const hasErrors = !result.isEmpty();
+  console.log(hasErrors);
+
+  if (hasErrors) {
+    //   debugLog('user body', req.body);
+    // 2. Throw a 422 if the body is invalid
+    return res.status(422).json({
+      error: true,
+      statusCode: 422,
+      message: "Invalid body request",
+      errors: result.array({ onlyFirstError: true }),
+    });
+  }
+};
+
 /*exporting all object from here*/
 module.exports = {
   sendError: sendError,
@@ -328,4 +349,5 @@ module.exports = {
   encryptPassword,
   checkRequestErrs,
   sendResponse,
+  bodyValidate,
 };
