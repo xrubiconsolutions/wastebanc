@@ -1,4 +1,4 @@
-const { scheduleDropModel } = require("../models");
+const { scheduleDropModel, dropOffModel } = require("../models");
 let dropoffController = {};
 
 const { validationResult, body } = require("express-validator");
@@ -164,6 +164,44 @@ dropoffController.companydropOffs = async (req, res) => {
       error: true,
       message: "An error occurred",
     });
+  }
+};
+
+dropoffController.deleteDropOff = async (req, res) => {
+  const { dropOffId } = req.body;
+  const { companyName: organisation } = req.user;
+  try {
+    const drop = await scheduleDropModel.findOneAndDelete({
+      _id: dropOffId,
+      organisation,
+    });
+    if (!drop)
+      return res.status(404).json({
+        error: true,
+        message: "Drop-off schedule data couldn't be found",
+      });
+
+    return res.status(200).json({
+      error: false,
+      message: "Drop-off removed successfully!",
+    });
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
+
+dropoffController.addDropOffLocation = async (req, res) => {
+  const dropLocation = { ...req.body };
+  try {
+    const drop = await dropOffModel.create(dropLocation);
+    return res.status(201).json({
+      error: false,
+      message: "Drop-off submitted successfully!",
+      data: drop,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
   }
 };
 
