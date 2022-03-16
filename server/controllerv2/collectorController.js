@@ -44,13 +44,13 @@ class CollectorService {
       if (key) {
         criteria = {
           $or: [
-            { fullname: key },
-            { gender: key },
-            { phone: key },
-            { email: key },
-            { localGovernment: key },
-            { organisation: key },
-            { IDNumber: key },
+            { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+            { gender: { $regex: `.*${key}.*`, $options: "i" } },
+            { phone: { $regex: `.*${key}.*`, $options: "i" } },
+            { email: { $regex: `.*${key}.*`, $options: "i" } },
+            { localGovernment: { $regex: `.*${key}.*`, $options: "i" } },
+            { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+            // { IDNumber: key },
           ],
         };
       } else {

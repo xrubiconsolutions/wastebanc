@@ -44,6 +44,9 @@ const transaction_Schema = {
     type: String,
     required: true,
   },
+  categories: {
+    type: Array,
+  },
   organisationID: {
     type: String,
   },

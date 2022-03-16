@@ -14,12 +14,12 @@ class UserService {
       if (key) {
         criteria = {
           $or: [
-            { username: key },
-            { cardID: key },
-            { fullName: key },
-            { gender: key },
-            { phone: key },
-            { email: key },
+            { username: { $regex: `.*${key}.*`, $options: "i" } },
+            // { cardID: key },
+            { fullName: { $regex: `.*${key}.*`, $options: "i" } },
+            { gender: { $regex: `.*${key}.*`, $options: "i" } },
+            { phone: { $regex: `.*${key}.*`, $options: "i" } },
+            { email: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           roles: "client",
         };
@@ -106,12 +106,12 @@ class UserService {
       roles: "client",
       verified: true,
       $or: [
-        { username: key },
-        { cardID: key },
-        { fullName: key },
-        { gender: key },
-        { phone: key },
-        { email: key },
+        { username: { $regex: `.*${key}.*`, $options: "i" } },
+        // { cardID: key },
+        { fullName: { $regex: `.*${key}.*`, $options: "i" } },
+        { gender: { $regex: `.*${key}.*`, $options: "i" } },
+        { phone: { $regex: `.*${key}.*`, $options: "i" } },
+        { email: { $regex: `.*${key}.*`, $options: "i" } },
       ],
     };
     if (state) criteria.state = state;
