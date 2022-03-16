@@ -33,12 +33,12 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/v2/collectors/geofence").get(
-    auth.companyPakamDataValidation,
+    companyPakamDataValidation,
     CollectorService.getGeoFencedCoordinates
   );
 
   APP.route("/api/v2/collectors/schedules/pending").get(
-    auth.companyPakamDataValidation,
+    companyPakamDataValidation,
     CollectorService.getOrganisationPendingSchedules
   );
 };
