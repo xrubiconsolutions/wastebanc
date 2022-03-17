@@ -98,7 +98,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
 
     const expireDate = moment(data.pickUpDate, "YYYY-MM-DD").add(7, "days");
     data.expiryDuration = expireDate;
-
+    data.clientId = result._id;
     MODEL.scheduleModel(data).save({}, (ERR, RESULT) => {
       try {
         if (ERR) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
