@@ -48,8 +48,8 @@ module.exports = (APP) => {
     dashboardController.collectormapData
   );
 
-  // APP.route("/api/v2/waste/chart").get(
-  //   adminPakamValidation,
-  //   dashboardController.chartData
-  // );
+  APP.route("/api/v2/waste/chart").get(
+    adminPakamValidation,
+    dashboardController.chartData
+  );
 };

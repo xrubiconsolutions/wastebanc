@@ -35,7 +35,7 @@ validateUser.userValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.status === "disabled") {
+  if (user.status === "disable") {
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -86,7 +86,7 @@ validateUser.userCollectorData = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.status === "disabled") {
+  if (user.status === "disable") {
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -141,7 +141,7 @@ validateUser.companyPakamDataValidation = async (REQUEST, RESPONSE, NEXT) => {
       });
     }
 
-    if (user.status === "disabled") {
+    if (user.status === "disable") {
       return RESPONSE.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -255,7 +255,7 @@ validateUser.adminValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.status === "disabled") {
+  if (user.status === "disable") {
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -357,7 +357,7 @@ validateUser.companyValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.status === "disabled") {
+  if (user.status === "disable") {
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -407,7 +407,7 @@ validateUser.lcdValidation = async (REQUEST, RESPONSE, NEXT) => {
     });
   }
 
-  if (user.status === "disabled") {
+  if (user.status === "disable") {
     return RESPONSE.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
