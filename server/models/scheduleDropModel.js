@@ -13,6 +13,10 @@ const scheduleDrop = new Schema({
     type: String,
     default: "",
   },
+  clientId: {
+    type: String,
+    default: "",
+  },
   fullname: {
     type: String,
     default: "",

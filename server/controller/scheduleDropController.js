@@ -80,6 +80,7 @@ scheduleDropController.schedule = (REQUEST, RESPONSE) => {
 
     const expireDate = moment(data.dropOffDate, "YYYY-MM-DD").add(7, "days");
     data.expiryDuration = expireDate;
+    data.clientId = result._id;
 
     MODEL.scheduleDropModel(data).save({}, (ERR, RESULT) => {
       try {
