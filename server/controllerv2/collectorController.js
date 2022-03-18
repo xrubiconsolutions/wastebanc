@@ -136,6 +136,85 @@ class CollectorService {
       sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
     }
   }
+  static async getCompanyCollectors(req, res) {
+    const { companyName: organisation } = req.user;
+    const projection = { password: 0, _v: 0 };
+    try {
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        start,
+        end,
+        state,
+        key,
+        verified,
+      } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+      verified = verified
+        ? verified === "true"
+          ? true
+          : false
+        : { $exists: true };
+      let criteria;
+
+      if (key) {
+        criteria = {
+          $or: [
+            { fullname: key },
+            { gender: key },
+            { phone: key },
+            { email: key },
+            { localGovernment: key },
+            { organisation: key },
+            { IDNumber: key },
+          ],
+          organisation,
+          verified,
+        };
+      } else if (start && end) {
+        const [startDate, endDate] = [new Date(start), new Date(end)];
+        criteria = {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          organisation,
+          verified,
+        };
+      } else criteria = { organisation, verified };
+      if (state) criteria.state = state;
+
+      const totalResult = await collectorModel.countDocuments(criteria);
+      const projection = {
+        roles: 0,
+        password: 0,
+      };
+      // get collectors based on page
+      const collectors = await collectorModel
+        .find(criteria, projection, { lean: true })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          collectors,
+          totalResult,
+          page,
+          resultsPerPage,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+      });
+    }
+  }
 
   static async getGeoFencedCoordinates(req, res) {
     const { _id: organisationId } = req.user;
@@ -251,6 +330,53 @@ class CollectorService {
         error: false,
         message: "success",
         data: schedules,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  }
+
+  static async approveCollector(req, res) {
+    const { collectorId } = req.body;
+    const { _id: companyId, companyName: organisation } = req.user;
+    const projection = { password: 0, _v: 0 };
+    try {
+      await collectorModel.updateOne(
+        { _id: collectorId, organisation },
+        {
+          verified: true,
+          approvedBy: companyId,
+        },
+        projection
+      );
+
+      return res.status(200).json({
+        error: false,
+        message: "Collector approved successfully!",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(error);
+    }
+  }
+  static async declineCollector(req, res) {
+    const { collectorId } = req.body;
+    const projection = { password: 0, __v: 0 };
+    const { companyName: organisation } = req.user;
+    try {
+      await collectorModel.updateOne(
+        { _id: collectorId, organisation },
+        {
+          verified: false,
+          organisation: "",
+        },
+        projection
+      );
+
+      return res.status(200).json({
+        error: false,
+        message: "Collector declined successfully!",
       });
     } catch (error) {
       console.log(error);

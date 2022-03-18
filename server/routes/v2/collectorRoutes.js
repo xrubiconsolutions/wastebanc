@@ -2,6 +2,7 @@ const CollectorService = require("../../controllerv2/collectorController.js");
 const adminAuthorization = require("../../middleware/adminAuthorization.js");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 const commonValidator = require("../../validators/commonValidator.js");
+const collectorValidator = require("../../validators/collectorValidator.js");
 const {
   adminPakamValidation,
   recyclerValidation,
@@ -24,6 +25,10 @@ module.exports = (APP) => {
     //checkRequestErrs,
     CollectorService.getCollectors
   );
+  APP.route("/api/v2/company-collectors").get(
+    companyPakamDataValidation,
+    CollectorService.getCompanyCollectors
+  );
 
   APP.route("/api/v2/collectors/search").get(
     adminPakamValidation,
@@ -40,5 +45,19 @@ module.exports = (APP) => {
   APP.route("/api/v2/collectors/schedules/pending").get(
     companyPakamDataValidation,
     CollectorService.getOrganisationPendingSchedules
+  );
+
+  APP.route("/api/v2/company-collectors/approve").get(
+    companyPakamDataValidation,
+    collectorValidator.verifyCollector,
+    checkRequestErrs,
+    CollectorService.approveCollector
+  );
+
+  APP.route("/api/v2/company-collectors/decline").get(
+    companyPakamDataValidation,
+    collectorValidator.verifyCollector,
+    checkRequestErrs,
+    CollectorService.declineCollector
   );
 };
