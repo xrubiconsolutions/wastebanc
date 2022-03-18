@@ -156,11 +156,10 @@ class ScheduleService {
       ? {
           $or: [
             { Category: key },
-            { organisation: key },
             { collectorStatus: key },
+            { scheduleCreator: key },
             { client: key },
             { phone: key },
-            { scheduleCreator: key },
           ],
           completionStatus,
           organisation,
