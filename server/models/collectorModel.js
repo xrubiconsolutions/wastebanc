@@ -24,13 +24,13 @@ const collector_Schema = new Schema({
     required: true,
     unique: true,
   },
-  roles:{
+  roles: {
     type: String,
-    default: "collector"
+    default: "collector",
   },
-  busy:{
+  busy: {
     type: Boolean,
-    default: false
+    default: false,
   },
   password: {
     type: String,
@@ -48,6 +48,10 @@ const collector_Schema = new Schema({
     type: Boolean,
     default: false,
   },
+  status: {
+    type: String,
+    default: "active",
+  },
   id: {
     type: Number,
   },
@@ -57,69 +61,69 @@ const collector_Schema = new Schema({
   dateOfBirth: {
     type: String,
   },
-  organisation :{
-      type: String
+  organisation: {
+    type: String,
   },
   IdNumber: {
     type: String,
   },
   state: {
-    type: String
+    type: String,
   },
-  place:{
-    type: String
+  place: {
+    type: String,
   },
   aggregatorId: {
     type: String,
   },
   localGovernment: {
-    type:String
+    type: String,
   },
   areaOfAccess: {
-    type : Array
+    type: Array,
   },
   approvedBy: {
     type: String,
-    default: null
- },
- totalCollected:{
-   type: Number,
-   default: 0
- },
- numberOfTripsCompleted:{
-  type: Number,
-  default: 0
- },
-  lat : {
-    type: String
+    default: null,
   },
-  long : {
-    type :String
+  totalCollected: {
+    type: Number,
+    default: 0,
   },
-  onesignal_id:{
-    type: String
+  numberOfTripsCompleted: {
+    type: Number,
+    default: 0,
   },
-  profile_picture:{
-    type: String
+  lat: {
+    type: String,
   },
-  mobile_carrier:{
-    type:String
+  long: {
+    type: String,
   },
-  phone_type:{
-    type:String
+  onesignal_id: {
+    type: String,
   },
-  phone_OS:{
-    type: String
+  profile_picture: {
+    type: String,
   },
-  last_logged_in:{
-    type: Date
+  mobile_carrier: {
+    type: String,
   },
-  internet_provider:{
-    type: String
+  phone_type: {
+    type: String,
   },
-   expiry_licence:{
+  phone_OS: {
+    type: String,
+  },
+  last_logged_in: {
     type: Date,
-    default: () => Date.now() + 365*24*60*60*1000
+  },
+  internet_provider: {
+    type: String,
+  },
+  expiry_licence: {
+    type: Date,
+    default: () => Date.now() + 365 * 24 * 60 * 60 * 1000,
   },
 });
 

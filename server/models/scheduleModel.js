@@ -13,6 +13,10 @@ const schedulePick = new Schema({
     type: String,
     required: true,
   },
+  clientId: {
+    type: String,
+    required: true,
+  },
   scheduleCreator: {
     type: String,
     default: "",

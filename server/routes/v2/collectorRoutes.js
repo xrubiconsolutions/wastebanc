@@ -60,4 +60,16 @@ module.exports = (APP) => {
     checkRequestErrs,
     CollectorService.declineCollector
   );
+
+  APP.route("/api/v2/collector/enable/:collectorId").put(
+    [param("collectorId").notEmpty().withMessage("collectorId is required")],
+    adminPakamValidation,
+    CollectorService.enableCollector
+  );
+
+  APP.route("/api/v2/collector/disable/:collectorId").put(
+    [param("collectorId").notEmpty().withMessage("collectorId is required")],
+    adminPakamValidation,
+    CollectorService.disableCollector
+  );
 };

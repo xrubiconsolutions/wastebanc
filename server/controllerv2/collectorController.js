@@ -44,13 +44,13 @@ class CollectorService {
       if (key) {
         criteria = {
           $or: [
-            { fullname: key },
-            { gender: key },
-            { phone: key },
-            { email: key },
-            { localGovernment: key },
-            { organisation: key },
-            { IDNumber: key },
+            { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+            { gender: { $regex: `.*${key}.*`, $options: "i" } },
+            { phone: { $regex: `.*${key}.*`, $options: "i" } },
+            { email: { $regex: `.*${key}.*`, $options: "i" } },
+            { localGovernment: { $regex: `.*${key}.*`, $options: "i" } },
+            { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+            // { IDNumber: key },
           ],
         };
       } else {
@@ -337,11 +337,93 @@ class CollectorService {
     }
   }
 
+  static async disableCollector(req, res) {
+    try {
+      const collectorId = req.params.collectorId;
+      const collector = await collectorModel.findById(collectorId);
+      if (!collector) {
+        return res.status(400).json({
+          error: true,
+          msg: "Aggregator not found",
+        });
+      }
+
+      if (!collector.status || collector.status === "active") {
+        return res.status(200).json({
+          error: false,
+          message: "Aggregator already enabled",
+        });
+      }
+
+      await collectorModel.updateOne(
+        { _id: collector._id },
+        {
+          status: "disabled",
+        }
+      );
+
+      return res.status(200).json({
+        error: false,
+        message: "Aggregator disabled successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+      });
+    }
+  }
+
+  static async enableCollector(req, res) {
+    try {
+      const collectorId = req.params.collectorId;
+      const collector = await collectorModel.findById(collectorId);
+      if (!collector) {
+        return res.status(400).json({
+          error: true,
+          msg: "Aggregator not found",
+        });
+      }
+
+      if (collector.status === "active") {
+        return res.status(200).json({
+          error: false,
+          message: "Aggregator already enabled",
+        });
+      }
+
+      await collectorModel.updateOne(
+        { _id: collector._id },
+        {
+          status: "active",
+        }
+      );
+
+      return res.status(200).json({
+        error: false,
+        message: "Aggregator enabled successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+      });
+    }
+  }
+
   static async approveCollector(req, res) {
     const { collectorId } = req.body;
     const { _id: companyId, companyName: organisation } = req.user;
     const projection = { password: 0, _v: 0 };
     try {
+      const collector = await collectorModel.findById(collectorId);
+
+      if (collector.verified === true)
+        return res.status(200).json({
+          error: false,
+          message: "Collector already approved",
+        });
+
       await collectorModel.updateOne(
         { _id: collectorId, organisation },
         {
@@ -365,6 +447,14 @@ class CollectorService {
     const projection = { password: 0, __v: 0 };
     const { companyName: organisation } = req.user;
     try {
+      const collector = await collectorModel.findById(collectorId);
+
+      if (collector.verified === false)
+        return res.status(200).json({
+          error: false,
+          message: "Collector already declined",
+        });
+
       await collectorModel.updateOne(
         { _id: collectorId, organisation },
         {

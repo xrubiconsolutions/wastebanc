@@ -155,11 +155,12 @@ class ScheduleService {
     const criteria = key
       ? {
           $or: [
-            { Category: key },
-            { collectorStatus: key },
-            { scheduleCreator: key },
-            { client: key },
-            { phone: key },
+            { Category: { $regex: `.*${key}.*`, $options: "i" } },
+            { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+            { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
+            { client: { $regex: `.*${key}.*`, $options: "i" } },
+            { phone: { $regex: `.*${key}.*`, $options: "i" } },
+            { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           completionStatus,
           organisation,
