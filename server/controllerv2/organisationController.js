@@ -113,17 +113,17 @@ organisationController.listOrganisation = async (req, res) => {
             companyTag: { $regex: `.*${key}.*`, $options: "i" },
           },
           {
-            "areaOfAccess.*": { $regex: `.*${key}.*`, $options: "i" },
+            areaOfAccess: { $regex: `.*${key}.*`, $options: "i" },
           },
           {
-            "streetOfAccess.*": { $regex: `.*${key}.*`, $options: "i" },
+            streetOfAccess: { $regex: `.*${key}.*`, $options: "i" },
           },
         ],
       };
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
-        createdAt: {
+        createAt: {
           $gte: startDate,
           $lt: endDate,
         },
