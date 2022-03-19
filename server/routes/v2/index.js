@@ -12,4 +12,5 @@ module.exports = function (app) {
   require("./dashboardRoutes")(app);
   require("./dropoffRoutes")(app);
   require("./paymentRoutes")(app);
+  require("./lcdAreaRoutes")(app);
 };

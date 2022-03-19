@@ -185,3 +185,5 @@ areasController.remove = async (req, res) => {
     });
   }
 };
+
+module.exports = areasController;
