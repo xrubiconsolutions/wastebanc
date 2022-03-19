@@ -62,10 +62,7 @@ module.exports = (APP) => {
     CONTROLLER.versionController.submitLCD
   );
 
-  APP.route("/api/get/lcd/areas").get(
-    auth.lcdValidation,
-    CONTROLLER.versionController.getLCD
-  );
+  APP.route("/api/get/lcd/areas").get(CONTROLLER.versionController.getLCD);
 
   APP.route("/api/update/lcd/areas").post(
     auth.companyPakamDataValidation,

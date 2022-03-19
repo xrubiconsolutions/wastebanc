@@ -8,7 +8,6 @@ const Constants = require("../util/constants");
  ************* localGovernment Model or collection ***********
  **************************************************/
 
-
 const localGovernment_Schema = new Schema({
   lcd: {
     type: String,
@@ -16,8 +15,12 @@ const localGovernment_Schema = new Schema({
   },
   lga: {
     type: String,
-    required: true
+    required: true,
   },
+  country: {
+    type: String,
+  },
+  state: { type: String },
   createdAt: {
     type: Date,
     default: Date.now,
