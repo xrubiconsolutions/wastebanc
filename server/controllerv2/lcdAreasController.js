@@ -136,10 +136,13 @@ areasController.getLcd = async (req, res) => {
 
     if (state) criteria.state = state;
 
+    const skip = (page - 1) * resultsPerPage;
+    console.log("s", skip);
+
     const totalResult = await localGovernmentModel.countDocuments(criteria);
     const areas = await localGovernmentModel
       .find(criteria)
-      .sort({ created: -1 })
+      .sort({ createdAt: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);
 
