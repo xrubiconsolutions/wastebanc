@@ -82,6 +82,7 @@ dropoffController.dropOffs = async (req, res) => {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     });
   } catch (error) {

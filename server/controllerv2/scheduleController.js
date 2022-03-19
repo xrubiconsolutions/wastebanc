@@ -70,6 +70,7 @@ class ScheduleService {
           totalResult,
           page,
           resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
         },
       });
     } catch (error) {
@@ -122,6 +123,7 @@ class ScheduleService {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       });
     } catch (error) {
       console.log(error);
@@ -189,6 +191,7 @@ class ScheduleService {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       });
     } catch (error) {
       console.log(error);

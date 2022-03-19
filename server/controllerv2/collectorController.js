@@ -84,6 +84,7 @@ class CollectorService {
           totalResult,
           page,
           resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
         },
       });
     } catch (error) {
@@ -130,6 +131,7 @@ class CollectorService {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       });
     } catch (error) {
       console.log(error);
@@ -206,6 +208,7 @@ class CollectorService {
           totalResult,
           page,
           resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
         },
       });
     } catch (error) {
@@ -257,7 +260,13 @@ class CollectorService {
         return res.status(200).json({
           error: false,
           message: "success",
-          data: { coordinateData, totalResult, page, resultsPerPage },
+          data: {
+            coordinateData,
+            totalResult,
+            page,
+            resultsPerPage,
+            totalPages: Math.ceil(totalResult / resultsPerPage),
+          },
         });
       } else {
         //send all coordinates

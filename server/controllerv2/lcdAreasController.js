@@ -42,7 +42,7 @@ areasController.create = async (req, res) => {
 areasController.update = async (req, res) => {
   try {
     bodyValidate(req, res);
-    const id = req.params.id;
+    const id = req.params.areaId;
     const area = await localGovernmentModel.findById(id);
     if (!area) {
       return res.status(400).json({
@@ -151,6 +151,7 @@ areasController.getLcd = async (req, res) => {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     });
   } catch (error) {

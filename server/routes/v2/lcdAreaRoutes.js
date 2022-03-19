@@ -36,4 +36,9 @@ module.exports = (APP) => {
     [param("areaId").notEmpty().withMessage("areaId is required")],
     lcdAreasController.remove
   );
+
+  APP.route("/api/v2/areas").get(
+    adminPakamValidation,
+    lcdAreasController.getLcd
+  );
 };
