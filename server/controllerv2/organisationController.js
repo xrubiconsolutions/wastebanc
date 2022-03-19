@@ -120,25 +120,6 @@ organisationController.listOrganisation = async (req, res) => {
           },
         ],
       };
-
-      const totalResult = await organisationModel.countDocuments(criteria);
-      const organisations = await organisationModel
-        .find(criteria)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * resultsPerPage)
-        .limit(resultsPerPage);
-
-      return res.status(200).json({
-        error: false,
-        message: "success",
-        data: {
-          organisations,
-          totalResult,
-          page,
-          resultsPerPage,
-          totalPages: Math.ceil(totalResult / resultsPerPage),
-        },
-      });
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
@@ -150,6 +131,25 @@ organisationController.listOrganisation = async (req, res) => {
     }
 
     if (state) criteria.state = state;
+
+    const totalResult = await organisationModel.countDocuments(criteria);
+    const organisations = await organisationModel
+      .find(criteria)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        organisations,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      },
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
