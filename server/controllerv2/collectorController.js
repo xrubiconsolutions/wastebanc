@@ -473,6 +473,53 @@ class CollectorService {
       return res.status(500).json(error);
     }
   }
+
+  static async getCompanyCollectorStats(req, res) {
+    const { companyName: organisation } = req.user;
+    try {
+      // count verified collecctors
+      const verifiedCount = await collectorModel.countDocuments({
+        verified: true,
+        organisation,
+      });
+
+      // count male company colelctors
+      const maleCount = await collectorModel.countDocuments({
+        gender: "male",
+        organisation,
+      });
+
+      // count female company colelctors
+      const femaleCount = await collectorModel.countDocuments({
+        gender: "female",
+        organisation,
+      });
+
+      // count new company collectors withon 30 days
+      const ONE_MONTH_AGO = new Date() - 1000 * 60 * 60 * 24 * 30;
+      const newCollectorsCount = await collectorModel.countDocuments({
+        verified: true,
+        createdAt: {
+          $gte: ONE_MONTH_AGO,
+        },
+        organisation,
+      });
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          male: maleCount,
+          female: femaleCount,
+          verified: verifiedCount,
+          newCollectors: newCollectorsCount,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json(error);
+    }
+  }
 }
 
 module.exports = CollectorService;
