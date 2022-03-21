@@ -517,7 +517,10 @@ class CollectorService {
       });
     } catch (error) {
       console.log(error);
-      res.status(500).json(error);
+      res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
     }
   }
 }
