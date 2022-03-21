@@ -47,14 +47,14 @@ module.exports = (APP) => {
     CollectorService.getOrganisationPendingSchedules
   );
 
-  APP.route("/api/v2/company-collectors/approve").get(
+  APP.route("/api/v2/company-collectors/approve").put(
     companyPakamDataValidation,
     collectorValidator.verifyCollector,
     checkRequestErrs,
     CollectorService.approveCollector
   );
 
-  APP.route("/api/v2/company-collectors/decline").get(
+  APP.route("/api/v2/company-collectors/decline").put(
     companyPakamDataValidation,
     collectorValidator.verifyCollector,
     checkRequestErrs,
@@ -71,5 +71,10 @@ module.exports = (APP) => {
     [param("collectorId").notEmpty().withMessage("collectorId is required")],
     adminPakamValidation,
     CollectorService.disableCollector
+  );
+
+  APP.route("/api/v2/company-collectors/stats").get(
+    companyPakamDataValidation,
+    CollectorService.getCompanyCollectorStats
   );
 };
