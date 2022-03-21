@@ -1,6 +1,39 @@
-const scheduleModel = require("../models/scheduleModel");
-const { sendResponse } = require("../util/commonFunction");
+const {
+  scheduleModel,
+  userModel,
+  transactionModel,
+  collectorModel,
+  organisationModel,
+} = require("../models");
+const { sendResponse, bodyValidate } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
+var sendNotification = function (data) {
+  var headers = {
+    "Content-Type": "application/json; charset=utf-8",
+  };
+
+  var options = {
+    host: "onesignal.com",
+    port: 443,
+    path: "/api/v1/notifications",
+    method: "POST",
+    headers: headers,
+  };
+
+  var https = require("https");
+  var req = https.request(options, function (res) {
+    res.on("data", function (data) {
+      console.log(JSON.parse(data));
+    });
+  });
+
+  req.on("error", function (e) {
+    console.log(e);
+  });
+
+  req.write(JSON.stringify(data));
+  req.end();
+};
 
 class ScheduleService {
   static async getSchedulesWithFilter(req, res) {
@@ -31,13 +64,13 @@ class ScheduleService {
       if (key) {
         criteria = {
           $or: [
-            { Category: key },
-            { organisation: key },
-            { schuduleCreator: key },
-            { collectorStatus: key },
-            { client: key },
-            { phone: key },
-            { completionStatus: key },
+            { Category: { $regex: `.*${key}.*`, $options: "i" } },
+            { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+            { schuduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+            { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
+            { client: { $regex: `.*${key}.*`, $options: "i" } },
+            { phone: { $regex: `.*${key}.*`, $options: "i" } },
+            { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           completionStatus,
         };
@@ -70,6 +103,7 @@ class ScheduleService {
           totalResult,
           page,
           resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
         },
       });
     } catch (error) {
@@ -95,12 +129,12 @@ class ScheduleService {
 
     const criteria = {
       $or: [
-        { Category: key },
-        { organisation: key },
-        { collectorStatus: key },
-        { client: key },
-        { phone: key },
-        { scheduleCreator: key },
+        { Category: { $regex: `.*${key}.*`, $options: "i" } },
+        { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+        { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
+        { client: { $regex: `.*${key}.*`, $options: "i" } },
+        { phone: { $regex: `.*${key}.*`, $options: "i" } },
+        { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
       ],
       completionStatus,
     };
@@ -122,6 +156,7 @@ class ScheduleService {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       });
     } catch (error) {
       console.log(error);
@@ -189,10 +224,190 @@ class ScheduleService {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       });
     } catch (error) {
       console.log(error);
       sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+    }
+  }
+
+  static async rewardSystem(req, res) {
+    bodyValidate(req, res);
+    try {
+      const collectorId = req.body.collectorId;
+      const categories = req.body.categories;
+      const scheduleId = req.body.scheduleId;
+
+      const schedule = await scheduleModel.findById(scheduleId);
+      if (!schedule) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not found",
+        });
+      }
+
+      const scheduler = await userModel.findOne({
+        email: schedule.client,
+      });
+
+      if (!scheduler) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid schedule, no user found under schedule",
+        });
+      }
+
+      const alreadyCompleted = await transactionModel.findOne({
+        scheduleId: schedule._id,
+      });
+      if (alreadyCompleted) {
+        return res.status(400).json({
+          error: true,
+          message: "This transaction had been completed by another recycler",
+        });
+      }
+
+      const collector = await collectorModel.findById(collectorId);
+      if (!collector || collector.verified === false) {
+        return res.status(400).json({
+          error: true,
+          message: "Collector not found or has not be verified",
+        });
+      }
+
+      const organisation = await organisationModel.findById(
+        collector.approvedBy
+      );
+      if (!organisation) {
+        return res.status(400).json({
+          error: true,
+          message:
+            "organisation not found or no longer exist, Please contact support",
+        });
+      }
+
+      let pricing = [];
+      let cat;
+      console.log("organisation", organisation);
+      for (let category of categories) {
+        if (organisation.categories.length !== 0) {
+          cat = organisation.categories.find(
+            (c) => c.name.toLowerCase() === category.name
+          );
+          if (!cat) {
+            return res.status(400).json({
+              error: true,
+              message: `${category.name} not found as a waste category for organisation`,
+            });
+          }
+          const p = parseFloat(category.quantity) * Number(cat.price);
+          console.log("quantity", parseFloat(category.quantity));
+          pricing.push(p);
+        } else {
+          var cc =
+            category.name === "nylonSachet"
+              ? "nylon"
+              : category.name === "glassBottle"
+              ? "glass"
+              : category.name.length < 4
+              ? category.name.substring(0, category.name.length)
+              : category.name.substring(0, category.name.length - 1);
+
+          var organisationCheck = JSON.parse(JSON.stringify(organisation));
+          console.log("organisation check here", organisationCheck);
+          for (let val in organisationCheck) {
+            console.log("category check here", cc);
+            if (val.includes(cc)) {
+              const equivalent = !!organisationCheck[val]
+                ? organisationCheck[val]
+                : 1;
+              console.log("equivalent here", equivalent);
+              const p = parseFloat(category.quantity) * equivalent;
+              pricing.push(p);
+            }
+          }
+        }
+      }
+
+      const totalpointGained = pricing.reduce((a, b) => {
+        return a + b;
+      }, 0);
+
+      const totalWeight = categories.reduce((a, b) => {
+        return a + (b["quantity"] || 0);
+      }, 0);
+      console.log("pricing", pricing);
+
+      await transactionModel.create({
+        weight: totalWeight,
+        coin: totalpointGained,
+        cardID: scheduler._id,
+        completedBy: collectorId,
+        categories,
+        fullname: `${scheduler.firstname} ${scheduler.lastname}`,
+        recycler: collector.fullname,
+        aggregatorId: collector.aggregatorId,
+        organisation: collector.organisation,
+        organisation: organisation._id,
+        scheduleId: schedule._id,
+        type: "pickup schedule",
+      });
+
+      const message = {
+        app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+        contents: {
+          en: "You have just been credited for your schedule",
+        },
+        include_player_ids: [`${scheduler.onesignal_id}`],
+      };
+
+      sendNotification(message);
+
+      await schedule.updateOne(
+        { _id: schedule._id },
+        {
+          $set: {
+            completionStatus: "completed",
+            collectedBy: collectorId,
+            quantity: totalWeight,
+            completionDate: new Date(),
+          },
+        }
+      );
+
+      await userModel.updateOne(
+        { email: scheduler.email },
+        {
+          $set: {
+            availablePoints: scheduler.availablePoints + totalpointGained,
+            schedulePoints: scheduler.schedulePoints + 1,
+          },
+        }
+      );
+
+      await collectorModel.updateOne(
+        { _id: collector._id },
+        {
+          $set: {
+            totalCollected: collector.totalCollected + totalWeight,
+            numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
+            busy: false,
+            last_logged_in: new Date(),
+          },
+        }
+      );
+      return res.status(200).json({
+        error: false,
+        message: "Transaction completed successfully",
+        data: totalpointGained,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
     }
   }
 }

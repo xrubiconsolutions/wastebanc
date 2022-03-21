@@ -136,10 +136,10 @@ const user_Schema = new Schema({
   internet_provider: {
     type: String,
   },
-  countries: {
+  country: {
     type: Array,
   },
-  states: {
+  state: {
     type: Array,
   },
   status: {

@@ -84,6 +84,7 @@ class CollectorService {
           totalResult,
           page,
           resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
         },
       });
     } catch (error) {
@@ -103,13 +104,13 @@ class CollectorService {
     const criteria = {
       verified: true,
       $or: [
-        { fullname: key },
-        { gender: key },
-        { phone: key },
-        { email: key },
-        { localGovernment: key },
-        { organisation: key },
-        { IDNumber: key },
+        { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+        { gender: { $regex: `.*${key}.*`, $options: "i" } },
+        { phone: { $regex: `.*${key}.*`, $options: "i" } },
+        { email: { $regex: `.*${key}.*`, $options: "i" } },
+        { localGovernment: { $regex: `.*${key}.*`, $options: "i" } },
+        { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+        //{ IDNumber: { $regex: `.*${key}.*`, $options: "i" } },
       ],
     };
     if (state) criteria.state = state;
@@ -130,6 +131,7 @@ class CollectorService {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       });
     } catch (error) {
       console.log(error);
@@ -206,6 +208,7 @@ class CollectorService {
           totalResult,
           page,
           resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
         },
       });
     } catch (error) {
@@ -257,7 +260,13 @@ class CollectorService {
         return res.status(200).json({
           error: false,
           message: "success",
-          data: { coordinateData, totalResult, page, resultsPerPage },
+          data: {
+            coordinateData,
+            totalResult,
+            page,
+            resultsPerPage,
+            totalPages: Math.ceil(totalResult / resultsPerPage),
+          },
         });
       } else {
         //send all coordinates

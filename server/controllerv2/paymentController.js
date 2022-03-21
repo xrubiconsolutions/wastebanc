@@ -65,6 +65,7 @@ paymentController.paymentHistory = async (req, res) => {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     });
   } catch (error) {
@@ -129,6 +130,7 @@ paymentController.charityHistory = async (req, res) => {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     });
   } catch (error) {

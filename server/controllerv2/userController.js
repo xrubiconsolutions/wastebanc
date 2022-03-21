@@ -52,6 +52,7 @@ class UserService {
           totalResult,
           page,
           resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
         },
       });
     } catch (error) {
@@ -132,6 +133,7 @@ class UserService {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       });
     } catch (error) {
       console.log(error);

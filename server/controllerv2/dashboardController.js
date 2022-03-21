@@ -193,6 +193,7 @@ dashboardController.recentPickups = async (req, res) => {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     });
   } catch (error) {
@@ -265,6 +266,7 @@ dashboardController.newUsers = async (req, res) => {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     });
   } catch (error) {
@@ -337,6 +339,7 @@ dashboardController.newAggregators = async (req, res) => {
         totalResult,
         page,
         resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     });
   } catch (error) {
