@@ -5,6 +5,7 @@ const scheduleModel = require("../models/scheduleModel");
 const { sendResponse } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
+const transactionModel = require("../models/transactionModel");
 
 class CollectorService {
   static bodyValidate(req, res) {
@@ -529,6 +530,72 @@ class CollectorService {
       res.status(500).json({
         error: true,
         message: "An error occurred",
+      });
+    }
+  }
+
+  static async getCompanyWasteTransaction(req, res) {
+    let { page = 1, resultsPerPage = 20, start, end, key, state } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    if (!key && (!start || !end))
+      return res.status(400).json({
+        error: true,
+        message: "Please pass a start and end date or a search key",
+      });
+
+    const { _id: organisationID } = req.user;
+    let criteria;
+
+    if (key) {
+      criteria = {
+        $or: [
+          { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+          { aggregatorId: { $regex: `.*${key}.*`, $options: "i" } },
+          { recycler: { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+        organisationID,
+      };
+    } else {
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+        organisationID,
+      };
+    }
+
+    try {
+      // totalResult count
+      const totalResult = await transactionModel.countDocuments(criteria);
+
+      // paginated outstanding payment
+      const wasteTransactions = await transactionModel
+        .find(criteria)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          wasteTransactions,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occured",
       });
     }
   }
