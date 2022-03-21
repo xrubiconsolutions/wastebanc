@@ -18,6 +18,9 @@ const transaction_Schema = {
     type: Number,
     required: true,
   },
+  type: {
+    type: String,
+  },
 
   scheduleId: {
     type: String,
@@ -42,7 +45,6 @@ const transaction_Schema = {
   },
   Category: {
     type: String,
-    required: true,
   },
   categories: {
     type: Array,

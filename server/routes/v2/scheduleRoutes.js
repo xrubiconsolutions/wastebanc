@@ -1,6 +1,8 @@
 const ScheduleService = require("../../controllerv2/scheduleController.js");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 const commonValidator = require("../../validators/commonValidator.js");
+const { body, query, check, param } = require("express-validator");
+
 const {
   adminPakamValidation,
   recyclerValidation,
@@ -26,5 +28,19 @@ module.exports = (APP) => {
     companyPakamDataValidation,
     checkRequestErrs,
     ScheduleService.getCompanySchedules
+  );
+
+  APP.route("/api/v2/rewardUser").post(
+    recyclerValidation,
+    [
+      body("collectorId").notEmpty().withMessage("collectorId is required"),
+      body("categories")
+        .notEmpty()
+        .withMessage("categories")
+        .isArray()
+        .withMessage("categories is an array"),
+      body("scheduleId").notEmpty().withMessage("scheduleId is required"),
+    ],
+    ScheduleService.rewardSystem
   );
 };

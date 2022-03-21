@@ -66,10 +66,10 @@ agenciesController.create = async (req, res) => {
       });
     }
 
-    const password = body.email.split("@");
+    const password = COMMON_FUN.generateRandomString();
     console.log(password[0]);
 
-    const hash = await COMMON_FUN.encryptPassword(password[0]);
+    const hash = await COMMON_FUN.encryptPassword(password);
     const agency = await MODEL.userModel.create({
       countries: body.countries,
       states: body.states,

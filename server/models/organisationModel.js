@@ -35,9 +35,8 @@ const organisation_Schema = new Schema({
     required: true,
   },
   phone: {
-    type: Number,
+    type: String,
     required: true,
-    unique: true,
   },
   roles: {
     type: String,
@@ -83,7 +82,7 @@ const organisation_Schema = new Schema({
   categories: [
     {
       name: { type: String },
-      price: { type: String },
+      price: { type: Number, default: 1 },
     },
   ],
   canEquivalent: {
