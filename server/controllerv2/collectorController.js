@@ -2,6 +2,7 @@ const { collectorModel } = require("../models");
 const geofenceModel = require("../models/geofenceModel");
 const organisationModel = require("../models/organisationModel");
 const scheduleModel = require("../models/scheduleModel");
+const transactionModel = require("../models/transactionModel");
 const {
   sendResponse,
   bodyValidate,
@@ -10,6 +11,7 @@ const {
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
+
 const request = require("request");
 
 class CollectorService {
@@ -129,7 +131,6 @@ class CollectorService {
   }
   static async getCompanyCollectors(req, res) {
     const { companyName: organisation } = req.user;
-    const projection = { password: 0, _v: 0 };
     try {
       let {
         page = 1,
@@ -622,6 +623,9 @@ class CollectorService {
         organisation,
       });
 
+      // get all company collectors
+      const collectors = await collectorModel.find({ organisation });
+
       return res.status(200).json({
         error: false,
         message: "success",
@@ -630,6 +634,7 @@ class CollectorService {
           female: femaleCount,
           verified: verifiedCount,
           newCollectors: newCollectorsCount,
+          collectors,
         },
       });
     } catch (error) {
@@ -637,6 +642,177 @@ class CollectorService {
       res.status(500).json({
         error: true,
         message: "An error occurred",
+      });
+    }
+  }
+
+  static async getCompanyWasteTransaction(req, res) {
+    let { page = 1, resultsPerPage = 20, start, end, key, state } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    if (!key && (!start || !end))
+      return res.status(400).json({
+        error: true,
+        message: "Please pass a start and end date or a search key",
+      });
+
+    const { _id: organisationID } = req.user;
+    let criteria;
+
+    if (key) {
+      criteria = {
+        $or: [
+          { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+          { aggregatorId: { $regex: `.*${key}.*`, $options: "i" } },
+          { recycler: { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+        organisationID,
+      };
+    } else {
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+        organisationID,
+      };
+    }
+
+    try {
+      // totalResult count
+      const totalResult = await transactionModel.countDocuments(criteria);
+
+      // paginated outstanding payment
+      const wasteTransactions = await transactionModel
+        .find(criteria)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          wasteTransactions,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occured",
+      });
+    }
+  }
+
+  static async getCompanyWasteStats(req, res) {
+    let { start, end, state } = req.query;
+    const { _id: organisation } = req.user;
+
+    if (!start || !end) {
+      return res.status(400).json({
+        error: true,
+        message: "Please pass a start and end date",
+      });
+    }
+
+    let criteria = {
+      createdAt: {
+        $gte: new Date(start),
+        $lt: new Date(end),
+      },
+      organisation,
+    };
+    const pipelines = [
+      {
+        $match: criteria,
+      },
+      {
+        $unwind: {
+          path: "$categories",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          category: {
+            $ifNull: ["$categories.name", "$Category"],
+          },
+          month: {
+            $month: "$createdAt",
+          },
+          createdAt: 1,
+          weight: {
+            $ifNull: ["$categories.quantity", "$weight"],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            month: "$month",
+            category: "$category",
+          },
+          categoryCount: {
+            $sum: 1,
+          },
+          totalWeight: {
+            $sum: "$weight",
+          },
+        },
+      },
+      {
+        $project: {
+          group: "$_id",
+          categoryCount: 1,
+          totalWeight: 1,
+          _id: 0,
+        },
+      },
+      {
+        $group: {
+          _id: "$group.month",
+          items: {
+            $push: {
+              cat: "$group.category",
+              count: "$categoryCount",
+              weight: "$totalWeight",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          month: "$_id",
+          items: 1,
+          _id: 0,
+        },
+      },
+      {
+        $sort: {
+          month: 1,
+        },
+      },
+    ];
+    try {
+      const wasteStats = await transactionModel.aggregate(pipelines);
+      return res.status(200).json({
+        error: false,
+        message: "Success",
+        data: { wasteStats, start, end },
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        error: true,
+        message: "An error occured",
       });
     }
   }

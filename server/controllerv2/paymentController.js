@@ -188,7 +188,7 @@ paymentController.getCompanyOutstanding = async (req, res) => {
     // paginated outstanding payment
     const outstandingPayments = await transactionModel
       .find(criteria)
-      .sort({ created: -1 })
+      .sort({ createdAt: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);
 
@@ -324,7 +324,7 @@ paymentController.companyPaymentHistory = async (req, res) => {
 
     const payments = await payModel
       .find(criteria)
-      .sort({ created: -1 })
+      .sort({ createdAt: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);
 
