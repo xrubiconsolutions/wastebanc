@@ -17,7 +17,7 @@ const request = require("request");
 
 organisationController.getOrganisationCompleted = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, state, key } = query;
+    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
@@ -73,7 +73,7 @@ organisationController.getOrganisationCompleted = async (req, res) => {
       },
     ]);
 
-    console.log("d", d);
+    //console.log("d", d);
 
     return res.status(200).json({
       error: false,
