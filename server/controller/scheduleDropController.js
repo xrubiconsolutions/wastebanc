@@ -345,7 +345,9 @@ scheduleDropController.dropRequestRecycler = (req, res) => {
       })
 
       .then((drop) => {
-        return res.status(200).json(drop);
+        return res
+          .status(200)
+          .json({ error: false, message: "success", data: drop });
       });
   } catch (err) {
     return res.status(500).json(err);
