@@ -32,7 +32,7 @@ const storage = new CloudinaryStorage({
 const parser = multer({ storage: storage });
 
 module.exports = (APP) => {
-  APP.route("/api/register").post(CONTROLLER.userController.registerUser);
+  APP.route("/api/v2/register").post(CONTROLLER.userController.registerUser);
 
   APP.route("/api/fileUpload").post(CONTROLLER.userController.upload);
 

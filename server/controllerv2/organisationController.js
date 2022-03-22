@@ -288,4 +288,8 @@ Pakam Team
   }
 };
 
+// organisationController.update = async (req, res) => {
+//   bodyValidate(req, res);
+// }
+
 module.exports = organisationController;

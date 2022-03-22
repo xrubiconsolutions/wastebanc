@@ -2,28 +2,16 @@ const { collectorModel } = require("../models");
 const geofenceModel = require("../models/geofenceModel");
 const organisationModel = require("../models/organisationModel");
 const scheduleModel = require("../models/scheduleModel");
-const { sendResponse } = require("../util/commonFunction");
+const {
+  sendResponse,
+  bodyValidate,
+  encryptPassword,
+  authToken,
+} = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
 
 class CollectorService {
-  static bodyValidate(req, res) {
-    const result = validationResult(req);
-
-    const hasErrors = !result.isEmpty();
-    console.log(hasErrors);
-
-    if (hasErrors) {
-      //   debugLog('user body', req.body);
-      // 2. Throw a 422 if the body is invalid
-      return res.status(422).json({
-        error: true,
-        statusCode: 422,
-        message: "Invalid body request",
-        errors: result.array({ onlyFirstError: true }),
-      });
-    }
-  }
   static async getCollectors(req, res) {
     try {
       let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
@@ -480,6 +468,124 @@ class CollectorService {
     } catch (error) {
       console.log(error);
       return res.status(500).json(error);
+    }
+  }
+
+  static async register(req, res) {
+    bodyValidate(req, res);
+    try {
+      const body = req.body;
+      const checkPhone = await collectorModel.findOne({
+        phone: body.phone,
+      });
+      if (checkPhone) {
+        return res.status(400).json({
+          error: true,
+          message: "Phone already exist",
+        });
+      }
+      if (body.email) {
+        const checkEmail = await collectorModel.findOne({
+          email: body.email,
+        });
+        if (checkEmail) {
+          return res.status(400).json({
+            error: true,
+            message: "Email already exist",
+          });
+        }
+      }
+
+      const create = await collectorMode.create({
+        fullname: body.fullname,
+        email: body.email || "",
+        phone: body.phone,
+        password: await encryptPassword(body.password),
+        gender: body.gender,
+        country: body.country,
+        state: body.state,
+      });
+      const token = authToken(create);
+      const phoneNo = String(create.phone).substring(1, 11);
+      const data = {
+        api_key:
+          "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+        message_type: "NUMERIC",
+        to: `+234${phoneNo}`,
+        from: "N-Alert",
+        channel: "dnd",
+        pin_attempts: 10,
+        pin_time_to_live: 5,
+        pin_length: 4,
+        pin_placeholder: "< 1234 >",
+        message_text:
+          "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+        pin_type: "NUMERIC",
+      };
+      const options = {
+        method: "POST",
+        url: "https://termii.com/api/sms/otp/send",
+        headers: {
+          "Content-Type": ["application/json", "application/json"],
+        },
+        body: JSON.stringify(data),
+      };
+
+      request(options, function (error, response) {
+        const iden = JSON.parse(response.body);
+        if (error) {
+          throw new Error(error);
+        } else {
+          // let UserData = {
+          //   email: RESULT.email,
+          //   phone: RESULT.phone,
+          //   username: RESULT.username,
+          //   roles: RESULT.roles,
+          //   pin_id: iden.pinId,
+          // };
+
+          var data = {
+            api_key:
+              "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+            phone_number: `+234${phoneNo}`,
+            country_code: "NG",
+          };
+          var options = {
+            method: "GET",
+            url: " https://termii.com/api/insight/number/query",
+            headers: {
+              "Content-Type": ["application/json", "application/json"],
+            },
+            body: JSON.stringify(data),
+          };
+          request(options, function (error, response) {
+            if (error) throw new Error(error);
+            //var mobileData = JSON.parse(response.body);
+            //var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
+          });
+        }
+      });
+
+      return res.status(200).json({
+        error: false,
+        message: "Collector created successfully",
+        data: {
+          _id: create._id,
+          fullname: create.fullname,
+          email: create._id,
+          phone: create._id,
+          gender: create.gender,
+          country: create.country,
+          state: create.state,
+          token,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
     }
   }
 }
