@@ -141,7 +141,6 @@ class CollectorService {
   }
   static async getCompanyCollectors(req, res) {
     const { companyName: organisation } = req.user;
-    const projection = { password: 0, _v: 0 };
     try {
       let {
         page = 1,
@@ -515,6 +514,9 @@ class CollectorService {
         organisation,
       });
 
+      // get all company collectors
+      const collectors = await collectorModel.find({ organisation });
+
       return res.status(200).json({
         error: false,
         message: "success",
@@ -523,6 +525,7 @@ class CollectorService {
           female: femaleCount,
           verified: verifiedCount,
           newCollectors: newCollectorsCount,
+          collectors,
         },
       });
     } catch (error) {
