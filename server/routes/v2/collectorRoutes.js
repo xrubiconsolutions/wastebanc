@@ -73,6 +73,20 @@ module.exports = (APP) => {
     CollectorService.disableCollector
   );
 
+  APP.route("/api/collector/register").post(
+    [
+      body("fullname").notEmpty().withMessage("fullname is required"),
+      body("email").optional("").isEmail().withMessage("Enter is valid email"),
+      body("phone").notEmpty().withMessage("phone is required"),
+      body("password").notEmpty().withMessage("password is required"),
+      body("gender").notEmpty().withMessage("gender is required"),
+      body("state").notEmpty().withMessage("state is required"),
+      body("country").notEmpty().withMessage("country is required"),
+      body("organisation").notEmpty().withMessage("organisation is required"),
+    ],
+    CollectorService.register
+  );
+
   APP.route("/api/v2/company-collectors/stats").get(
     companyPakamDataValidation,
     CollectorService.getCompanyCollectorStats

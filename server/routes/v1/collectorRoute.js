@@ -8,7 +8,7 @@ let auth = require("../../util/auth");
  ****************************************/
 module.exports = (APP) => {
 
-    APP.route('/api/collector/register')
+    APP.route('/api/v2/collector/register')
         .post(CONTROLLER.collectorController.registerCollector);
 
     APP.route('/api/collector/login')

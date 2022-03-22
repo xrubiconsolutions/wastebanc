@@ -1,6 +1,12 @@
 const userModel = require("../models/userModel");
-const { sendResponse } = require("../util/commonFunction");
+const {
+  sendResponse,
+  bodyValidate,
+  encryptPassword,
+  authToken,
+} = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
+const request = require("request");
 
 class UserService {
   static async getClients(req, res) {
@@ -138,6 +144,163 @@ class UserService {
     } catch (error) {
       console.log(error);
       sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+    }
+  }
+
+  static async register(req, res) {
+    bodyValidate(req, res);
+    try {
+      const body = req.body;
+      const checkPhone = await userModel.findOne({
+        phone: body.phone,
+      });
+      if (checkPhone) {
+        return res.status(400).json({
+          error: true,
+          message: "Phone already exist",
+        });
+      }
+      if (body.email) {
+        const checkEmail = await userModel.findOne({
+          email: body.email,
+        });
+        if (checkEmail) {
+          return res.status(400).json({
+            error: true,
+            message: "Email already exist",
+          });
+        }
+      }
+
+      if (body.commerical) {
+        if (!body.organisation) {
+          return res.status(422).json({
+            error: true,
+            message: "select a commerical type",
+          });
+        }
+      }
+
+      const create = await userModel.create({
+        fullname: body.fullname,
+        username: body.fullname,
+        phone: body.phone,
+        country: body.country,
+        state: body.state,
+        password: await encryptPassword(body.password),
+        gender: body.gender,
+        email: body.email,
+        lcd: body.lga,
+        uType: body.uType,
+        organisationType: body.organisationType,
+      });
+
+      const token = authToken(create);
+      await userModel.updateOne(
+        {
+          email: create.email,
+        },
+        {
+          $set: {
+            cardID: create._id,
+          },
+        }
+      );
+
+      const phoneNo = String(create.phone).substring(1, 11);
+      const msg = {
+        api_key:
+          "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+        message_type: "NUMERIC",
+        to: `+234${phoneNo}`,
+        from: "N-Alert",
+        channel: "dnd",
+        pin_attempts: 10,
+        pin_time_to_live: 5,
+        pin_length: 4,
+        pin_placeholder: "< 1234 >",
+        message_text:
+          "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+        pin_type: "NUMERIC",
+      };
+      const options = {
+        method: "POST",
+        url: "https://termii.com/api/sms/otp/send",
+        headers: {
+          "Content-Type": ["application/json", "application/json"],
+        },
+        body: JSON.stringify(msg),
+      };
+      request(options, function (error, response) {
+        const res = JSON.parse(response.body);
+        if (error) {
+          throw new Error(error);
+        } else {
+          // let UserData = {
+          //   ...test,
+          //   pin_id: iden.pinId,
+          // };
+          var data = {
+            api_key:
+              "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+            phone_number: `+234${phoneNo}`,
+            country_code: "NG",
+          };
+          var options = {
+            method: "GET",
+            url: " https://termii.com/api/insight/number/query",
+            headers: {
+              "Content-Type": ["application/json", "application/json"],
+            },
+            body: JSON.stringify(data),
+          };
+
+          request(options, function (error, response) {
+            if (error) throw new Error(error);
+            //var mobileData = JSON.parse(response.body);
+            // var mobile_carrier =
+            //   mobileData.result[0].operatorDetail.operatorName;
+            // userModel.updateOne(
+            //   { email: RESULT.email },
+            //   {
+            //     $set: {
+            //       fullname:
+            //         create.username.split(" ")[0] +
+            //         " " +
+            //         create.username.split(" ")[1],
+            //       //mobile_carrier: mobile_carrier,
+            //     },
+            //   },
+            //   (res) => {
+            //     return RESPONSE.status(200).jsonp(UserData);
+            //   }
+            // );
+          });
+        }
+      });
+
+      return res.status(200).json({
+        error: false,
+        message: "user created successfully",
+        data: {
+          _id: create._id,
+          fullname: create.fullname,
+          phone: create.phone,
+          email: create.email || "",
+          gender: create.gender,
+          country: create.country,
+          state: create.state,
+          lga: create.lga,
+          uType: create.uType,
+          organisationType: create.organisationType,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
     }
   }
 }

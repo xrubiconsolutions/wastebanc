@@ -618,6 +618,7 @@ const totalWaste = async (criteria) => {
 
 const totalpayout = async (criteria) => {
   criteria.paid = true;
+  criteria.requestedForPayment = true;
   console.log("totalpayout", criteria);
 
   const transactions = await transactionModel.find(criteria);
@@ -629,6 +630,7 @@ const totalpayout = async (criteria) => {
 
 const totaloutstanding = async (criteria) => {
   criteria.paid = false;
+  criteria.requestedForPayment = false;
   console.log("totaloutstanding", criteria);
 
   const transactions = await transactionModel.find(criteria);

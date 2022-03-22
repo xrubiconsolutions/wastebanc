@@ -87,7 +87,7 @@ const user_Schema = new Schema({
   },
   userType: {
     type: Number,
-    default: 5,
+    default: 1,
   },
   availablePoints: {
     type: Number,
@@ -137,10 +137,10 @@ const user_Schema = new Schema({
     type: String,
   },
   country: {
-    type: Array,
+    type: String,
   },
   state: {
-    type: Array,
+    type: String,
   },
   status: {
     type: String,
@@ -151,6 +151,12 @@ const user_Schema = new Schema({
   },
   resetTimeOut: {
     type: Date,
+  },
+  uType: {
+    type: Number,
+  },
+  organisationType: {
+    type: String,
   },
 });
 

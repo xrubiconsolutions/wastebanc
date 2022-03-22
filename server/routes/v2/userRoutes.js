@@ -3,6 +3,7 @@ const UserService = require("../../controllerv2/userController.js");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 const commonValidator = require("../../validators/commonValidator.js");
 const { adminPakamValidation } = require("../../util/auth");
+const { body, query, check, param } = require("express-validator");
 
 module.exports = (APP) => {
   APP.route("/api/v2/clients").get(
@@ -17,5 +18,31 @@ module.exports = (APP) => {
     // commonValidator.search,
     // checkRequestErrs,
     UserService.searchClients
+  );
+
+  APP.route("/api/register").post(
+    [
+      body("fullname")
+        .notEmpty()
+        .withMessage("fullname is required")
+        .isString()
+        .withMessage("fullname should be string"),
+      body("phone")
+        .notEmpty()
+        .withMessage("phone is required")
+        .isNumeric()
+        .withMessage("phone should be numeric string"),
+      body("email").optional().isEmail().withMessage("Enter a valid email"),
+      body("gender")
+        .notEmpty()
+        .withMessage("gender is required")
+        .isIn(["male", "female", "prefer not to say"]),
+      body("country").notEmpty().withMessage("country is required"),
+      body("state").notEmpty().withMessage("state is required"),
+      body("lga").notEmpty().withMessage("lga is required"),
+      body("uType").notEmpty().withMessage("uType is required"),
+      body("organisationType").optional(),
+    ],
+    UserService.register
   );
 };

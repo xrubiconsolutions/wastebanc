@@ -400,7 +400,7 @@ class ScheduleService {
       return res.status(200).json({
         error: false,
         message: "Transaction completed successfully",
-        data: totalpointGained,
+        //data: totalpointGained,
       });
     } catch (error) {
       console.log(error);
