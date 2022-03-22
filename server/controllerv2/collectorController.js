@@ -599,6 +599,111 @@ class CollectorService {
       });
     }
   }
+
+  static async getCompanyWasteStats(req, res) {
+    let { start, end, state } = req.query;
+    const { _id: organisation } = req.user;
+
+    if (!start || !end) {
+      return res.status(400).json({
+        error: true,
+        message: "Please pass a start and end date",
+      });
+    }
+
+    let criteria = {
+      createdAt: {
+        $gte: new Date(start),
+        $lt: new Date(end),
+      },
+      organisation,
+    };
+    const pipelines = [
+      {
+        $match: criteria,
+      },
+      {
+        $unwind: {
+          path: "$categories",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          category: {
+            $ifNull: ["$categories.name", "$Category"],
+          },
+          month: {
+            $month: "$createdAt",
+          },
+          createdAt: 1,
+          weight: {
+            $ifNull: ["$categories.quantity", "$weight"],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            month: "$month",
+            category: "$category",
+          },
+          categoryCount: {
+            $sum: 1,
+          },
+          totalWeight: {
+            $sum: "$weight",
+          },
+        },
+      },
+      {
+        $project: {
+          group: "$_id",
+          categoryCount: 1,
+          totalWeight: 1,
+          _id: 0,
+        },
+      },
+      {
+        $group: {
+          _id: "$group.month",
+          items: {
+            $push: {
+              cat: "$group.category",
+              count: "$categoryCount",
+              weight: "$totalWeight",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          month: "$_id",
+          items: 1,
+          _id: 0,
+        },
+      },
+      {
+        $sort: {
+          month: 1,
+        },
+      },
+    ];
+    try {
+      const wasteStats = await transactionModel.aggregate(pipelines);
+      return res.status(200).json({
+        error: false,
+        message: "Success",
+        data: { wasteStats, start, end },
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        error: true,
+        message: "An error occured",
+      });
+    }
+  }
 }
 
 module.exports = CollectorService;
