@@ -66,4 +66,14 @@ module.exports = (APP) => {
     ],
     organisationController.create
   );
+
+  APP.route("/api/v2/organisation/:organisationId").get(
+    adminPakamValidation,
+    [
+      param("organisationId")
+        .notEmpty()
+        .withMessage("organisationId is required"),
+    ],
+    organisationController.findOrganisation
+  );
 };

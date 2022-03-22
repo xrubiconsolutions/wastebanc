@@ -288,6 +288,34 @@ Pakam Team
   }
 };
 
+organisationController.findOrganisation = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const organisation = await organisationModel.findById(
+      req.params.organisationId,
+      { password: 0 }
+    );
+    if (!organisation) {
+      return res.status(400).json({
+        error: true,
+        message: "Organisation not found",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "Organisation found",
+      data: organisation,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 // organisationController.update = async (req, res) => {
 //   bodyValidate(req, res);
 // }
