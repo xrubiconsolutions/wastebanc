@@ -137,10 +137,10 @@ const user_Schema = new Schema({
     type: String,
   },
   country: {
-    type: Array,
+    type: String,
   },
   state: {
-    type: Array,
+    type: String,
   },
   status: {
     type: String,

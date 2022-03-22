@@ -181,7 +181,7 @@ class UserService {
         }
       }
 
-      const create = await userMode.create({
+      const create = await userModel.create({
         fullname: body.fullname,
         username: body.fullname,
         phone: body.phone,
@@ -236,10 +236,10 @@ class UserService {
         if (error) {
           throw new Error(error);
         } else {
-          let UserData = {
-            ...test,
-            pin_id: iden.pinId,
-          };
+          // let UserData = {
+          //   ...test,
+          //   pin_id: iden.pinId,
+          // };
           var data = {
             api_key:
               "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",

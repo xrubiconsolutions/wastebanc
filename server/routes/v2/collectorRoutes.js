@@ -47,14 +47,14 @@ module.exports = (APP) => {
     CollectorService.getOrganisationPendingSchedules
   );
 
-  APP.route("/api/v2/company-collectors/approve").get(
+  APP.route("/api/v2/company-collectors/approve").put(
     companyPakamDataValidation,
     collectorValidator.verifyCollector,
     checkRequestErrs,
     CollectorService.approveCollector
   );
 
-  APP.route("/api/v2/company-collectors/decline").get(
+  APP.route("/api/v2/company-collectors/decline").put(
     companyPakamDataValidation,
     collectorValidator.verifyCollector,
     checkRequestErrs,
@@ -74,7 +74,6 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/collector/register").post(
-    adminPakamValidation,
     [
       body("fullname").notEmpty().withMessage("fullname is required"),
       body("email").optional("").isEmail().withMessage("Enter is valid email"),
@@ -82,7 +81,13 @@ module.exports = (APP) => {
       body("password").notEmpty().withMessage("password is required"),
       body("gender").notEmpty().withMessage("gender is required"),
       body("state").notEmpty().withMessage("state is required"),
+      body("organisation").notEmpty().withMessage("organisation is required"),
     ],
     CollectorService.register
+  );
+
+  APP.route("/api/v2/company-collectors/stats").get(
+    companyPakamDataValidation,
+    CollectorService.getCompanyCollectorStats
   );
 };

@@ -41,9 +41,7 @@ module.exports = (APP) => {
       body("state").notEmpty().withMessage("state is required"),
       body("lga").notEmpty().withMessage("lga is required"),
       body("uType").notEmpty().withMessage("uType is required"),
-      body("organisationType")
-        .notEmpty()
-        .withMessage("organisationType is required"),
+      body("organisationType").optional(),
     ],
     UserService.register
   );

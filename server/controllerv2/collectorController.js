@@ -10,6 +10,7 @@ const {
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
+const request = require("request");
 
 class CollectorService {
   static async getCollectors(req, res) {
@@ -496,7 +497,7 @@ class CollectorService {
         }
       }
 
-      const create = await collectorMode.create({
+      const create = await collectorModel.create({
         fullname: body.fullname,
         email: body.email || "",
         phone: body.phone,
@@ -504,6 +505,7 @@ class CollectorService {
         gender: body.gender,
         country: body.country,
         state: body.state,
+        organisation: body.organisation,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -583,6 +585,56 @@ class CollectorService {
     } catch (error) {
       console.log(error);
       return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async getCompanyCollectorStats(req, res) {
+    const { companyName: organisation } = req.user;
+    try {
+      // count verified collecctors
+      const verifiedCount = await collectorModel.countDocuments({
+        verified: true,
+        organisation,
+      });
+
+      // count male company colelctors
+      const maleCount = await collectorModel.countDocuments({
+        gender: "male",
+        organisation,
+      });
+
+      // count female company colelctors
+      const femaleCount = await collectorModel.countDocuments({
+        gender: "female",
+        organisation,
+      });
+
+      // count new company collectors withon 30 days
+      const ONE_MONTH_AGO = new Date() - 1000 * 60 * 60 * 24 * 30;
+      const newCollectorsCount = await collectorModel.countDocuments({
+        verified: true,
+        createdAt: {
+          $gte: ONE_MONTH_AGO,
+        },
+        organisation,
+      });
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          male: maleCount,
+          female: femaleCount,
+          verified: verifiedCount,
+          newCollectors: newCollectorsCount,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
         error: true,
         message: "An error occurred",
       });
