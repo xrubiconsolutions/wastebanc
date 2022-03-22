@@ -91,4 +91,14 @@ module.exports = (APP) => {
     companyPakamDataValidation,
     CollectorService.getCompanyCollectorStats
   );
+
+  APP.route("/api/v2/company-waste/history").get(
+    companyPakamDataValidation,
+    CollectorService.getCompanyWasteTransaction
+  );
+
+  APP.route("/api/v2/company-waste/stats").get(
+    companyPakamDataValidation,
+    CollectorService.getCompanyWasteStats
+  );
 };
