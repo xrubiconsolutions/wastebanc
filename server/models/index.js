@@ -32,5 +32,6 @@ module.exports = {
   userBinModel: require("./userbinModel"),
   activitesModel: require("./activitiesModel"),
   worldlocationModel: require("./worldLocationModel"),
+  incidentModel: require("./incidentModel"),
   organisationTypeModel: require("./organisationTypeModel"),
 };

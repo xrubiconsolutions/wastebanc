@@ -1,3 +1,4 @@
+const incidentModel = require("../models/incidentModel");
 const { userModel, organisationTyeModel } = require("../models");
 const {
   sendResponse,
@@ -303,6 +304,86 @@ class UserService {
           lga: create.lga,
           uType: create.uType,
           organisationType: create.organisationType,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async getAllUserReportLogs(req, res) {
+    try {
+      const usersIncidents = await incidentModel.aggregate([
+        {
+          $group: {
+            _id: "$caller.phoneNumber",
+            incidents: {
+              $push: "$$ROOT",
+            },
+          },
+        },
+        {
+          $project: {
+            userPhoneNo: "$_id",
+            incidents: 1,
+            _id: 0,
+          },
+        },
+      ]);
+
+      return res.status(200).json({
+        error: false,
+        message: "success!",
+        data: usersIncidents,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async getUserReportLogs(req, res) {
+    const { phone } = req.user;
+    let { page = 1, resultsPerPage = 20, start, end } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    const criteria = { "caller.phoneNumber": phone };
+
+    if (start && end) {
+      criteria.createdAt = {
+        $gte: new Date(start),
+        $lt: new Date(end),
+      };
+    }
+
+    try {
+      // count of report logs
+      const totalResult = await incidentModel.countDocuments(criteria);
+
+      const userReportLogs = await incidentModel
+        .find(criteria)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return res.status(200).json({
+        error: false,
+        message: "success!",
+        data: {
+          userReportLogs,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
         },
       });
     } catch (error) {

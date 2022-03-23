@@ -1,12 +1,10 @@
-
-'use strict';
+"use strict";
 
 /***********************************
  * www.js is a file from where our *
  * server is running  **************
  ***********************************/
-let www = require('./bin/www.js');
-
+let www = require("./bin/www.js");
 
 /***********************************
  * dbConnection.js is a file from **
@@ -14,27 +12,24 @@ let www = require('./bin/www.js');
  * mongodb database  **************
  ***********************************/
 
-let db  = require('./bin/dbConnection.js');
-
+let { dbSetup: db } = require("./bin/dbConnection.js");
 
 /***********************************
  * dbConfig.js is a file from we ***
  ****** are getting mongodb ********
  ********* configurations **********
  ***********************************/
-let dbConfig = require('./server/config/dbConfig');
-
+let dbConfig = require("./server/config/dbConfig");
 
 /***********************************
  * Database conectinvity before ****
  ***** running server (www()) ******
  ***********************************/
-db(dbConfig.mongodb.url).then(resolve => {
+db(dbConfig.mongodb.url)
+  .then((resolve) => {
     console.log(`*********DB is connected successfully*********`);
     www();
-}).catch(err => {
+  })
+  .catch((err) => {
     console.log(`*********err*********  ${err}`);
-});
-
-
-
+  });
