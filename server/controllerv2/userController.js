@@ -1,4 +1,5 @@
 const userModel = require("../models/userModel");
+const reportLogsModel = require("../models/reportModelLog");
 const {
   sendResponse,
   bodyValidate,
@@ -294,6 +295,42 @@ class UserService {
           uType: create.uType,
           organisationType: create.organisationType,
         },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async getAllUserReportLogs(req, res) {
+    try {
+      const userReports = await reportLogsModel.aggregate([
+        [
+          {
+            $group: {
+              _id: "$phone",
+              reports: {
+                $push: "$$ROOT",
+              },
+            },
+          },
+          {
+            $project: {
+              userPhoneNo: "$_id",
+              reports: 1,
+              _id: 0,
+            },
+          },
+        ],
+      ]);
+
+      return res.status(200).json({
+        error: false,
+        message: "success!",
+        data: userReports,
       });
     } catch (error) {
       console.log(error);

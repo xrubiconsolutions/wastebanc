@@ -45,4 +45,9 @@ module.exports = (APP) => {
     ],
     UserService.register
   );
+
+  APP.route("/api/v2/reportlogs").get(
+    adminPakamValidation,
+    UserService.getAllUserReportLogs
+  );
 };
