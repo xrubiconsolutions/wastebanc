@@ -82,7 +82,7 @@ module.exports = (APP) => {
       body("gender").notEmpty().withMessage("gender is required"),
       body("state").notEmpty().withMessage("state is required"),
       body("country").notEmpty().withMessage("country is required"),
-      body("organisation").notEmpty().withMessage("organisation is required"),
+      //body("organisation").notEmpty().withMessage("organisation is required"),
     ],
     CollectorService.register
   );

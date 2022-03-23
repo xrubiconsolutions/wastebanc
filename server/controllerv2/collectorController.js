@@ -506,7 +506,7 @@ class CollectorService {
         gender: body.gender,
         country: body.country,
         state: body.state,
-        organisation: body.organisation,
+        //organisation: body.organisation,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
