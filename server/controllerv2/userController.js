@@ -1,5 +1,4 @@
 const userModel = require("../models/userModel");
-const reportLogsModel = require("../models/reportModelLog");
 const incidentModel = require("../models/incidentModel");
 const {
   sendResponse,
@@ -9,7 +8,6 @@ const {
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const request = require("request");
-const { getDBHelper } = require("../../bin/dbConnection");
 
 class UserService {
   static async getClients(req, res) {
@@ -309,30 +307,28 @@ class UserService {
 
   static async getAllUserReportLogs(req, res) {
     try {
-      const userReports = await reportLogsModel.aggregate([
-        [
-          {
-            $group: {
-              _id: "$phone",
-              reports: {
-                $push: "$$ROOT",
-              },
+      const usersIncidents = await incidentModel.aggregate([
+        {
+          $group: {
+            _id: "$caller.phoneNumber",
+            incidents: {
+              $push: "$$ROOT",
             },
           },
-          {
-            $project: {
-              userPhoneNo: "$_id",
-              reports: 1,
-              _id: 0,
-            },
+        },
+        {
+          $project: {
+            userPhoneNo: "$_id",
+            incidents: 1,
+            _id: 0,
           },
-        ],
+        },
       ]);
 
       return res.status(200).json({
         error: false,
         message: "success!",
-        data: userReports,
+        data: usersIncidents,
       });
     } catch (error) {
       console.log(error);
