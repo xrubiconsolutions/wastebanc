@@ -45,4 +45,6 @@ module.exports = (APP) => {
     ],
     UserService.register
   );
+
+ 
 };

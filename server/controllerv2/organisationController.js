@@ -3,6 +3,7 @@
 let organisationController = {};
 const {
   organisationModel,
+  organisationTypeModel,
   transactionModel,
   geofenceModel,
 } = require("../models");
@@ -15,6 +16,53 @@ const {
 const sgMail = require("@sendgrid/mail");
 const request = require("request");
 
+organisationController.types = async (req, res) => {
+  try {
+    const types = await organisationTypeModel.find({}).sort({ createdAt: -1 });
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: types,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+organisationController.createtype = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const checkName = await organisationTypeModel.findOne({
+      name: req.body.name,
+    });
+    if (checkName) {
+      return res.status(400).json({
+        error: true,
+        message: "Name already exist",
+      });
+    }
+
+    const store = await organisationTypeModel.create({
+      name: req.body.name,
+    });
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: store,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
 organisationController.getOrganisationCompleted = async (req, res) => {
   try {
     let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;

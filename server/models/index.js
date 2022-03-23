@@ -19,7 +19,7 @@ module.exports = {
   payOutModel: require("./payOutModel"),
   versionModel: require("./versionModel"),
   geofenceModel: require("./geofenceModel"),
-  
+
   dropOffModel: require("./dropOffModel"),
   charityModel: require("./charityModel"),
   scheduleDropModel: require("./scheduleDropModel"),
@@ -32,4 +32,5 @@ module.exports = {
   userBinModel: require("./userbinModel"),
   activitesModel: require("./activitiesModel"),
   worldlocationModel: require("./worldLocationModel"),
+  organisationTypeModel: require("./organisationTypeModel"),
 };

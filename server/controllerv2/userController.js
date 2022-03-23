@@ -1,4 +1,4 @@
-const userModel = require("../models/userModel");
+const { userModel, organisationTyeModel } = require("../models");
 const {
   sendResponse,
   bodyValidate,
@@ -46,7 +46,8 @@ class UserService {
       // get clients based on page
       const users = await userModel
         .find(criteria)
-        .sort({ createdAt: -1 })
+        .populate("organisationType", "name")
+        .sort({ createAt: -1 })
         .skip((page - 1) * resultsPerPage)
         .limit(resultsPerPage);
 
@@ -171,13 +172,21 @@ class UserService {
           });
         }
       }
-
+      let typename;
       if (body.commerical) {
         if (!body.organisation) {
           return res.status(422).json({
             error: true,
             message: "select a commerical type",
           });
+        } else {
+          typename = await organisationTypeModel.findById(body.organisation);
+          if (!typename) {
+            return res.status(400).json({
+              error: true,
+              message: "Organisation type not found",
+            });
+          }
         }
       }
 
@@ -193,6 +202,7 @@ class UserService {
         lcd: body.lga,
         uType: body.uType,
         organisationType: body.organisationType,
+        organisationTypename: typename.name,
       });
 
       const token = authToken(create);
