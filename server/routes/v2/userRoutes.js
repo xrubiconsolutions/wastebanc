@@ -52,7 +52,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/v2/user/reportlogs").get(
-    // userValidation,
+    userValidation,
     UserService.getUserReportLogs
   );
 };

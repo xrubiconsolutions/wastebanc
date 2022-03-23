@@ -254,7 +254,8 @@ dashboardController.newUsers = async (req, res) => {
 
     const users = await userModel
       .find(criteria, projection, { lean: true })
-      .sort({ createdAt: -1 })
+      .populate("organisationType", "name")
+      .sort({ createAt: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);
 

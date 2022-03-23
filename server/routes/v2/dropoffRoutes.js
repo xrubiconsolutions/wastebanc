@@ -9,6 +9,7 @@ const {
   deleteDropOff,
 } = require("../../validators/dropOffValidator");
 const { checkRequestErrs } = require("../../util/commonFunction");
+const { body, query, check, param } = require("express-validator");
 
 module.exports = (APP) => {
   APP.route("/api/v2/dropoffs").get(
@@ -33,5 +34,19 @@ module.exports = (APP) => {
     createDropOffLocation,
     checkRequestErrs,
     dropoffController.addDropOffLocation
+  );
+
+  APP.route("/api/v2/company/dropoffs/rewardUser").post(
+    recyclerValidation,
+    [
+      body("collectorId").notEmpty().withMessage("collectorId is required"),
+      body("categories")
+        .notEmpty()
+        .withMessage("categories")
+        .isArray()
+        .withMessage("categories is an array"),
+      body("scheduleId").notEmpty().withMessage("scheduleId is required"),
+    ],
+    dropoffController.rewardDropSystem
   );
 };

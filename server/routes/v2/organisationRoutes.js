@@ -66,4 +66,28 @@ module.exports = (APP) => {
     ],
     organisationController.create
   );
+
+  APP.route("/api/v2/organisation/:organisationId").get(
+    adminPakamValidation,
+    [
+      param("organisationId")
+        .notEmpty()
+        .withMessage("organisationId is required"),
+    ],
+    organisationController.findOrganisation
+  );
+
+  APP.route("/api/v2/organisation/types/all").get(organisationController.types);
+
+  APP.route("/api/v2/organisation/type/create").post(
+    adminPakamValidation,
+    [
+      body("name")
+        .notEmpty()
+        .withMessage("name is required")
+        .isString()
+        .withMessage("name should be string"),
+    ],
+    organisationController.createtype
+  );
 };

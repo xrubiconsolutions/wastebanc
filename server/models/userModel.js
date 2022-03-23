@@ -156,7 +156,8 @@ const user_Schema = new Schema({
     type: Number,
   },
   organisationType: {
-    type: String,
+    type: MONGOOSE.Schema.Types.ObjectId,
+    ref: "organisationType",
   },
 });
 
