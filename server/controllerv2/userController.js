@@ -1,5 +1,6 @@
 const userModel = require("../models/userModel");
 const reportLogsModel = require("../models/reportModelLog");
+const incidentModel = require("../models/incidentModel");
 const {
   sendResponse,
   bodyValidate,
@@ -8,6 +9,7 @@ const {
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const request = require("request");
+const { getDBHelper } = require("../../bin/dbConnection");
 
 class UserService {
   static async getClients(req, res) {
@@ -331,6 +333,52 @@ class UserService {
         error: false,
         message: "success!",
         data: userReports,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async getUserReportLogs(req, res) {
+    const { phone } = req.user;
+    let { page = 1, resultsPerPage = 20, start, end } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    const criteria = { "caller.phoneNumber": phone };
+
+    if (start && end) {
+      criteria.createdAt = {
+        $gte: new Date(start),
+        $lt: new Date(end),
+      };
+    }
+
+    try {
+      // count of report logs
+      const totalResult = await incidentModel.countDocuments(criteria);
+
+      const userReportLogs = await incidentModel
+        .find(criteria)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return res.status(200).json({
+        error: false,
+        message: "success!",
+        data: {
+          userReportLogs,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
       });
     } catch (error) {
       console.log(error);
