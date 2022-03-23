@@ -2782,8 +2782,8 @@ userController.resetPassword = async (req, res) => {
       });
     }
 
-    const password = body.password;
-    const confirmPassword = body.confirmPassword;
+    const password = body.password.trim();
+    const confirmPassword = body.confirmPassword.trim();
     if (password !== confirmPassword) {
       return res.status(400).json({
         error: true,
