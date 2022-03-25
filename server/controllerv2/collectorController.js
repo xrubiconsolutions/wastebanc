@@ -829,7 +829,6 @@ class CollectorService {
 
     // construct criteria to find
     const { _id: collectedBy } = req.user;
-    // const collectedBy = "605ca2baac37af06196c33d9";
     const criteria = { collectedBy, completionStatus };
 
     try {
