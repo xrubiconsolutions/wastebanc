@@ -208,6 +208,7 @@ class UserService {
         lcd: body.lga,
         uType: body.uType,
         organisationType: body.organisation,
+        onesignal_id: body.onesignal_id,
       });
 
       const token = authToken(create);
