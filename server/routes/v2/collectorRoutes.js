@@ -7,6 +7,7 @@ const {
   adminPakamValidation,
   recyclerValidation,
   companyPakamDataValidation,
+  userValidation,
 } = require("../../util/auth");
 const { body, query, check, param } = require("express-validator");
 
@@ -100,5 +101,10 @@ module.exports = (APP) => {
   APP.route("/api/v2/company-waste/stats").get(
     companyPakamDataValidation,
     CollectorService.getCompanyWasteStats
+  );
+
+  APP.route("/api/v2/collector/pickups").get(
+    recyclerValidation,
+    CollectorService.getCollectorPickups
   );
 };
