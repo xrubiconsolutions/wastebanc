@@ -1,5 +1,5 @@
 const incidentModel = require("../models/incidentModel");
-const { userModel, organisationTyeModel } = require("../models");
+const { userModel, organisationTypeModel } = require("../models");
 const {
   sendResponse,
   bodyValidate,
@@ -174,7 +174,7 @@ class UserService {
         }
       }
       let typename;
-      if (body.commerical) {
+      if (body.uType === 2) {
         if (!body.organisation) {
           return res.status(422).json({
             error: true,
@@ -182,6 +182,7 @@ class UserService {
           });
         } else {
           typename = await organisationTypeModel.findById(body.organisation);
+          console.log(typename);
           if (!typename) {
             return res.status(400).json({
               error: true,
@@ -189,6 +190,10 @@ class UserService {
             });
           }
         }
+      } else {
+        typename = await organisationTypeModel.findOne({
+          default: true,
+        });
       }
 
       const create = await userModel.create({
@@ -202,8 +207,7 @@ class UserService {
         email: body.email,
         lcd: body.lga,
         uType: body.uType,
-        organisationType: body.organisationType,
-        organisationTypename: typename.name,
+        organisationType: body.organisation,
       });
 
       const token = authToken(create);
@@ -302,8 +306,9 @@ class UserService {
           country: create.country,
           state: create.state,
           lga: create.lga,
-          uType: create.uType,
-          organisationType: create.organisationType,
+          // uType: create.uType,
+          // organisationType: create.organisationType,
+          organisationName: typename.name,
         },
       });
     } catch (error) {

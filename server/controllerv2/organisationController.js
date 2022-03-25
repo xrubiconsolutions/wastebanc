@@ -364,8 +364,28 @@ organisationController.findOrganisation = async (req, res) => {
   }
 };
 
-// organisationController.update = async (req, res) => {
-//   bodyValidate(req, res);
-// }
+organisationController.update = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const orgId = req.params.orgId;
+    const organisation = await organisationModel.findOne({
+      _id: orgId,
+    });
+
+    if (!organisation) {
+      return res.status(400).joson({
+        error: true,
+        message: "Organisation does to exist",
+      });
+    }
+
+    
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
 
 module.exports = organisationController;
