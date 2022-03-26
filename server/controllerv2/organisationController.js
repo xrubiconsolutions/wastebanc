@@ -6,6 +6,8 @@ const {
   organisationTypeModel,
   transactionModel,
   geofenceModel,
+  collectorBinModel,
+  organisationBinModel,
 } = require("../models");
 const {
   sendResponse,
@@ -15,6 +17,9 @@ const {
 } = require("../util/commonFunction");
 const sgMail = require("@sendgrid/mail");
 const request = require("request");
+let dbConfig = require("./server/config/dbConfig");
+const db = require("./bin/dbConnection.js");
+const collectorModel = require("../models/collectorModel");
 
 organisationController.types = async (req, res) => {
   try {
@@ -379,7 +384,37 @@ organisationController.update = async (req, res) => {
       });
     }
 
-    
+    await organisationModel.updateOne(
+      { _id: organisation._id },
+      {
+        email: req.body.email || organisation.email,
+        areaOfAccess: req.body.areaOfAccess || organisation.areaOfAccess,
+        companyName: req.body.companyName || organisation.companyName,
+        rcNo: req.body.rcNo || organisation.rcNo,
+        companyTag: req.body.companyTag || organisation.companyTag,
+        phone: req.body.phone || organisation.phone,
+        streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
+        categories: req.body.categories || organisation.categories,
+        location: req.body.location || organisation.location,
+      }
+    );
+
+    organisation.email = req.body.email || organisation.email;
+    organisation.areaOfAccess =
+      req.body.areaOfAccess || organisation.areaOfAccess;
+    organisation.companyName = req.body.companyName || organisation.companyName;
+    organisation.rcNo = req.body.rcNo || organisation.rcNo;
+    organisation.companyTag = req.body.companyTag || organisation.companyTag;
+    organisation.phone = req.body.phone || organisation.phone;
+    organisation.streetOfAccess =
+      req.body.streetOfAccess || organisation.streetOfAccess;
+    organisation.categories = req.body.categories || organisation.categories;
+    organisation.location = req.body.location || organisation.location;
+
+    return res.status(200).json({
+      error: false,
+      message: "organisation updated successfully",
+    });
   } catch (error) {
     return res.status(500).json({
       error: true,
@@ -388,4 +423,125 @@ organisationController.update = async (req, res) => {
   }
 };
 
+organisationController.aggregators = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    let { page = 1, resultsPerPage = 20, state, key } = req.query;
+    const { organisation } = req.params;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    const org = await organisationModel.findById(organisation);
+    if (!org) {
+      res.status(400).json({
+        error: true,
+        message: "Organisation not found",
+      });
+    }
+
+    let criteria;
+    if (key) {
+      criteria = {
+        $or: [
+          { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+          { gender: { $regex: `.*${key}.*`, $options: "i" } },
+          { phone: { $regex: `.*${key}.*`, $options: "i" } },
+          { email: { $regex: `.*${key}.*`, $options: "i" } },
+          { localGovernment: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+          // { IDNumber: key },
+        ],
+        organisation: org.companyName,
+      };
+    } else {
+      criteria = {
+        organisation: org.companyName,
+      };
+    }
+
+    if (state) criteria.state = state;
+    const totalResult = await collectorModel.countDocuments(criteria);
+    const projection = {
+      roles: 0,
+      password: 0,
+    };
+
+    const collectors = await collectorModel
+      .find(criteria, projection, { lean: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        collectors,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+organisationController.remove = async (req, res) => {
+  bodyValidate(req, res);
+
+  const { orgId } = req.params;
+  const organisation = await organisationModel.findById(orgId);
+  if (!organisation) {
+    return res.status(400).json({
+      error: true,
+      message: "Organisation not found",
+    });
+  }
+
+  const collectors = await collectorModel.find({
+    organisation: organisation.companyName,
+  });
+
+  const session = await db.startSession();
+
+  try {
+    session.startTransaction();
+
+    if (collectors.length !== 0) {
+      await collectorBinModel.insertMany(collectors, { session });
+    }
+
+    await collectorModel.deleteMany(
+      {
+        organisation: organisation.companyName,
+      },
+      { session }
+    );
+
+    await organisationBinModel.insert(organisation, { session });
+    await organisationModel.deleteOne(
+      {
+        _id: organisation._id,
+      },
+      { session }
+    );
+
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+
+  session.endSession();
+};
 module.exports = organisationController;

@@ -90,4 +90,40 @@ module.exports = (APP) => {
     ],
     organisationController.createtype
   );
+
+  APP.route("/api/v2/organisation/:orgId").put(
+    adminPakamValidation,
+    [
+      param("orgId")
+        .notEmpty()
+        .withMessage("orgId is required")
+        .isString()
+        .withMessage("orgId is string"),
+    ],
+    organisationController.update
+  );
+
+  APP.route("/api/v2/organisation/aggregators/:organisation").get(
+    adminPakamValidation,
+    [
+      param("organisation")
+        .notEmpty()
+        .withMessage("orgId is required")
+        .isString()
+        .withMessage("orgId is string"),
+    ],
+    organisationController.aggregators
+  );
+
+  APP.route("/api/v2/organisation/remove").delete(
+    adminPakamValidation,
+    [
+      param("orgId")
+        .notEmpty()
+        .withMessage("orgId is required")
+        .isString()
+        .withMessage("orgId is string"),
+    ],
+    organisationController.remove
+  );
 };
