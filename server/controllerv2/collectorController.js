@@ -817,6 +817,45 @@ class CollectorService {
       });
     }
   }
+
+  static async getCollectorPickups(req, res) {
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      completionStatus = { $ne: "" },
+    } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    // construct criteria to find
+    const { _id: collectedBy } = req.user;
+    const criteria = { collectedBy, completionStatus };
+
+    try {
+      // count collector's pickups
+      const totalResult = await scheduleModel.countDocuments(criteria);
+
+      // pickups related to collector
+      const pickups = await scheduleModel.find(criteria);
+
+      // send response
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          pickups,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
 }
 
 module.exports = CollectorService;
