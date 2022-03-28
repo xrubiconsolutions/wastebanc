@@ -18,7 +18,10 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
   let dataToSave = { ...REQUEST.body };
 
   COMMON_FUN.encryptPswrd(dataToSave.password, (ERR, PASSWORD) => {
-    if (ERR) return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+    if (ERR) {
+      console.log(ERR);
+      return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+    }
     else {
       dataToSave.password = PASSWORD;
       var errors = {};
@@ -35,12 +38,15 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
         })
         .then((user) => {
           if (user) {
+            console.log("user already exists");
             errors.message = "User already exists";
-            RESPONSE.status(400).jsonp(errors);
+            return RESPONSE.status(400).jsonp(errors);
           } else {
             MODEL.collectorModel(dataToSave).save({}, (ERR, RESULT) => {
-              if (ERR) console.log(ERR);
-              else {
+              if (ERR) {
+                console.log(ERR);
+                return RESPONSE.status(400).jsonp(ERR);
+              } else {
                 var phoneNo = String(RESULT.phone).substring(1, 11);
                 var data = {
                   api_key:
