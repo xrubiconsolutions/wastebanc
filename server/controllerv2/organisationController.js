@@ -378,7 +378,7 @@ organisationController.update = async (req, res) => {
     });
 
     if (!organisation) {
-      return res.status(400).joson({
+      return res.status(400).json({
         error: true,
         message: "Organisation does to exist",
       });
@@ -393,11 +393,37 @@ organisationController.update = async (req, res) => {
       ],
     });
 
-    if (organisation.length) {
-      res.status(400).json({
-        error: true,
-        message: "Email or company name already exist",
-      });
+    if (organisations.length !== 0) {
+      if (req.body.email) {
+        const checkemail = organisations.find(
+          (org) => org.email.toLowerCase() === req.body.email.toLowerCase()
+        );
+        if (
+          checkemail &&
+          checkemail._id.toString() !== organisation._id.toString()
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "Email already exist",
+          });
+        }
+      }
+
+      if (req.body.companyName) {
+        const checkcompanyName = organisations.find(
+          (org) =>
+            org.companyName.toLowerCase() === req.body.companyName.toLowerCase()
+        );
+        if (
+          checkcompanyName &&
+          checkcompanyName._id.toString() !== organisation._id.toString()
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "company name already exist",
+          });
+        }
+      }
     }
 
     await organisationModel.updateOne(
@@ -430,6 +456,7 @@ organisationController.update = async (req, res) => {
     return res.status(200).json({
       error: false,
       message: "organisation updated successfully",
+      data: organisation,
     });
   } catch (error) {
     console.log(error);
@@ -525,40 +552,65 @@ organisationController.remove = async (req, res) => {
     organisation: organisation.companyName,
   });
 
-  const session = await db.startSession();
-
   try {
-    session.startTransaction();
-
     if (collectors.length !== 0) {
-      await collectorBinModel.insertMany(collectors, { session });
+      const insertMany = await collectorBinModel.insertMany(collectors);
+      console.log("insertMany", insertMany);
+      if (insertMany) {
+        await collectorModel.deleteMany({
+          organisation: organisation.companyName,
+        });
+      }
     }
 
-    await collectorModel.deleteMany(
-      {
-        organisation: organisation.companyName,
-      },
-      { session }
-    );
+    const insert = await organisationBinModel.create({
+      companyName: organisation.companyName,
+      email: organisation.email,
+      password: organisation.password,
+      rcNo: organisation.rcNo,
+      companyTag: organisation.companyTag,
+      phone: organisation.phone,
+      roles: organisation.roles,
+      role: organisation.role,
+      license_active: organisation.license_active,
+      expiry_date: organisation.expiry_date,
+      totalAvailable: organisation.totalAvailable,
+      totalSpent: organisation.totalSpent,
+      resetToken: organisation.resetToken,
+      location: organisation.location,
+      areaOfAccess: organisation.areaOfAccess,
+      streetOfAccess: organisation.streetOfAccess,
+      categories: organisation.categories,
+      canEquivalent: organisation.canEquivalent,
+      cartonEquivalent: organisation.cartonEquivalent,
+      petBottleEquivalent: organisation.petBottleEquivalent,
+      rubberEquivalent: organisation.rubberEquivalent,
+      plasticEquivalent: organisation.plasticEquivalent,
+      woodEquivalent: organisation.woodEquivalent,
+      glassEquivalent: organisation.glassEquivalent,
+      nylonEquivalent: organisation.nylonEquivalent,
+      metalEquivalent: organisation.metalEquivalent,
+      eWasteEquivalent: organisation.eWasteEquivalent,
+      tyreEquivalent: organisation.tyreEquivalent,
+      wallet: organisation.wallet,
+    });
 
-    await organisationBinModel.insert(organisation, { session });
-    await organisationModel.deleteOne(
-      {
+    console.log("insert", insert);
+    if (insert) {
+      await organisationModel.deleteOne({
         _id: organisation._id,
-      },
-      { session }
-    );
-
-    await session.commitTransaction();
+      });
+    }
+    return res.status(200).json({
+      error: false,
+      message: "Organisation deleted successfully",
+    });
   } catch (error) {
-    await session.abortTransaction();
     console.log(error);
     return res.status(500).json({
       error: true,
       message: "An error occurred",
     });
   }
-
-  session.endSession();
 };
 module.exports = organisationController;

@@ -137,7 +137,7 @@ module.exports = (APP) => {
     organisationController.aggregators
   );
 
-  APP.route("/api/v2/organisation/remove").delete(
+  APP.route("/api/v2/organisation/remove/:orgId").delete(
     adminPakamValidation,
     [
       param("orgId")
