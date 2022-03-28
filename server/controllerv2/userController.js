@@ -372,7 +372,7 @@ class UserService {
     }
 
     try {
-      // count of report logs
+      //   count of report logs
       const totalResult = await incidentModel.countDocuments(criteria);
 
       const userReportLogs = await incidentModel
