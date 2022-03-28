@@ -385,9 +385,6 @@ organisationController.update = async (req, res) => {
     }
 
     const organisations = await organisationModel.find({
-      $not: {
-        _id: organisation,
-      },
       $or: [
         { email: req.body.email || "" },
         {

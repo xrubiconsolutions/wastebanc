@@ -39,7 +39,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
             RESPONSE.status(400).jsonp(errors);
           } else {
             MODEL.collectorModel(dataToSave).save({}, (ERR, RESULT) => {
-              if (ERR) RESPONSE.status(400).jsonp(ERR);
+              if (ERR) console.log(ERR);
               else {
                 var phoneNo = String(RESULT.phone).substring(1, 11);
                 var data = {
