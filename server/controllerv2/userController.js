@@ -356,22 +356,21 @@ class UserService {
   }
 
   static async getUserReportLogs(req, res) {
-    const { phone } = req.user;
-    let { page = 1, resultsPerPage = 20, start, end } = req.query;
-    if (typeof page === "string") page = parseInt(page);
-    if (typeof resultsPerPage === "string")
-      resultsPerPage = parseInt(resultsPerPage);
-
-    const criteria = { "caller.phoneNumber": phone };
-
-    if (start && end) {
-      criteria.createdAt = {
-        $gte: new Date(start),
-        $lt: new Date(end),
-      };
-    }
-
     try {
+      const { phone } = req.user;
+      let { page = 1, resultsPerPage = 20, start, end } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      const criteria = { "caller.phoneNumber": phone };
+
+      if (start && end) {
+        criteria.createdAt = {
+          $gte: new Date(start),
+          $lt: new Date(end),
+        };
+      }
       //   count of report logs
       const totalResult = await incidentModel.countDocuments(criteria);
 
