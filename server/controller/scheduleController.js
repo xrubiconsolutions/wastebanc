@@ -1542,7 +1542,7 @@ scheduleController.collectorMissed = (req, res) => {
       MODEL.scheduleModel
         .updateOne(
           { _id: result._id },
-          { $set: { completionStatus: "missed" } }
+          { $set: { completionStatus: "missed" , reason: req.body.reason } }
         )
         .then((resp, err) => {
           MODEL.userModel
