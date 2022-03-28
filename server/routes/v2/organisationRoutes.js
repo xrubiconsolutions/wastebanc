@@ -1,6 +1,11 @@
 "use strict";
 const organisationController = require("../../controllerv2/organisationController");
-const { adminPakamValidation } = require("../../util/auth");
+const {
+  adminPakamValidation,
+  recyclerValidation,
+  companyPakamDataValidation,
+  userValidation,
+} = require("../../util/auth");
 // const { bodyValidate } = require("../../util/commonFunction");
 const { body, query, check, param } = require("express-validator");
 
@@ -147,5 +152,29 @@ module.exports = (APP) => {
         .withMessage("orgId is string"),
     ],
     organisationController.remove
+  );
+
+  APP.route("/api/v2/organisation/update").put(
+    companyPakamDataValidation,
+    [
+      param("orgId")
+        .notEmpty()
+        .withMessage("orgId is required")
+        .isString()
+        .withMessage("orgId is string"),
+      body("categories")
+        .optional()
+        .isArray()
+        .withMessage("categories should be an array"),
+      body("categories.*.name")
+        .optional()
+        .isString()
+        .withMessage("name should be string"),
+      body("categories.*.price")
+        .optional()
+        .isInt()
+        .withMessage("price should be integer"),
+    ],
+    organisationController.updateProfile
   );
 };

@@ -613,4 +613,91 @@ organisationController.remove = async (req, res) => {
     });
   }
 };
+
+organisationController.updateProfile = async (req, res) => {
+  bodyValidate(req, res);
+  const organisation = req.user;
+  try {
+    const organisations = await organisationModel.find({
+      $or: [
+        { email: req.body.email || "" },
+        {
+          companyName: req.body.companyName || "",
+        },
+      ],
+    });
+
+    if (organisations.length !== 0) {
+      if (req.body.email) {
+        const checkemail = organisations.find(
+          (org) => org.email.toLowerCase() === req.body.email.toLowerCase()
+        );
+        if (
+          checkemail &&
+          checkemail._id.toString() !== organisation._id.toString()
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "Email already exist",
+          });
+        }
+      }
+
+      if (req.body.companyName) {
+        const checkcompanyName = organisations.find(
+          (org) =>
+            org.companyName.toLowerCase() === req.body.companyName.toLowerCase()
+        );
+        if (
+          checkcompanyName &&
+          checkcompanyName._id.toString() !== organisation._id.toString()
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "company name already exist",
+          });
+        }
+      }
+    }
+
+    await organisationModel.updateOne(
+      { _id: organisation._id },
+      {
+        email: req.body.email || organisation.email,
+        areaOfAccess: req.body.areaOfAccess || organisation.areaOfAccess,
+        companyName: req.body.companyName || organisation.companyName,
+        rcNo: req.body.rcNo || organisation.rcNo,
+        companyTag: req.body.companyTag || organisation.companyTag,
+        phone: req.body.phone || organisation.phone,
+        streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
+        categories: req.body.categories || organisation.categories,
+        location: req.body.location || organisation.location,
+      }
+    );
+
+    organisation.email = req.body.email || organisation.email;
+    organisation.areaOfAccess =
+      req.body.areaOfAccess || organisation.areaOfAccess;
+    organisation.companyName = req.body.companyName || organisation.companyName;
+    organisation.rcNo = req.body.rcNo || organisation.rcNo;
+    organisation.companyTag = req.body.companyTag || organisation.companyTag;
+    organisation.phone = req.body.phone || organisation.phone;
+    organisation.streetOfAccess =
+      req.body.streetOfAccess || organisation.streetOfAccess;
+    organisation.categories = req.body.categories || organisation.categories;
+    organisation.location = req.body.location || organisation.location;
+
+    return res.status(200).json({
+      error: false,
+      message: "organisation updated successfully",
+      data: organisation,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
 module.exports = organisationController;
