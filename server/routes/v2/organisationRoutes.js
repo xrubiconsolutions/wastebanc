@@ -58,6 +58,16 @@ module.exports = (APP) => {
         .withMessage("categories is required")
         .isArray()
         .withMessage("categories should be an array"),
+      body("categories.*.name")
+        .notEmpty()
+        .withMessage("name is required")
+        .isString()
+        .withMessage("name should be string"),
+      body("categories.*.price")
+        .notEmpty()
+        .withMessage("price is required")
+        .isInt()
+        .withMessage("price should be string"),
       body("location")
         .notEmpty()
         .withMessage("location is required")
@@ -99,6 +109,18 @@ module.exports = (APP) => {
         .withMessage("orgId is required")
         .isString()
         .withMessage("orgId is string"),
+      body("categories")
+        .optional()
+        .isArray()
+        .withMessage("categories should be an array"),
+      body("categories.*.name")
+        .optional()
+        .isString()
+        .withMessage("name should be string"),
+      body("categories.*.price")
+        .optional()
+        .isInt()
+        .withMessage("price should be integer"),
     ],
     organisationController.update
   );

@@ -17,8 +17,8 @@ const {
 } = require("../util/commonFunction");
 const sgMail = require("@sendgrid/mail");
 const request = require("request");
-let dbConfig = require("./server/config/dbConfig");
-const db = require("./bin/dbConnection.js");
+let dbConfig = require("../../server/config/dbConfig");
+const db = require("../../bin/dbConnection.js");
 const collectorModel = require("../models/collectorModel");
 
 organisationController.types = async (req, res) => {
@@ -198,7 +198,7 @@ organisationController.listOrganisation = async (req, res) => {
 
     const totalResult = await organisationModel.countDocuments(criteria);
     const organisations = await organisationModel
-      .find(criteria)
+      .find(criteria, { password: 0 })
       .sort({ createdAt: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);
@@ -384,6 +384,25 @@ organisationController.update = async (req, res) => {
       });
     }
 
+    const organisations = await organisationModel.find({
+      $not: {
+        _id: organisation,
+      },
+      $or: [
+        { email: req.body.email || "" },
+        {
+          companyName: req.body.companyName || "",
+        },
+      ],
+    });
+
+    if (organisation.length) {
+      res.status(400).json({
+        error: true,
+        message: "Email or company name already exist",
+      });
+    }
+
     await organisationModel.updateOne(
       { _id: organisation._id },
       {
@@ -416,6 +435,7 @@ organisationController.update = async (req, res) => {
       message: "organisation updated successfully",
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       error: true,
       message: "An error occurred",

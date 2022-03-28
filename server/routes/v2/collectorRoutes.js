@@ -74,7 +74,7 @@ module.exports = (APP) => {
     CollectorService.disableCollector
   );
 
-  APP.route("/api/collector/register").post(
+  APP.route("/api/v2/collector/register").post(
     [
       body("fullname").notEmpty().withMessage("fullname is required"),
       body("email").optional("").isEmail().withMessage("Enter is valid email"),
