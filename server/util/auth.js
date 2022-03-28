@@ -133,7 +133,7 @@ validateUser.companyPakamDataValidation = async (REQUEST, RESPONSE, NEXT) => {
 
     const user = await MODEL.organisationModel.findById(validated.userId);
     if (!user) {
-      console.log('here')
+      console.log("here");
       return RESPONSE.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -189,7 +189,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
       statusCode: 401,
     });
   }
-  
+
   const user = await MODEL.collectorModel.findById(validated.userId);
   if (!user) {
     console.log("here 1");
