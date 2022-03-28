@@ -658,7 +658,8 @@ class CollectorService {
         message: "Please pass a start and end date or a search key",
       });
 
-    const { _id: organisationID } = req.user;
+    let { _id: organisationID } = req.user;
+    organisationID = organisationID.toString();
     let criteria;
 
     if (key) {
@@ -714,8 +715,8 @@ class CollectorService {
 
   static async getCompanyWasteStats(req, res) {
     let { start, end, state } = req.query;
-    const { _id: organisation } = req.user;
-
+    let { _id: organisation } = req.user;
+    organisation = organisation.toString();
     if (!start || !end) {
       return res.status(400).json({
         error: true,

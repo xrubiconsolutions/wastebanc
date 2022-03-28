@@ -154,7 +154,9 @@ paymentController.getCompanyOutstanding = async (req, res) => {
       message: "Please pass a start and end date or a search key",
     });
 
-  const { _id: organisationID } = req.user;
+  let { _id: organisation } = req.user;
+  // organisationID = organisationID.toString();
+  organisation = "6033f9f971af350024ae6185";
   let criteria;
 
   if (key) {
@@ -165,7 +167,7 @@ paymentController.getCompanyOutstanding = async (req, res) => {
         { recycler: { $regex: `.*${key}.*`, $options: "i" } },
       ],
       paid: false,
-      organisationID,
+      organisation,
       requestedForPayment: true,
     };
   } else {
@@ -176,7 +178,7 @@ paymentController.getCompanyOutstanding = async (req, res) => {
         $lt: endDate,
       },
       paid: false,
-      organisationID,
+      organisation,
       requestedForPayment: true,
     };
   }
@@ -228,7 +230,8 @@ paymentController.companyCharityHistory = async (req, res) => {
       }
     }
 
-    const { _id: organisation } = req.user;
+    let { _id: organisation } = req.user;
+    organisation = organisation.toString();
     let criteria;
 
     if (key) {
@@ -295,7 +298,8 @@ paymentController.companyPaymentHistory = async (req, res) => {
     }
 
     let criteria;
-    const { _id: organisation } = req.user;
+    let { _id: organisation } = req.user;
+    organisation = organisation.toString();
 
     if (key) {
       criteria = {
