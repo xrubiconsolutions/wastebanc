@@ -48,7 +48,7 @@ class UserService {
       // get clients based on page
       const users = await userModel
         .find(criteria)
-        .populate("organisationType", "name")
+        //.populate("organisationType", "name")
         .sort({ createAt: -1 })
         .skip((page - 1) * resultsPerPage)
         .limit(resultsPerPage);
