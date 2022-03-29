@@ -418,6 +418,8 @@ class UserService {
     const token = req.body.token;
     const pin_id = req.body.pin_id;
 
+    console.log("phone", phone);
+
     const user = await userModel.findOne({
       phone,
     });
