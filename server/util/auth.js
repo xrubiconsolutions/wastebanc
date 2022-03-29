@@ -96,7 +96,7 @@ validateUser.userCollectorData = async (req, res, NEXT) => {
   }
 
   if (user.roles === "admin" || user.roles === "analytics-admin") {
-    res.user = user;
+    req.user = user;
     NEXT();
   } else {
     return res.status(401).json({
@@ -151,7 +151,7 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
     }
 
     if (user.roles === "admin" || user.roles === "company") {
-      res.user = user;
+      req.user = user;
       NEXT();
     } else {
       return res.status(401).json({
@@ -211,7 +211,7 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
   }
 
   if (user.roles === "collector" || user.roles === "company") {
-    res.user = user;
+    req.user = user;
     NEXT();
   } else {
     console.log("here 3");
@@ -265,7 +265,7 @@ validateUser.adminValidation = async (req, res, NEXT) => {
   }
 
   if (user.roles === "analytics-admin" || user.roles === "admin") {
-    res.user = user;
+    req.user = user;
     NEXT();
   } else {
     return res.status(401).json({
@@ -316,7 +316,7 @@ validateUser.adminPakamValidation = async (req, res, NEXT) => {
   }
 
   if (user.roles === "admin") {
-    res.user = user;
+    req.user = user;
     NEXT();
   } else {
     console.log("here");
@@ -367,7 +367,7 @@ validateUser.companyValidation = async (req, res, NEXT) => {
   }
 
   if (user.roles === "company") {
-    res.user = user;
+    req.user = user;
     NEXT();
   } else {
     return res.status(401).json({
@@ -422,7 +422,7 @@ validateUser.lcdValidation = async (req, res, NEXT) => {
     user.roles === "admin" ||
     user.roles === "collector"
   ) {
-    res.user = user;
+    req.user = user;
     NEXT();
   } else {
     return res.status(401).json({
