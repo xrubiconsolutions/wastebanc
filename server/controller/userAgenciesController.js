@@ -153,11 +153,11 @@ agenciesController.getAgencies = async (req, res) => {
       error: false,
       message: "User agencies",
       data: {
-          agencies,
-          totalResult,
-          page,
-          resultsPerPage,
-          totalPages: Math.ceil(totalResult / resultsPerPage),
+        agencies,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     });
   } catch (error) {
