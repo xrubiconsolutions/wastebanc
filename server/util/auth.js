@@ -12,15 +12,15 @@ let validateUser = {};
 /********************************
  ********* validate user ********
  ********************************/
-validateUser.userValidation = async (REQUEST, RESPONSE, NEXT) => {
-  if (!REQUEST.headers.authorization) {
+validateUser.userValidation = async (req, res, NEXT) => {
+  if (!req.headers.authorization) {
     return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  console.log("req", REQUEST.headers.authorization.split(" ")[1]);
-  var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
+  console.log("req", req.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
   if (Date.now() >= validated.exp * 1000) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: "Token time out. Login again",
       statusCode: 401,
@@ -29,7 +29,7 @@ validateUser.userValidation = async (REQUEST, RESPONSE, NEXT) => {
 
   const user = await MODEL.userModel.findById(validated.userId);
   if (!user) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -37,7 +37,7 @@ validateUser.userValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.status === "disable") {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -45,10 +45,10 @@ validateUser.userValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.roles === "client") {
-    REQUEST.user = user;
+    req.user = user;
     NEXT();
   } else {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
