@@ -16,6 +16,7 @@ validateUser.userValidation = async (REQUEST, RESPONSE, NEXT) => {
   if (!REQUEST.headers.authorization) {
     return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
+  console.log("req", REQUEST.headers.authorization.split(" ")[1]);
   var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
   if (Date.now() >= validated.exp * 1000) {
