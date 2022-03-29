@@ -887,11 +887,45 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
 userController.getAllClients = async (REQUEST, RESPONSE) => {
   console.log("here");
   try {
+    let { page = 1, resultsPerPage = 20, key } = req.query;
     /* check user exist or not*/
+
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    let criteria = {
+      $or: [
+        { Category: { $regex: `.*${key}.*`, $options: "i" } },
+        { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+        { schuduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+        { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
+        { client: { $regex: `.*${key}.*`, $options: "i" } },
+        { phone: { $regex: `.*${key}.*`, $options: "i" } },
+        { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
+      ],
+      roles: "client",
+      verified: true,
+    };
+
+    const totalResult = await MODEL.userModel.countDocuments(criteria);
+
     let users = await MODEL.userModel
-      .find({ roles: "client", verified: true })
-      .sort({ _id: -1 });
-    return RESPONSE.jsonp(users);
+      .find(criteria)
+      .sort({ _id: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+    return RESPONSE.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        users,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      },
+    });
   } catch (err) {
     return RESPONSE.status(400).jsonp(err);
   }
