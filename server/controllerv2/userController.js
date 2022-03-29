@@ -474,10 +474,7 @@ class UserService {
             state: user.state,
             lga: user.lga,
             verified: true,
-            //pin_id: send.data.pinId,
-            // uType: user.uType,
-            // organisationType: user.organisationType,
-            //organisationName: typename.name,
+
             token,
           },
         });
