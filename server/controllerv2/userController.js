@@ -212,6 +212,8 @@ class UserService {
         onesignal_id: body.onesignal_id,
       });
 
+      //fine
+
       const token = authToken(create);
       await userModel.updateOne(
         {
