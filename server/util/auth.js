@@ -487,7 +487,7 @@ validateUser.adminCheck = (req, res, NEXT) => {
 /********************************
  ****** User check model ********
  *********************************/
-validateUser.userCheck = (req, res, NEXT) => {
+validateUser.userCheck = (req, res, NEXT) => {         
   let dataObj = req.query.username;
   if (req.query.username) {
     dataObj = req.query;

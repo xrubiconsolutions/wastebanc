@@ -310,6 +310,7 @@ class UserService {
           // uType: create.uType,
           // organisationType: create.organisationType,
           organisationName: typename.name,
+          token,
         },
       });
     } catch (error) {
