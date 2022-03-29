@@ -38,7 +38,7 @@ module.exports = (APP) => {
 
   APP.route("/api/login").post(CONTROLLER.userController.loginUser);
 
-  APP.route("/api/verify").post(CONTROLLER.userController.verifyPhone);
+  APP.route("/api/v2/verify").post(CONTROLLER.userController.verifyPhone);
 
   APP.route("/api/resendVerification").post(
     CONTROLLER.userController.resendVerification

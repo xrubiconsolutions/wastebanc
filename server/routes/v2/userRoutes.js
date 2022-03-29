@@ -56,4 +56,6 @@ module.exports = (APP) => {
     userValidation,
     UserService.getUserReportLogs
   );
+
+  APP.route("/api/verify").post(UserService.verifyOTP);
 };

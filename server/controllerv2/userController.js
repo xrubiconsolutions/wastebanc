@@ -8,6 +8,7 @@ const {
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const request = require("request");
+const axios = require("axios");
 
 class UserService {
   static async getClients(req, res) {
@@ -223,6 +224,7 @@ class UserService {
         }
       );
 
+      let dres;
       const phoneNo = String(create.phone).substring(1, 11);
       const msg = {
         api_key:
@@ -247,53 +249,60 @@ class UserService {
         },
         body: JSON.stringify(msg),
       };
-      request(options, function (error, response) {
-        const res = JSON.parse(response.body);
-        if (error) {
-          throw new Error(error);
-        } else {
-          // let UserData = {
-          //   ...test,
-          //   pin_id: iden.pinId,
-          // };
-          var data = {
-            api_key:
-              "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-            phone_number: `+234${phoneNo}`,
-            country_code: "NG",
-          };
-          var options = {
-            method: "GET",
-            url: " https://termii.com/api/insight/number/query",
-            headers: {
-              "Content-Type": ["application/json", "application/json"],
-            },
-            body: JSON.stringify(data),
-          };
 
-          request(options, function (error, response) {
-            if (error) throw new Error(error);
-            //var mobileData = JSON.parse(response.body);
-            // var mobile_carrier =
-            //   mobileData.result[0].operatorDetail.operatorName;
-            // userModel.updateOne(
-            //   { email: RESULT.email },
-            //   {
-            //     $set: {
-            //       fullname:
-            //         create.username.split(" ")[0] +
-            //         " " +
-            //         create.username.split(" ")[1],
-            //       //mobile_carrier: mobile_carrier,
-            //     },
-            //   },
-            //   (res) => {
-            //     return RESPONSE.status(200).jsonp(UserData);
-            //   }
-            // );
-          });
-        }
+      const send = await axios.post(options.url, options.body, {
+        headers: options.headers,
       });
+
+      console.log("res", send.data);
+
+      // request(options, function (error, response) {
+      //   dres = JSON.parse(response.body);
+      //   if (error) {
+      //     throw new Error(error);
+      //   } else {
+      //     // let UserData = {
+      //     //   ...test,
+      //     //   pin_id: res.pinId,
+      //     // };
+      //     var data = {
+      //       api_key:
+      //         "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+      //       phone_number: `+234${phoneNo}`,
+      //       country_code: "NG",
+      //     };
+      //     var options = {
+      //       method: "GET",
+      //       url: " https://termii.com/api/insight/number/query",
+      //       headers: {
+      //         "Content-Type": ["application/json", "application/json"],
+      //       },
+      //       body: JSON.stringify(data),
+      //     };
+
+      //     request(options, function (error, response) {
+      //       if (error) throw new Error(error);
+      //       //var mobileData = JSON.parse(response.body);
+      //       // var mobile_carrier =
+      //       //   mobileData.result[0].operatorDetail.operatorName;
+      //       // userModel.updateOne(
+      //       //   { email: RESULT.email },
+      //       //   {
+      //       //     $set: {
+      //       //       fullname:
+      //       //         create.username.split(" ")[0] +
+      //       //         " " +
+      //       //         create.username.split(" ")[1],
+      //       //       //mobile_carrier: mobile_carrier,
+      //       //     },
+      //       //   },
+      //       //   (res) => {
+      //       //     return RESPONSE.status(200).jsonp(UserData);
+      //       //   }
+      //       // );
+      //     });
+      //   }
+      // });
 
       return res.status(200).json({
         error: false,
@@ -307,6 +316,7 @@ class UserService {
           country: create.country,
           state: create.state,
           lga: create.lga,
+          pin_id: send.data.pinId,
           // uType: create.uType,
           // organisationType: create.organisationType,
           organisationName: typename.name,
@@ -392,6 +402,91 @@ class UserService {
           totalPages: Math.ceil(totalResult / resultsPerPage),
         },
       });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async verifyOTP(req, res) {
+    const phone = req.body.phone;
+    const token = req.body.token;
+    const pin_id = req.body.pin_id;
+
+    const user = await userModel.findOne({
+      phone,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Phone number does not exist",
+      });
+    }
+
+    try {
+      var data = {
+        api_key:
+          "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+        pin_id: pin_id,
+        pin: token,
+      };
+
+      const send = await axios.post(
+        "https://termii.com/api/sms/otp/verify",
+        JSON.stringify(data),
+        {
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+        }
+      );
+
+      //console.log(send.data);
+
+      //     pinId: '41a11125-e3c9-4f66-9f94-596ba0d2f115',
+      // verified: true,
+      // msisdn: '+2349065180963',
+      // attemptsRemaining: 0
+      if (send.data.verified === true) {
+        await userModel.updateOne(
+          {
+            phone,
+          },
+          { verified: true }
+        );
+
+        const token = authToken(user);
+
+        return res.status(200).json({
+          error: false,
+          message: "Token verifieed successfully",
+          data: {
+            _id: user._id,
+            fullname: user.fullname,
+            phone: user.phone,
+            email: user.email || "",
+            gender: user.gender,
+            country: user.country,
+            state: user.state,
+            lga: user.lga,
+            verified: true,
+            //pin_id: send.data.pinId,
+            // uType: user.uType,
+            // organisationType: user.organisationType,
+            //organisationName: typename.name,
+            token,
+          },
+        });
+      } else {
+        return res.status(400).json({
+          error: true,
+          message: send.data.verified || "Invalid or Expired Token",
+        });
+      }
     } catch (error) {
       console.log(error);
       return res.status(500).json({
