@@ -3,6 +3,7 @@ const geofenceModel = require("../models/geofenceModel");
 const organisationModel = require("../models/organisationModel");
 const scheduleModel = require("../models/scheduleModel");
 const transactionModel = require("../models/transactionModel");
+const dropOffModel = require("../models/dropOffModel");
 const {
   sendResponse,
   bodyValidate,
@@ -846,6 +847,66 @@ class CollectorService {
         message: "success",
         data: {
           pickups,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
+
+  static async getCompanyDropOffLocations(req, res) {
+    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    let criteria;
+    const { _id } = req.user;
+    const organisationId = _id.toString();
+
+    if (key) {
+      criteria = {
+        $or: [
+          { phone: { $regex: `.*${key}.*`, $options: "i" } },
+          { "location.address": { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+        organisationId,
+      };
+    } else if (start && end) {
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+        organisationId,
+      };
+    } else criteria = { organisationId };
+    if (state) criteria.state = state;
+
+    try {
+      const totalResult = await dropOffModel.countDocuments(criteria);
+      const projection = {
+        roles: 0,
+        password: 0,
+      };
+      // get locations based on page
+      const locations = await dropOffModel
+        .find(criteria, projection, { lean: true })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          locations,
           totalResult,
           page,
           resultsPerPage,
