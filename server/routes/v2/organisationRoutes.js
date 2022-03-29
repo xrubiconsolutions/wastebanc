@@ -1,6 +1,11 @@
 "use strict";
 const organisationController = require("../../controllerv2/organisationController");
-const { adminPakamValidation } = require("../../util/auth");
+const {
+  adminPakamValidation,
+  recyclerValidation,
+  companyPakamDataValidation,
+  userValidation,
+} = require("../../util/auth");
 // const { bodyValidate } = require("../../util/commonFunction");
 const { body, query, check, param } = require("express-validator");
 
@@ -58,6 +63,16 @@ module.exports = (APP) => {
         .withMessage("categories is required")
         .isArray()
         .withMessage("categories should be an array"),
+      body("categories.*.name")
+        .notEmpty()
+        .withMessage("name is required")
+        .isString()
+        .withMessage("name should be string"),
+      body("categories.*.price")
+        .notEmpty()
+        .withMessage("price is required")
+        .isInt()
+        .withMessage("price should be string"),
       body("location")
         .notEmpty()
         .withMessage("location is required")
@@ -89,5 +104,77 @@ module.exports = (APP) => {
         .withMessage("name should be string"),
     ],
     organisationController.createtype
+  );
+
+  APP.route("/api/v2/organisation/:orgId").put(
+    adminPakamValidation,
+    [
+      param("orgId")
+        .notEmpty()
+        .withMessage("orgId is required")
+        .isString()
+        .withMessage("orgId is string"),
+      body("categories")
+        .optional()
+        .isArray()
+        .withMessage("categories should be an array"),
+      body("categories.*.name")
+        .optional()
+        .isString()
+        .withMessage("name should be string"),
+      body("categories.*.price")
+        .optional()
+        .isInt()
+        .withMessage("price should be integer"),
+    ],
+    organisationController.update
+  );
+
+  APP.route("/api/v2/organisation/aggregators/:organisation").get(
+    adminPakamValidation,
+    [
+      param("organisation")
+        .notEmpty()
+        .withMessage("orgId is required")
+        .isString()
+        .withMessage("orgId is string"),
+    ],
+    organisationController.aggregators
+  );
+
+  APP.route("/api/v2/organisation/remove/:orgId").delete(
+    adminPakamValidation,
+    [
+      param("orgId")
+        .notEmpty()
+        .withMessage("orgId is required")
+        .isString()
+        .withMessage("orgId is string"),
+    ],
+    organisationController.remove
+  );
+
+  APP.route("/api/v2/organisation/update").put(
+    companyPakamDataValidation,
+    [
+      param("orgId")
+        .notEmpty()
+        .withMessage("orgId is required")
+        .isString()
+        .withMessage("orgId is string"),
+      body("categories")
+        .optional()
+        .isArray()
+        .withMessage("categories should be an array"),
+      body("categories.*.name")
+        .optional()
+        .isString()
+        .withMessage("name should be string"),
+      body("categories.*.price")
+        .optional()
+        .isInt()
+        .withMessage("price should be integer"),
+    ],
+    organisationController.updateProfile
   );
 };

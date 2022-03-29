@@ -6,6 +6,8 @@ const {
   organisationTypeModel,
   transactionModel,
   geofenceModel,
+  collectorBinModel,
+  organisationBinModel,
 } = require("../models");
 const {
   sendResponse,
@@ -15,6 +17,9 @@ const {
 } = require("../util/commonFunction");
 const sgMail = require("@sendgrid/mail");
 const request = require("request");
+let dbConfig = require("../../server/config/dbConfig");
+const db = require("../../bin/dbConnection.js");
+const collectorModel = require("../models/collectorModel");
 
 organisationController.types = async (req, res) => {
   try {
@@ -193,7 +198,7 @@ organisationController.listOrganisation = async (req, res) => {
 
     const totalResult = await organisationModel.countDocuments(criteria);
     const organisations = await organisationModel
-      .find(criteria)
+      .find(criteria, { password: 0 })
       .sort({ createdAt: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);
@@ -364,8 +369,335 @@ organisationController.findOrganisation = async (req, res) => {
   }
 };
 
-// organisationController.update = async (req, res) => {
-//   bodyValidate(req, res);
-// }
+organisationController.update = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    const orgId = req.params.orgId;
+    const organisation = await organisationModel.findOne({
+      _id: orgId,
+    });
 
+    if (!organisation) {
+      return res.status(400).json({
+        error: true,
+        message: "Organisation does to exist",
+      });
+    }
+
+    const organisations = await organisationModel.find({
+      $or: [
+        { email: req.body.email || "" },
+        {
+          companyName: req.body.companyName || "",
+        },
+      ],
+    });
+
+    if (organisations.length !== 0) {
+      if (req.body.email) {
+        const checkemail = organisations.find(
+          (org) => org.email.toLowerCase() === req.body.email.toLowerCase()
+        );
+        if (
+          checkemail &&
+          checkemail._id.toString() !== organisation._id.toString()
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "Email already exist",
+          });
+        }
+      }
+
+      if (req.body.companyName) {
+        const checkcompanyName = organisations.find(
+          (org) =>
+            org.companyName.toLowerCase() === req.body.companyName.toLowerCase()
+        );
+        if (
+          checkcompanyName &&
+          checkcompanyName._id.toString() !== organisation._id.toString()
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "company name already exist",
+          });
+        }
+      }
+    }
+
+    await organisationModel.updateOne(
+      { _id: organisation._id },
+      {
+        email: req.body.email || organisation.email,
+        areaOfAccess: req.body.areaOfAccess || organisation.areaOfAccess,
+        companyName: req.body.companyName || organisation.companyName,
+        rcNo: req.body.rcNo || organisation.rcNo,
+        companyTag: req.body.companyTag || organisation.companyTag,
+        phone: req.body.phone || organisation.phone,
+        streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
+        categories: req.body.categories || organisation.categories,
+        location: req.body.location || organisation.location,
+      }
+    );
+
+    organisation.email = req.body.email || organisation.email;
+    organisation.areaOfAccess =
+      req.body.areaOfAccess || organisation.areaOfAccess;
+    organisation.companyName = req.body.companyName || organisation.companyName;
+    organisation.rcNo = req.body.rcNo || organisation.rcNo;
+    organisation.companyTag = req.body.companyTag || organisation.companyTag;
+    organisation.phone = req.body.phone || organisation.phone;
+    organisation.streetOfAccess =
+      req.body.streetOfAccess || organisation.streetOfAccess;
+    organisation.categories = req.body.categories || organisation.categories;
+    organisation.location = req.body.location || organisation.location;
+
+    return res.status(200).json({
+      error: false,
+      message: "organisation updated successfully",
+      data: organisation,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+organisationController.aggregators = async (req, res) => {
+  bodyValidate(req, res);
+  try {
+    let { page = 1, resultsPerPage = 20, state, key } = req.query;
+    const { organisation } = req.params;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    const org = await organisationModel.findById(organisation);
+    if (!org) {
+      res.status(400).json({
+        error: true,
+        message: "Organisation not found",
+      });
+    }
+
+    let criteria;
+    if (key) {
+      criteria = {
+        $or: [
+          { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+          { gender: { $regex: `.*${key}.*`, $options: "i" } },
+          { phone: { $regex: `.*${key}.*`, $options: "i" } },
+          { email: { $regex: `.*${key}.*`, $options: "i" } },
+          { localGovernment: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+          // { IDNumber: key },
+        ],
+        organisation: org.companyName,
+      };
+    } else {
+      criteria = {
+        organisation: org.companyName,
+      };
+    }
+
+    if (state) criteria.state = state;
+    const totalResult = await collectorModel.countDocuments(criteria);
+    const projection = {
+      roles: 0,
+      password: 0,
+    };
+
+    const collectors = await collectorModel
+      .find(criteria, projection, { lean: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        collectors,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+organisationController.remove = async (req, res) => {
+  bodyValidate(req, res);
+
+  const { orgId } = req.params;
+  const organisation = await organisationModel.findById(orgId);
+  if (!organisation) {
+    return res.status(400).json({
+      error: true,
+      message: "Organisation not found",
+    });
+  }
+
+  const collectors = await collectorModel.find({
+    organisation: organisation.companyName,
+  });
+
+  try {
+    if (collectors.length !== 0) {
+      const insertMany = await collectorBinModel.insertMany(collectors);
+      console.log("insertMany", insertMany);
+      if (insertMany) {
+        await collectorModel.deleteMany({
+          organisation: organisation.companyName,
+        });
+      }
+    }
+
+    const insert = await organisationBinModel.create({
+      companyName: organisation.companyName,
+      email: organisation.email,
+      password: organisation.password,
+      rcNo: organisation.rcNo,
+      companyTag: organisation.companyTag,
+      phone: organisation.phone,
+      roles: organisation.roles,
+      role: organisation.role,
+      license_active: organisation.license_active,
+      expiry_date: organisation.expiry_date,
+      totalAvailable: organisation.totalAvailable,
+      totalSpent: organisation.totalSpent,
+      resetToken: organisation.resetToken,
+      location: organisation.location,
+      areaOfAccess: organisation.areaOfAccess,
+      streetOfAccess: organisation.streetOfAccess,
+      categories: organisation.categories,
+      canEquivalent: organisation.canEquivalent,
+      cartonEquivalent: organisation.cartonEquivalent,
+      petBottleEquivalent: organisation.petBottleEquivalent,
+      rubberEquivalent: organisation.rubberEquivalent,
+      plasticEquivalent: organisation.plasticEquivalent,
+      woodEquivalent: organisation.woodEquivalent,
+      glassEquivalent: organisation.glassEquivalent,
+      nylonEquivalent: organisation.nylonEquivalent,
+      metalEquivalent: organisation.metalEquivalent,
+      eWasteEquivalent: organisation.eWasteEquivalent,
+      tyreEquivalent: organisation.tyreEquivalent,
+      wallet: organisation.wallet,
+    });
+
+    console.log("insert", insert);
+    if (insert) {
+      await organisationModel.deleteOne({
+        _id: organisation._id,
+      });
+    }
+    return res.status(200).json({
+      error: false,
+      message: "Organisation deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+organisationController.updateProfile = async (req, res) => {
+  bodyValidate(req, res);
+  const organisation = req.user;
+  try {
+    const organisations = await organisationModel.find({
+      $or: [
+        { email: req.body.email || "" },
+        {
+          companyName: req.body.companyName || "",
+        },
+      ],
+    });
+
+    if (organisations.length !== 0) {
+      if (req.body.email) {
+        const checkemail = organisations.find(
+          (org) => org.email.toLowerCase() === req.body.email.toLowerCase()
+        );
+        if (
+          checkemail &&
+          checkemail._id.toString() !== organisation._id.toString()
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "Email already exist",
+          });
+        }
+      }
+
+      if (req.body.companyName) {
+        const checkcompanyName = organisations.find(
+          (org) =>
+            org.companyName.toLowerCase() === req.body.companyName.toLowerCase()
+        );
+        if (
+          checkcompanyName &&
+          checkcompanyName._id.toString() !== organisation._id.toString()
+        ) {
+          return res.status(400).json({
+            error: true,
+            message: "company name already exist",
+          });
+        }
+      }
+    }
+
+    await organisationModel.updateOne(
+      { _id: organisation._id },
+      {
+        email: req.body.email || organisation.email,
+        areaOfAccess: req.body.areaOfAccess || organisation.areaOfAccess,
+        companyName: req.body.companyName || organisation.companyName,
+        rcNo: req.body.rcNo || organisation.rcNo,
+        companyTag: req.body.companyTag || organisation.companyTag,
+        phone: req.body.phone || organisation.phone,
+        streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
+        categories: req.body.categories || organisation.categories,
+        location: req.body.location || organisation.location,
+      }
+    );
+
+    organisation.email = req.body.email || organisation.email;
+    organisation.areaOfAccess =
+      req.body.areaOfAccess || organisation.areaOfAccess;
+    organisation.companyName = req.body.companyName || organisation.companyName;
+    organisation.rcNo = req.body.rcNo || organisation.rcNo;
+    organisation.companyTag = req.body.companyTag || organisation.companyTag;
+    organisation.phone = req.body.phone || organisation.phone;
+    organisation.streetOfAccess =
+      req.body.streetOfAccess || organisation.streetOfAccess;
+    organisation.categories = req.body.categories || organisation.categories;
+    organisation.location = req.body.location || organisation.location;
+
+    return res.status(200).json({
+      error: false,
+      message: "organisation updated successfully",
+      data: organisation,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
 module.exports = organisationController;

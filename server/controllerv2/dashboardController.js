@@ -395,166 +395,98 @@ dashboardController.collectormapData = async (req, res) => {
 
 dashboardController.chartData = async (req, res) => {
   try {
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+    let { start, end, state } = req.query;
+    if (!start || !end) {
+      return res.status(400).json({
+        error: true,
+        message: "Please pass a start and end date",
+      });
+    }
+    let criteria = {
+      createdAt: {
+        $gte: new Date(start),
+        $lt: new Date(end),
+      },
+    };
+    if (state) criteria.state = state;
+
+    const pipelines = [
+      {
+        $match: criteria,
+      },
+      {
+        $unwind: {
+          path: "$categories",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          category: {
+            $ifNull: ["$categories.name", "$Category"],
+          },
+          month: {
+            $month: "$createdAt",
+          },
+          createdAt: 1,
+          weight: {
+            $ifNull: ["$categories.quantity", "$weight"],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            month: "$month",
+            category: "$category",
+          },
+          categoryCount: {
+            $sum: 1,
+          },
+          totalWeight: {
+            $sum: "$weight",
+          },
+        },
+      },
+      {
+        $project: {
+          group: "$_id",
+          categoryCount: 1,
+          totalWeight: 1,
+          _id: 0,
+        },
+      },
+      {
+        $group: {
+          _id: "$group.month",
+          items: {
+            $push: {
+              cat: "$group.category",
+              count: "$categoryCount",
+              weight: "$totalWeight",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          month: "$_id",
+          items: 1,
+          _id: 0,
+        },
+      },
+      {
+        $sort: {
+          month: 1,
+        },
+      },
     ];
-    const ground_Y = new Date().getFullYear();
-    //const ceil_year = new Date().
-    const report = [];
-    const today = new Date();
-    const lastWeek = new Date();
-    const forthWeek = new Date();
-    const thirdWeek = new Date();
-    const lastMonth = new Date();
 
-    lastWeek.setDate(today.getDate() - 7);
-    forthWeek.setDate(today.getDate() - 14);
-    thirdWeek.setDate(today.getDate() - 21);
-    lastMonth.setDate(today.getDate() - 28);
-
-    var year = new Date().getFullYear();
-
-    const Jan = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 2] },
-        ],
-      },
-    });
-
-    const Feb = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 3] },
-        ],
-      },
-    });
-
-    const March = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 4] },
-        ],
-      },
-    });
-
-    const April = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 5] },
-        ],
-      },
-    });
-
-    const May = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 6] },
-        ],
-      },
-    });
-
-    const June = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 7] },
-        ],
-      },
-    });
-
-    const July = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 8] },
-        ],
-      },
-    });
-
-    const Aug = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 9] },
-        ],
-      },
-    });
-
-    const sept = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 10] },
-        ],
-      },
-    });
-
-    const Oct = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 11] },
-        ],
-      },
-    });
-
-    const Nov = await transactionModel.find({
-      $expr: {
-        $and: [
-          { $eq: [{ $year: "$createdAt" }, year] },
-          { $eq: [{ $month: "$createdAt" }, 12] },
-        ],
-      },
-    });
-
-    const Dec = await transactionModel.find({
-      // $expr: {
-      //   $and: [
-      //     { $eq: [{ $year: "$createdAt" }, year] },
-      //     { $eq: [{ $month: "$createdAt" }, 2] },
-      //   ],
-      // },
-    });
-
-    const cat = await categoryModel.find({});
-
-    let Jandata = [];
-    let data = [];
-
-    // cat.map((i, c) => {
-    //   // const d = Jan.filter(
-    //   //   (x) =>
-    //   //     x.Category == cat.name.toLowerCase() ||
-    //   //     x.categories.includes(cat.name.toLowerCase())
-    //   // )
-    //   //   .map((x) => x.weight)
-    //   //   .reduce((acc, curr) => acc + curr, 0);
-    //   // data[cat.name] = d;
-    //   // Jandata.push(data);
-    // });
-
+    const wasteStats = await transactionModel.aggregate(pipelines);
     return res.status(200).json({
       error: false,
-      message: "Map data",
-      categories: cat,
-      data: data,
+      message: "Success",
+      data: { wasteStats, start, end },
     });
   } catch (error) {
     console.log(error);

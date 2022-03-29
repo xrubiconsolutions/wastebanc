@@ -131,16 +131,34 @@ agenciesController.create = async (req, res) => {
 agenciesController.getAgencies = async (req, res) => {
   bodyValidate(req, res);
   try {
+    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    const totalResult = await MODEL.userModel.countDocuments({
+      roles: "admin",
+    });
+
     const agencies = await MODEL.userModel
       .find({
         roles: "admin",
       })
-      .sort({ _id: -1 });
+      .sort({ createAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
 
     return res.status(200).json({
       error: false,
       message: "User agencies",
-      data: agencies,
+      data: {
+        agencies,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      },
     });
   } catch (error) {
     console.log(error);
