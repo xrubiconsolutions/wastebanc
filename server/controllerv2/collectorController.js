@@ -132,6 +132,7 @@ class CollectorService {
   }
   static async getCompanyCollectors(req, res) {
     const { companyName: organisation } = req.user;
+    // log
     try {
       let {
         page = 1,
