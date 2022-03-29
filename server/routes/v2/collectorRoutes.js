@@ -107,4 +107,14 @@ module.exports = (APP) => {
     recyclerValidation,
     CollectorService.getCollectorPickups
   );
+
+  APP.route("/api/v2/collector/pickups").get(
+    recyclerValidation,
+    CollectorService.getCollectorPickups
+  );
+
+  APP.route("/api/v2/collector/dropoff-locations").get(
+    companyPakamDataValidation,
+    CollectorService.getCompanyDropOffLocations
+  );
 };
