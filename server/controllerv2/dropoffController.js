@@ -43,15 +43,15 @@ dropoffController.dropOffs = async (req, res) => {
     if (key) {
       criteria = {
         $or: [
-          { scheduleCreator: key },
-          { fullname: key },
-          { completionStatus: key },
-          { organisation: key },
-          { phone: key },
-          { organisationPhone: key },
-          { quantity: key },
+          { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+          { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+          { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+          { phone: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisationPhone: { $regex: `.*${key}.*`, $options: "i" } },
+          //{ quantity: key },
           { categories: { $in: [key] } },
-          { Category: key },
+          { Category: { $regex: `.*${key}.*`, $options: "i" } },
         ],
       };
     } else {
@@ -115,15 +115,15 @@ dropoffController.companydropOffs = async (req, res) => {
     if (key) {
       criteria = {
         $or: [
-          { scheduleCreator: key },
-          { fullname: key },
-          { completionStatus: key },
-          { organisation: key },
-          { phone: key },
-          { organisationPhone: key },
+          { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+          { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+          { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+          { phone: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisationPhone: { $regex: `.*${key}.*`, $options: "i" } },
           // { quantity: key },
           { categories: { $in: [key] } },
-          { Category: key },
+          { Category: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         organisation,
       };
