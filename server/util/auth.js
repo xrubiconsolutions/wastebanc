@@ -63,11 +63,11 @@ validateUser.userValidation = async (req, res, NEXT) => {
   //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.userCollectorData = async (res, res, NEXT) => {
-  if (!res.headers.authorization) {
+validateUser.userCollectorData = async (req, res, NEXT) => {
+  if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
 
   if (Date.now() >= validated.exp * 1000) {
@@ -115,13 +115,13 @@ validateUser.userCollectorData = async (res, res, NEXT) => {
   //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.companyPakamDataValidation = async (res, res, NEXT) => {
+validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
   try {
-    if (!res.headers.authorization) {
+    if (!req.headers.authorization) {
       return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
     }
 
-    var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
+    var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
     console.log("valid", validated);
 
     if (Date.now() >= validated.exp * 1000) {
@@ -176,11 +176,11 @@ validateUser.companyPakamDataValidation = async (res, res, NEXT) => {
   //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.recyclerValidation = async (res, res, NEXT) => {
-  if (!res.headers.authorization) {
+validateUser.recyclerValidation = async (req, res, NEXT) => {
+  if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated.userId);
 
   if (Date.now() >= validated.exp * 1000) {
@@ -232,11 +232,11 @@ validateUser.recyclerValidation = async (res, res, NEXT) => {
 /********************************
  ****** admin authentication ****
  ********************************/
-validateUser.adminValidation = async (res, res, NEXT) => {
-  if (!res.headers.authorization) {
+validateUser.adminValidation = async (req, res, NEXT) => {
+  if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
 
   if (Date.now() >= validated.exp * 1000) {
@@ -283,11 +283,11 @@ validateUser.adminValidation = async (res, res, NEXT) => {
   //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.adminPakamValidation = async (res, res, NEXT) => {
-  if (!res.headers.authorization) {
+validateUser.adminPakamValidation = async (req, res, NEXT) => {
+  if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
     return res.status(401).json({
@@ -335,11 +335,11 @@ validateUser.adminPakamValidation = async (res, res, NEXT) => {
   //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.companyValidation = async (res, res, NEXT) => {
-  if (!res.headers.authorization) {
+validateUser.companyValidation = async (req, res, NEXT) => {
+  if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
     return res.status(401).json({
@@ -385,11 +385,11 @@ validateUser.companyValidation = async (res, res, NEXT) => {
   //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.lcdValidation = async (res, res, NEXT) => {
-  if (!res.headers.authorization) {
+validateUser.lcdValidation = async (req, res, NEXT) => {
+  if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
     return res.status(401).json({
@@ -445,12 +445,12 @@ validateUser.lcdValidation = async (res, res, NEXT) => {
 /********************************
  ****** admin check model ********
  *********************************/
-validateUser.adminCheck = (res, res, NEXT) => {
-  let dataObj = res.query.username;
-  if (res.query.username) {
-    dataObj = res.query;
+validateUser.adminCheck = (req, res, NEXT) => {
+  let dataObj = req.query.username;
+  if (req.query.username) {
+    dataObj = req.query;
   } else {
-    dataObj = res.body;
+    dataObj = req.body;
   }
 
   /** Check required properties **/
@@ -487,12 +487,12 @@ validateUser.adminCheck = (res, res, NEXT) => {
 /********************************
  ****** User check model ********
  *********************************/
-validateUser.userCheck = (res, res, NEXT) => {
-  let dataObj = res.query.username;
-  if (res.query.username) {
-    dataObj = res.query;
+validateUser.userCheck = (req, res, NEXT) => {
+  let dataObj = req.query.username;
+  if (req.query.username) {
+    dataObj = req.query;
   } else {
-    dataObj = res.body;
+    dataObj = req.body;
   }
   COMMON_FUN.objProperties(dataObj, (ERR, RESULT) => {
     if (ERR) {
