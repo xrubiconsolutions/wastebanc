@@ -14,7 +14,7 @@ let validateUser = {};
  ********************************/
 validateUser.userValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
-    return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
   console.log("req", req.headers.authorization.split(" ")[1]);
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
@@ -55,23 +55,23 @@ validateUser.userValidation = async (req, res, NEXT) => {
     });
   }
 
-  //   let status = REQUEST.headers.authorization
-  //     ? JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
-  //     : JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
+  //   let status = res.headers.authorization
+  //     ? JWT.decode(res.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
+  //     : JWT.decode(res.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
   //   validated && validated.roles === "client"
   //     ? NEXT()
-  //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+  //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.userCollectorData = async (REQUEST, RESPONSE, NEXT) => {
-  if (!REQUEST.headers.authorization) {
-    return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+validateUser.userCollectorData = async (res, res, NEXT) => {
+  if (!res.headers.authorization) {
+    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
 
   if (Date.now() >= validated.exp * 1000) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: "Token time out. Login again",
       statusCode: 401,
@@ -80,7 +80,7 @@ validateUser.userCollectorData = async (REQUEST, RESPONSE, NEXT) => {
 
   const user = await MODEL.userModel.findById(validated.userId);
   if (!user) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -88,7 +88,7 @@ validateUser.userCollectorData = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.status === "disable") {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -96,36 +96,36 @@ validateUser.userCollectorData = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.roles === "admin" || user.roles === "analytics-admin") {
-    REQUEST.user = user;
+    res.user = user;
     NEXT();
   } else {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
     });
   }
 
-  //   let status = REQUEST.headers.authorization
-  //     ? JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
-  //     : JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
+  //   let status = res.headers.authorization
+  //     ? JWT.decode(res.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
+  //     : JWT.decode(res.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
   //   (validated && validated.roles === "admin") ||
   //   validated.roles == "analytics-admin"
   //     ? NEXT()
-  //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+  //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.companyPakamDataValidation = async (REQUEST, RESPONSE, NEXT) => {
+validateUser.companyPakamDataValidation = async (res, res, NEXT) => {
   try {
-    if (!REQUEST.headers.authorization) {
-      return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    if (!res.headers.authorization) {
+      return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
     }
 
-    var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
+    var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
     console.log("valid", validated);
 
     if (Date.now() >= validated.exp * 1000) {
-      return RESPONSE.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Token time out. Login again",
         statusCode: 401,
@@ -135,7 +135,7 @@ validateUser.companyPakamDataValidation = async (REQUEST, RESPONSE, NEXT) => {
     const user = await MODEL.organisationModel.findById(validated.userId);
     if (!user) {
       console.log("here");
-      return RESPONSE.status(401).json({
+      return res.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
         statusCode: 403,
@@ -143,7 +143,7 @@ validateUser.companyPakamDataValidation = async (REQUEST, RESPONSE, NEXT) => {
     }
 
     if (user.status === "disable") {
-      return RESPONSE.status(401).json({
+      return res.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
         statusCode: 401,
@@ -151,10 +151,10 @@ validateUser.companyPakamDataValidation = async (REQUEST, RESPONSE, NEXT) => {
     }
 
     if (user.roles === "admin" || user.roles === "company") {
-      REQUEST.user = user;
+      res.user = user;
       NEXT();
     } else {
-      return RESPONSE.status(401).json({
+      return res.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
         statusCode: 401,
@@ -162,29 +162,29 @@ validateUser.companyPakamDataValidation = async (REQUEST, RESPONSE, NEXT) => {
     }
   } catch (error) {
     console.log(error);
-    RESPONSE.status(500).json({
+    res.status(500).json({
       error: true,
       message: "An error occurred",
     });
   }
 
-  //   let status = REQUEST.headers.authorization
-  //     ? JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
-  //     : JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
+  //   let status = res.headers.authorization
+  //     ? JWT.decode(res.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
+  //     : JWT.decode(res.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
   //   (validated && validated.roles === "admin") || validated.role == "company"
   //     ? NEXT()
-  //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+  //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
-  if (!REQUEST.headers.authorization) {
-    return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+validateUser.recyclerValidation = async (res, res, NEXT) => {
+  if (!res.headers.authorization) {
+    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
   console.log("valid", validated.userId);
 
   if (Date.now() >= validated.exp * 1000) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: "Token time out. Login again",
       statusCode: 401,
@@ -194,7 +194,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
   const user = await MODEL.collectorModel.findById(validated.userId);
   if (!user) {
     console.log("here 1");
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 401,
@@ -203,7 +203,7 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
 
   if (user.status === "disable") {
     console.log("here 2");
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 401,
@@ -211,36 +211,36 @@ validateUser.recyclerValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.roles === "collector" || user.roles === "company") {
-    REQUEST.user = user;
+    res.user = user;
     NEXT();
   } else {
     console.log("here 3");
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 401,
     });
   }
-  //   let status = REQUEST.headers.authorization
-  //     ? JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
-  //     : JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
+  //   let status = res.headers.authorization
+  //     ? JWT.decode(res.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
+  //     : JWT.decode(res.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
   //   validated && validated.roles === "collector"
   //     ? NEXT()
-  //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+  //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
 /********************************
  ****** admin authentication ****
  ********************************/
-validateUser.adminValidation = async (REQUEST, RESPONSE, NEXT) => {
-  if (!REQUEST.headers.authorization) {
-    return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+validateUser.adminValidation = async (res, res, NEXT) => {
+  if (!res.headers.authorization) {
+    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
 
   if (Date.now() >= validated.exp * 1000) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: "Token time out. Login again",
       statusCode: 401,
@@ -249,7 +249,7 @@ validateUser.adminValidation = async (REQUEST, RESPONSE, NEXT) => {
 
   const user = await MODEL.userModel.findById(validated.userId);
   if (!user) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -257,7 +257,7 @@ validateUser.adminValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.status === "disable") {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -265,32 +265,32 @@ validateUser.adminValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.roles === "analytics-admin" || user.roles === "admin") {
-    REQUEST.user = user;
+    res.user = user;
     NEXT();
   } else {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
     });
   }
 
-  //   let status = REQUEST.headers.authorization
-  //     ? JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
-  //     : JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
+  //   let status = res.headers.authorization
+  //     ? JWT.decode(res.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
+  //     : JWT.decode(res.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
   //   validated && validated.roles === "analytics-admin"
   //     ? NEXT()
-  //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+  //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.adminPakamValidation = async (REQUEST, RESPONSE, NEXT) => {
-  if (!REQUEST.headers.authorization) {
-    return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+validateUser.adminPakamValidation = async (res, res, NEXT) => {
+  if (!res.headers.authorization) {
+    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: "Token time out. Login again",
       statusCode: 401,
@@ -300,7 +300,7 @@ validateUser.adminPakamValidation = async (REQUEST, RESPONSE, NEXT) => {
   const user = await MODEL.userModel.findById(validated.userId);
 
   if (!user) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -308,7 +308,7 @@ validateUser.adminPakamValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.status === "disable") {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: "Account disabled, Please contact support team",
       statusCode: 403,
@@ -316,33 +316,33 @@ validateUser.adminPakamValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.roles === "admin") {
-    REQUEST.user = user;
+    res.user = user;
     NEXT();
   } else {
     console.log("here");
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
     });
   }
 
-  //   let status = REQUEST.headers.authorization
-  //     ? JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
-  //     : JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
+  //   let status = res.headers.authorization
+  //     ? JWT.decode(res.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
+  //     : JWT.decode(res.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
   //   validated && validated.roles === "admin"
   //     ? NEXT()
-  //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+  //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.companyValidation = async (REQUEST, RESPONSE, NEXT) => {
-  if (!REQUEST.headers.authorization) {
-    return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+validateUser.companyValidation = async (res, res, NEXT) => {
+  if (!res.headers.authorization) {
+    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: "Token time out. Login again",
       statusCode: 401,
@@ -351,7 +351,7 @@ validateUser.companyValidation = async (REQUEST, RESPONSE, NEXT) => {
 
   const user = await MODEL.organisationModel.findById(validated.userId);
   if (!user) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -359,7 +359,7 @@ validateUser.companyValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.status === "disable") {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -367,32 +367,32 @@ validateUser.companyValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.roles === "company") {
-    REQUEST.user = user;
+    res.user = user;
     NEXT();
   } else {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
     });
   }
 
-  //   let status = REQUEST.headers.authorization
-  //     ? JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
-  //     : JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
+  //   let status = res.headers.authorization
+  //     ? JWT.decode(res.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
+  //     : JWT.decode(res.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
   //   validated && validated.role === "company"
   //     ? NEXT()
-  //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+  //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
-validateUser.lcdValidation = async (REQUEST, RESPONSE, NEXT) => {
-  if (!REQUEST.headers.authorization) {
-    return RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+validateUser.lcdValidation = async (res, res, NEXT) => {
+  if (!res.headers.authorization) {
+    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  var validated = jwt_decode(REQUEST.headers.authorization.split(" ")[1]);
+  var validated = jwt_decode(res.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: "Token time out. Login again",
       statusCode: 401,
@@ -401,7 +401,7 @@ validateUser.lcdValidation = async (REQUEST, RESPONSE, NEXT) => {
 
   const user = await MODEL.userModel.findById(validated.userId);
   if (!user) {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -409,7 +409,7 @@ validateUser.lcdValidation = async (REQUEST, RESPONSE, NEXT) => {
   }
 
   if (user.status === "disable") {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
@@ -422,41 +422,41 @@ validateUser.lcdValidation = async (REQUEST, RESPONSE, NEXT) => {
     user.roles === "admin" ||
     user.roles === "collector"
   ) {
-    REQUEST.user = user;
+    res.user = user;
     NEXT();
   } else {
-    return RESPONSE.status(401).json({
+    return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 403,
     });
   }
-  //   let status = REQUEST.headers.authorization
-  //     ? JWT.decode(REQUEST.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
-  //     : JWT.decode(REQUEST.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
+  //   let status = res.headers.authorization
+  //     ? JWT.decode(res.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
+  //     : JWT.decode(res.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
   //   (validated && validated.roles === "client") ||
   //   validated.roles === "collector" ||
   //   validated.role === "company" ||
   //   validated.roles === "admin"
   //     ? NEXT()
-  //     : RESPONSE.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+  //     : res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
 };
 
 /********************************
  ****** admin check model ********
  *********************************/
-validateUser.adminCheck = (REQUEST, RESPONSE, NEXT) => {
-  let dataObj = REQUEST.query.username;
-  if (REQUEST.query.username) {
-    dataObj = REQUEST.query;
+validateUser.adminCheck = (res, res, NEXT) => {
+  let dataObj = res.query.username;
+  if (res.query.username) {
+    dataObj = res.query;
   } else {
-    dataObj = REQUEST.body;
+    dataObj = res.body;
   }
 
   /** Check required properties **/
   COMMON_FUN.objProperties(dataObj, (ERR, RESULT) => {
     if (ERR) {
-      return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+      return res.jsonp(COMMON_FUN.sendError(ERR));
     } else {
       MODEL.userModel.findOne(
         {
@@ -466,15 +466,15 @@ validateUser.adminCheck = (REQUEST, RESPONSE, NEXT) => {
         { lean: true },
         (ERR, RESULT) => {
           if (ERR) {
-            return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+            return res.jsonp(COMMON_FUN.sendError(ERR));
           } else if (!RESULT) {
-            return RESPONSE.jsonp(
+            return res.jsonp(
               COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_USERNAME)
             );
           } else {
             RESULT.roles === admin
               ? NEXT()
-              : RESPONSE.status(400).jsonp(
+              : res.status(400).jsonp(
                   COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED)
                 );
           }
@@ -487,16 +487,16 @@ validateUser.adminCheck = (REQUEST, RESPONSE, NEXT) => {
 /********************************
  ****** User check model ********
  *********************************/
-validateUser.userCheck = (REQUEST, RESPONSE, NEXT) => {
-  let dataObj = REQUEST.query.username;
-  if (REQUEST.query.username) {
-    dataObj = REQUEST.query;
+validateUser.userCheck = (res, res, NEXT) => {
+  let dataObj = res.query.username;
+  if (res.query.username) {
+    dataObj = res.query;
   } else {
-    dataObj = REQUEST.body;
+    dataObj = res.body;
   }
   COMMON_FUN.objProperties(dataObj, (ERR, RESULT) => {
     if (ERR) {
-      return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+      return res.jsonp(COMMON_FUN.sendError(ERR));
     } else {
       MODEL.userModel.findOne(
         {
@@ -506,15 +506,15 @@ validateUser.userCheck = (REQUEST, RESPONSE, NEXT) => {
         { lean: true },
         (ERR, RESULT) => {
           if (ERR) {
-            return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
+            return res.jsonp(COMMON_FUN.sendError(ERR));
           } else if (!RESULT) {
-            return RESPONSE.jsonp(
+            return res.jsonp(
               COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_USERNAME)
             );
           } else {
             RESULT.roles === CONSTANTS.DATABASE.USER_ROLES.USER
               ? NEXT()
-              : RESPONSE.jsonp(
+              : res.jsonp(
                   COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED)
                 );
           }
