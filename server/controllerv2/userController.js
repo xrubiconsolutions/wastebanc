@@ -208,7 +208,7 @@ class UserService {
             gender: checkPhone.gender,
             country: checkPhone.country,
             state: checkPhone.state,
-            lga: create.lga,
+            lga: checkPhone.lga,
             pin_id: checkPhone.data.pinId,
             verified: checkPhone.verified,
             // uType: create.uType,
