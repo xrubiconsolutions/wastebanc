@@ -209,7 +209,7 @@ class UserService {
             country: checkPhone.country,
             state: checkPhone.state,
             lga: checkPhone.lga,
-            pin_id: checkPhone.data.pinId,
+            pin_id: send.data.pinId,
             verified: checkPhone.verified,
             // uType: create.uType,
             // organisationType: create.organisationType,
