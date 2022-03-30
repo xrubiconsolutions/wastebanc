@@ -77,10 +77,11 @@ scheduleDropController.schedule = (REQUEST, RESPONSE) => {
         console.log("Logged date updated", new Date());
       }
     );
+    console.log("result", result);
 
     const expireDate = moment(data.dropOffDate, "YYYY-MM-DD").add(7, "days");
     data.expiryDuration = expireDate;
-    data.clientId = result._id;
+    //data.clientId = result._id;
 
     MODEL.scheduleDropModel(data).save({}, (ERR, RESULT) => {
       try {
