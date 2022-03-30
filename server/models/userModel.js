@@ -142,6 +142,12 @@ const user_Schema = new Schema({
   state: {
     type: String,
   },
+  countries: {
+    type: Array,
+  },
+  states: {
+    type: Array,
+  },
   status: {
     type: String,
     default: "active",
