@@ -448,7 +448,7 @@ class CollectorService {
     try {
       const collector = await collectorModel.findById(collectorId);
 
-      if (collector.verified === false)
+      if (!collector.organisation)
         return res.status(200).json({
           error: false,
           message: "Collector already declined",
@@ -597,22 +597,24 @@ class CollectorService {
   static async getCompanyCollectorStats(req, res) {
     const { companyName: organisation } = req.user;
     try {
-      // count verified collecctors
+      // count verified collectors
       const verifiedCount = await collectorModel.countDocuments({
         verified: true,
         organisation,
       });
 
-      // count male company colelctors
+      // count male company collectors
       const maleCount = await collectorModel.countDocuments({
         gender: "male",
         organisation,
+        verified: true,
       });
 
-      // count female company colelctors
+      // count female company collectors
       const femaleCount = await collectorModel.countDocuments({
         gender: "female",
         organisation,
+        verified: true,
       });
 
       // count new company collectors withon 30 days
@@ -626,7 +628,9 @@ class CollectorService {
       });
 
       // get all company collectors
-      const collectors = await collectorModel.find({ organisation });
+      const collectors = await collectorModel.find({
+        organisation,
+      });
 
       return res.status(200).json({
         error: false,
