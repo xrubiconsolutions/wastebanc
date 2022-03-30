@@ -166,6 +166,7 @@ class UserService {
         }
 
         const phoneNo = String(checkPhone.phone).substring(1, 11);
+        const token = authToken(phoneNo);
         const msg = {
           api_key:
             "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
