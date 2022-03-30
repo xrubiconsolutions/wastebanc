@@ -100,8 +100,10 @@ paymentController.charityHistory = async (req, res) => {
         $or: [
           { fullname: { $regex: `.*${key}.*`, $options: "i" } },
           { aggregatorOrganisation: { $regex: `.*${key}.*`, $options: "i" } },
-          { quantityOfWaste: { $regex: `.*${key}.*`, $options: "i" } },
-          { amount: { $regex: `.*${key}.*`, $options: "i" } },
+          // {
+          //   quantityOfWaste: { $regex: `.*${ParseInt(key)}.*`, $options: "i" },
+          // },
+          // { amount: { $regex: `.*${ParseInt(key)}.*`, $options: "i" } },
         ],
       };
     } else {
