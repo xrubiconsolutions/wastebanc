@@ -348,7 +348,7 @@ class CollectorService {
         });
       }
 
-      if (!collector.status || collector.status === "active") {
+      if (collector.status === "disable") {
         return res.status(200).json({
           error: false,
           message: "Aggregator already enabled",
@@ -358,7 +358,7 @@ class CollectorService {
       await collectorModel.updateOne(
         { _id: collector._id },
         {
-          status: "disabled",
+          status: "disable",
         }
       );
 
