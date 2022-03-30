@@ -323,6 +323,7 @@ const bodyValidate = (req, res) => {
       errors: result.array({ onlyFirstError: true }),
     });
   }
+  return;
 };
 
 /*exporting all object from here*/
