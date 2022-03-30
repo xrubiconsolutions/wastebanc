@@ -158,9 +158,64 @@ class UserService {
         phone: body.phone,
       });
       if (checkPhone) {
-        return res.status(400).json({
-          error: true,
-          message: "Phone already exist",
+        if (checkPhone.verified) {
+          return res.status(400).json({
+            error: true,
+            message: "Phone already exist",
+          });
+        }
+
+        const phoneNo = String(checkPhone.phone).substring(1, 11);
+        const msg = {
+          api_key:
+            "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+          message_type: "NUMERIC",
+          to: `+234${phoneNo}`,
+          from: "N-Alert",
+          channel: "dnd",
+          pin_attempts: 10,
+          pin_time_to_live: 5,
+          pin_length: 4,
+          pin_placeholder: "< 1234 >",
+          message_text:
+            "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+          pin_type: "NUMERIC",
+        };
+
+        const options = {
+          method: "POST",
+          url: "https://termii.com/api/sms/otp/send",
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+          body: JSON.stringify(msg),
+        };
+
+        const send = await axios.post(options.url, options.body, {
+          headers: options.headers,
+        });
+
+        console.log("res", send.data);
+
+        return res.status(200).json({
+          error: false,
+          message: "user created successfully",
+          data: {
+            _id: checkPhone._id,
+            fullname: checkPhone.fullname,
+            phone: checkPhone.phone,
+            email: checkPhone.email || "",
+            gender: checkPhone.gender,
+            country: checkPhone.country,
+            state: checkPhone.state,
+            lga: create.lga,
+            pin_id: checkPhone.data.pinId,
+            verified: checkPhone.verified,
+            // uType: create.uType,
+            // organisationType: create.organisationType,
+            //organisationName: typename.name,
+            token,
+          },
         });
       }
       if (body.email) {
@@ -226,7 +281,6 @@ class UserService {
         }
       );
 
-      let dres;
       const phoneNo = String(create.phone).substring(1, 11);
       const msg = {
         api_key:
