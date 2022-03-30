@@ -884,7 +884,7 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
   });
 };
 
-userController.getAllClients = async (REQUEST, RESPONSE) => {
+userController.getAllClients = async (req, res) => {
   console.log("here");
   try {
     let { page = 1, resultsPerPage = 20, key } = req.query;
@@ -894,19 +894,27 @@ userController.getAllClients = async (REQUEST, RESPONSE) => {
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    let criteria = {
-      $or: [
-        { Category: { $regex: `.*${key}.*`, $options: "i" } },
-        { organisation: { $regex: `.*${key}.*`, $options: "i" } },
-        { schuduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
-        { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
-        { client: { $regex: `.*${key}.*`, $options: "i" } },
-        { phone: { $regex: `.*${key}.*`, $options: "i" } },
-        { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
-      ],
-      roles: "client",
-      verified: true,
-    };
+    let criteria;
+    if (key) {
+      criteria = {
+        $or: [
+          { Category: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+          { schuduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+          { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
+          { client: { $regex: `.*${key}.*`, $options: "i" } },
+          { phone: { $regex: `.*${key}.*`, $options: "i" } },
+          { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+        roles: "client",
+        verified: true,
+      };
+    } else {
+      criteria = {
+        roles: "client",
+        verified: true,
+      };
+    }
 
     const totalResult = await MODEL.userModel.countDocuments(criteria);
 
@@ -915,7 +923,7 @@ userController.getAllClients = async (REQUEST, RESPONSE) => {
       .sort({ _id: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);
-    return RESPONSE.status(200).json({
+    return res.status(200).json({
       error: false,
       message: "success",
       data: {
@@ -927,7 +935,8 @@ userController.getAllClients = async (REQUEST, RESPONSE) => {
       },
     });
   } catch (err) {
-    return RESPONSE.status(400).jsonp(err);
+    console.log(err);
+    return res.status(400).jsonp(err);
   }
 };
 
