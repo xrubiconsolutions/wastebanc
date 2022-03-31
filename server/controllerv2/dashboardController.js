@@ -504,36 +504,38 @@ const allSchedules = async (criteria) => {
 };
 
 const completed = async (criteria) => {
-  criteria.completionStatus = "completed";
-  const totalCompleted = await scheduleModel.countDocuments(criteria);
+  const totalCompleted = await scheduleModel.countDocuments({
+    ...criteria,
+    completionStatus: "completed",
+  });
   return totalCompleted;
 };
 
 const missed = async (criteria) => {
-  criteria.completionStatus = "missed";
-  delete criteria.paid;
-  console.log("missed", criteria);
-  const totalMissed = await scheduleModel.countDocuments(criteria);
+  const totalMissed = await scheduleModel.countDocuments({
+    ...criteria,
+    completionStatus: "missed",
+  });
   return totalMissed;
 };
 
 const pending = async (criteria) => {
-  //pending
-  criteria.completionStatus = "pending";
-  console.log("pending", criteria);
-  const totalPending = await scheduleModel.countDocuments(criteria);
+  const totalPending = await scheduleModel.countDocuments({
+    ...criteria,
+    completionStatus: "pending",
+  });
   return totalPending;
 };
 
 const cancelled = async (criteria) => {
-  criteria.completionStatus = "cancelled";
-  console.log("cancelled", criteria);
-  const totalCancelled = await scheduleModel.countDocuments(criteria);
+  const totalCancelled = await scheduleModel.countDocuments({
+    ...criteria,
+    completionStatus: "cancelled",
+  });
   return totalCancelled;
 };
 
 const dropOffs = async (criteria) => {
-  console.log("dropoffs", criteria);
   const totalResult = await scheduleDropModel.countDocuments(criteria);
   return totalResult;
 };
@@ -550,11 +552,11 @@ const totalWaste = async (criteria) => {
 };
 
 const totalpayout = async (criteria) => {
-  criteria.paid = true;
-  criteria.requestedForPayment = true;
-  console.log("totalpayout", criteria);
-
-  const transactions = await transactionModel.find(criteria);
+  const transactions = await transactionModel.find({
+    ...criteria,
+    paid: true,
+    requestedForPayment: true,
+  });
   const totalpayouts = transactions
     .map((x) => x.coin)
     .reduce((acc, curr) => acc + curr, 0);
@@ -562,11 +564,11 @@ const totalpayout = async (criteria) => {
 };
 
 const totaloutstanding = async (criteria) => {
-  criteria.paid = false;
-  criteria.requestedForPayment = false;
-  console.log("totaloutstanding", criteria);
-
-  const transactions = await transactionModel.find(criteria);
+  const transactions = await transactionModel.find({
+    ...criteria,
+    paid: false,
+    requestedForPayment: true,
+  });
   const totalpayouts = transactions
     .map((x) => x.coin)
     .reduce((acc, curr) => acc + curr, 0);
@@ -574,22 +576,15 @@ const totaloutstanding = async (criteria) => {
 };
 
 const totalMale = async (criteria) => {
-  delete criteria.female;
-  criteria.gender = "male";
-  return await collectorModel.countDocuments(criteria);
+  return await collectorModel.countDocuments({ ...criteria, gender: "male" });
 };
 
 const totalFemale = async (criteria) => {
-  delete criteria.male;
-  criteria.gender = "female";
-  return await collectorModel.countDocuments(criteria);
+  return await collectorModel.countDocuments({ ...criteria, gender: "female" });
 };
 
 const verified = async (criteria) => {
-  delete criteria.male;
-  delete criteria.female;
-  criteria.verified = true;
-  return await collectorModel.countDocuments(criteria);
+  return await collectorModel.countDocuments({ ...criteria, verified: true });
 };
 
 const allCollector = async (criteria) => {
