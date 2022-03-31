@@ -12,7 +12,7 @@ const {
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
-
+const axios = require("axios");
 const request = require("request");
 
 class CollectorService {
@@ -475,16 +475,69 @@ class CollectorService {
   }
 
   static async register(req, res) {
-    bodyValidate(req, res);
     try {
       const body = req.body;
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
       });
       if (checkPhone) {
-        return res.status(400).json({
-          error: true,
-          message: "Phone already exist",
+        if (checkPhone.verified) {
+          return res.status(400).json({
+            error: true,
+            message: "Phone already exist",
+          });
+        }
+
+        const phoneNo = String(checkPhone.phone).substring(1, 11);
+        const token = authToken(phoneNo);
+        const msg = {
+          api_key:
+            "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+          message_type: "NUMERIC",
+          to: `+234${phoneNo}`,
+          from: "N-Alert",
+          channel: "dnd",
+          pin_attempts: 10,
+          pin_time_to_live: 5,
+          pin_length: 4,
+          pin_placeholder: "< 1234 >",
+          message_text:
+            "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+          pin_type: "NUMERIC",
+        };
+
+        const options = {
+          method: "POST",
+          url: "https://termii.com/api/sms/otp/send",
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+          body: JSON.stringify(msg),
+        };
+
+        const send = await axios.post(options.url, options.body, {
+          headers: options.headers,
+        });
+
+        console.log("res", send.data);
+
+        return res.status(200).json({
+          error: false,
+          message: "Collector created successfully",
+          data: {
+            _id: checkPhone._id,
+            fullname: checkPhone.fullname,
+            email: checkPhone._id,
+            phone: checkPhone.phone,
+            gender: checkPhone.gender,
+            country: checkPhone.country,
+            state: checkPhone.state,
+            pin_id: send.data.pinId,
+            verified: checkPhone.verified,
+            long: checkPhone.long,
+            lat: checkPhone.lat,
+            token,
+          },
         });
       }
       if (body.email) {
@@ -507,13 +560,13 @@ class CollectorService {
         gender: body.gender,
         country: body.country,
         state: body.state,
-        // long: body.long,
-        // lat: body.lat
-        //organisation: body.organisation,
+        long: body.long,
+        lat: body.lat,
+        organisation: body.organisation,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
-      const data = {
+      const msg = {
         api_key:
           "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
         message_type: "NUMERIC",
@@ -534,43 +587,74 @@ class CollectorService {
         headers: {
           "Content-Type": ["application/json", "application/json"],
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(msg),
       };
 
-      request(options, function (error, response) {
-        const iden = JSON.parse(response.body);
-        if (error) {
-          throw new Error(error);
-        } else {
-          // let UserData = {
-          //   email: RESULT.email,
-          //   phone: RESULT.phone,
-          //   username: RESULT.username,
-          //   roles: RESULT.roles,
-          //   pin_id: iden.pinId,
-          // };
-
-          var data = {
-            api_key:
-              "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-            phone_number: `+234${phoneNo}`,
-            country_code: "NG",
-          };
-          var options = {
-            method: "GET",
-            url: " https://termii.com/api/insight/number/query",
-            headers: {
-              "Content-Type": ["application/json", "application/json"],
-            },
-            body: JSON.stringify(data),
-          };
-          request(options, function (error, response) {
-            if (error) throw new Error(error);
-            //var mobileData = JSON.parse(response.body);
-            //var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
-          });
-        }
+      const send = await axios.post(options.url, options.body, {
+        headers: options.headers,
       });
+
+      console.log("res", send.data);
+      // const data = {
+      //   api_key:
+      //     "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+      //   message_type: "NUMERIC",
+      //   to: `+234${phoneNo}`,
+      //   from: "N-Alert",
+      //   channel: "dnd",
+      //   pin_attempts: 10,
+      //   pin_time_to_live: 5,
+      //   pin_length: 4,
+      //   pin_placeholder: "< 1234 >",
+      //   message_text:
+      //     "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+      //   pin_type: "NUMERIC",
+      // };
+      // const options = {
+      //   method: "POST",
+      //   url: "https://termii.com/api/sms/otp/send",
+      //   headers: {
+      //     "Content-Type": ["application/json", "application/json"],
+      //   },
+      //   body: JSON.stringify(data),
+      // };
+
+      // request(options, function (error, response) {
+      //   const iden = JSON.parse(response.body);
+      //   if (error) {
+      //     throw new Error(error);
+      //   } else {
+      //     // let UserData = {
+      //     //   email: RESULT.email,
+      //     //   phone: RESULT.phone,
+      //     //   username: RESULT.username,
+      //     //   roles: RESULT.roles,
+      //     //   pin_id: iden.pinId,
+      //     // };
+
+      //     var data = {
+      //       api_key:
+      //         "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+      //       phone_number: `+234${phoneNo}`,
+      //       country_code: "NG",
+      //     };
+      //     var options = {
+      //       method: "GET",
+      //       url: " https://termii.com/api/insight/number/query",
+      //       headers: {
+      //         "Content-Type": ["application/json", "application/json"],
+      //       },
+      //       body: JSON.stringify(data),
+      //     };
+      //     request(options, function (error, response) {
+      //       if (error) throw new Error(error);
+      //       //var mobileData = JSON.parse(response.body);
+      //       //var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
+      //     });
+      //   }
+      // });
+
+      console.log("c", create);
 
       return res.status(200).json({
         error: false,
@@ -583,6 +667,9 @@ class CollectorService {
           gender: create.gender,
           country: create.country,
           state: create.state,
+          pin_id: send.data.pinId,
+          long: create.long,
+          lat: create.lat,
           token,
         },
       });
@@ -921,6 +1008,79 @@ class CollectorService {
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
+
+  static async verifyOTP(req, res) {
+    const phone = req.body.phone;
+    const token = req.body.token;
+    const pin_id = req.body.pin_id;
+
+    console.log("phone", phone);
+
+    const user = await collectorModel.findOne({
+      phone,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Phone number does not exist",
+      });
+    }
+
+    try {
+      var data = {
+        api_key:
+          "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+        pin_id: pin_id,
+        pin: token,
+      };
+
+      const send = await axios.post(
+        "https://termii.com/api/sms/otp/verify",
+        JSON.stringify(data),
+        {
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+        }
+      );
+
+      if (send.data.verified === true) {
+        await collectorModel.updateOne({ phone }, { verified: true });
+
+        const token = authToken(user);
+        return res.status(200).json({
+          error: false,
+          message: "Token verified successfully",
+          data: {
+            _id: user._id,
+            fullname: user.fullname,
+            profile_picture: user.profile_picture,
+            phone: user.phone,
+            email: user.email || "",
+            gender: user.gender,
+            country: user.country,
+            state: user.state,
+            verified: true,
+            long: user.long,
+            lat: user.lat,
+            status: user.status,
+            organisation: user.organisation,
+            areaOfAccess: user.areaOfAccess,
+            totalCollected: user.totalCollected,
+            numberOfTripsCompleted: user.numberOfTripsCompleted,
+            token,
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
     }
   }
 }

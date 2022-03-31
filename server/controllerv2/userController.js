@@ -474,7 +474,7 @@ class UserService {
 
         return res.status(200).json({
           error: false,
-          message: "Token verifieed successfully",
+          message: "Token verified successfully",
           data: {
             _id: user._id,
             fullname: user.fullname,

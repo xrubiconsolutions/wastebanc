@@ -295,7 +295,12 @@ let messageLogs = (error, success) => {
 const checkRequestErrs = (req, res, next) => {
   const errs = validationResult(req);
   if (errs.isEmpty()) return next();
-  return res.status(422).jsonp(errs.array());
+  return res.status(422).json({
+    error: true,
+    statusCode: 422,
+    message: "Invalid body request",
+    errors: errs.array({ onlyFirstError: true }),
+  });
 };
 
 const sendResponse = (res, { statusCode, customMessage }, data, token) =>
@@ -305,7 +310,7 @@ const sendResponse = (res, { statusCode, customMessage }, data, token) =>
     token,
   });
 
-const bodyValidate = (req, res) => {
+const bodyValidate = (req, res, next) => {
   // 1. Validate the request coming in
   // console.log(req.body);
   const result = validationResult(req);
@@ -323,7 +328,7 @@ const bodyValidate = (req, res) => {
       errors: result.array({ onlyFirstError: true }),
     });
   }
-  return;
+  return next();
 };
 
 /*exporting all object from here*/
