@@ -405,7 +405,6 @@ validateUser.companyValidation = async (req, res, NEXT) => {
     });
   }
 
-
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
@@ -465,7 +464,7 @@ validateUser.lcdValidation = async (req, res, NEXT) => {
       message: "Invalid token",
     });
   }
-  
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
