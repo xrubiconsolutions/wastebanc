@@ -2542,10 +2542,6 @@ userController.uploadResume = async (req, res) => {
   SERVICE.resumeUpload(req, res).then((result) => {
     return RESPONSE.jsonp({ status: true, message: result });
   });
-  // const firstname = REQUEST.body.firstname;
-  // const lastname = REQUEST.body.lastname;
-  // const resume = REQUEST.file;
-  // console.log("resume", resume);
 };
 
 userController.loginUserV2 = async (req, res) => {
