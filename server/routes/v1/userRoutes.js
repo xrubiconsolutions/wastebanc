@@ -190,7 +190,6 @@ module.exports = (APP) => {
     ],
     CONTROLLER.userController.loginUserV2
   );
-  // APP.route("/api/lawma/get/transaction").get(CONTROLLER.userController.getTransactions);
 
   APP.route("/api/v2/user/encrypt").post(
     CONTROLLER.userController.passwordEncrypt
