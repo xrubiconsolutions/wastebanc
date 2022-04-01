@@ -25,6 +25,14 @@ validateUser.userValidation = async (req, res, NEXT) => {
       message: "Invalid token",
     });
   }
+
+  if (token === "undefined" || token === null || token === undefined) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
   if (Date.now() >= validated.exp * 1000) {
@@ -84,6 +92,14 @@ validateUser.userCollectorData = async (req, res, NEXT) => {
       message: "Invalid token",
     });
   }
+
+  if (token === "undefined" || token === null || token === undefined) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
 
@@ -141,6 +157,13 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
     const token = req.headers.authorization.split(" ")[1];
 
     if (!token) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
+
+    if (token === "undefined" || token === null || token === undefined) {
       return res.status(400).json({
         error: true,
         message: "Invalid token",
@@ -216,6 +239,13 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
     });
   }
 
+  if (token === "undefined" || token === null || token === undefined) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated.userId);
 
@@ -282,6 +312,13 @@ validateUser.adminValidation = async (req, res, NEXT) => {
     });
   }
 
+  if (token === "undefined" || token === null) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
 
@@ -337,6 +374,13 @@ validateUser.adminPakamValidation = async (req, res, NEXT) => {
   const token = req.headers.authorization.split(" ")[1];
 
   if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
+  if (token === "undefined" || token === null || token === defined) {
     return res.status(400).json({
       error: true,
       message: "Invalid token",
@@ -405,6 +449,13 @@ validateUser.companyValidation = async (req, res, NEXT) => {
     });
   }
 
+  if (token === "undefined" || token === null || token === undefined) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
@@ -459,6 +510,13 @@ validateUser.lcdValidation = async (req, res, NEXT) => {
   const token = req.headers.authorization.split(" ")[1];
 
   if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
+  if (token === "undefined" || token === null || token === undefined) {
     return res.status(400).json({
       error: true,
       message: "Invalid token",

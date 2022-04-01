@@ -535,6 +535,6 @@ module.exports = () => {
     );
   });
 
-  AwakeHeroku.add("https://pakam-staging.herokuapp.com/");
-  AwakeHeroku.start();
+  //AwakeHeroku.add("https://pakam-staging.herokuapp.com/");
+  //AwakeHeroku.start();
 };
