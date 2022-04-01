@@ -503,6 +503,127 @@ class UserService {
       });
     }
   }
+
+  static async login(req, res) {
+    try {
+      const user = await MODEL.userModel.findOne({
+        phone: req.body.phone,
+      });
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid credentials",
+          statusCode: 400,
+        });
+      }
+
+      if (
+        !(await COMMON_FUN.comparePassword(req.body.password, user.password))
+      ) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid email or password",
+          statusCode: 400,
+        });
+      }
+
+      if (!user.verified) {
+        const phoneNo = String(checkPhone.phone).substring(1, 11);
+        const token = authToken(phoneNo);
+        const msg = {
+          api_key:
+            "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+          message_type: "NUMERIC",
+          to: `+234${phoneNo}`,
+          from: "N-Alert",
+          channel: "dnd",
+          pin_attempts: 10,
+          pin_time_to_live: 5,
+          pin_length: 4,
+          pin_placeholder: "< 1234 >",
+          message_text:
+            "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+          pin_type: "NUMERIC",
+        };
+
+        const options = {
+          method: "POST",
+          url: "https://termii.com/api/sms/otp/send",
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+          body: JSON.stringify(msg),
+        };
+
+        const send = await axios.post(options.url, options.body, {
+          headers: options.headers,
+        });
+
+        console.log("res", send.data);
+
+        return res.status(200).json({
+          error: false,
+          message: "Phone number not verified",
+          statusCode: 200,
+          data: {
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            phone: user.phone,
+            othernames: user.othernames,
+            address: user.address,
+            roles: user.roles,
+            countryCode: user.countryCode,
+            verified: user.verified,
+            availablePoints: user.availablePoints,
+            rafflePoints: user.rafflePoints,
+            schedulePoints: user.schedulePoints,
+            cardID: user.cardID,
+            lcd: user.lcd,
+            last_logged_in: user.last_logged_in,
+            pin_id: send.data.pinId,
+            token,
+          },
+        });
+      }
+
+      await MODEL.userModel.updateOne(
+        { _id: user._id },
+        { last_logged_in: new Date() }
+      );
+      const token = COMMON_FUN.authToken(user);
+      delete user.password;
+      return res.status(200).json({
+        error: false,
+        message: "Login successfull",
+        statusCode: 200,
+        data: {
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email,
+          phone: user.phone,
+          othernames: user.othernames,
+          address: user.address,
+          roles: user.roles,
+          countryCode: user.countryCode,
+          verified: user.verified,
+          availablePoints: user.availablePoints,
+          rafflePoints: user.rafflePoints,
+          schedulePoints: user.schedulePoints,
+          cardID: user.cardID,
+          lcd: user.lcd,
+          last_logged_in: user.last_logged_in,
+          token,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = UserService;
