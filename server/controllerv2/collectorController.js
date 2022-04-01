@@ -629,6 +629,7 @@ class CollectorService {
           profile_picture: create.organisation,
           long: create.long,
           lat: create.lat,
+          pin_id: send.data.pinId,
           token,
         },
       });
