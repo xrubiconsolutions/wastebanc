@@ -506,7 +506,7 @@ class UserService {
 
   static async login(req, res) {
     try {
-      const user = await MODEL.userModel.findOne({
+      const user = await userModel.findOne({
         phone: req.body.phone,
       });
       if (!user) {
