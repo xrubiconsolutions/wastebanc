@@ -380,7 +380,7 @@ validateUser.adminPakamValidation = async (req, res, NEXT) => {
     });
   }
 
-  if (token === "undefined" || token === null || token === defined) {
+  if (token === "undefined" || token === null || token === undefined) {
     return res.status(400).json({
       error: true,
       message: "Invalid token",
