@@ -2606,7 +2606,7 @@ userController.loginUserV2 = async (req, res) => {
 };
 
 userController.adminLogin = async (req, res) => {
-  bodyValidate(req, res);
+  //bodyValidate(req, res);
   const email = req.body.email;
   try {
     const user = await MODEL.userModel.findOne({
