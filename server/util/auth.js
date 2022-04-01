@@ -239,12 +239,12 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
     });
   }
 
-  if (token === "undefined" || token === null || token === undefined) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+  // if (token === "undefined" || token === null || token === undefined) {
+  //   return res.status(400).json({
+  //     error: true,
+  //     message: "Invalid token",
+  //   });
+  // }
 
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated.userId);
