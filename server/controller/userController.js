@@ -2684,6 +2684,7 @@ userController.adminLogin = async (req, res) => {
         _id: user._id,
         firstname: user.firstname,
         lastname: user.lastname,
+        fullname: user.fullname,
         email: user.email,
         phone: user.phone,
         othernames: user.othernames,
