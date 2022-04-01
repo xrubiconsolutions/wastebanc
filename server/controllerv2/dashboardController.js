@@ -35,8 +35,6 @@ const bodyValidate = (req, res) => {
 };
 
 dashboardController.cardMapData = async (req, res) => {
-  bodyValidate(req, res);
-
   try {
     const { start, end, state } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
