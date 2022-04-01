@@ -518,9 +518,7 @@ class UserService {
         });
       }
 
-      if (
-        !(await comparePassword(req.body.password, user.password))
-      ) {
+      if (!(await comparePassword(req.body.password, user.password))) {
         return res.status(400).json({
           error: true,
           message: "Invalid email or password",
@@ -571,6 +569,11 @@ class UserService {
             lastname: user.lastname,
             email: user.email,
             phone: user.phone,
+            fullname: user.fullname,
+            gender: user.gender,
+            country: user.country,
+            state: user.state,
+            username: user.username,
             othernames: user.othernames,
             address: user.address,
             roles: user.roles,
@@ -603,6 +606,11 @@ class UserService {
           lastname: user.lastname,
           email: user.email,
           phone: user.phone,
+          fullname: user.fullname,
+          gender: user.gender,
+          country: user.country,
+          state: user.state,
+          username: user.username,
           othernames: user.othernames,
           address: user.address,
           roles: user.roles,
