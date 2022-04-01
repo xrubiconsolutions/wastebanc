@@ -5,6 +5,7 @@ const {
   bodyValidate,
   encryptPassword,
   authToken,
+  comparePassword,
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const request = require("request");
@@ -518,7 +519,7 @@ class UserService {
       }
 
       if (
-        !(await COMMON_FUN.comparePassword(req.body.password, user.password))
+        !(await comparePassword(req.body.password, user.password))
       ) {
         return res.status(400).json({
           error: true,
@@ -528,8 +529,8 @@ class UserService {
       }
 
       if (!user.verified) {
-        const phoneNo = String(checkPhone.phone).substring(1, 11);
-        const token = authToken(phoneNo);
+        const phoneNo = String(user.phone).substring(1, 11);
+        const token = authToken(user);
         const msg = {
           api_key:
             "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
@@ -587,11 +588,11 @@ class UserService {
         });
       }
 
-      await MODEL.userModel.updateOne(
+      await userModel.updateOne(
         { _id: user._id },
         { last_logged_in: new Date() }
       );
-      const token = COMMON_FUN.authToken(user);
+      const token = authToken(user);
       delete user.password;
       return res.status(200).json({
         error: false,
