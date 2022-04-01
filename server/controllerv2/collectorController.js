@@ -1118,7 +1118,7 @@ class CollectorService {
             gender: collector.gender,
             localGovernment: collector.localGovernment,
             organisation: collector.organisation,
-            profile_picture: collector.organisation,
+            profile_picture: collector.profile_picture,
             pin_id: send.data.pinId,
             token,
           },
@@ -1151,7 +1151,7 @@ class CollectorService {
           gender: collector.gender,
           localGovernment: collector.localGovernment,
           organisation: collector.organisation,
-          profile_picture: collector.organisation,
+          profile_picture: collector.profile_picture,
           token,
         },
       });
