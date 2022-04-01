@@ -116,5 +116,5 @@ module.exports = (APP) => {
     CollectorService.verifyOTP
   );
 
-  APP.route("api/collector/login").post(CollectorService.login);
+  APP.route("/api/collector/login").post(CollectorService.login);
 };
