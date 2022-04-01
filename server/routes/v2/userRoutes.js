@@ -2,6 +2,7 @@ const UserService = require("../../controllerv2/userController.js");
 
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 const commonValidator = require("../../validators/commonValidator.js");
+const userValidator = require("../../validators/userValidator");
 const { adminPakamValidation, userValidation } = require("../../util/auth");
 const { body, query, check, param } = require("express-validator");
 

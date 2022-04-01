@@ -13,6 +13,8 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const fileUpload = multer();
 //const resumeUpload = multer({ storage: ustorage });
+const userValidator = require("../../validators/userValidator");
+const { checkRequestErrs } = require("../../util/commonFunction.js");
 
 cloudinary.config({
   cloud_name: "pakam",
@@ -176,10 +178,8 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/v2/admin/login").post(
-    [
-      body("email", "email is required").isString(),
-      body("password", "password is required").isString(),
-    ],
+    userValidator.login,
+    checkRequestErrs,
     CONTROLLER.userController.adminLogin
   );
 
