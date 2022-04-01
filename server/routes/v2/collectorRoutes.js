@@ -115,4 +115,6 @@ module.exports = (APP) => {
     checkRequestErrs,
     CollectorService.verifyOTP
   );
+
+  APP.route("api/collector/login").post(CollectorService.login);
 };

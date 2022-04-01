@@ -565,6 +565,7 @@ class UserService {
           message: "Phone number not verified",
           statusCode: 200,
           data: {
+            _id: user._id,
             firstname: user.firstname,
             lastname: user.lastname,
             email: user.email,
@@ -603,6 +604,7 @@ class UserService {
         message: "Login successfull",
         statusCode: 200,
         data: {
+          _id: user._id,
           firstname: user.firstname,
           lastname: user.lastname,
           email: user.email,

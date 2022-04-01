@@ -11,7 +11,7 @@ module.exports = (APP) => {
     CONTROLLER.collectorController.registerCollector
   );
 
-  APP.route("/api/collector/login").post(
+  APP.route("/api/v2/collector/login").post(
     CONTROLLER.collectorController.loginCollector
   );
 
