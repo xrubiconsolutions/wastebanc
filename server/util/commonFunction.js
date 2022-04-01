@@ -328,7 +328,6 @@ const bodyValidate = (req, res, next) => {
       errors: result.array({ onlyFirstError: true }),
     });
   }
-  return next();
 };
 
 /*exporting all object from here*/
