@@ -274,6 +274,7 @@ agenciesController.updateAgencies = async (req, res) => {
       { _id: agency._id },
       {
         username: body.name || agency.userrname,
+        fullname : body.name || agency.fullname,
         email: body.email || agency.email,
         countries: body.countries || agency.countries,
         states: body.states || agency.states,
