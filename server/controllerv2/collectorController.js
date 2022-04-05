@@ -1163,6 +1163,51 @@ class CollectorService {
       });
     }
   }
+
+  static async recentTransaction(req, res) {
+    try {
+      let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      const collectorId = req.user._id;
+      const totalResult = await transactionModel.countDocuments({
+        completedBy: collectorId,
+      });
+      const t = await transactionModel.find({
+        completedBy: collectorId,
+      });
+      const totalWaste = t
+        .map((waste) => waste.weight)
+        .reduce((a, b) => {
+          return a + b;
+        }, 0);
+      const transactions = await transactionModel
+        .find({
+          completedBy: collectorId,
+        })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          totalWaste: Math.ceil(totalWaste),
+          transactions,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
 }
 
 module.exports = CollectorService;

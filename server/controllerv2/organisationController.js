@@ -227,10 +227,11 @@ organisationController.create = async (req, res) => {
   bodyValidate(req, res);
   try {
     const body = req.body;
+    const email = body.email.trim();
     const check = await organisationModel.findOne({
       $or: [
         { companyName: body.companyName },
-        { email: body.email },
+        { email: email },
         { rcNo: body.rcNo },
         { companyTag: body.companyTag },
         { phone: body.phone },
@@ -246,6 +247,7 @@ organisationController.create = async (req, res) => {
 
     const password = generateRandomString();
     body.password = await encryptPassword(password);
+    body.email = email.toLowerCase();
     const org = await organisationModel.create(body);
     sgMail.setApiKey(
       "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"

@@ -117,4 +117,9 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/collector/login").post(CollectorService.login);
+
+  APP.route("/api/collector/recent/transactions").get(
+    recyclerValidation,
+    CollectorService.recentTransaction
+  );
 };
