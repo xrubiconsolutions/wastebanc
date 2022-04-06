@@ -3,6 +3,8 @@ const {
   dropOffModel,
   userModel,
   transactionModel,
+  collectorModel,
+  organisationModel,
 } = require("../models");
 let dropoffController = {};
 
