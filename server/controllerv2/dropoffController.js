@@ -5,6 +5,7 @@ const {
   transactionModel,
   collectorModel,
   organisationModel,
+  notificationModel,
 } = require("../models");
 let dropoffController = {};
 
