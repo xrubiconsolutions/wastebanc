@@ -1183,13 +1183,46 @@ class CollectorService {
         .reduce((a, b) => {
           return a + b;
         }, 0);
-      const transactions = await transactionModel
-        .find({
-          completedBy: collectorId,
-        })
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * resultsPerPage)
-        .limit(resultsPerPage);
+
+      const condition = { completedBy: collectorId.toString() };
+      const skip = (page - 1) * resultsPerPage;
+
+      console.log(condition);
+      const transactions = await transactionModel.aggregate([
+        {
+          $match: condition,
+        },
+        {
+          $addFields: { "scheduleId": { "$toObjectId": "$scheduleId" } },
+        },
+        {
+          $lookup: {
+            from: "schedulepicks",
+            localField: "scheduleId",
+            foreignField: "_id",
+            as: "pickups",
+          },
+        },
+        {
+          $lookup: {
+            from: "scheduledrops",
+            localField: "scheduleId",
+            foreignField: "_id",
+            as: "drops",
+          },
+        },
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+        {
+          $limit: resultsPerPage,
+        },
+        {
+          $skip: skip,
+        },
+      ]);
 
       return res.status(200).json({
         error: false,
