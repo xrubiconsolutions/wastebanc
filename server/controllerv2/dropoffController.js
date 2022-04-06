@@ -269,6 +269,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
     let cat;
 
     console.log("organisation", organisation);
+    console.log("categories", categories);
     for (let category of categories) {
       if (organisation.categories.length !== 0) {
         cat = organisation.categories.find(
