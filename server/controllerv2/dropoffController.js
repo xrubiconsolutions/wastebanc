@@ -8,26 +8,32 @@ const {
 } = require("../models");
 let dropoffController = {};
 
-const { validationResult, body } = require("express-validator");
+var sendNotification = function (data) {
+  var headers = {
+    "Content-Type": "application/json; charset=utf-8",
+  };
 
-const bodyValidate = (req, res) => {
-  // 1. Validate the request coming in
-  // console.log(req.body);
-  const result = validationResult(req);
+  var options = {
+    host: "onesignal.com",
+    port: 443,
+    path: "/api/v1/notifications",
+    method: "POST",
+    headers: headers,
+  };
 
-  const hasErrors = !result.isEmpty();
-  console.log(hasErrors);
-
-  if (hasErrors) {
-    //   debugLog('user body', req.body);
-    // 2. Throw a 422 if the body is invalid
-    return res.status(422).json({
-      error: true,
-      statusCode: 422,
-      message: "Invalid body request",
-      errors: result.array({ onlyFirstError: true }),
+  var https = require("https");
+  var req = https.request(options, function (res) {
+    res.on("data", function (data) {
+      console.log(JSON.parse(data));
     });
-  }
+  });
+
+  req.on("error", function (e) {
+    console.log(e);
+  });
+
+  req.write(JSON.stringify(data));
+  req.end();
 };
 
 dropoffController.dropOffs = async (req, res) => {
@@ -218,6 +224,17 @@ dropoffController.rewardDropSystem = async (req, res) => {
   const categories = req.body.categories;
   const scheduleId = req.body.scheduleId;
   try {
+    const alreadyCompleted = await transactionModel.findOne({
+      scheduleId,
+    });
+    if (alreadyCompleted) {
+      return res.status(400).json({
+        error: true,
+        message: "This transaction had been completed by another recycler",
+      });
+    }
+
+
     const dropoffs = await scheduleDropModel.findById(scheduleId);
     if (!dropoffs) {
       return res.status(400).json({
@@ -237,17 +254,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       });
     }
 
-    const alreadyCompleted = await transactionModel.findOne({
-      scheduleId: dropoffs._id,
-    });
-
-    if (alreadyCompleted) {
-      return res.status(400).json({
-        error: true,
-        message: "This transaction had been completed by another recycler",
-      });
-    }
-
+    
     const collector = await collectorModel.findById(collectorId);
     if (!collector || collector.verified === false) {
       return res.status(400).json({
@@ -319,7 +326,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
     }, 0);
     console.log("pricing", pricing);
 
-    await transactionModel.create({
+    const t = await transactionModel.create({
       weight: totalWeight,
       coin: totalpointGained,
       cardID: scheduler._id,
@@ -330,7 +337,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       aggregatorId: collector.aggregatorId,
       organisation: collector.organisation,
       organisation: organisation._id,
-      scheduleId: schedule._id,
+      scheduleId,
       type: "pickup schedule",
     });
 
@@ -344,8 +351,8 @@ dropoffController.rewardDropSystem = async (req, res) => {
 
     sendNotification(message);
 
-    await schedule.updateOne(
-      { _id: schedule._id },
+    await dropoffs.updateOne(
+      { _id: dropoffs._id },
       {
         $set: {
           completionStatus: "completed",

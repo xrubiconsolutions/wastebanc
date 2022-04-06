@@ -235,9 +235,20 @@ class ScheduleService {
   static async rewardSystem(req, res) {
     bodyValidate(req, res);
     try {
+      console.log('body', req.body);
       const collectorId = req.body.collectorId;
       const categories = req.body.categories;
       const scheduleId = req.body.scheduleId;
+
+      const alreadyCompleted = await transactionModel.findOne({
+        scheduleId,
+      });
+      if (alreadyCompleted) {
+        return res.status(400).json({
+          error: true,
+          message: "This transaction had been completed by another recycler",
+        });
+      }
 
       const schedule = await scheduleModel.findById(scheduleId);
       if (!schedule) {
@@ -255,16 +266,6 @@ class ScheduleService {
         return res.status(400).json({
           error: true,
           message: "Invalid schedule, no user found under schedule",
-        });
-      }
-
-      const alreadyCompleted = await transactionModel.findOne({
-        scheduleId: schedule._id,
-      });
-      if (alreadyCompleted) {
-        return res.status(400).json({
-          error: true,
-          message: "This transaction had been completed by another recycler",
         });
       }
 
@@ -289,7 +290,7 @@ class ScheduleService {
 
       let pricing = [];
       let cat;
-      console.log("organisation", organisation);
+      //console.log("organisation", organisation);
       for (let category of categories) {
         if (organisation.categories.length !== 0) {
           cat = organisation.categories.find(
@@ -302,7 +303,7 @@ class ScheduleService {
             });
           }
           const p = parseFloat(category.quantity) * Number(cat.price);
-          console.log("quantity", parseFloat(category.quantity));
+          //console.log("quantity", parseFloat(category.quantity));
           pricing.push(p);
         } else {
           var cc =
@@ -317,7 +318,7 @@ class ScheduleService {
           var organisationCheck = JSON.parse(JSON.stringify(organisation));
           console.log("organisation check here", organisationCheck);
           for (let val in organisationCheck) {
-            console.log("category check here", cc);
+            //console.log("category check here", cc);
             if (val.includes(cc)) {
               const equivalent = !!organisationCheck[val]
                 ? organisationCheck[val]
