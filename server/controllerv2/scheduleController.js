@@ -4,6 +4,7 @@ const {
   transactionModel,
   collectorModel,
   organisationModel,
+  notificationModel,
 } = require("../models");
 const { sendResponse, bodyValidate } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
@@ -235,7 +236,6 @@ class ScheduleService {
   static async rewardSystem(req, res) {
     bodyValidate(req, res);
     try {
-      console.log('body', req.body);
       const collectorId = req.body.collectorId;
       const categories = req.body.categories;
       const scheduleId = req.body.scheduleId;
@@ -293,6 +293,7 @@ class ScheduleService {
       //console.log("organisation", organisation);
       for (let category of categories) {
         if (organisation.categories.length !== 0) {
+          console.log("here");
           cat = organisation.categories.find(
             (c) => c.name.toLowerCase() === category.name
           );
@@ -306,6 +307,7 @@ class ScheduleService {
           //console.log("quantity", parseFloat(category.quantity));
           pricing.push(p);
         } else {
+          console.log("here2");
           var cc =
             category.name === "nylonSachet"
               ? "nylon"
@@ -316,7 +318,7 @@ class ScheduleService {
               : category.name.substring(0, category.name.length - 1);
 
           var organisationCheck = JSON.parse(JSON.stringify(organisation));
-          console.log("organisation check here", organisationCheck);
+          //console.log("organisation check here", organisationCheck);
           for (let val in organisationCheck) {
             //console.log("category check here", cc);
             if (val.includes(cc)) {
@@ -355,21 +357,32 @@ class ScheduleService {
         type: "pickup schedule",
       });
 
+      // send push notification to household user
       const message = {
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
-          en: "You have just been credited for your schedule",
+          en: `You have just been credited ${totalpointGained} for your schedule`,
         },
         include_player_ids: [`${scheduler.onesignal_id}`],
       };
 
+      await notificationModel.create({
+        title: "Schedule completed",
+        lcd: scheduler.lcd,
+        message: `You have just been credited ${totalpointGained} for your schedule`,
+        scheduler_id: scheduler._id,
+      });
+
       sendNotification(message);
 
-      await schedule.updateOne(
+      //console.log('scheduler', scheduler);
+      //console.log('schedule', schedule);
+      await scheduleModel.updateOne(
         { _id: schedule._id },
         {
           $set: {
             completionStatus: "completed",
+            collectorStatus: "accept",
             collectedBy: collectorId,
             quantity: totalWeight,
             completionDate: new Date(),
@@ -401,7 +414,8 @@ class ScheduleService {
       return res.status(200).json({
         error: false,
         message: "Transaction completed successfully",
-        //data: totalpointGained,
+        data: totalpointGained,
+        da: totalWeight,
       });
     } catch (error) {
       console.log(error);

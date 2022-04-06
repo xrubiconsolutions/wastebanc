@@ -344,10 +344,17 @@ dropoffController.rewardDropSystem = async (req, res) => {
     const message = {
       app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
       contents: {
-        en: "Your schedule drop off has been completed successfully. You have received the equivalent amount in your wallet",
+        en: `You have just been credited ${totalpointGained} for your drop off`,
       },
       include_player_ids: [`${scheduler.onesignal_id}`],
     };
+
+    await notificationModel.create({
+      title: "Schedule completed",
+      lcd: scheduler.lcd,
+      message: `You have just been credited ${totalpointGained} for your drop off`,
+      scheduler_id: scheduler._id,
+    });
 
     sendNotification(message);
 

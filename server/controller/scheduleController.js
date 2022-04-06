@@ -145,7 +145,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
               const datum = {
                 title: "Schedule made",
                 lcd: lcd,
-                message: `A schedule was made in ${lcd}`,
+                message: `A user in ${lcd} just created a schedule`,
                 recycler_id: recycler[i]._id,
               };
               MODEL.notificationModel(datum).save({}, (err, data) => {
@@ -160,6 +160,26 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
         return RESPONSE.status(400).json(err);
       }
     });
+
+    // notify household user
+    var message = {
+      app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+      contents: {
+        en: `Your schedule has been made successfully`,
+      },
+      include_player_ids: [`${result.onesignal_id} || ' '`],
+    };
+
+    const datum = {
+      title: "Schedule made",
+      lcd: lcd,
+      message: `Your schedule has been made successfully`,
+      scheduler_id: result._id,
+    };
+    MODEL.notificationModel(datum).save({}, (err, data) => {
+      console.log("-->", data);
+    });
+    sendNotification(message);
   });
 };
 
@@ -380,6 +400,16 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
                           include_player_ids: [`${result.onesignal_id}`],
                         };
 
+                        const datum = {
+                          title: "Schedule Accepted",
+                          lcd: result.lcd,
+                          message: "A collector just accepted your schedule",
+                          scheduler_id: result._id,
+                        };
+
+                        MODEL.notificationModel(datum).save({}, (err, data) => {
+                          console.log("-->", data);
+                        });
                         sendNotification(message);
                       });
 

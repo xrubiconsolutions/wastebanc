@@ -10,37 +10,40 @@ const Schema = MONGOOSE.Schema;
 // expiry.setDate(expiry.getDate() + 365 );
 
 const notification_Schema = new Schema({
-    notification_type: {
-      type: String,
-       enum: ["schedule_made"],
-       required: true,
-       default: "schedule_made"
+  notification_type: {
+    type: String,
+    enum: ["schedule_made"],
+    required: true,
+    default: "schedule_made",
   },
   recycler_id: {
     type: String,
-    required: true
+    default: "",
+  },
+  schedulerId: {
+    type: String,
   },
   seenNotification: {
     type: Boolean,
-    default: false
+    default: false,
   },
-  lcd : {
-      type: String
+  lcd: {
+    type: String,
   },
-  title : {
-      type: String
+  title: {
+    type: String,
   },
-  message : {
-        type: String,
-        required: true
+  message: {
+    type: String,
+    required: true,
   },
   scheduleId: {
-  type: String,
-  default: ""
-},
-  createdAt:{
-      type: Date,
-      default: Date.now
-  }
+    type: String,
+    default: "",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 module.exports = MONGOOSE.model("notification", notification_Schema);
