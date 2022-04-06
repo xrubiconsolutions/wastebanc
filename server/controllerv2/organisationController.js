@@ -702,4 +702,10 @@ organisationController.updateProfile = async (req, res) => {
     });
   }
 };
+
+// organisationController.dropOffPakam = async (req, req) => {
+//   try{
+
+//   }cath
+// }
 module.exports = organisationController;

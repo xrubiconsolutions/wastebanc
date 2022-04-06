@@ -1,4 +1,9 @@
-const { scheduleDropModel, dropOffModel, userModel } = require("../models");
+const {
+  scheduleDropModel,
+  dropOffModel,
+  userModel,
+  transactionModel,
+} = require("../models");
 let dropoffController = {};
 
 const { validationResult, body } = require("express-validator");
@@ -207,7 +212,6 @@ dropoffController.addDropOffLocation = async (req, res) => {
 };
 
 dropoffController.rewardDropSystem = async (req, res) => {
-  bodyValidate(req, res);
   const collectorId = req.body.collectorId;
   const categories = req.body.categories;
   const scheduleId = req.body.scheduleId;
