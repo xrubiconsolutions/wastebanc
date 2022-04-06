@@ -235,7 +235,6 @@ dropoffController.rewardDropSystem = async (req, res) => {
       });
     }
 
-
     const dropoffs = await scheduleDropModel.findById(scheduleId);
     if (!dropoffs) {
       return res.status(400).json({
@@ -255,7 +254,6 @@ dropoffController.rewardDropSystem = async (req, res) => {
       });
     }
 
-    
     const collector = await collectorModel.findById(collectorId);
     if (!collector || collector.verified === false) {
       return res.status(400).json({
@@ -319,11 +317,11 @@ dropoffController.rewardDropSystem = async (req, res) => {
     }
 
     const totalpointGained = pricing.reduce((a, b) => {
-      return a + b;
+      return parseFloat(a) + parseFloat(b);
     }, 0);
 
     const totalWeight = categories.reduce((a, b) => {
-      return a + (b["quantity"] || 0);
+      return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
     }, 0);
     console.log("pricing", pricing);
 
@@ -359,7 +357,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
 
     sendNotification(message);
 
-    await dropoffs.updateOne(
+    await scheduleDropModel.updateOne(
       { _id: dropoffs._id },
       {
         $set: {
@@ -395,7 +393,8 @@ dropoffController.rewardDropSystem = async (req, res) => {
     return res.status(200).json({
       error: false,
       message: "Transaction completed successfully",
-      //data: totalpointGained,
+      data: totalpointGained,
+      dd: totalWeight,
     });
   } catch (error) {
     console.log(error);
