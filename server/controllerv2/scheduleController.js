@@ -334,11 +334,11 @@ class ScheduleService {
       }
 
       const totalpointGained = pricing.reduce((a, b) => {
-        return a + b;
+        return parseFloat(a) + parseFloat(b);
       }, 0);
 
       const totalWeight = categories.reduce((a, b) => {
-        return a + (b["quantity"] || 0);
+        return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
       }, 0);
       console.log("pricing", pricing);
 
