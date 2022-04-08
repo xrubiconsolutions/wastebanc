@@ -176,7 +176,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
 
       const datum = {
         title: "Schedule made",
-        lcd: lcd,
+        lcd: body.lcd,
         message: `Your schedule has been made successfully`,
         schedulerId: result._id,
       };
