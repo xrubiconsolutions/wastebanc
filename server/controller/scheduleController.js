@@ -73,7 +73,7 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
   try {
     var data = { ...REQUEST.body };
 
-    //console.log("data", data);
+    console.log("data", data);
 
     if (moment(data.pickUpDate) < moment()) {
       return RESPONSE.status(400).json({
@@ -173,10 +173,11 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
         },
         include_player_ids: [`${result.onesignal_id} || ' '`],
       };
+      console.log("lcd", data.lcd);
 
       const datum = {
         title: "Schedule made",
-        lcd: body.lcd,
+        lcd: data.lcd,
         message: `Your schedule has been made successfully`,
         schedulerId: result._id,
       };
