@@ -352,7 +352,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       title: "Schedule completed",
       lcd: scheduler.lcd,
       message: `You have just been credited ${totalpointGained} for your drop off`,
-      scheduler_id: scheduler._id,
+      schedulerId: scheduler._id,
     });
 
     sendNotification(message);
