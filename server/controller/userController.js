@@ -2643,17 +2643,20 @@ userController.adminLogin = async (req, res) => {
       });
     }
 
-    const claims = await MODEL.roleModel.findById(user.role).populate({
-      path: "claims.claimId",
-      populate: {
-        path: "children",
-        match: { show: true },
+    const claims = await MODEL.roleModel
+      .findById(user.role)
+      .populate({
+        path: "claims.claimId",
         populate: {
           path: "children",
           match: { show: true },
+          populate: {
+            path: "children",
+            match: { show: true },
+          },
         },
-      },
-    });
+      })
+      .sort({ display: -1 });
 
     if (!claims) {
       return res.status(400).json({

@@ -425,6 +425,89 @@ class ScheduleService {
       });
     }
   }
+
+  static async smartRoute(req, res) {
+    try {
+      const { user } = req;
+      const collectorAccessArea = user.areaOfAccess;
+      let geofencedSchedules = [];
+      let active_today = new Date();
+      active_today.setHours(0);
+      active_today.setMinutes(0);
+      let tomorrow = new Date();
+      tomorrow.setDate(new Date().getDate() + 7);
+      console.log("tomorrow", tomorrow);
+      // console.log("user", user);
+
+      const active_schedules = await scheduleModel.aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                pickUpDate: {
+                  $gte: active_today,
+                },
+                pickUpDate: {
+                  $lt: tomorrow,
+                },
+                completionStatus: "pending",
+                collectorStatus: "decline",
+              },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "client",
+            foreignField: "email",
+            as: "client",
+          },
+        },
+        {
+          $unwind: {
+            path: "$client",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $sort: {
+            _id: -1,
+          },
+        },
+      ]);
+
+      await Promise.all(
+        active_schedules.map(async (schedule) => {
+          if (collectorAccessArea.includes(schedule.lcd)) {
+            geofencedSchedules.push(schedule);
+          }
+          const splitAddress = schedule.address.split(", ");
+          await Promise.all(
+            splitAddress.map((address) => {
+              if (collectorAccessArea.includes(address)) {
+                geofencedSchedules.push(schedule);
+              }
+            })
+          );
+        })
+      );
+
+      const referenceSchedules = [...new Set(geofencedSchedules)];
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: referenceSchedules,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = ScheduleService;
