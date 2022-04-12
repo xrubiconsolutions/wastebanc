@@ -35,6 +35,9 @@ const bodyValidate = (req, res) => {
 };
 
 dashboardController.cardMapData = async (req, res) => {
+  bodyValidate(req, res);
+  const { states } = req.user;
+
   try {
     const { start, end, state } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -45,8 +48,8 @@ dashboardController.cardMapData = async (req, res) => {
         $gte: startDate,
         $lt: endDate,
       },
+      state: { $in: states },
     };
-    if (state) criteria.state = state;
 
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
@@ -98,7 +101,6 @@ dashboardController.companyCardMapData = async (req, res) => {
       },
       organisation,
     };
-    if (state) criteria.state = state;
 
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
@@ -149,6 +151,7 @@ dashboardController.recentPickups = async (req, res) => {
         });
       }
     }
+    const { states } = req.user;
 
     let criteria;
     if (key) {
@@ -162,6 +165,7 @@ dashboardController.recentPickups = async (req, res) => {
           { phone: { $regex: `.*${key}.*`, $options: "i" } },
           { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
         ],
+        state: { $in: states },
       };
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -170,9 +174,9 @@ dashboardController.recentPickups = async (req, res) => {
           $gte: startDate,
           $lt: endDate,
         },
+        state: { $in: states },
       };
     }
-    if (state) criteria.state = state;
 
     const totalResult = await scheduleModel.countDocuments(criteria);
 
@@ -218,6 +222,7 @@ dashboardController.newUsers = async (req, res) => {
         });
       }
     }
+    const { states } = req.user;
 
     let criteria;
     if (key) {
@@ -230,6 +235,7 @@ dashboardController.newUsers = async (req, res) => {
           { email: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         roles: "client",
+        state: { $in: states },
       };
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -239,9 +245,9 @@ dashboardController.newUsers = async (req, res) => {
           $lt: endDate,
         },
         roles: "client",
+        state: { $in: states },
       };
     }
-    if (state) criteria.state = state;
 
     const totalResult = await userModel.countDocuments(criteria);
 
@@ -292,6 +298,7 @@ dashboardController.newAggregators = async (req, res) => {
         });
       }
     }
+    const { states } = req.user;
 
     let criteria;
     if (key) {
@@ -305,6 +312,7 @@ dashboardController.newAggregators = async (req, res) => {
           { organisation: { $regex: `.*${key}.*`, $options: "i" } },
           // { IDNumber: { $regex: `.*${key}.*`, $options: "i" } },
         ],
+        state: { $in: states },
       };
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -313,9 +321,9 @@ dashboardController.newAggregators = async (req, res) => {
           $gte: startDate,
           $lt: endDate,
         },
+        state: { $in: states },
       };
     }
-    if (state) criteria.state = state;
 
     const totalResult = await collectorModel.countDocuments(criteria);
 
@@ -356,14 +364,15 @@ dashboardController.collectormapData = async (req, res) => {
   try {
     const { start, end, state } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
+    const { states } = req.user;
 
     let criteria = {
       createdAt: {
         $gte: startDate,
         $lt: endDate,
       },
+      state: { $in: states },
     };
-    if (state) criteria.state = state;
 
     const collectors = await allCollector(criteria);
 
@@ -400,13 +409,14 @@ dashboardController.chartData = async (req, res) => {
         message: "Please pass a start and end date",
       });
     }
+    const { states } = req.user;
     let criteria = {
       createdAt: {
         $gte: new Date(start),
         $lt: new Date(end),
       },
+      state: { $in: states },
     };
-    if (state) criteria.state = state;
 
     const pipelines = [
       {
