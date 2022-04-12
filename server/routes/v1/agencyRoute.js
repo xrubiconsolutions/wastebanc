@@ -3,38 +3,19 @@
 const controller = require("../../controller");
 let auth = require("../../util/auth");
 const { body, query, check, param } = require("express-validator");
+const {
+  adminPakamValidation,
+  recyclerValidation,
+  companyPakamDataValidation,
+} = require("../../util/auth");
+const userValidator = require("../../validators/userValidator.js");
+const { checkRequestErrs } = require("../../util/commonFunction");
 
 module.exports = (APP) => {
   APP.route("/api/user/agencies/create").post(
     auth.adminPakamValidation,
-    [
-      body("name")
-        .notEmpty()
-        .withMessage("name is required")
-        .isString()
-        .withMessage("name should be string"),
-      body("email").notEmpty().withMessage("email is required"),
-      body("countries")
-        .notEmpty()
-        .withMessage("countries is required")
-        .isArray()
-        .withMessage("countries should be array"),
-      body("states")
-        .notEmpty()
-        .withMessage("states is required")
-        .isArray()
-        .withMessage("states should be array"),
-      body("role")
-        .notEmpty()
-        .withMessage("role is required")
-        .isString()
-        .withMessage("role should be string"),
-      body("phone")
-        .notEmpty()
-        .withMessage("phone is required")
-        .isNumeric()
-        .withMessage("phone is number"),
-    ],
+    userValidator.userAgencies,
+    checkRequestErrs,
     controller.userAgenciesController.create
   );
 
@@ -44,17 +25,20 @@ module.exports = (APP) => {
   );
   APP.route("/api/user/agencies/find/:agencyId").get(
     auth.adminPakamValidation,
-    [param("agencyId").notEmpty().withMessage("agencyId is required")],
+    userValidator.findAgencies,
+    checkRequestErrs,
     controller.userAgenciesController.findAgencies
   );
   APP.route("/api/user/agencies/update/:agencyId").put(
     auth.adminPakamValidation,
-    [param("agencyId").notEmpty().withMessage("agencyId is required")],
+    userValidator.updateAgencies,
+    checkRequestErrs,
     controller.userAgenciesController.updateAgencies
   );
   APP.route("/api/user/agencies/remove/:agencyId").delete(
     auth.adminPakamValidation,
-    [param("agencyId").notEmpty().withMessage("agencyId is required")],
+    userValidator.findAgencies,
+    checkRequestErrs,
     controller.userAgenciesController.remove
   );
 };

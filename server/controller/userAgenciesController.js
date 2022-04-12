@@ -30,7 +30,6 @@ const bodyValidate = (req, res) => {
 };
 
 agenciesController.create = async (req, res) => {
-  bodyValidate(req, res);
   try {
     const body = req.body;
 
