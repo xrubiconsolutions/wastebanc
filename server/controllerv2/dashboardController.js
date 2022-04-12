@@ -41,8 +41,6 @@ dashboardController.cardMapData = async (req, res) => {
   try {
     const { start, end, state } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
-    // console.log("startDate", startDate);
-    // console.log("endDate", endDate);
     let criteria = {
       createdAt: {
         $gte: startDate,
