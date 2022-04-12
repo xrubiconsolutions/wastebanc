@@ -50,6 +50,8 @@ dashboardController.cardMapData = async (req, res) => {
     };
     if (state) criteria.state = state;
 
+    if (state) criteria.state = state;
+
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
     const totalPayment = await totalpayout(criteria);
