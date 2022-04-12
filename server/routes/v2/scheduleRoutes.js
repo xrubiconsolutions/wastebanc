@@ -43,4 +43,9 @@ module.exports = (APP) => {
     ],
     ScheduleService.rewardSystem
   );
+
+  APP.route("/api/geofenced/schedule").get(
+    recyclerValidation,
+    ScheduleService.smartRoute
+  );
 };

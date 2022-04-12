@@ -11,10 +11,8 @@ const { filter: dateCheck } = require("../../validators/commonValidator");
 module.exports = (APP) => {
   APP.route("/api/v2/dashboard/matrix").get(
     adminPakamValidation,
-    [
-      query("start").notEmpty().withMessage("start is required"),
-      query("end").notEmpty().withMessage("end is required"),
-    ],
+    dateCheck,
+    checkRequestErrs,
     dashboardController.cardMapData
   );
   APP.route("/api/v2/dashboard/company/matrix").get(

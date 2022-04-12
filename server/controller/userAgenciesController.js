@@ -236,26 +236,24 @@ agenciesController.updateAgencies = async (req, res) => {
 
     let role;
     let roles;
+    let displayRole;
     if (body.role) {
-      role = await MODEL.roleModel.findOne(
-        {
-          _id: new mongodb.ObjectId("62273fc3844f40002318c978"),
-          active: true,
-        },
-        { claims: 0 }
-      );
-      console.log("role", role);
-      if (!role) {
+      const r = await MODEL.roleModel.findById(body.role);
+      console.log("role", r);
+      if (!r) {
         return res.status(400).json({
           error: true,
           message: "Role not found or not active",
         });
       }
-      roles = role.group;
-      role = role._id;
+      roles = r.group;
+      role = r._id;
+      displayRole = r.title;
+      console.log("displayROle", r.title);
     } else {
       role = agency.role;
       roles = agency.roles;
+      displayRole = agency.displayRole;
     }
 
     if (body.status) {
@@ -267,18 +265,17 @@ agenciesController.updateAgencies = async (req, res) => {
       }
     }
 
-    console.log("role", role);
-    console.log("roles", roles);
-
     const update = await MODEL.userModel.updateOne(
       { _id: agency._id },
       {
         username: body.name || agency.userrname,
+        fullname: body.name || agency.fullname,
         email: body.email || agency.email,
         countries: body.countries || agency.countries,
         states: body.states || agency.states,
         role,
         roles,
+        displayRole,
         status: body.status || agency.status,
       }
     );
@@ -290,7 +287,9 @@ agenciesController.updateAgencies = async (req, res) => {
     agency.role = body.role || agency.role;
     agency.roles = body.roles || agency.roles;
     agency.status = body.status || agency.status;
+    agency.displayRole = displayRole;
 
+    console.log(agency);
     if (!update) {
       return res.status(400).json({
         error: true,
@@ -302,10 +301,10 @@ agenciesController.updateAgencies = async (req, res) => {
       error: false,
       message: "User updated successfully",
       data: {
-        name: agency.username,
+        name: agency.fullname,
         countries: agency.countries,
         states: agency.states,
-        role: agency.displayRole,
+        displayRole: displayRole,
         roles: agency.roles,
         email: agency.email,
         phone: agency.phone,

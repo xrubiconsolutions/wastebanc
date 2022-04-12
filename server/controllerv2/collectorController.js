@@ -9,10 +9,11 @@ const {
   bodyValidate,
   encryptPassword,
   authToken,
+  comparePassword,
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
-
+const axios = require("axios");
 const request = require("request");
 
 class CollectorService {
@@ -475,16 +476,77 @@ class CollectorService {
   }
 
   static async register(req, res) {
-    bodyValidate(req, res);
     try {
       const body = req.body;
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
       });
       if (checkPhone) {
-        return res.status(400).json({
-          error: true,
-          message: "Phone already exist",
+        if (checkPhone.verified) {
+          return res.status(400).json({
+            error: true,
+            message: "Phone already exist",
+          });
+        }
+
+        const phoneNo = String(checkPhone.phone).substring(1, 11);
+        const token = authToken(phoneNo);
+        const msg = {
+          api_key:
+            "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+          message_type: "NUMERIC",
+          to: `+234${phoneNo}`,
+          from: "N-Alert",
+          channel: "dnd",
+          pin_attempts: 10,
+          pin_time_to_live: 5,
+          pin_length: 4,
+          pin_placeholder: "< 1234 >",
+          message_text:
+            "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+          pin_type: "NUMERIC",
+        };
+
+        const options = {
+          method: "POST",
+          url: "https://termii.com/api/sms/otp/send",
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+          body: JSON.stringify(msg),
+        };
+
+        const send = await axios.post(options.url, options.body, {
+          headers: options.headers,
+        });
+
+        console.log("res", send.data);
+
+        return res.status(200).json({
+          error: false,
+          message: "Collector created successfully",
+          data: {
+            pin_id: send.data.pinId,
+            _id: checkPhone._id,
+            verified: checkPhone.verified,
+            countryCode: checkPhone.countryCode,
+            status: checkPhone.status,
+            areaOfAccess: checkPhone.areasOfAccess,
+            approvedBy: checkPhone.approvedBy,
+            totalCollected: checkPhone.totalCollected,
+            numberOfTripsCompleted: checkPhone.numberOfTripsCompleted,
+            fullname: checkPhone.fullname,
+            email: checkPhone.email,
+            phone: checkPhone.phone,
+            address: checkPhone.address,
+            gender: checkPhone.gender,
+            localGovernment: checkPhone.localGovernment,
+            organisation: checkPhone.organisation,
+            profile_picture: checkPhone.organisation,
+            long: checkPhone.long,
+            lat: checkPhone.lat,
+            token,
+          },
         });
       }
       if (body.email) {
@@ -507,13 +569,13 @@ class CollectorService {
         gender: body.gender,
         country: body.country,
         state: body.state,
-        // long: body.long,
-        // lat: body.lat
-        //organisation: body.organisation,
+        long: body.long || "",
+        lat: body.lat || "",
+        organisation: body.organisation || "",
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
-      const data = {
+      const msg = {
         api_key:
           "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
         message_type: "NUMERIC",
@@ -534,55 +596,40 @@ class CollectorService {
         headers: {
           "Content-Type": ["application/json", "application/json"],
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(msg),
       };
 
-      request(options, function (error, response) {
-        const iden = JSON.parse(response.body);
-        if (error) {
-          throw new Error(error);
-        } else {
-          // let UserData = {
-          //   email: RESULT.email,
-          //   phone: RESULT.phone,
-          //   username: RESULT.username,
-          //   roles: RESULT.roles,
-          //   pin_id: iden.pinId,
-          // };
-
-          var data = {
-            api_key:
-              "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-            phone_number: `+234${phoneNo}`,
-            country_code: "NG",
-          };
-          var options = {
-            method: "GET",
-            url: " https://termii.com/api/insight/number/query",
-            headers: {
-              "Content-Type": ["application/json", "application/json"],
-            },
-            body: JSON.stringify(data),
-          };
-          request(options, function (error, response) {
-            if (error) throw new Error(error);
-            //var mobileData = JSON.parse(response.body);
-            //var mobile_carrier = mobileData.result[0].operatorDetail.operatorName;
-          });
-        }
+      const send = await axios.post(options.url, options.body, {
+        headers: options.headers,
       });
+
+      console.log("res", send.data);
+
+      console.log("c", create);
 
       return res.status(200).json({
         error: false,
         message: "Collector created successfully",
         data: {
           _id: create._id,
+          verified: create.verified,
+          countryCode: create.countryCode,
+          status: create.status,
+          areaOfAccess: create.areasOfAccess,
+          approvedBy: create.approvedBy,
+          totalCollected: create.totalCollected,
+          numberOfTripsCompleted: create.numberOfTripsCompleted,
           fullname: create.fullname,
-          email: create._id,
-          phone: create._id,
+          email: create.email,
+          phone: create.phone,
+          address: create.address,
           gender: create.gender,
-          country: create.country,
-          state: create.state,
+          localGovernment: create.localGovernment,
+          organisation: create.organisation,
+          profile_picture: create.organisation,
+          long: create.long,
+          lat: create.lat,
+          pin_id: send.data.pinId,
           token,
         },
       });
@@ -912,6 +959,277 @@ class CollectorService {
         message: "success",
         data: {
           locations,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
+
+  static async verifyOTP(req, res) {
+    const phone = req.body.phone;
+    const token = req.body.token;
+    const pin_id = req.body.pin_id;
+
+    console.log("phone", phone);
+
+    const user = await collectorModel.findOne({
+      phone,
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Phone number does not exist",
+      });
+    }
+
+    try {
+      var data = {
+        api_key:
+          "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+        pin_id: pin_id,
+        pin: token,
+      };
+
+      const send = await axios.post(
+        "https://termii.com/api/sms/otp/verify",
+        JSON.stringify(data),
+        {
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+        }
+      );
+
+      if (send.data.verified === true) {
+        await collectorModel.updateOne({ phone }, { verified: true });
+
+        const token = authToken(user);
+        return res.status(200).json({
+          error: false,
+          message: "Token verified successfully",
+          data: {
+            _id: user._id,
+            fullname: user.fullname,
+            profile_picture: user.profile_picture,
+            phone: user.phone,
+            email: user.email || "",
+            gender: user.gender,
+            country: user.country,
+            state: user.state,
+            verified: true,
+            long: user.long,
+            lat: user.lat,
+            status: user.status,
+            organisation: user.organisation,
+            areaOfAccess: user.areaOfAccess,
+            totalCollected: user.totalCollected,
+            numberOfTripsCompleted: user.numberOfTripsCompleted,
+            token,
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async login(req, res) {
+    try {
+      const collector = await collectorModel.findOne({
+        phone: req.body.phone,
+      });
+      if (!collector) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid credentials",
+        });
+      }
+
+      if (!(await comparePassword(req.body.password, collector.password))) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid email or password",
+          statusCode: 400,
+        });
+      }
+
+      if (!collector.verified) {
+        const phoneNo = String(collector.phone).substring(1, 11);
+        const token = authToken(collector);
+        const msg = {
+          api_key:
+            "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+          message_type: "NUMERIC",
+          to: `+234${phoneNo}`,
+          from: "N-Alert",
+          channel: "dnd",
+          pin_attempts: 10,
+          pin_time_to_live: 5,
+          pin_length: 4,
+          pin_placeholder: "< 1234 >",
+          message_text:
+            "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+          pin_type: "NUMERIC",
+        };
+
+        const options = {
+          method: "POST",
+          url: "https://termii.com/api/sms/otp/send",
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+          body: JSON.stringify(msg),
+        };
+
+        const send = await axios.post(options.url, options.body, {
+          headers: options.headers,
+        });
+
+        console.log("res", send.data);
+
+        return res.status(200).json({
+          error: false,
+          message: "Phone number not verified",
+          statusCode: 200,
+          data: {
+            _id: collector._id,
+            verified: collector.verified,
+            countryCode: collector.countryCode,
+            status: collector.status,
+            areaOfAccess: collector.areasOfAccess,
+            approvedBy: collector.approvedBy,
+            totalCollected: collector.totalCollected,
+            numberOfTripsCompleted: collector.numberOfTripsCompleted,
+            fullname: collector.fullname,
+            email: collector.email,
+            phone: collector.phone,
+            address: collector.address,
+            gender: collector.gender,
+            localGovernment: collector.localGovernment,
+            organisation: collector.organisation,
+            profile_picture: collector.profile_picture,
+            pin_id: send.data.pinId,
+            token,
+          },
+        });
+      }
+
+      await collectorModel.updateOne(
+        { _id: collector._id },
+        { last_logged_in: new Date() }
+      );
+
+      const token = authToken(collector);
+      return res.status(200).json({
+        error: false,
+        message: "Collector login successfull",
+        statusCode: 200,
+        data: {
+          _id: collector._id,
+          verified: collector.verified,
+          countryCode: collector.countryCode,
+          status: collector.status,
+          areaOfAccess: collector.areasOfAccess,
+          approvedBy: collector.approvedBy,
+          totalCollected: collector.totalCollected,
+          numberOfTripsCompleted: collector.numberOfTripsCompleted,
+          fullname: collector.fullname,
+          email: collector.email,
+          phone: collector.phone,
+          address: collector.address,
+          gender: collector.gender,
+          localGovernment: collector.localGovernment,
+          organisation: collector.organisation,
+          profile_picture: collector.profile_picture,
+          token,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async recentTransaction(req, res) {
+    try {
+      let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      const collectorId = req.user._id;
+      const totalResult = await transactionModel.countDocuments({
+        completedBy: collectorId,
+      });
+      const t = await transactionModel.find({
+        completedBy: collectorId,
+      });
+      const totalWaste = t
+        .map((waste) => waste.weight)
+        .reduce((a, b) => {
+          return a + b;
+        }, 0);
+
+      const condition = { completedBy: collectorId.toString() };
+      const skip = (page - 1) * resultsPerPage;
+
+      console.log(condition);
+      const transactions = await transactionModel.aggregate([
+        {
+          $match: condition,
+        },
+        {
+          $addFields: { "scheduleId": { "$toObjectId": "$scheduleId" } },
+        },
+        {
+          $lookup: {
+            from: "schedulepicks",
+            localField: "scheduleId",
+            foreignField: "_id",
+            as: "pickups",
+          },
+        },
+        {
+          $lookup: {
+            from: "scheduledrops",
+            localField: "scheduleId",
+            foreignField: "_id",
+            as: "drops",
+          },
+        },
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+        {
+          $limit: resultsPerPage,
+        },
+        {
+          $skip: skip,
+        },
+      ]);
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          totalWaste: Math.ceil(totalWaste),
+          transactions,
           totalResult,
           page,
           resultsPerPage,

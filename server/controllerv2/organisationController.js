@@ -8,6 +8,7 @@ const {
   geofenceModel,
   collectorBinModel,
   organisationBinModel,
+  dropOffModel,
 } = require("../models");
 const {
   sendResponse,
@@ -227,10 +228,11 @@ organisationController.create = async (req, res) => {
   bodyValidate(req, res);
   try {
     const body = req.body;
+    const email = body.email.trim();
     const check = await organisationModel.findOne({
       $or: [
         { companyName: body.companyName },
-        { email: body.email },
+        { email: email },
         { rcNo: body.rcNo },
         { companyTag: body.companyTag },
         { phone: body.phone },
@@ -246,6 +248,7 @@ organisationController.create = async (req, res) => {
 
     const password = generateRandomString();
     body.password = await encryptPassword(password);
+    body.email = email.toLowerCase();
     const org = await organisationModel.create(body);
     sgMail.setApiKey(
       "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"
@@ -692,6 +695,62 @@ organisationController.updateProfile = async (req, res) => {
       message: "organisation updated successfully",
       data: organisation,
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+organisationController.dropOffPakam = async (req, res) => {
+  try {
+    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    let criteria;
+    if (key) {
+      criteria = {
+        $or: [
+          { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+          { phone: { $regex: `.*${key}.*`, $options: "i" } },
+          { "location.address": { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+      };
+    } else if (start && end) {
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+      };
+    } else {
+      criteria = {};
+    }
+
+    if (state) criteria.state = state;
+    const totalResults = await dropOffModel.countDocuments(criteria);
+    const drops = await dropOffModel
+      .find(criteria)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        drops,
+        totalResults,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResults / resultsPerPage),
+      }
+    })
   } catch (error) {
     console.log(error);
     return res.status(500).json({

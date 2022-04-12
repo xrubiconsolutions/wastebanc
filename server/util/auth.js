@@ -17,6 +17,22 @@ validateUser.userValidation = async (req, res, NEXT) => {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
   console.log("req", req.headers.authorization.split(" ")[1]);
+  const token = req.headers.authorization.split(" ")[1];
+
+  if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
+  if (token === "undefined" || token === null || token === undefined) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
   if (Date.now() >= validated.exp * 1000) {
@@ -67,6 +83,23 @@ validateUser.userCollectorData = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
+
+  const token = req.headers.authorization.split(" ")[1];
+
+  if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
+  if (token === "undefined" || token === null || token === undefined) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
 
@@ -119,6 +152,22 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
   try {
     if (!req.headers.authorization) {
       return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    }
+
+    const token = req.headers.authorization.split(" ")[1];
+
+    if (!token) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
+
+    if (token === "undefined" || token === null || token === undefined) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
     }
 
     var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
@@ -180,6 +229,23 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
+
+  const token = req.headers.authorization.split(" ")[1];
+
+  if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
+  if (token === "undefined" || token === null || token === undefined) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated.userId);
 
@@ -236,6 +302,23 @@ validateUser.adminValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
+
+  const token = req.headers.authorization.split(" ")[1];
+
+  if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
+  if (token === "undefined" || token === null) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
   console.log("valid", validated);
 
@@ -287,6 +370,23 @@ validateUser.adminPakamValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
+
+  const token = req.headers.authorization.split(" ")[1];
+
+  if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
+  if (token === "undefined" || token === null || token === undefined) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
@@ -339,6 +439,23 @@ validateUser.companyValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
+
+  const token = req.headers.authorization.split(" ")[1];
+
+  if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
+  if (token === "undefined" || token === null || token === undefined) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
@@ -389,6 +506,23 @@ validateUser.lcdValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
+
+  const token = req.headers.authorization.split(" ")[1];
+
+  if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
+  if (token === "undefined" || token === null || token === undefined) {
+    return res.status(400).json({
+      error: true,
+      message: "Invalid token",
+    });
+  }
+
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
   if (Date.now() >= validated.exp * 1000) {
@@ -474,9 +608,13 @@ validateUser.adminCheck = (req, res, NEXT) => {
           } else {
             RESULT.roles === admin
               ? NEXT()
-              : res.status(400).jsonp(
-                  COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED)
-                );
+              : res
+                  .status(400)
+                  .jsonp(
+                    COMMON_FUN.sendError(
+                      CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED
+                    )
+                  );
           }
         }
       );
@@ -487,7 +625,7 @@ validateUser.adminCheck = (req, res, NEXT) => {
 /********************************
  ****** User check model ********
  *********************************/
-validateUser.userCheck = (req, res, NEXT) => {         
+validateUser.userCheck = (req, res, NEXT) => {
   let dataObj = req.query.username;
   if (req.query.username) {
     dataObj = req.query;
