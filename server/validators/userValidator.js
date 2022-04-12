@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator");
+const { body, param, query } = require("express-validator");
 
 module.exports = {
   login: [
@@ -41,5 +41,40 @@ module.exports = {
 
   updateAgencies: [
     param("agencyId").notEmpty().withMessage("agencyId is required"),
+  ],
+
+  storeactivites: [
+    body("userId")
+      .notEmpty()
+      .withMessage("userId is required")
+      .isString()
+      .withMessage("userId should be string"),
+    body("message")
+      .notEmpty()
+      .withMessage("message is required")
+      .isString()
+      .withMessage("message should be string"),
+    body("type")
+      .optional({ default: "collector" })
+      .isString()
+      .withMessage("type should be string"),
+    body("activity_type")
+      .notEmpty()
+      .withMessage("activity_type is required")
+      .isString()
+      .withMessage("activity_type should be string"),
+  ],
+
+  getActivites: [
+    param("userId")
+      .notEmpty()
+      .withMessage("userId is required")
+      .isString()
+      .withMessage("userId should be string"),
+    query("type")
+      .notEmpty()
+      .withMessage("type is required")
+      .isString()
+      .withMessage("type should be string"),
   ],
 };
