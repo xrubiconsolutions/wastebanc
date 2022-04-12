@@ -4,6 +4,7 @@ const {
   transactionModel,
   collectorModel,
   organisationModel,
+  notificationModel,
 } = require("../models");
 const { sendResponse, bodyValidate } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
@@ -239,6 +240,16 @@ class ScheduleService {
       const categories = req.body.categories;
       const scheduleId = req.body.scheduleId;
 
+      const alreadyCompleted = await transactionModel.findOne({
+        scheduleId,
+      });
+      if (alreadyCompleted) {
+        return res.status(400).json({
+          error: true,
+          message: "This transaction had been completed by another recycler",
+        });
+      }
+
       const schedule = await scheduleModel.findById(scheduleId);
       if (!schedule) {
         return res.status(400).json({
@@ -255,16 +266,6 @@ class ScheduleService {
         return res.status(400).json({
           error: true,
           message: "Invalid schedule, no user found under schedule",
-        });
-      }
-
-      const alreadyCompleted = await transactionModel.findOne({
-        scheduleId: schedule._id,
-      });
-      if (alreadyCompleted) {
-        return res.status(400).json({
-          error: true,
-          message: "This transaction had been completed by another recycler",
         });
       }
 
@@ -289,9 +290,10 @@ class ScheduleService {
 
       let pricing = [];
       let cat;
-      console.log("organisation", organisation);
+      //console.log("organisation", organisation);
       for (let category of categories) {
         if (organisation.categories.length !== 0) {
+          console.log("here");
           cat = organisation.categories.find(
             (c) => c.name.toLowerCase() === category.name
           );
@@ -302,9 +304,10 @@ class ScheduleService {
             });
           }
           const p = parseFloat(category.quantity) * Number(cat.price);
-          console.log("quantity", parseFloat(category.quantity));
+          //console.log("quantity", parseFloat(category.quantity));
           pricing.push(p);
         } else {
+          console.log("here2");
           var cc =
             category.name === "nylonSachet"
               ? "nylon"
@@ -315,9 +318,9 @@ class ScheduleService {
               : category.name.substring(0, category.name.length - 1);
 
           var organisationCheck = JSON.parse(JSON.stringify(organisation));
-          console.log("organisation check here", organisationCheck);
+          //console.log("organisation check here", organisationCheck);
           for (let val in organisationCheck) {
-            console.log("category check here", cc);
+            //console.log("category check here", cc);
             if (val.includes(cc)) {
               const equivalent = !!organisationCheck[val]
                 ? organisationCheck[val]
@@ -331,11 +334,11 @@ class ScheduleService {
       }
 
       const totalpointGained = pricing.reduce((a, b) => {
-        return a + b;
+        return parseFloat(a) + parseFloat(b);
       }, 0);
 
       const totalWeight = categories.reduce((a, b) => {
-        return a + (b["quantity"] || 0);
+        return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
       }, 0);
       console.log("pricing", pricing);
 
@@ -354,21 +357,32 @@ class ScheduleService {
         type: "pickup schedule",
       });
 
+      // send push notification to household user
       const message = {
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
-          en: "You have just been credited for your schedule",
+          en: `You have just been credited ${totalpointGained} for your schedule`,
         },
         include_player_ids: [`${scheduler.onesignal_id}`],
       };
 
+      await notificationModel.create({
+        title: "Schedule completed",
+        lcd: scheduler.lcd,
+        message: `You have just been credited ${totalpointGained} for your schedule`,
+        schedulerId: scheduler._id,
+      });
+
       sendNotification(message);
 
-      await schedule.updateOne(
+      //console.log('scheduler', scheduler);
+      //console.log('schedule', schedule);
+      await scheduleModel.updateOne(
         { _id: schedule._id },
         {
           $set: {
             completionStatus: "completed",
+            collectorStatus: "accept",
             collectedBy: collectorId,
             quantity: totalWeight,
             completionDate: new Date(),
@@ -400,7 +414,91 @@ class ScheduleService {
       return res.status(200).json({
         error: false,
         message: "Transaction completed successfully",
-        //data: totalpointGained,
+        data: totalpointGained,
+        da: totalWeight,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async smartRoute(req, res) {
+    try {
+      const { user } = req;
+      const collectorAccessArea = user.areaOfAccess;
+      let geofencedSchedules = [];
+      let active_today = new Date();
+      active_today.setHours(0);
+      active_today.setMinutes(0);
+      let tomorrow = new Date();
+      tomorrow.setDate(new Date().getDate() + 7);
+      console.log("tomorrow", tomorrow);
+      // console.log("user", user);
+
+      const active_schedules = await scheduleModel.aggregate([
+        {
+          $match: {
+            $and: [
+              {
+                pickUpDate: {
+                  $gte: active_today,
+                },
+                pickUpDate: {
+                  $lt: tomorrow,
+                },
+                completionStatus: "pending",
+                collectorStatus: "decline",
+              },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "client",
+            foreignField: "email",
+            as: "client",
+          },
+        },
+        {
+          $unwind: {
+            path: "$client",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $sort: {
+            _id: -1,
+          },
+        },
+      ]);
+
+      await Promise.all(
+        active_schedules.map(async (schedule) => {
+          if (collectorAccessArea.includes(schedule.lcd)) {
+            geofencedSchedules.push(schedule);
+          }
+          const splitAddress = schedule.address.split(", ");
+          await Promise.all(
+            splitAddress.map((address) => {
+              if (collectorAccessArea.includes(address)) {
+                geofencedSchedules.push(schedule);
+              }
+            })
+          );
+        })
+      );
+
+      const referenceSchedules = [...new Set(geofencedSchedules)];
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: referenceSchedules,
       });
     } catch (error) {
       console.log(error);

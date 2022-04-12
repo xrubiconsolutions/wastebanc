@@ -7,15 +7,15 @@ let auth = require("../../util/auth");
  ***** @param APP (express instance)*****
  ****************************************/
 module.exports = (APP) => {
-  APP.route("/api/collector/register").post(
+  APP.route("/api/v2/collector/register").post(
     CONTROLLER.collectorController.registerCollector
   );
 
-  APP.route("/api/collector/login").post(
+  APP.route("/api/v2/collector/login").post(
     CONTROLLER.collectorController.loginCollector
   );
 
-  APP.route("/api/collector/verify").post(
+  APP.route("/api/v2/collector/verify").post(
     CONTROLLER.collectorController.verifyPhone
   );
 

@@ -2542,10 +2542,6 @@ userController.uploadResume = async (req, res) => {
   SERVICE.resumeUpload(req, res).then((result) => {
     return RESPONSE.jsonp({ status: true, message: result });
   });
-  // const firstname = REQUEST.body.firstname;
-  // const lastname = REQUEST.body.lastname;
-  // const resume = REQUEST.file;
-  // console.log("resume", resume);
 };
 
 userController.loginUserV2 = async (req, res) => {
@@ -2600,6 +2596,7 @@ userController.loginUserV2 = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       error: true,
       message: "Internal Server Error",
@@ -2609,7 +2606,7 @@ userController.loginUserV2 = async (req, res) => {
 };
 
 userController.adminLogin = async (req, res) => {
-  bodyValidate(req, res);
+  //bodyValidate(req, res);
   const email = req.body.email;
   try {
     const user = await MODEL.userModel.findOne({
@@ -2646,17 +2643,20 @@ userController.adminLogin = async (req, res) => {
       });
     }
 
-    const claims = await MODEL.roleModel.findById(user.role).populate({
-      path: "claims.claimId",
-      populate: {
-        path: "children",
-        match: { show: true },
+    const claims = await MODEL.roleModel
+      .findById(user.role)
+      .populate({
+        path: "claims.claimId",
         populate: {
           path: "children",
           match: { show: true },
+          populate: {
+            path: "children",
+            match: { show: true },
+          },
         },
-      },
-    });
+      })
+      .sort({ display: -1 });
 
     if (!claims) {
       return res.status(400).json({
@@ -2687,6 +2687,7 @@ userController.adminLogin = async (req, res) => {
         _id: user._id,
         firstname: user.firstname,
         lastname: user.lastname,
+        fullname: user.fullname,
         email: user.email,
         phone: user.phone,
         othernames: user.othernames,

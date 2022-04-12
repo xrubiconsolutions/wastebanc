@@ -36,4 +36,13 @@ module.exports = {
       .isMongoId()
       .withMessage("id is invalid"),
   ],
+  rewardUser: [
+    body("collectorId").notEmpty().withMessage("collectorId is required"),
+    body("categories")
+      .notEmpty()
+      .withMessage("categories")
+      .isArray()
+      .withMessage("categories is an array"),
+    body("scheduleId").notEmpty().withMessage("scheduleId is required"),
+  ],
 };

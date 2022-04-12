@@ -123,24 +123,35 @@ cron.schedule("0 7 * * *", function () {
             email: schedules[i].client,
           })
           .then((user) => {
-            var message = {
-              app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-              contents: {
-                en: `${messages}`,
-              },
-              include_player_ids: [`${user.onesignal_id}`],
-            };
-            MODEL.scheduleModel.updateOne(
-              {
-                _id: schedules[i]._id,
-              },
-              {
-                completionStatus: "missed",
-              },
-              (err, res) => {
-                sendNotification(message);
-              }
-            );
+            if (user.onesignal_id) {
+              var message = {
+                app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+                contents: {
+                  en: `${messages}`,
+                },
+                include_player_ids: [`${user.onesignal_id}`],
+              };
+              MODEL.scheduleModel.updateOne(
+                {
+                  _id: schedules[i]._id,
+                },
+                {
+                  completionStatus: "missed",
+                },
+                (err, res) => {
+                  const datum = {
+                    title: "Schedule missed",
+                    lcd: user.lcd,
+                    message: `${messages}`,
+                    schedulerId: user._id,
+                  };
+                  MODEL.notificationModel(datum).save({}, (err, data) => {
+                    console.log("-->", data);
+                  });
+                  sendNotification(message);
+                }
+              );
+            }
           });
       }
     });
@@ -220,14 +231,25 @@ cron.schedule("01 7 * * *", function () {
             email: schedules[i].client,
           })
           .then((user) => {
-            var message = {
-              app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-              contents: {
-                en: `${messages}`,
-              },
-              include_player_ids: [`${user.onesignal_id}`],
-            };
-            sendNotification(message);
+            if (user.onesignal_id) {
+              var message = {
+                app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+                contents: {
+                  en: `${messages}`,
+                },
+                include_player_ids: [`${user.onesignal_id}`],
+              };
+              const datum = {
+                title: "Schedule Pickup",
+                lcd: user.lcd,
+                message: `${messages}`,
+                schedulerId: user._id,
+              };
+              MODEL.notificationModel(datum).save({}, (err, data) => {
+                console.log("-->", data);
+              });
+              sendNotification(message);
+            }
           });
       }
     });
@@ -535,6 +557,6 @@ module.exports = () => {
     );
   });
 
-  AwakeHeroku.add("https://pakam-staging.herokuapp.com/");
-  AwakeHeroku.start();
+  //AwakeHeroku.add("https://pakam-staging.herokuapp.com/");
+  //AwakeHeroku.start();
 };

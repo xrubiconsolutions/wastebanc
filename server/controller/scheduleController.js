@@ -70,97 +70,129 @@ const bodyValidate = (req, res) => {
 // sendNotification(message);
 
 scheduleController.schedule = (REQUEST, RESPONSE) => {
-  var data = { ...REQUEST.body };
+  try {
+    var data = { ...REQUEST.body };
 
-  //console.log("data", data);
+    console.log("data", data);
 
-  if (moment(data.pickUpDate) < moment()) {
-    return RESPONSE.status(400).json({
-      statusCode: 400,
-      customMessage: "Invalid date",
-    });
-  }
-
-  MODEL.userModel.findOne({ email: REQUEST.body.client }).then((result) => {
-    MODEL.userModel.updateOne(
-      { email: REQUEST.body.client },
-      { last_logged_in: new Date() },
-      (res) => {
-        console.log("Logged date updated", new Date());
-      }
-    );
-
-    if (result.cardID == null) {
+    if (moment(data.pickUpDate) < moment()) {
       return RESPONSE.status(400).json({
-        message: "You don't have a valid card ID, contact support for help",
+        statusCode: 400,
+        customMessage: "Invalid date",
       });
     }
 
-    const expireDate = moment(data.pickUpDate, "YYYY-MM-DD").add(7, "days");
-    data.expiryDuration = expireDate;
-    data.clientId = result._id;
-    console.log("sch", data);
-    MODEL.scheduleModel(data).save({}, (ERR, RESULT) => {
-      try {
-        if (ERR) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-        let UserData = {
-          client: RESULT.client,
-          quantity: RESULT.quantity,
-          details: RESULT.details,
-          address: RESULT.address,
-          pickUpDate: RESULT.pickUpDate,
-          reminder: RESULT.reminder,
-          callOnArrival: RESULT.callOnArrival,
-          lat: RESULT.lat,
-          long: RESULT.long,
-          lcd: RESULT.lcd || "",
-          completionStatus: RESULT.completionStatus,
-          categories: RESULT.categories,
-        };
-        if (!RESULT.lat || !RESULT.long) {
-          return RESPONSE.status(400).json({
-            message: "Location Invalid",
-          });
+    MODEL.userModel.findOne({ email: REQUEST.body.client }).then((result) => {
+      MODEL.userModel.updateOne(
+        { email: REQUEST.body.client },
+        { last_logged_in: new Date() },
+        (res) => {
+          console.log("Logged date updated", new Date());
         }
-        const lcd = UserData.lcd;
+      );
 
-        MODEL.collectorModel
-          .aggregate([
-            {
-              $match: {
-                areaOfAccess: { $in: [lcd] },
-              },
-            },
-          ])
-          .then((recycler) => {
-            for (let i = 0; i < recycler.length; i++) {
-              var message = {
-                app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-                contents: {
-                  en: `A user in ${lcd} just created a schedule`,
-                },
-                include_player_ids: [`${recycler[i].onesignal_id} || ' '`],
-              };
-              sendNotification(message);
-              const datum = {
-                title: "Schedule made",
-                lcd: lcd,
-                message: `A schedule was made in ${lcd}`,
-                recycler_id: recycler[i]._id,
-              };
-              MODEL.notificationModel(datum).save({}, (err, data) => {
-                console.log("-->", data);
-              });
-            }
-          });
-        return RESPONSE.status(200).jsonp(
-          COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, UserData)
-        );
-      } catch (err) {
-        return RESPONSE.status(400).json(err);
+      if (result.cardID == null) {
+        return RESPONSE.status(400).json({
+          message: "You don't have a valid card ID, contact support for help",
+        });
       }
+
+      const expireDate = moment(data.pickUpDate, "YYYY-MM-DD").add(7, "days");
+      data.expiryDuration = expireDate;
+      data.clientId = result._id;
+      console.log("sch", data);
+      MODEL.scheduleModel(data).save({}, (ERR, RESULT) => {
+        try {
+          if (ERR) return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+          let UserData = {
+            client: RESULT.client,
+            quantity: RESULT.quantity,
+            details: RESULT.details,
+            address: RESULT.address,
+            pickUpDate: RESULT.pickUpDate,
+            reminder: RESULT.reminder,
+            callOnArrival: RESULT.callOnArrival,
+            lat: RESULT.lat,
+            long: RESULT.long,
+            lcd: RESULT.lcd || "",
+            completionStatus: RESULT.completionStatus,
+            categories: RESULT.categories,
+          };
+          if (!RESULT.lat || !RESULT.long) {
+            return RESPONSE.status(400).json({
+              message: "Location Invalid",
+            });
+          }
+          const lcd = UserData.lcd;
+
+          MODEL.collectorModel
+            .aggregate([
+              {
+                $match: {
+                  areaOfAccess: { $in: [lcd] },
+                },
+              },
+            ])
+            .then((recycler) => {
+              for (let i = 0; i < recycler.length; i++) {
+                var message = {
+                  app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+                  contents: {
+                    en: `A user in ${lcd} just created a schedule`,
+                  },
+                  include_player_ids: [`${recycler[i].onesignal_id} || ' '`],
+                };
+                sendNotification(message);
+                const datum = {
+                  title: "Schedule made",
+                  lcd: lcd,
+                  message: `A user in ${lcd} just created a schedule`,
+                  recycler_id: recycler[i]._id,
+                };
+                MODEL.notificationModel(datum).save({}, (err, data) => {
+                  console.log("-->", data);
+                });
+              }
+            });
+          return RESPONSE.status(200).jsonp(
+            COMMON_FUN.sendSuccess(
+              CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+              UserData
+            )
+          );
+        } catch (err) {
+          return RESPONSE.status(400).json(err);
+        }
+      });
+
+      // notify household user
+      var message = {
+        app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+        contents: {
+          en: `Your schedule has been made successfully`,
+        },
+        include_player_ids: [`${result.onesignal_id} || ' '`],
+      };
+      console.log("lcd", data.lcd);
+
+      const datum = {
+        title: "Schedule made",
+        lcd: data.lcd,
+        message: `Your schedule has been made successfully`,
+        schedulerId: result._id,
+      };
+      MODEL.notificationModel(datum).save({}, (err, data) => {
+        console.log("-->", data);
+      });
+      sendNotification(message);
     });
-  });
+  } catch (error) {
+    console.log(error);
+    return RESPONSE.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
 };
 
 scheduleController.scheduleNotifications = (req, res) => {
@@ -335,86 +367,108 @@ scheduleController.updateSchedule = (REQUEST, RESPONSE) => {
 scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
   var errors = {};
 
-  MODEL.collectorModel
-    .findOne({ email: REQUEST.body.client }, {}, { lean: true })
-    .then((results) => {
-      if (results) {
-        MODEL.scheduleModel
-          .findOne({ _id: REQUEST.body._id })
-          .then((result, err) => {
-            if (err) return RESPONSE.status(400).json(err);
-            if (result.collectorStatus == "accept") {
-              return RESPONSE.status(400).json({
-                message: "This schedule had been accepted by another collector",
-              });
-            }
+  try {
+    MODEL.collectorModel
+      .findOne({ email: REQUEST.body.client }, {}, { lean: true })
+      .then((results) => {
+        if (results) {
+          MODEL.scheduleModel
+            .findOne({ _id: REQUEST.body._id })
+            .then((result, err) => {
+              if (err) return RESPONSE.status(400).json(err);
+              if (result.collectorStatus == "accept") {
+                return RESPONSE.status(400).json({
+                  message:
+                    "This schedule had been accepted by another collector",
+                });
+              }
 
-            MODEL.scheduleModel
-              .updateOne(
-                { _id: REQUEST.body._id },
-                {
-                  $set: {
-                    collectorStatus: "accept",
-                    collectedBy: results._id,
-                    collectedPhone: results.phone,
-                    organisation: results.organisation,
-                    organisationCollection: results.approvedBy,
-                    recycler: results.fullname,
-                  },
-                }
-              )
-              .then((SUCCESS) => {
-                MODEL.scheduleModel
-                  .findOne({ _id: REQUEST.body._id })
-                  .then((result, err) => {
-                    if (err) return RESPONSE.status(400).json(err);
+              MODEL.scheduleModel
+                .updateOne(
+                  { _id: REQUEST.body._id },
+                  {
+                    $set: {
+                      collectorStatus: "accept",
+                      collectedBy: results._id,
+                      collectedPhone: results.phone,
+                      organisation: results.organisation,
+                      organisationCollection: results.approvedBy,
+                      recycler: results.fullname,
+                    },
+                  }
+                )
+                .then((SUCCESS) => {
+                  MODEL.scheduleModel
+                    .findOne({ _id: REQUEST.body._id })
+                    .then((result, err) => {
+                      if (err) return RESPONSE.status(400).json(err);
 
-                    MODEL.userModel
-                      .findOne({ email: result.client })
-                      .then((result, err) => {
-                        var message = {
-                          app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-                          contents: {
-                            en: "A collector just accepted your schedule",
-                          },
-                          include_player_ids: [`${result.onesignal_id}`],
-                        };
+                      MODEL.userModel
+                        .findOne({ email: result.client })
+                        .then((result, err) => {
+                          var message = {
+                            app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+                            contents: {
+                              en: "A collector just accepted your schedule",
+                            },
+                            include_player_ids: [`${result.onesignal_id}`],
+                          };
 
-                        sendNotification(message);
-                      });
+                          const datum = {
+                            title: "Schedule Accepted",
+                            lcd: result.lcd,
+                            message: "A collector just accepted your schedule",
+                            schedulerId: result._id,
+                          };
 
-                    MODEL.collectorModel.updateOne(
-                      {
-                        _id: results._id,
-                      },
-                      {
-                        $set: {
-                          busy: true,
+                          MODEL.notificationModel(datum).save(
+                            {},
+                            (err, data) => {
+                              console.log("-->", data);
+                            }
+                          );
+                          sendNotification(message);
+                        });
+
+                      MODEL.collectorModel.updateOne(
+                        {
+                          _id: results._id,
                         },
-                      },
-                      (err, resp) => console.log("collector updated")
-                    );
+                        {
+                          $set: {
+                            busy: true,
+                          },
+                        },
+                        (err, resp) => console.log("collector updated")
+                      );
 
-                    return RESPONSE.status(200).jsonp(
-                      COMMON_FUN.sendSuccess(
-                        CONSTANTS.STATUS_MSG.SUCCESS.UPDATED,
-                        result
-                      )
-                    );
-                  });
-              })
-              .catch((ERR) => {
-                return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-              });
-          });
-      } else {
-        errors.message = "Only a collector can accept or decline an offer";
-        return RESPONSE.status(400).jsonp(errors);
-      }
-    })
-    .catch((err) => {
-      return RESPONSE.status(500).jsonp(err);
+                      return RESPONSE.status(200).jsonp(
+                        COMMON_FUN.sendSuccess(
+                          CONSTANTS.STATUS_MSG.SUCCESS.UPDATED,
+                          result
+                        )
+                      );
+                    });
+                })
+                .catch((ERR) => {
+                  return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+                });
+            });
+        } else {
+          errors.message = "Only a collector can accept or decline an offer";
+          return RESPONSE.status(400).jsonp(errors);
+        }
+      })
+      .catch((err) => {
+        return RESPONSE.status(500).jsonp(err);
+      });
+  } catch (error) {
+    console.log(error);
+    return RESPONSE.status(500).json({
+      error: true,
+      message: "An error occured",
     });
+  }
 };
 
 scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {

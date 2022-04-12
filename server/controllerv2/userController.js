@@ -5,6 +5,7 @@ const {
   bodyValidate,
   encryptPassword,
   authToken,
+  comparePassword,
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const request = require("request");
@@ -474,7 +475,7 @@ class UserService {
 
         return res.status(200).json({
           error: false,
-          message: "Token verifieed successfully",
+          message: "Token verified successfully",
           data: {
             _id: user._id,
             fullname: user.fullname,
@@ -495,6 +496,139 @@ class UserService {
           message: send.data.verified || "Invalid or Expired Token",
         });
       }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async login(req, res) {
+    try {
+      const user = await userModel.findOne({
+        phone: req.body.phone,
+      });
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid credentials",
+          statusCode: 400,
+        });
+      }
+
+      if (!(await comparePassword(req.body.password, user.password))) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid email or password",
+          statusCode: 400,
+        });
+      }
+
+      if (!user.verified) {
+        const phoneNo = String(user.phone).substring(1, 11);
+        const token = authToken(user);
+        const msg = {
+          api_key:
+            "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+          message_type: "NUMERIC",
+          to: `+234${phoneNo}`,
+          from: "N-Alert",
+          channel: "dnd",
+          pin_attempts: 10,
+          pin_time_to_live: 5,
+          pin_length: 4,
+          pin_placeholder: "< 1234 >",
+          message_text:
+            "Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+          pin_type: "NUMERIC",
+        };
+
+        const options = {
+          method: "POST",
+          url: "https://termii.com/api/sms/otp/send",
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+          body: JSON.stringify(msg),
+        };
+
+        const send = await axios.post(options.url, options.body, {
+          headers: options.headers,
+        });
+
+        console.log("res", send.data);
+
+        return res.status(200).json({
+          error: false,
+          message: "Phone number not verified",
+          statusCode: 200,
+          data: {
+            _id: user._id,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            phone: user.phone,
+            fullname: user.fullname,
+            gender: user.gender,
+            country: user.country,
+            state: user.state,
+            username: user.username,
+            othernames: user.othernames,
+            address: user.address,
+            profile_picture: user.profile_picture,
+            roles: user.roles,
+            countryCode: user.countryCode,
+            verified: user.verified,
+            availablePoints: user.availablePoints,
+            rafflePoints: user.rafflePoints,
+            schedulePoints: user.schedulePoints,
+            cardID: user.cardID,
+            lcd: user.lcd,
+            last_logged_in: user.last_logged_in,
+            pin_id: send.data.pinId,
+            token,
+          },
+        });
+      }
+
+      await userModel.updateOne(
+        { _id: user._id },
+        { last_logged_in: new Date() }
+      );
+      const token = authToken(user);
+      delete user.password;
+      return res.status(200).json({
+        error: false,
+        message: "Login successfull",
+        statusCode: 200,
+        data: {
+          _id: user._id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email,
+          phone: user.phone,
+          fullname: user.fullname,
+          gender: user.gender,
+          country: user.country,
+          state: user.state,
+          username: user.username,
+          othernames: user.othernames,
+          address: user.address,
+          profile_picture: user.profile_picture,
+          roles: user.roles,
+          countryCode: user.countryCode,
+          verified: user.verified,
+          availablePoints: user.availablePoints,
+          rafflePoints: user.rafflePoints,
+          schedulePoints: user.schedulePoints,
+          cardID: user.cardID,
+          lcd: user.lcd,
+          last_logged_in: user.last_logged_in,
+          token,
+        },
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({

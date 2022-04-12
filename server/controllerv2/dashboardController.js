@@ -51,6 +51,8 @@ dashboardController.cardMapData = async (req, res) => {
       state: { $in: states },
     };
 
+    if (state) criteria.state = state;
+
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
     const totalPayment = await totalpayout(criteria);
@@ -177,6 +179,7 @@ dashboardController.recentPickups = async (req, res) => {
         state: { $in: states },
       };
     }
+    if (state) criteria.state = state;
 
     const totalResult = await scheduleModel.countDocuments(criteria);
 
@@ -248,6 +251,7 @@ dashboardController.newUsers = async (req, res) => {
         state: { $in: states },
       };
     }
+    if (state) criteria.state = state;
 
     const totalResult = await userModel.countDocuments(criteria);
 
@@ -324,6 +328,7 @@ dashboardController.newAggregators = async (req, res) => {
         state: { $in: states },
       };
     }
+    if (state) criteria.state = state;
 
     const totalResult = await collectorModel.countDocuments(criteria);
 

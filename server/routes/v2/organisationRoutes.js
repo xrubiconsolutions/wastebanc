@@ -177,4 +177,9 @@ module.exports = (APP) => {
     ],
     organisationController.updateProfile
   );
+
+  APP.route("/api/v2/organisation/dropoff/locations").get(
+    adminPakamValidation,
+    organisationController.dropOffPakam
+  );
 };

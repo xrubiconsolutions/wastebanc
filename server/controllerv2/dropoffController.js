@@ -1,26 +1,40 @@
-const { scheduleDropModel, dropOffModel, userModel } = require("../models");
+const {
+  scheduleDropModel,
+  dropOffModel,
+  userModel,
+  transactionModel,
+  collectorModel,
+  organisationModel,
+  notificationModel,
+} = require("../models");
 let dropoffController = {};
 
-const { validationResult, body } = require("express-validator");
+var sendNotification = function (data) {
+  var headers = {
+    "Content-Type": "application/json; charset=utf-8",
+  };
 
-const bodyValidate = (req, res) => {
-  // 1. Validate the request coming in
-  // console.log(req.body);
-  const result = validationResult(req);
+  var options = {
+    host: "onesignal.com",
+    port: 443,
+    path: "/api/v1/notifications",
+    method: "POST",
+    headers: headers,
+  };
 
-  const hasErrors = !result.isEmpty();
-  console.log(hasErrors);
-
-  if (hasErrors) {
-    //   debugLog('user body', req.body);
-    // 2. Throw a 422 if the body is invalid
-    return res.status(422).json({
-      error: true,
-      statusCode: 422,
-      message: "Invalid body request",
-      errors: result.array({ onlyFirstError: true }),
+  var https = require("https");
+  var req = https.request(options, function (res) {
+    res.on("data", function (data) {
+      console.log(JSON.parse(data));
     });
-  }
+  });
+
+  req.on("error", function (e) {
+    console.log(e);
+  });
+
+  req.write(JSON.stringify(data));
+  req.end();
 };
 
 dropoffController.dropOffs = async (req, res) => {
@@ -207,11 +221,20 @@ dropoffController.addDropOffLocation = async (req, res) => {
 };
 
 dropoffController.rewardDropSystem = async (req, res) => {
-  bodyValidate(req, res);
   const collectorId = req.body.collectorId;
   const categories = req.body.categories;
   const scheduleId = req.body.scheduleId;
   try {
+    const alreadyCompleted = await transactionModel.findOne({
+      scheduleId,
+    });
+    if (alreadyCompleted) {
+      return res.status(400).json({
+        error: true,
+        message: "This transaction had been completed by another recycler",
+      });
+    }
+
     const dropoffs = await scheduleDropModel.findById(scheduleId);
     if (!dropoffs) {
       return res.status(400).json({
@@ -228,17 +251,6 @@ dropoffController.rewardDropSystem = async (req, res) => {
       return res.status(400).json({
         error: true,
         message: "Invalid schedule, no user found under schedule",
-      });
-    }
-
-    const alreadyCompleted = await transactionModel.findOne({
-      scheduleId: dropoffs._id,
-    });
-
-    if (alreadyCompleted) {
-      return res.status(400).json({
-        error: true,
-        message: "This transaction had been completed by another recycler",
       });
     }
 
@@ -263,6 +275,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
     let cat;
 
     console.log("organisation", organisation);
+    console.log("categories", categories);
     for (let category of categories) {
       if (organisation.categories.length !== 0) {
         cat = organisation.categories.find(
@@ -304,15 +317,15 @@ dropoffController.rewardDropSystem = async (req, res) => {
     }
 
     const totalpointGained = pricing.reduce((a, b) => {
-      return a + b;
+      return parseFloat(a) + parseFloat(b);
     }, 0);
 
     const totalWeight = categories.reduce((a, b) => {
-      return a + (b["quantity"] || 0);
+      return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
     }, 0);
     console.log("pricing", pricing);
 
-    await transactionModel.create({
+    const t = await transactionModel.create({
       weight: totalWeight,
       coin: totalpointGained,
       cardID: scheduler._id,
@@ -323,22 +336,29 @@ dropoffController.rewardDropSystem = async (req, res) => {
       aggregatorId: collector.aggregatorId,
       organisation: collector.organisation,
       organisation: organisation._id,
-      scheduleId: schedule._id,
+      scheduleId,
       type: "pickup schedule",
     });
 
     const message = {
       app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
       contents: {
-        en: "Your schedule drop off has been completed successfully. You have received the equivalent amount in your wallet",
+        en: `You have just been credited ${totalpointGained} for your drop off`,
       },
       include_player_ids: [`${scheduler.onesignal_id}`],
     };
 
+    await notificationModel.create({
+      title: "Schedule completed",
+      lcd: scheduler.lcd,
+      message: `You have just been credited ${totalpointGained} for your drop off`,
+      schedulerId: scheduler._id,
+    });
+
     sendNotification(message);
 
-    await schedule.updateOne(
-      { _id: schedule._id },
+    await scheduleDropModel.updateOne(
+      { _id: dropoffs._id },
       {
         $set: {
           completionStatus: "completed",
@@ -373,7 +393,8 @@ dropoffController.rewardDropSystem = async (req, res) => {
     return res.status(200).json({
       error: false,
       message: "Transaction completed successfully",
-      //data: totalpointGained,
+      data: totalpointGained,
+      dd: totalWeight,
     });
   } catch (error) {
     console.log(error);
