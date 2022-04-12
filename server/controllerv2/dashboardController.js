@@ -48,7 +48,6 @@ dashboardController.cardMapData = async (req, res) => {
         $gte: startDate,
         $lt: endDate,
       },
-      state: { $in: states },
     };
 
     if (state) criteria.state = state;
