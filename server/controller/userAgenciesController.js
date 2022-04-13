@@ -344,4 +344,77 @@ agenciesController.remove = async (req, res) => {
   }
 };
 
+agenciesController.getLocationScope = async (req, res) => {
+  const { _id } = req.user;
+  try {
+    const admin = await MODEL.userModel.findById(_id);
+    if (!admin)
+      return res.status(404).json({
+        error: true,
+        message: "Agency account not found!",
+      });
+
+    // values are read this way to guarantee reading the locationScope from the instance
+    const { states: agencyStates, locationScope } = admin.toObject();
+
+    // construct array of location scope
+    const data = agencyStates.concat("All").map((state) => ({
+      name: state,
+      default: locationScope === state,
+    }));
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: true,
+      message: "An error occured",
+    });
+  }
+};
+
+agenciesController.setLocationScope = async (req, res) => {
+  const { _id } = req.user;
+  const { scope } = req.query;
+  try {
+    const admin = await MODEL.userModel.findById(_id);
+    if (!admin)
+      return res.status(404).json({
+        error: true,
+        message: "Agency account not found!",
+      });
+
+    // send error if scope provided isn't included in admin states
+    if (!admin.states.includes(scope) && scope !== "All")
+      return res.status(400).json({
+        error: true,
+        message: "Scope isn't part of admin states!",
+      });
+
+    console.log(`The admins is 1: ${admin}`);
+    // admin.locationScope = scope;
+    // await admin.save();
+
+    await MODEL.userModel.updateOne(
+      { _id },
+      { $set: { locationScope: scope } }
+    );
+    console.log(`The admins is: ${admin}`);
+    return res.status(200).json({
+      error: false,
+      message: "Updated successfully!",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 module.exports = agenciesController;
