@@ -395,15 +395,7 @@ agenciesController.setLocationScope = async (req, res) => {
         message: "Scope isn't part of admin states!",
       });
 
-    console.log(`The admins is 1: ${admin}`);
-    // admin.locationScope = scope;
-    // await admin.save();
-
-    await MODEL.userModel.updateOne(
-      { _id },
-      { $set: { locationScope: scope } }
-    );
-    console.log(`The admins is: ${admin}`);
+    await MODEL.userModel.updateOne({ _id }, { locationScope: scope });
     return res.status(200).json({
       error: false,
       message: "Updated successfully!",
