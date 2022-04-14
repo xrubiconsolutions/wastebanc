@@ -593,7 +593,6 @@ class UserService {
           },
         });
       }
-      let signal_id;
 
       console.log("user id", user.onesignal_id);
       if (user.onesignal_id === "" || user.onesignal_id === " ") {
