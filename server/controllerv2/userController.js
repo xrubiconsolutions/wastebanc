@@ -600,6 +600,7 @@ class UserService {
       } else {
         signal_id = user.onesignal_id;
       }
+      console.log("signalid", signal_id);
       await userModel.updateOne(
         { _id: user._id },
         { last_logged_in: new Date(), onesignal_id: signal_id }
