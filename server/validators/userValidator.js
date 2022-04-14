@@ -77,4 +77,12 @@ module.exports = {
       .isString()
       .withMessage("type should be string"),
   ],
+
+  locationScope: [
+    query("scope")
+      .notEmpty()
+      .withMessage("location scope is required in query params")
+      .isString()
+      .withMessage("location scope must be a string"),
+  ],
 };
