@@ -593,20 +593,22 @@ class UserService {
           },
         });
       }
+      let signal_id;
 
       console.log("user id", user.onesignal_id);
       if (user.onesignal_id === "" || user.onesignal_id === " ") {
-        const id = uuid.v1().toString();
+        signal_id = uuid.v1().toString();
         console.log("changing", id);
         await userModel.updateOne(
           { email: user.email },
-          { $set: { last_logged_in: new Date(), onesignal_id: id } }
+          { $set: { last_logged_in: new Date(), onesignal_id: signal_id } }
         );
       } else {
+        signal_id = user.onesignal_id;
         console.log("not changing", user.onesignal_id);
         await userModel.updateOne(
           { email: user.email },
-          { $set: { last_logged_in: new Date(), onesignal_id: id } }
+          { $set: { last_logged_in: new Date() } }
         );
       }
       // console.log("signalid", signal_id);
