@@ -601,13 +601,13 @@ class UserService {
         console.log("changing", id);
         await userModel.updateOne(
           { email: user.email },
-          { last_logged_in: new Date(), onesignal_id: id }
+          { $set: { last_logged_in: new Date(), onesignal_id: id } }
         );
       } else {
         console.log("not changing", user.onesignal_id);
         await userModel.updateOne(
           { email: user.email },
-          { last_logged_in: new Date(), onesignal_id: user.onesignal_id }
+          { $set: { last_logged_in: new Date(), onesignal_id: id } }
         );
       }
       // console.log("signalid", signal_id);
