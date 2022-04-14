@@ -602,7 +602,7 @@ class UserService {
       }
       console.log("signalid", signal_id);
       const update = await userModel.updateOne(
-        { _id: user._id },
+        { email: user.email },
         { last_logged_in: new Date(), onesignal_id: signal_id }
       );
       console.log("update", update);
