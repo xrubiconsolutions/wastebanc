@@ -596,7 +596,7 @@ class UserService {
       let signal_id;
       console.log("user id", user);
       if (user.onesignal_id === "") {
-        signal_id = uuid.v1();
+        signal_id = uuid.v1().toString();
       } else {
         signal_id = user.onesignal_id;
       }
