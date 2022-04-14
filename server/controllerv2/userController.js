@@ -601,10 +601,11 @@ class UserService {
         signal_id = user.onesignal_id;
       }
       console.log("signalid", signal_id);
-      await userModel.updateOne(
+      const update = await userModel.updateOne(
         { _id: user._id },
         { last_logged_in: new Date(), onesignal_id: signal_id }
       );
+      console.log("update", update);
       const token = authToken(user);
       delete user.password;
       return res.status(200).json({
