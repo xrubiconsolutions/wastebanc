@@ -41,4 +41,15 @@ module.exports = (APP) => {
     checkRequestErrs,
     controller.userAgenciesController.remove
   );
+  APP.route("/api/user/agencies/location-scope")
+    .get(
+      auth.adminPakamValidation,
+      controller.userAgenciesController.getLocationScope
+    )
+    .put(
+      auth.adminPakamValidation,
+      userValidator.locationScope,
+      checkRequestErrs,
+      controller.userAgenciesController.setLocationScope
+    );
 };

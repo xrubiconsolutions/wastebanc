@@ -164,6 +164,14 @@ const user_Schema = new Schema({
   organisationType: {
     type: String,
   },
+  locationScope: {
+    type: String,
+  },
+});
+
+user_Schema.pre("save", function (next) {
+  if (this.roles === "client") next();
+  this.locationScope = "All";
 });
 
 module.exports = MONGOOSE.model("User", user_Schema);
