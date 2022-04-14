@@ -611,12 +611,7 @@ class UserService {
           { $set: { last_logged_in: new Date() } }
         );
       }
-      // console.log("signalid", signal_id);
-      // const update = await userModel.updateOne(
-      //   { email: user.email },
-      //   { last_logged_in: new Date(), onesignal_id: signal_id }
-      // );
-      // console.log("update", update);
+
       const token = authToken(user);
       delete user.password;
       return res.status(200).json({
