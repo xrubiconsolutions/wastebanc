@@ -596,17 +596,25 @@ class UserService {
       let signal_id;
 
       console.log("user id", user.onesignal_id);
-      if (user.onesignal_id === "") {
-        signal_id = uuid.v1().toString();
+      if (user.onesignal_id === "" || user.onesignal_id === " ") {
+        const id = uuid.v1().toString();
+        await userModel.updateOne(
+          { email: user.email },
+          { last_logged_in: new Date(), onesignal_id: id }
+        );
       } else {
-        signal_id = user.onesignal_id;
+        console.log("not changing", user.onesignal_id);
+        await userModel.updateOne(
+          { email: user.email },
+          { last_logged_in: new Date(), onesignal_id: user.onesignal_id }
+        );
       }
-      console.log("signalid", signal_id);
-      const update = await userModel.updateOne(
-        { email: user.email },
-        { last_logged_in: new Date(), onesignal_id: signal_id }
-      );
-      console.log("update", update);
+      // console.log("signalid", signal_id);
+      // const update = await userModel.updateOne(
+      //   { email: user.email },
+      //   { last_logged_in: new Date(), onesignal_id: signal_id }
+      // );
+      // console.log("update", update);
       const token = authToken(user);
       delete user.password;
       return res.status(200).json({
