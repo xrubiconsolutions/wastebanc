@@ -43,4 +43,10 @@ module.exports = (APP) => {
     checkRequestErrs,
     dropoffController.rewardDropSystem
   );
+
+  APP.route("/api/submit/drop/request").post(
+    scheduleValidator.dropOff,
+    checkRequestErrs,
+    dropoffController.scheduledropOffs
+  );
 };

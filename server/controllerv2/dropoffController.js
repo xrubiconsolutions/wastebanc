@@ -405,4 +405,71 @@ dropoffController.rewardDropSystem = async (req, res) => {
   }
 };
 
+dropoffController.scheduledropOffs = async (req, res) => {
+  try {
+    let data = req.body;
+    if (moment(data.dropOffDate) < moment()) {
+      return RESPONSE.status(400).json({
+        statusCode: 400,
+        customMessage: "Invalid date",
+      });
+    }
+    const user = await userModel.findOne({ email: data.scheduleCreator });
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "User not found",
+      });
+    }
+
+    if (user.status != "active") {
+      return res.status(400).json({
+        error: true,
+        message: "Account disabled, contact support for help",
+      });
+    }
+
+    const expireDate = moment(data.dropOffDate, "YYYY-MM-DD").add(7, "days");
+    data.expiryDuration = expireDate;
+
+    const schedule = await scheduleDropModel.create(data);
+
+    if (user.onesignal_id) {
+      sendNotification({
+        app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+        contents: {
+          en: `Your dropoff schedule has been made successfully`,
+        },
+        include_player_ids: [`${user.onesignal_id} || ' '`],
+      });
+      await notificationModel.create({
+        title: "Dropoff Schedule made",
+        lcd: schedule.lcd,
+        message: `Your dropoff schedule has been made successfully`,
+        schedulerId: user._id,
+      });
+    }
+    // notify user
+
+    await userModel.updateOne(
+      { email: data.client },
+      {
+        last_logged_in: new Date(),
+      }
+    );
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: schedule,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 module.exports = dropoffController;

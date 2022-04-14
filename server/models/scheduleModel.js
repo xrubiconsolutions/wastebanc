@@ -119,6 +119,9 @@ const schedulePick = new Schema({
     type: Date,
     default: Date.now(),
   },
+  state: {
+    type: String,
+  },
 });
 
 module.exports = MONGOOSE.model("schedulePick", schedulePick);

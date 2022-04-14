@@ -23,7 +23,7 @@ module.exports = (APP) => {
   APP.route("/api/v2/collectors").get(
     adminPakamValidation,
     commonValidator.filter,
-    //checkRequestErrs,
+    checkRequestErrs,
     CollectorService.getCollectors
   );
   APP.route("/api/v2/company-collectors").get(

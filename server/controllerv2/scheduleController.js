@@ -508,6 +508,117 @@ class ScheduleService {
       });
     }
   }
+
+  static async pickup(req, res) {
+    try {
+      let data = req.body;
+      console.log("data", data);
+
+      if (moment(data.pickUpDate) < moment()) {
+        return RESPONSE.status(400).json({
+          statusCode: 400,
+          customMessage: "Invalid date",
+        });
+      }
+
+      const user = await userModel.findOne({
+        email: data.client,
+      });
+
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+
+      if (user.status != "active") {
+        return res.status(400).json({
+          error: true,
+          message: "Account disabled, contact support for help",
+        });
+      }
+
+      if (user.cardID == null) {
+        return (
+          res,
+          status(400).json({
+            error: true,
+            message: "You don't have a valid card ID, contact support for help",
+          })
+        );
+      }
+
+      const expireDate = moment(data.pickUpDate, "YYYY-MM-DD").add(7, "days");
+      data.expiryDuration = expireDate;
+      data.clientId = user._id.toString();
+      data.state = user.state;
+
+      console.log("data", data);
+
+      const schedule = await scheduleModel.create(data);
+      const collectors = await collectorModel.aggregate([
+        {
+          $match: {
+            areaOfAccess: { $in: [schedule.lcd] },
+          },
+        },
+      ]);
+      //send out notification to collectors
+      collectors.map((collector) => {
+        const message = {
+          app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+          contents: {
+            en: `A user in ${schedule.lcd} just created a schedule`,
+          },
+          include_player_ids: [`${collector.onesignal_id} || ' '`],
+        };
+        sendNotification(message);
+        await notificationModel.create({
+          title: "Schedule made",
+          lcd: schedule.lcd,
+          message: `A user in ${schedule.lcd} just created a schedule`,
+          recycler_id: collector._id,
+        });
+      });
+
+      //send notification to user
+      if (user.onesignal_id) {
+        sendNotification({
+          app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+          contents: {
+            en: `Your schedule has been made successfully`,
+          },
+          include_player_ids: [`${user.onesignal_id} || ' '`],
+        });
+        await notificationModel.create({
+          title: "Schedule made",
+          lcd: schedule.lcd,
+          message: `Your schedule has been made successfully`,
+          schedulerId: user._id,
+        });
+      }
+
+      await userModel.updateOne(
+        { email: data.client },
+        {
+          last_logged_in: new Date(),
+        }
+      );
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: schedule,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = ScheduleService;

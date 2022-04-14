@@ -1,4 +1,4 @@
-const { query } = require("express-validator");
+const { query, check, param, body } = require("express-validator");
 
 module.exports = {
   filter: [
@@ -22,4 +22,11 @@ module.exports = {
       }),
   ],
   search: [query("key", "search key cannot be empty").exists().notEmpty()],
+  createArea: [
+    body("coverageArea").notEmpty().withMessage("coverageArea is required"),
+    body("lga").notEmpty().withMessage("lga is required"),
+    body("country").optional({ default: "" }),
+    body("state").optional({ default: "" }),
+  ],
+  areaId: [param("areaId").notEmpty().withMessage("areaId is required")],
 };
