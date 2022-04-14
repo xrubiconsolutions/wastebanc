@@ -570,32 +570,36 @@ class ScheduleService {
       //send out notification to collectors
       await Promise.all(
         collectors.map(async (collector) => {
-          const message = {
-            app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-            contents: {
-              en: `A user in ${schedule.lcd} just created a schedule`,
-            },
-            include_player_ids: [`${collector.onesignal_id} || ' '`],
-          };
-          sendNotification(message);
-          await notificationModel.create({
-            title: "Schedule made",
-            lcd: schedule.lcd,
-            message: `A user in ${schedule.lcd} just created a schedule`,
-            recycler_id: collector._id,
-          });
+          if (!collector.onesignal_id || collector.onesignal_id !== "") {
+            const message = {
+              app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+              contents: {
+                en: `A user in ${schedule.lcd} just created a schedule`,
+              },
+              include_player_ids: [`${collector.onesignal_id} || ' '`],
+            };
+            sendNotification(message);
+            await notificationModel.create({
+              title: "Schedule made",
+              lcd: schedule.lcd,
+              message: `A user in ${schedule.lcd} just created a schedule`,
+              recycler_id: collector._id,
+            });
+          }
         })
       );
 
       //send notification to user
-      if (user.onesignal_id !== "") {
+      if (user.onesignal_id !== "" || !user.onesignal_id) {
         console.log(user.onesignal_id);
+        const playerIds = [`${user.onesignal_id}`];
+        console.log("playerids", playerIds);
         sendNotification({
           app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
           contents: {
             en: `Your schedule has been made successfully`,
           },
-          include_player_ids: [user.onesignal_id],
+          include_player_ids: playerIds,
         });
         await notificationModel.create({
           title: "Schedule made",
