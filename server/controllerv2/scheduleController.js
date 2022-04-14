@@ -8,6 +8,9 @@ const {
 } = require("../models");
 const { sendResponse, bodyValidate } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
+const moment = require("moment-timezone");
+
+moment().tz("Africa/Lagos", false);
 var sendNotification = function (data) {
   var headers = {
     "Content-Type": "application/json; charset=utf-8",
@@ -565,31 +568,34 @@ class ScheduleService {
         },
       ]);
       //send out notification to collectors
-      collectors.map((collector) => {
-        const message = {
-          app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-          contents: {
-            en: `A user in ${schedule.lcd} just created a schedule`,
-          },
-          include_player_ids: [`${collector.onesignal_id} || ' '`],
-        };
-        sendNotification(message);
-        await notificationModel.create({
-          title: "Schedule made",
-          lcd: schedule.lcd,
-          message: `A user in ${schedule.lcd} just created a schedule`,
-          recycler_id: collector._id,
-        });
-      });
+      await Promise.all(
+        collectors.map(async (collector) => {
+          const message = {
+            app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+            contents: {
+              en: `A user in ${schedule.lcd} just created a schedule`,
+            },
+            include_player_ids: [`${collector.onesignal_id} || ' '`],
+          };
+          sendNotification(message);
+          await notificationModel.create({
+            title: "Schedule made",
+            lcd: schedule.lcd,
+            message: `A user in ${schedule.lcd} just created a schedule`,
+            recycler_id: collector._id,
+          });
+        })
+      );
 
       //send notification to user
-      if (user.onesignal_id) {
+      if (user.onesignal_id !== "") {
+        console.log(user.onesignal_id);
         sendNotification({
           app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
           contents: {
             en: `Your schedule has been made successfully`,
           },
-          include_player_ids: [`${user.onesignal_id} || ' '`],
+          include_player_ids: [user.onesignal_id],
         });
         await notificationModel.create({
           title: "Schedule made",

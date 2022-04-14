@@ -11,7 +11,7 @@ const {
 } = require("../../validators/dropOffValidator");
 const { checkRequestErrs } = require("../../util/commonFunction");
 const { body, query, check, param } = require("express-validator");
-
+const scheduleValidator = require("../../validators/scheduleValidators");
 module.exports = (APP) => {
   APP.route("/api/v2/dropoffs").get(
     adminPakamValidation,

@@ -123,7 +123,7 @@ cron.schedule("0 7 * * *", function () {
             email: schedules[i].client,
           })
           .then((user) => {
-            if (user.onesignal_id) {
+            if (user.onesignal_id !== "") {
               var message = {
                 app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
                 contents: {
@@ -231,7 +231,7 @@ cron.schedule("01 7 * * *", function () {
             email: schedules[i].client,
           })
           .then((user) => {
-            if (user.onesignal_id) {
+            if (user.onesignal_id !== "") {
               var message = {
                 app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
                 contents: {

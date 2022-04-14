@@ -2,11 +2,12 @@ const ScheduleService = require("../../controllerv2/scheduleController.js");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 const commonValidator = require("../../validators/commonValidator.js");
 const { body, query, check, param } = require("express-validator");
-
+const scheduleValidator = require("../../validators/scheduleValidators");
 const {
   adminPakamValidation,
   recyclerValidation,
   companyPakamDataValidation,
+  userValidation,
 } = require("../../util/auth");
 
 module.exports = (APP) => {

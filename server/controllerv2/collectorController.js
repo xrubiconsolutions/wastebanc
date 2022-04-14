@@ -15,6 +15,7 @@ const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
 const axios = require("axios");
 const request = require("request");
+const uuid = require("uuid");
 
 class CollectorService {
   static async getCollectors(req, res) {
@@ -1046,6 +1047,7 @@ class CollectorService {
 
   static async login(req, res) {
     try {
+      const onesignal_id = uuid.v1();
       const collector = await collectorModel.findOne({
         phone: req.body.phone,
       });
@@ -1125,11 +1127,16 @@ class CollectorService {
         });
       }
 
+      let signal_id;
+      if (!collector.onesignal_id || collector.onesignal_id === "") {
+        signal_id = uuid.v1();
+      } else {
+        signal_id = collector.onesignal_id;
+      }
       await collectorModel.updateOne(
         { _id: collector._id },
-        { last_logged_in: new Date() }
+        { last_logged_in: new Date(), onesignal_id: signal_id }
       );
-
       const token = authToken(collector);
       return res.status(200).json({
         error: false,
@@ -1148,6 +1155,7 @@ class CollectorService {
           email: collector.email,
           phone: collector.phone,
           address: collector.address,
+          onesignal_id: signal_id,
           gender: collector.gender,
           localGovernment: collector.localGovernment,
           organisation: collector.organisation,
@@ -1193,7 +1201,7 @@ class CollectorService {
           $match: condition,
         },
         {
-          $addFields: { "scheduleId": { "$toObjectId": "$scheduleId" } },
+          $addFields: { scheduleId: { $toObjectId: "$scheduleId" } },
         },
         {
           $lookup: {

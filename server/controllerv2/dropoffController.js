@@ -8,6 +8,9 @@ const {
   notificationModel,
 } = require("../models");
 let dropoffController = {};
+const moment = require("moment-timezone");
+
+moment().tz("Africa/Lagos", false);
 
 var sendNotification = function (data) {
   var headers = {
@@ -434,7 +437,7 @@ dropoffController.scheduledropOffs = async (req, res) => {
 
     const schedule = await scheduleDropModel.create(data);
 
-    if (user.onesignal_id) {
+    if (user.onesignal_id !== "") {
       sendNotification({
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
