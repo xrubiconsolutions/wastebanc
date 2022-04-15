@@ -10,6 +10,7 @@ const {
 const { STATUS_MSG } = require("../util/constants");
 const request = require("request");
 const axios = require("axios");
+const uuid = require("uuid");
 
 class UserService {
   static async getClients(req, res) {
@@ -592,11 +593,25 @@ class UserService {
           },
         });
       }
+      let signal_id;
 
-      await userModel.updateOne(
-        { _id: user._id },
-        { last_logged_in: new Date() }
-      );
+      console.log("user id", user.onesignal_id);
+      if (user.onesignal_id === "" || user.onesignal_id === " ") {
+        signal_id = uuid.v1().toString();
+        console.log("changing", signal_id);
+        await userModel.updateOne(
+          { email: user.email },
+          { $set: { last_logged_in: new Date(), onesignal_id: signal_id } }
+        );
+      } else {
+        signal_id = user.onesignal_id;
+        console.log("not changing", user.onesignal_id);
+        await userModel.updateOne(
+          { email: user.email },
+          { $set: { last_logged_in: new Date() } }
+        );
+      }
+
       const token = authToken(user);
       delete user.password;
       return res.status(200).json({
@@ -623,6 +638,7 @@ class UserService {
           availablePoints: user.availablePoints,
           rafflePoints: user.rafflePoints,
           schedulePoints: user.schedulePoints,
+          onesignal_id: signal_id,
           cardID: user.cardID,
           lcd: user.lcd,
           last_logged_in: user.last_logged_in,

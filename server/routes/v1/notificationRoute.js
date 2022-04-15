@@ -15,4 +15,9 @@ module.exports = (APP) => {
     auth.userValidation,
     CONTROLLER.notificationController.householdNotification
   );
+
+  APP.route("/api/push/notification").get(
+    auth.userValidation,
+    CONTROLLER.notificationController.pushNotification
+  );
 };

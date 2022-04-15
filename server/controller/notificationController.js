@@ -6,7 +6,7 @@
 
 let notificationController = {};
 let MODEL = require("../models");
-let COMMON_FUN = require("../util/commonFunction");
+let { sendNotification } = require("../util/commonFunction");
 let SERVICE = require("../services/commonService");
 let CONSTANTS = require("../util/constants");
 
@@ -57,7 +57,7 @@ notificationController.notifyOrganisations = (req, res) => {
 
 notificationController.householdNotification = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20 } = req.query;
+    let { page = 1, resultsPerPage = 10 } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
@@ -97,5 +97,31 @@ notificationController.householdNotification = async (req, res) => {
   }
 };
 
+notificationController.pushNotification = (req, res) => {
+  try {
+    const { user } = req;
+    const message = {
+      app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+      contents: {
+        en: "Test push",
+      },
+      channel_for_external_user_ids: "push",
+      include_external_user_ids: [user.onesignal_id],
+    };
+
+    sendNotification(message);
+
+    return res.status(200).json({
+      error: false,
+      message: "Push done",
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
 /* export notificationControllers */
 module.exports = notificationController;

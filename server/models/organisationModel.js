@@ -112,7 +112,6 @@ const organisation_Schema = new Schema({
   metalEquivalent: {
     type: Number,
   },
-
   eWasteEquivalent: {
     type: Number,
   },
@@ -126,6 +125,12 @@ const organisation_Schema = new Schema({
   wallet: {
     type: Number,
     default: 0,
+  },
+  country: {
+    type: String,
+  },
+  state: {
+    type: String,
   },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);

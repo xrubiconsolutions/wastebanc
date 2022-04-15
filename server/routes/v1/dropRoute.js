@@ -2,13 +2,17 @@
 let CONTROLLER = require("../../controller");
 let auth = require("../../util/auth");
 const { body, query, check, param } = require("express-validator");
+const { checkRequestErrs } = require("../../util/commonFunction");
+const scheduleValidator = require("../../validators/scheduleValidators");
 
 /****************************************
  ***** Managing User Routes here ********
  ***** @param APP (express instance)*****
  ****************************************/
 module.exports = (APP) => {
-  APP.route("/api/submit/drop/request").post(
+  APP.route("/api/v2/submit/drop/request").post(
+    scheduleValidator.dropOff,
+    checkRequestErrs,
     CONTROLLER.scheduleDropController.schedule
   );
 

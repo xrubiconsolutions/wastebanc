@@ -6,7 +6,6 @@ const { sendResponse, bodyValidate } = require("../util/commonFunction");
 
 areasController.create = async (req, res) => {
   try {
-    bodyValidate(req, res);
     const check = await localGovernmentModel.findOne({
       lcd: req.body.coverageArea,
       lga: req.body.lga,

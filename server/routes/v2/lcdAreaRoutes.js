@@ -7,33 +7,35 @@ const {
 
 const { body, query, check, param } = require("express-validator");
 
+const { checkRequestErrs } = require("../../util/commonFunction");
+const commonValidator = require("../../validators/commonValidator.js");
+
 module.exports = (APP) => {
   APP.route("/api/v2/area/create").post(
     adminPakamValidation,
-    [
-      body("coverageArea").notEmpty().withMessage("coverageArea is required"),
-      body("lga").notEmpty().withMessage("lga is required"),
-      body("country").optional({ default: "" }),
-      body("state").optional({ default: "" }),
-    ],
+    commonValidator.createArea,
+    checkRequestErrs,
     lcdAreasController.create
   );
 
   APP.route("/api/v2/area/:areaId").get(
     adminPakamValidation,
-    [param("areaId").notEmpty().withMessage("areaId is required")],
+    commonValidator.areaId,
+    checkRequestErrs,
     lcdAreasController.find
   );
 
   APP.route("/api/v2/area/:areaId").put(
     adminPakamValidation,
-    [param("areaId").notEmpty().withMessage("areaId is required")],
+    commonValidator.areaId,
+    checkRequestErrs,
     lcdAreasController.update
   );
 
   APP.route("/api/v2/area/:areaId").delete(
     adminPakamValidation,
-    [param("areaId").notEmpty().withMessage("areaId is required")],
+    commonValidator.areaId,
+    checkRequestErrs,
     lcdAreasController.remove
   );
 
