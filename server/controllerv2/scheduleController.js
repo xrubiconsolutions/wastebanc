@@ -9,35 +9,37 @@ const {
 const { sendResponse, bodyValidate } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const moment = require("moment-timezone");
+const { sendNotification } = require("../util/commonFunction")
+
 
 moment().tz("Africa/Lagos", false);
-var sendNotification = function (data) {
-  var headers = {
-    "Content-Type": "application/json; charset=utf-8",
-  };
+// var sendNotification = function (data) {
+//   var headers = {
+//     "Content-Type": "application/json; charset=utf-8",
+//   };
 
-  var options = {
-    host: "onesignal.com",
-    port: 443,
-    path: "/api/v1/notifications",
-    method: "POST",
-    headers: headers,
-  };
+//   var options = {
+//     host: "onesignal.com",
+//     port: 443,
+//     path: "/api/v1/notifications",
+//     method: "POST",
+//     headers: headers,
+//   };
 
-  var https = require("https");
-  var req = https.request(options, function (res) {
-    res.on("data", function (data) {
-      console.log(JSON.parse(data));
-    });
-  });
+//   var https = require("https");
+//   var req = https.request(options, function (res) {
+//     res.on("data", function (data) {
+//       console.log(JSON.parse(data));
+//     });
+//   });
 
-  req.on("error", function (e) {
-    console.log(e);
-  });
+//   req.on("error", function (e) {
+//     console.log(e);
+//   });
 
-  req.write(JSON.stringify(data));
-  req.end();
-};
+//   req.write(JSON.stringify(data));
+//   req.end();
+// };
 
 class ScheduleService {
   static async getSchedulesWithFilter(req, res) {

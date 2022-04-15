@@ -321,6 +321,8 @@ agenciesController.updateAgencies = async (req, res) => {
 agenciesController.remove = async (req, res) => {
   bodyValidate(req, res);
   try {
+    const { user } = req;
+
     const agencyId = req.params.agencyId;
     const agency = await MODEL.userModel.findById(agencyId);
     if (!agency) {
@@ -330,6 +332,12 @@ agenciesController.remove = async (req, res) => {
       });
     }
 
+    if (user._id.toString() === agencyId) {
+      return res.status(400).json({
+        error: true,
+        message: "Action cannot be performed on login user",
+      });
+    }
     await MODEL.userModel.deleteOne({ _id: agency._id });
     return res.status(200).json({
       error: false,

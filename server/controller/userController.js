@@ -20,6 +20,7 @@ const sgMail = require("@sendgrid/mail");
 const passwordResetTemplate = require("../../email-templates/password-reset.template");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
+const { sendNotification } = require("../util/commonFunction");
 
 const ustorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -81,35 +82,35 @@ var transporter = nodemailer.createTransport({
   },
 });
 
-var sendNotification = function (data) {
-  var headers = {
-    "Content-Type": "application/json; charset=utf-8",
-  };
+// var sendNotification = function (data) {
+//   var headers = {
+//     "Content-Type": "application/json; charset=utf-8",
+//   };
 
-  var options = {
-    host: "onesignal.com",
-    port: 443,
-    path: "/api/v1/notifications",
-    method: "POST",
-    headers: headers,
-  };
+//   var options = {
+//     host: "onesignal.com",
+//     port: 443,
+//     path: "/api/v1/notifications",
+//     method: "POST",
+//     headers: headers,
+//   };
 
-  var https = require("https");
-  var req = https.request(options, function (res) {
-    res.on("data", function (data) {
-      console.log("Response:");
-      console.log(JSON.parse(data));
-    });
-  });
+//   var https = require("https");
+//   var req = https.request(options, function (res) {
+//     res.on("data", function (data) {
+//       console.log("Response:");
+//       console.log(JSON.parse(data));
+//     });
+//   });
 
-  req.on("error", function (e) {
-    console.log("ERROR:");
-    console.log(e);
-  });
+//   req.on("error", function (e) {
+//     console.log("ERROR:");
+//     console.log(e);
+//   });
 
-  req.write(JSON.stringify(data));
-  req.end();
-};
+//   req.write(JSON.stringify(data));
+//   req.end();
+// };
 
 userController.upload = (REQUEST, RESPONSE) => {
   /** Stream
@@ -2614,6 +2615,7 @@ userController.adminLogin = async (req, res) => {
     });
 
     if (!user) {
+      console.log("here");
       return res.status(400).json({
         error: true,
         message: "Invalid email or password",

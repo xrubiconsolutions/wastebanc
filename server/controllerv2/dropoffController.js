@@ -9,36 +9,37 @@ const {
 } = require("../models");
 let dropoffController = {};
 const moment = require("moment-timezone");
+const { sendNotification } = require("../util/commonFunction");
 
 moment().tz("Africa/Lagos", false);
 
-var sendNotification = function (data) {
-  var headers = {
-    "Content-Type": "application/json; charset=utf-8",
-  };
+// var sendNotification = function (data) {
+//   var headers = {
+//     "Content-Type": "application/json; charset=utf-8",
+//   };
 
-  var options = {
-    host: "onesignal.com",
-    port: 443,
-    path: "/api/v1/notifications",
-    method: "POST",
-    headers: headers,
-  };
+//   var options = {
+//     host: "onesignal.com",
+//     port: 443,
+//     path: "/api/v1/notifications",
+//     method: "POST",
+//     headers: headers,
+//   };
 
-  var https = require("https");
-  var req = https.request(options, function (res) {
-    res.on("data", function (data) {
-      console.log(JSON.parse(data));
-    });
-  });
+//   var https = require("https");
+//   var req = https.request(options, function (res) {
+//     res.on("data", function (data) {
+//       console.log(JSON.parse(data));
+//     });
+//   });
 
-  req.on("error", function (e) {
-    console.log(e);
-  });
+//   req.on("error", function (e) {
+//     console.log(e);
+//   });
 
-  req.write(JSON.stringify(data));
-  req.end();
-};
+//   req.write(JSON.stringify(data));
+//   req.end();
+// };
 
 dropoffController.dropOffs = async (req, res) => {
   try {
@@ -438,12 +439,14 @@ dropoffController.scheduledropOffs = async (req, res) => {
     const schedule = await scheduleDropModel.create(data);
 
     if (user.onesignal_id !== "") {
+      console.log("user", user.onesignal_id);
       sendNotification({
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
           en: `Your dropoff schedule has been made successfully`,
         },
-        include_player_ids: [`${user.onesignal_id} || ' '`],
+        channel_for_external_user_ids: "push",
+        include_external_user_ids: [user.onesignal_id],
       });
       await notificationModel.create({
         title: "Dropoff Schedule made",

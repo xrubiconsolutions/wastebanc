@@ -17,6 +17,7 @@ const MODEL = require("../server/models");
 const cron = require("node-cron");
 var request = require("request");
 const { AwakeHeroku } = require("awake-heroku");
+const { sendNotification } = require("../server/util/commonFunction");
 
 var nodemailer = require("nodemailer");
 
@@ -50,35 +51,35 @@ var transporter = nodemailer.createTransport({
   },
 });
 
-var sendNotification = function (data) {
-  var headers = {
-    "Content-Type": "application/json; charset=utf-8",
-  };
+// var sendNotification = function (data) {
+//   var headers = {
+//     "Content-Type": "application/json; charset=utf-8",
+//   };
 
-  var options = {
-    host: "onesignal.com",
-    port: 443,
-    path: "/api/v1/notifications",
-    method: "POST",
-    headers: headers,
-  };
+//   var options = {
+//     host: "onesignal.com",
+//     port: 443,
+//     path: "/api/v1/notifications",
+//     method: "POST",
+//     headers: headers,
+//   };
 
-  var https = require("https");
-  var req = https.request(options, function (res) {
-    res.on("data", function (data) {
-      console.log("Response:");
-      console.log(JSON.parse(data));
-    });
-  });
+//   var https = require("https");
+//   var req = https.request(options, function (res) {
+//     res.on("data", function (data) {
+//       console.log("Response:");
+//       console.log(JSON.parse(data));
+//     });
+//   });
 
-  req.on("error", function (e) {
-    console.log("ERROR:");
-    console.log(e);
-  });
+//   req.on("error", function (e) {
+//     console.log("ERROR:");
+//     console.log(e);
+//   });
 
-  req.write(JSON.stringify(data));
-  req.end();
-};
+//   req.write(JSON.stringify(data));
+//   req.end();
+// };
 
 // MODEL.scheduleModel.find({
 //     collectorStatus: "accept",
@@ -123,7 +124,7 @@ cron.schedule("0 7 * * *", function () {
             email: schedules[i].client,
           })
           .then((user) => {
-            if (user.onesignal_id !== "") {
+            if (user.onesignal_id && user.onsignal_id !== "") {
               var message = {
                 app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
                 contents: {
