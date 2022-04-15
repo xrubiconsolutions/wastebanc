@@ -52,4 +52,9 @@ module.exports = (APP) => {
       checkRequestErrs,
       controller.userAgenciesController.setLocationScope
     );
+
+  APP.route("/api/user/agency-profile").get(
+    auth.adminPakamValidation,
+    controller.userAgenciesController.getAgencyProfile
+  );
 };

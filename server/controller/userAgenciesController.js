@@ -417,4 +417,16 @@ agenciesController.setLocationScope = async (req, res) => {
   }
 };
 
+agenciesController.getAgencyProfile = async (req, res) => {
+  // destructure to remove password and last logged in from data
+  const { password, last_logged_in, ...data } = req.user.toObject();
+
+  // send admin profile
+  return res.status(200).json({
+    error: false,
+    message: "success!",
+    data,
+  });
+};
+
 module.exports = agenciesController;
