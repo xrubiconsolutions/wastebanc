@@ -57,7 +57,7 @@ notificationController.notifyOrganisations = (req, res) => {
 
 notificationController.householdNotification = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20 } = req.query;
+    let { page = 1, resultsPerPage = 10 } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
