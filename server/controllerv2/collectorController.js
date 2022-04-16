@@ -51,7 +51,7 @@ class CollectorService {
             // { IDNumber: key },
           ],
         };
-      } else if (state || end) {
+      } else if (start || end) {
         const [startDate, endDate] = [new Date(start), new Date(end)];
         criteria = {
           createdAt: {
@@ -1070,7 +1070,7 @@ class CollectorService {
 
   static async login(req, res) {
     try {
-      const onesignal_id = uuid.v1();
+      //const onesignal_id = uuid.v1();
       const collector = await collectorModel.findOne({
         phone: req.body.phone,
       });

@@ -63,14 +63,18 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/v2/collector/enable/:collectorId").put(
-    [param("collectorId").notEmpty().withMessage("collectorId is required")],
+    // [param("collectorId").notEmpty().withMessage("collectorId is required")],
     adminPakamValidation,
+    collectorValidator.verifyCollector,
+    checkRequestErrs,
     CollectorService.enableCollector
   );
 
   APP.route("/api/v2/collector/disable/:collectorId").put(
-    [param("collectorId").notEmpty().withMessage("collectorId is required")],
+    //[param("collectorId").notEmpty().withMessage("collectorId is required")],
     adminPakamValidation,
+    collectorValidator.verifyCollector,
+    checkRequestErrs,
     CollectorService.disableCollector
   );
 

@@ -35,8 +35,9 @@ const bodyValidate = (req, res) => {
 };
 
 dashboardController.cardMapData = async (req, res) => {
-  bodyValidate(req, res);
-  const { states } = req.user;
+  let state;
+  const { user } = req;
+  const currentScope = user.locationScope;
 
   try {
     const { start, end, state } = req.query;
@@ -48,7 +49,21 @@ dashboardController.cardMapData = async (req, res) => {
       },
     };
 
-    if (state) criteria.state = state;
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+    //if (state) criteria.state = state;
 
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
@@ -86,7 +101,7 @@ dashboardController.cardMapData = async (req, res) => {
 };
 
 dashboardController.companyCardMapData = async (req, res) => {
-  bodyValidate(req, res);
+  //bodyValidate(req, res);
 
   try {
     const { start, end, state } = req.query;
