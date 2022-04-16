@@ -20,19 +20,23 @@ const uuid = require("uuid");
 class CollectorService {
   static async getCollectors(req, res) {
     try {
-      let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+      let state;
+      const { user } = req;
+      const currentScope = user.locationScope;
+
+      let { page = 1, resultsPerPage = 20, end, start, key } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
 
-      if (!key) {
-        if (!start || !end) {
-          return res.status(400).json({
-            error: true,
-            message: "Please pass a start and end date",
-          });
-        }
-      }
+      // if (!key) {
+      //   if (!start || !end) {
+      //     return res.status(400).json({
+      //       error: true,
+      //       message: "Please pass a start and end date",
+      //     });
+      //   }
+      // }
 
       let criteria;
       if (key) {
@@ -47,7 +51,7 @@ class CollectorService {
             // { IDNumber: key },
           ],
         };
-      } else {
+      } else if (state || end) {
         const [startDate, endDate] = [new Date(start), new Date(end)];
         criteria = {
           createdAt: {
@@ -55,8 +59,27 @@ class CollectorService {
             $lt: endDate,
           },
         };
+      } else {
+        criteria = {};
       }
-      if (state) criteria.state = state;
+
+      if (!currentScope) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid request",
+        });
+      }
+
+      if (currentScope === "All") {
+        criteria.state = {
+          $in: user.states,
+        };
+      } else {
+        criteria.state = currentScope;
+      }
+
+      console.log(criteria);
+      //if (state) criteria.state = state;
 
       const totalResult = await collectorModel.countDocuments(criteria);
       const projection = {

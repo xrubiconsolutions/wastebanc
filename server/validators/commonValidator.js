@@ -3,8 +3,8 @@ const { query, check, param, body } = require("express-validator");
 module.exports = {
   filter: [
     query("start", "Provide a range start date")
-      .exists()
-      .notEmpty()
+      //.exists()
+      .optional()
       .custom((val) => {
         const resDate = new Date(val);
         if (resDate.toDateString() === "Invalid Date")
@@ -12,8 +12,8 @@ module.exports = {
         return true;
       }),
     query("end", "Provide a range end date")
-      .exists()
-      .notEmpty()
+      //.exists()
+      .optional()
       .custom((val) => {
         const resDate = new Date(val);
         if (resDate.toDateString() === "Invalid Date")
@@ -29,4 +29,11 @@ module.exports = {
     body("state").optional({ default: "" }),
   ],
   areaId: [param("areaId").notEmpty().withMessage("areaId is required")],
+  removenotification: [
+    body("notificationIds")
+      .notEmpty()
+      .withMessage("notificationIds is required")
+      .isArray()
+      .withMessage("notificationIds should be an array of ids"),
+  ],
 };

@@ -9,7 +9,6 @@ let MODEL = require("../models");
 let { sendNotification } = require("../util/commonFunction");
 let SERVICE = require("../services/commonService");
 let CONSTANTS = require("../util/constants");
-
 var nodemailer = require("nodemailer");
 
 var transporter = nodemailer.createTransport({
@@ -87,6 +86,30 @@ notificationController.householdNotification = async (req, res) => {
         resultsPerPage,
         totalPages: Math.ceil(totalResults / resultsPerPage),
       },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+// remove notification
+notificationController.removeNotification = async (req, res) => {
+  try {
+    const { user } = req;
+    const { notificationIds } = req.body;
+
+    const remove = await MODEL.notificationModel.deleteMany({
+      $or: [{ recycler_id: user._id }, { schedulerId: user._id }],
+      _id: { $in: notificationIds },
+    });
+
+    return res.status(200).json({
+      error: false,
+      message: "Notifications removed successfully",
     });
   } catch (error) {
     console.log(error);
