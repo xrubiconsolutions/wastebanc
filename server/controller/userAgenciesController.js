@@ -417,4 +417,48 @@ agenciesController.setLocationScope = async (req, res) => {
   }
 };
 
+agenciesController.getAgencyProfile = async (req, res) => {
+  // destructure to remove password and last logged in from data
+  const { password, last_logged_in, ...data } = req.user.toObject();
+
+  try {
+    const claims = await MODEL.roleModel
+      .findById(data.role)
+      .populate({
+        path: "claims.claimId",
+        populate: {
+          path: "children",
+          match: { show: true },
+          populate: {
+            path: "children",
+            match: { show: true },
+          },
+        },
+      })
+      .sort({ display: -1 });
+
+    if (!claims) {
+      return res.status(400).json({
+        error: true,
+        message: "Admin role not found",
+      });
+    }
+
+    data.claims = claims;
+
+    // send admin profile
+    return res.status(200).json({
+      error: false,
+      message: "success!",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: true,
+      message: "An internal error just occured",
+    });
+  }
+};
+
 module.exports = agenciesController;
