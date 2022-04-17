@@ -20,7 +20,6 @@ const uuid = require("uuid");
 class CollectorService {
   static async getCollectors(req, res) {
     try {
-      let state;
       const { user } = req;
       const currentScope = user.locationScope;
 

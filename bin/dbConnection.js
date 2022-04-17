@@ -17,13 +17,17 @@ module.exports = {
   getDBHelper: () => dbHelper,
   dbSetup: (URL) => {
     return new Promise((resolve, reject) => {
-      MONGOOSE.connect(URL, { useNewUrlParser: true }, (err, response) => {
-        if (err) reject(err);
-        else {
-          dbHelper = response;
-          resolve(null);
+      MONGOOSE.connect(
+        URL,
+        { useNewUrlParser: true, useUnifiedTopology: true },
+        (err, response) => {
+          if (err) reject(err);
+          else {
+            dbHelper = response;
+            resolve(null);
+          }
         }
-      });
+      );
     });
   },
 };

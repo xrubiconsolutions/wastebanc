@@ -40,7 +40,7 @@ dashboardController.cardMapData = async (req, res) => {
   const currentScope = user.locationScope;
 
   try {
-    const { start, end, state } = req.query;
+    const { start, end } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
     let criteria = {
       createdAt: {
@@ -92,7 +92,7 @@ dashboardController.cardMapData = async (req, res) => {
       },
     });
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     return res.status(500).json({
       error: true,
       message: "An error occurred",
@@ -152,20 +152,22 @@ dashboardController.companyCardMapData = async (req, res) => {
 
 dashboardController.recentPickups = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    let state;
+    const { user } = req;
+    const currentScope = user.locationScope;
+    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    if (!key) {
-      if (!start || !end) {
-        return res.status(400).json({
-          error: true,
-          message: "Please pass a start and end date",
-        });
-      }
-    }
-    const { states } = req.user;
+    // if (!key) {
+    //   if (!start || !end) {
+    //     return res.status(400).json({
+    //       error: true,
+    //       message: "Please pass a start and end date",
+    //     });
+    //   }
+    // }
 
     let criteria;
     if (key) {
@@ -179,19 +181,34 @@ dashboardController.recentPickups = async (req, res) => {
           { phone: { $regex: `.*${key}.*`, $options: "i" } },
           { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        state: { $in: states },
       };
-    } else {
+    } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createdAt: {
           $gte: startDate,
           $lt: endDate,
         },
-        state: { $in: states },
       };
+    } else {
+      criteria = {};
     }
-    if (state) criteria.state = state;
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log(criteria);
 
     const totalResult = await scheduleModel.countDocuments(criteria);
 
@@ -224,20 +241,23 @@ dashboardController.recentPickups = async (req, res) => {
 
 dashboardController.newUsers = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    const { user } = req;
+    const currentScope = user.locationScope;
+
+    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    if (!key) {
-      if (!start || !end) {
-        return res.status(400).json({
-          error: true,
-          message: "Please pass a start and end date",
-        });
-      }
-    }
-    const { states } = req.user;
+    // if (!key) {
+    //   if (!start || !end) {
+    //     return res.status(400).json({
+    //       error: true,
+    //       message: "Please pass a start and end date",
+    //     });
+    //   }
+    // }
+    // const { states } = req.user;
 
     let criteria;
     if (key) {
@@ -250,9 +270,9 @@ dashboardController.newUsers = async (req, res) => {
           { email: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         roles: "client",
-        state: { $in: states },
+        //state: { $in: states },
       };
-    } else {
+    } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createAt: {
@@ -260,10 +280,27 @@ dashboardController.newUsers = async (req, res) => {
           $lt: endDate,
         },
         roles: "client",
-        state: { $in: states },
+        // state: { $in: states },
       };
+    } else {
+      criteria = {};
     }
-    if (state) criteria.state = state;
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log(criteria);
 
     const totalResult = await userModel.countDocuments(criteria);
 
@@ -301,20 +338,23 @@ dashboardController.newUsers = async (req, res) => {
 
 dashboardController.newAggregators = async (req, res) => {
   try {
+    const { user } = req;
+    const currentScope = user.locationScope;
+
     let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    if (!key) {
-      if (!start || !end) {
-        return res.status(400).json({
-          error: true,
-          message: "Please pass a start and end date",
-        });
-      }
-    }
-    const { states } = req.user;
+    // if (!key) {
+    //   if (!start || !end) {
+    //     return res.status(400).json({
+    //       error: true,
+    //       message: "Please pass a start and end date",
+    //     });
+    //   }
+    // }
+    // const { states } = req.user;
 
     let criteria;
     if (key) {
@@ -328,19 +368,38 @@ dashboardController.newAggregators = async (req, res) => {
           { organisation: { $regex: `.*${key}.*`, $options: "i" } },
           // { IDNumber: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        state: { $in: states },
+        //state: { $in: states },
       };
-    } else {
+    } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createdAt: {
           $gte: startDate,
           $lt: endDate,
         },
-        state: { $in: states },
+        // state: { $in: states },
       };
+    } else {
+      criteria = {};
     }
-    if (state) criteria.state = state;
+
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log(criteria);
+    //if (state) criteria.state = state;
 
     const totalResult = await collectorModel.countDocuments(criteria);
 
