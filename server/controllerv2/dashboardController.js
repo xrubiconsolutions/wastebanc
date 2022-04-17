@@ -35,7 +35,6 @@ const bodyValidate = (req, res) => {
 };
 
 dashboardController.cardMapData = async (req, res) => {
-  let state;
   const { user } = req;
   const currentScope = user.locationScope;
 
@@ -63,7 +62,8 @@ dashboardController.cardMapData = async (req, res) => {
     } else {
       criteria.state = currentScope;
     }
-    //if (state) criteria.state = state;
+
+    console.log("criteria", criteria);
 
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
@@ -435,7 +435,7 @@ dashboardController.newAggregators = async (req, res) => {
 
 dashboardController.collectormapData = async (req, res) => {
   console.log("here");
- 
+
   try {
     const { user } = req;
     const currentScope = user.locationScope;
