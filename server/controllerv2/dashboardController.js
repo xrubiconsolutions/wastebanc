@@ -160,14 +160,14 @@ dashboardController.recentPickups = async (req, res) => {
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    // if (!key) {
-    //   if (!start || !end) {
-    //     return res.status(400).json({
-    //       error: true,
-    //       message: "Please pass a start and end date",
-    //     });
-    //   }
-    // }
+    if (!key) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
+    }
 
     let criteria;
     if (key) {
@@ -249,15 +249,15 @@ dashboardController.newUsers = async (req, res) => {
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    // if (!key) {
-    //   if (!start || !end) {
-    //     return res.status(400).json({
-    //       error: true,
-    //       message: "Please pass a start and end date",
-    //     });
-    //   }
-    // }
-    // const { states } = req.user;
+    if (!key) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
+    }
+    //const { states } = req.user;
 
     let criteria;
     if (key) {
@@ -346,15 +346,14 @@ dashboardController.newAggregators = async (req, res) => {
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    // if (!key) {
-    //   if (!start || !end) {
-    //     return res.status(400).json({
-    //       error: true,
-    //       message: "Please pass a start and end date",
-    //     });
-    //   }
-    // }
-    // const { states } = req.user;
+    if (!key) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
+    }
 
     let criteria;
     if (key) {
@@ -436,19 +435,38 @@ dashboardController.newAggregators = async (req, res) => {
 
 dashboardController.collectormapData = async (req, res) => {
   console.log("here");
-  bodyValidate(req, res);
+ 
   try {
-    const { start, end, state } = req.query;
+    const { user } = req;
+    const currentScope = user.locationScope;
+
+    const { start, end } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
-    const { states } = req.user;
 
     let criteria = {
       createdAt: {
         $gte: startDate,
         $lt: endDate,
       },
-      state: { $in: states },
+      //state: { $in: states },
     };
+
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log("cri", criteria);
 
     const collectors = await allCollector(criteria);
 
