@@ -41,7 +41,7 @@ moment().tz("Africa/Lagos", false);
 //   req.end();
 // };
 
-// all dropoffs
+// all dropoffss
 dropoffController.dropOffs = async (req, res) => {
   try {
     let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
