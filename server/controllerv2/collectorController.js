@@ -171,13 +171,13 @@ class CollectorService {
         end,
         state,
         key,
-        verified,
+        companyVerified,
       } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
-      verified = verified
-        ? verified === "true"
+      companyVerified = companyVerified
+        ? companyVerified === "true"
           ? true
           : false
         : { $exists: true };
@@ -194,7 +194,7 @@ class CollectorService {
             { organisation: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           organisation,
-          verified,
+          companyVerified,
         };
       } else if (start && end) {
         if (!start || !end) {
@@ -210,9 +210,9 @@ class CollectorService {
             $lt: endDate,
           },
           organisation,
-          verified,
+          companyVerified,
         };
-      } else criteria = { organisation, verified };
+      } else criteria = { organisation, companyVerified };
       if (state) criteria.state = state;
 
       const totalResult = await collectorModel.countDocuments(criteria);
@@ -463,7 +463,7 @@ class CollectorService {
       await collectorModel.updateOne(
         { _id: collectorId, organisation },
         {
-          verified: true,
+          companyVerified: true,
           approvedBy: companyId,
         },
         projection
@@ -494,7 +494,7 @@ class CollectorService {
       await collectorModel.updateOne(
         { _id: collectorId, organisation },
         {
-          verified: false,
+          companyVerified: false,
           organisation: "",
         },
         projection

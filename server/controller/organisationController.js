@@ -238,6 +238,12 @@ organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
   console.log("body", REQUEST.body);
   var PROJECTION = { __v: 0, createAt: 0 };
 
+  if (!REQUEST.body.email || !REQUEST.body.password) {
+    return RESPONSE.json({
+      error: false,
+      message: "Invalid Body request",
+    });
+  }
   /** find user is exists or not */
   MODEL.organisationModel
     .findOne({ email: REQUEST.body.email }, PROJECTION, { lean: true })

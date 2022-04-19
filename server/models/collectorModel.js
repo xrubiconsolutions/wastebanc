@@ -73,6 +73,9 @@ const collector_Schema = new Schema({
   place: {
     type: String,
   },
+  companyVerified: {
+    type: Boolean,
+  },
   aggregatorId: {
     type: String,
   },

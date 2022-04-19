@@ -52,6 +52,11 @@ module.exports = (APP) => {
     );
 
   APP.route("/api/user/agency-profile").get(
+    auth.adminPakamValidation,
+    controller.userAgenciesController.getAgencyProfile
+  );
+
+  APP.route("/api/user/company/agency-profile").get(
     companyPakamDataValidation,
     controller.userAgenciesController.getAgencyProfile
   );
