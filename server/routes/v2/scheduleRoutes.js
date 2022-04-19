@@ -49,4 +49,11 @@ module.exports = (APP) => {
     checkRequestErrs,
     ScheduleService.pickup
   );
+
+  APP.route("/api/acceptCollection").post(
+    recyclerValidation,
+    scheduleValidator.acceptSchedule,
+    checkRequestErrs,
+    ScheduleService.acceptSchedule
+  );
 };

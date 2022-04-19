@@ -15,7 +15,9 @@ const uuid = require("uuid");
 class UserService {
   static async getClients(req, res) {
     try {
-      let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+      const { user } = req;
+      const currentScope = user.locationScope;
+      let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
@@ -33,8 +35,14 @@ class UserService {
           ],
           roles: "client",
         };
-      } else {
+      } else if (start || end) {
         const [startDate, endDate] = [new Date(start), new Date(end)];
+        if (!start || !end) {
+          return res.status(400).json({
+            error: true,
+            message: "Please pass a start and end date",
+          });
+        }
         criteria = {
           createAt: {
             $gte: startDate,
@@ -42,8 +50,27 @@ class UserService {
           },
           roles: "client",
         };
+      } else {
+        criteria = {};
       }
-      if (state) criteria.state = state;
+
+      if (!currentScope) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid request",
+        });
+      }
+
+      if (currentScope === "All") {
+        criteria.state = {
+          $in: user.states,
+        };
+      } else {
+        criteria.state = currentScope;
+      }
+
+      console.log(criteria);
+      //if (state) criteria.state = state;
 
       const totalResult = await userModel.countDocuments(criteria);
 

@@ -80,7 +80,7 @@ module.exports = (APP) => {
     CONTROLLER.scheduleController.updateSchedule
   );
 
-  APP.route("/api/acceptCollection").post(
+  APP.route("/api/v2/acceptCollection").post(
     CONTROLLER.scheduleController.acceptCollection
   );
 

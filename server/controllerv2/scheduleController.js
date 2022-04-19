@@ -5,51 +5,27 @@ const {
   collectorModel,
   organisationModel,
   notificationModel,
+  activitesModel,
 } = require("../models");
 const { sendResponse, bodyValidate } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const moment = require("moment-timezone");
-const { sendNotification } = require("../util/commonFunction")
-
+const { sendNotification } = require("../util/commonFunction");
+const randomstring = require("randomstring");
 
 moment().tz("Africa/Lagos", false);
-// var sendNotification = function (data) {
-//   var headers = {
-//     "Content-Type": "application/json; charset=utf-8",
-//   };
-
-//   var options = {
-//     host: "onesignal.com",
-//     port: 443,
-//     path: "/api/v1/notifications",
-//     method: "POST",
-//     headers: headers,
-//   };
-
-//   var https = require("https");
-//   var req = https.request(options, function (res) {
-//     res.on("data", function (data) {
-//       console.log(JSON.parse(data));
-//     });
-//   });
-
-//   req.on("error", function (e) {
-//     console.log(e);
-//   });
-
-//   req.write(JSON.stringify(data));
-//   req.end();
-// };
 
 class ScheduleService {
   static async getSchedulesWithFilter(req, res) {
     try {
+      const { user } = req;
+      const currentScope = user.locationScope;
       let {
         page = 1,
         resultsPerPage = 20,
         start,
         end,
-        state,
+        //state,
         key,
         completionStatus = { $ne: "" },
       } = req.query;
@@ -57,14 +33,14 @@ class ScheduleService {
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
 
-      if (!key) {
-        if (!start || !end) {
-          return res.status(400).json({
-            error: true,
-            message: "Please pass a start and end date",
-          });
-        }
-      }
+      // if (!key) {
+      //   if (!start || !end) {
+      //     return res.status(400).json({
+      //       error: true,
+      //       message: "Please pass a start and end date",
+      //     });
+      //   }
+      // }
 
       let criteria;
       if (key) {
@@ -80,7 +56,13 @@ class ScheduleService {
           ],
           completionStatus,
         };
-      } else {
+      } else if (start || end) {
+        if (!start || !end) {
+          return res.status(400).json({
+            error: true,
+            message: "Please pass a start and end date",
+          });
+        }
         const [startDate, endDate] = [new Date(start), new Date(end)];
         criteria = {
           createdAt: {
@@ -89,8 +71,27 @@ class ScheduleService {
           },
           completionStatus,
         };
+      } else {
+        criteria = {};
       }
-      if (state) criteria.state = state;
+
+      if (!currentScope) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid request",
+        });
+      }
+
+      if (currentScope === "All") {
+        criteria.state = {
+          $in: user.states,
+        };
+      } else {
+        criteria.state = currentScope;
+      }
+
+      console.log(criteria);
+      //if (state) criteria.state = state;
 
       const totalResult = await scheduleModel.countDocuments(criteria);
 
@@ -239,7 +240,6 @@ class ScheduleService {
   }
 
   static async rewardSystem(req, res) {
-    bodyValidate(req, res);
     try {
       const collectorId = req.body.collectorId;
       const categories = req.body.categories;
@@ -347,7 +347,12 @@ class ScheduleService {
       }, 0);
       console.log("pricing", pricing);
 
-      await transactionModel.create({
+      const ref = randomstring.generate({
+        length: 7,
+        charset: "numeric",
+      });
+
+      const t = await transactionModel.create({
         weight: totalWeight,
         coin: totalpointGained,
         cardID: scheduler._id,
@@ -360,19 +365,22 @@ class ScheduleService {
         organisation: organisation._id,
         scheduleId: schedule._id,
         type: "pickup schedule",
+        state: scheduler.state || "",
+        ref_id: ref,
       });
 
       // send push notification to household user
       const message = {
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
-          en: `You have just been credited ${totalpointGained} for your schedule`,
+          en: `You have just been credited ${totalpointGained} for the pickup`,
         },
-        include_player_ids: [`${scheduler.onesignal_id}`],
+        channel_for_external_user_ids: "push",
+        include_external_user_ids: [scheduler.onesignal_id],
       };
 
       await notificationModel.create({
-        title: "Schedule completed",
+        title: "Pickup Schedule completed",
         lcd: scheduler.lcd,
         message: `You have just been credited ${totalpointGained} for your schedule`,
         schedulerId: scheduler._id,
@@ -416,9 +424,25 @@ class ScheduleService {
           },
         }
       );
+
+      // store the user activity for both scheduler and collector
+      // collector
+      await activitesModel.create({
+        userId: collector._id,
+        message: `Pickup completed. Reference ID: ${t.ref_id}`,
+        activity_type: "pickup",
+      });
+
+      //scheduler
+      await activitesModel.create({
+        userType: "client",
+        userId: scheduler._id,
+        message: `Pickup completed. Reference ID: ${t.ref_id}`,
+        activity_type: "pickup",
+      });
       return res.status(200).json({
         error: false,
-        message: "Transaction completed successfully",
+        message: "Pickup completed successfully",
         data: totalpointGained,
         da: totalWeight,
       });
@@ -457,6 +481,7 @@ class ScheduleService {
                 },
                 completionStatus: "pending",
                 collectorStatus: "decline",
+                state: user.state || "Lagos",
               },
             ],
           },
@@ -520,7 +545,7 @@ class ScheduleService {
       console.log("data", data);
 
       if (moment(data.pickUpDate) < moment()) {
-        return RESPONSE.status(400).json({
+        return res.status(400).json({
           statusCode: 400,
           customMessage: "Invalid date",
         });
@@ -578,7 +603,9 @@ class ScheduleService {
               contents: {
                 en: `A user in ${schedule.lcd} just created a schedule`,
               },
-              include_player_ids: [`${collector.onesignal_id} || ' '`],
+              channel_for_external_user_ids: "push",
+              include_external_user_ids: [collector.onesignal_id],
+              //include_player_ids: [`${collector.onesignal_id} || ' '`],
             };
             sendNotification(message);
             await notificationModel.create({
@@ -594,17 +621,18 @@ class ScheduleService {
       //send notification to user
       if (user.onesignal_id !== "" || !user.onesignal_id) {
         console.log(user.onesignal_id);
-        const playerIds = [`${user.onesignal_id}`];
+        const playerIds = [user.onesignal_id];
         console.log("playerids", playerIds);
         sendNotification({
           app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
           contents: {
-            en: `Your schedule has been made successfully`,
+            en: `Your pickup schedule has been made successfully`,
           },
-          include_player_ids: playerIds,
+          channel_for_external_user_ids: "push",
+          include_external_user_ids: playerIds,
         });
         await notificationModel.create({
-          title: "Schedule made",
+          title: "Pickup Schedule made",
           lcd: schedule.lcd,
           message: `Your schedule has been made successfully`,
           schedulerId: user._id,
@@ -621,6 +649,102 @@ class ScheduleService {
       return res.status(200).json({
         error: false,
         message: "success",
+        data: schedule,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async acceptSchedule(req, res) {
+    try {
+      const { user } = req;
+      const schedule = await scheduleModel.findById(req.body._id);
+      if (!schedule) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not found",
+        });
+      }
+
+      if (schedule.collectorStatus === "accept") {
+        return res.status(400).json({
+          error: true,
+          message: "This schedule had been accepted by another collector",
+        });
+      }
+
+      await scheduleModel.updateOne(
+        { _id: schedule._id },
+        {
+          $set: {
+            collectorStatus: "accept",
+            collectedBy: user._id,
+            collectedPhone: user.phone,
+            organisation: user.organisation,
+            organisationCollection: user.approvedBy,
+            recycler: user.fullname,
+          },
+        }
+      );
+
+      const client = await userModel.findOne({ email: schedule.client });
+
+      if (!client) {
+        return res.status(400).json({
+          error: true,
+          message: "Client not found or removed from the system",
+        });
+      }
+
+      // notify client
+      sendNotification({
+        app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+        contents: {
+          en: "A collector just accepted your schedule",
+        },
+        channel_for_external_user_ids: "push",
+        include_external_user_ids: [client.onesignal_id],
+      });
+      await notificationModel.create({
+        title: "Pickup Schedule Accepted",
+        lcd: client.lcd,
+        message: "A collector just accepted your schedule",
+        schedulerId: client._id,
+      });
+
+      await collectorModel.updateOne(
+        {
+          _id: user._id,
+        },
+        {
+          $set: {
+            busy: true,
+          },
+        }
+      );
+
+      // collector activity
+      await activitesModel.create({
+        userId: user._id,
+        message: "Pickup Accepted",
+        activity_type: "pickup",
+      });
+
+      schedule.collectorStatus = "accept";
+      schedule.collectedBy = user._id;
+      schedule.collectedPhone = user.phone;
+      schedule.organisation = user.organisation;
+      schedule.organisationCollection = user.approvedBy;
+      schedule.recycler = user.fullname;
+
+      return res.status(200).json({
+        error: false,
+        message: "Pickup schedule accepted",
         data: schedule,
       });
     } catch (error) {

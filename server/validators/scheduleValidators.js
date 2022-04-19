@@ -125,4 +125,6 @@ module.exports = {
       .withMessage("categories is an array"),
     body("scheduleId").notEmpty().withMessage("scheduleId is required"),
   ],
+
+  acceptSchedule: [body("_id").notEmpty().withMessage("_id is required")],
 };
