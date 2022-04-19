@@ -52,7 +52,7 @@ module.exports = (APP) => {
     );
 
   APP.route("/api/user/agency-profile").get(
-    companyPakamDav1/agencyRoutetaValidation,
+    companyPakamDataValidation,
     controller.userAgenciesController.getAgencyProfile
   );
 };
