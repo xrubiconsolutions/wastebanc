@@ -56,8 +56,6 @@ agenciesController.create = async (req, res) => {
       phone: body.phone,
     });
 
-    console.log("c", checkPhone);
-
     if (checkPhone) {
       return res.status(400).json({
         error: true,
@@ -66,7 +64,6 @@ agenciesController.create = async (req, res) => {
     }
 
     const password = COMMON_FUN.generateRandomString();
-    console.log(password[0]);
 
     const hash = await COMMON_FUN.encryptPassword(password);
     const agency = await MODEL.userModel.create({
@@ -87,7 +84,6 @@ agenciesController.create = async (req, res) => {
       { email: agency.email },
       { cardID: agency._id }
     );
-
     const emailTemplate = welcomeTemplate(agency, password);
 
     //send mail to the company holding the agencies password
@@ -103,8 +99,6 @@ agenciesController.create = async (req, res) => {
     };
 
     await sgMail.send(msg);
-    //console.log("send", send);
-
     return res.status(200).json({
       error: false,
       message: "User agency created successfully",
