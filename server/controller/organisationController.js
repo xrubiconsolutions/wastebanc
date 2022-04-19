@@ -235,6 +235,7 @@ organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
 };
 
 organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
+  console.log("body", REQUEST.body);
   var PROJECTION = { __v: 0, createAt: 0 };
 
   /** find user is exists or not */

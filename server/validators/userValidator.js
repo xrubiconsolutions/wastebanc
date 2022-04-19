@@ -85,4 +85,28 @@ module.exports = {
       .isString()
       .withMessage("location scope must be a string"),
   ],
+
+  register: [
+    body("fullname")
+      .notEmpty()
+      .withMessage("fullname is required")
+      .isString()
+      .withMessage("fullname should be string"),
+    body("phone")
+      .notEmpty()
+      .withMessage("phone is required")
+      .isNumeric()
+      .withMessage("phone should be numeric string"),
+    body("email").optional().isEmail().withMessage("Enter a valid email"),
+    body("gender")
+      .notEmpty()
+      .withMessage("gender is required")
+      .isIn(["male", "female", "prefer not to say"]),
+    body("country").notEmpty().withMessage("country is required"),
+    body("state").notEmpty().withMessage("state is required"),
+    body("lga").notEmpty().withMessage("lga is required"),
+    body("uType").notEmpty().withMessage("uType is required"),
+    body("organisation").optional(),
+    body("onesignal_id").notEmpty().withMessage("onesignal_id is required"),
+  ],
 };
