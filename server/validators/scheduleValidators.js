@@ -13,8 +13,7 @@ module.exports = {
       .isInt()
       .withMessage("quantity should be number"),
     body("details")
-      .notEmpty()
-      .withMessage("details is required")
+      .optional()
       .isString()
       .withMessage("details should be string"),
     body("address")
