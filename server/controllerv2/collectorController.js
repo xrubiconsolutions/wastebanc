@@ -607,6 +607,7 @@ class CollectorService {
         long: body.long || "",
         lat: body.lat || "",
         organisation: body.organisation || "",
+        aggregatorId: "",
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -666,6 +667,7 @@ class CollectorService {
           lat: create.lat,
           pin_id: send.data.pinId,
           token,
+          aggregatorId: collector.aggregatorId,
         },
       });
     } catch (error) {
