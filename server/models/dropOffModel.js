@@ -37,6 +37,12 @@ const dropOff_Schema = new Schema({
     },
     required: true
   },
+  country: {
+    type: String
+  },
+  state: {
+    type: String
+  },
   lastDroppedDate: {
     type: Date,
   },

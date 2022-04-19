@@ -51,6 +51,12 @@ class CollectorService {
           ],
         };
       } else if (start || end) {
+        if (!start || !end) {
+          return res.status(400).json({
+            error: true,
+            message: "Please pass a start and end date",
+          });
+        }
         const [startDate, endDate] = [new Date(start), new Date(end)];
         criteria = {
           createdAt: {
@@ -191,6 +197,12 @@ class CollectorService {
           verified,
         };
       } else if (start && end) {
+        if (!start || !end) {
+          return res.status(400).json({
+            error: true,
+            message: "Please pass a start and end date",
+          });
+        }
         const [startDate, endDate] = [new Date(start), new Date(end)];
         criteria = {
           createdAt: {

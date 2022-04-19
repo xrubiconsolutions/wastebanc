@@ -50,16 +50,15 @@ activitesController.add = async (req, res) => {
 };
 
 activitesController.get = async (req, res) => {
-  bodyValidate(req, res);
   try {
-    const userId = req.params.userId;
-    const userType = req.query.type;
+    const { user } = req;
+
     const limit = req.query.limit || 10;
 
     const activites = await MODEL.activitesModel
       .find({
-        userId,
-        userType,
+        userId: user._id,
+        userType: "collector",
       })
       .sort({ createdAt: -1 })
       .limit(limit);

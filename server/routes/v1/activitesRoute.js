@@ -5,6 +5,11 @@ let auth = require("../../util/auth");
 const { body, query, check, param } = require("express-validator");
 const userValidator = require("../../validators/userValidator.js");
 const { checkRequestErrs } = require("../../util/commonFunction");
+const {
+  adminPakamValidation,
+  recyclerValidation,
+  companyPakamDataValidation,
+} = require("../../util/auth");
 
 module.exports = (APP) => {
   APP.route("/api/activity/add").post(
@@ -13,9 +18,8 @@ module.exports = (APP) => {
     controller.activitesController.add
   );
 
-  APP.route("/api/activity/get/:userId").get(
-    userValidator.getActivites,
-    checkRequestErrs,
+  APP.route("/api/activity/get").get(
+    recyclerValidation,
     controller.activitesController.get
   );
 };

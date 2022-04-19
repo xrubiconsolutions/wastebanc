@@ -6,11 +6,12 @@ const {
   collectorModel,
   organisationModel,
   notificationModel,
+  activitesModel,
 } = require("../models");
 let dropoffController = {};
 const moment = require("moment-timezone");
 const { sendNotification } = require("../util/commonFunction");
-
+const randomstring = require("randomstring");
 moment().tz("Africa/Lagos", false);
 
 // var sendNotification = function (data) {
@@ -43,18 +44,29 @@ moment().tz("Africa/Lagos", false);
 
 dropoffController.dropOffs = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    const { user } = req;
+    const currentScope = user.locationScope;
+    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
-    if (!key) {
-      if (!start || !end) {
+
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
         return res.status(400).json({
           error: true,
-          message: "Please pass a start and end date",
+          message: "Start date cannot be greater than end date",
         });
       }
     }
+    // if (!key) {
+    //   if (!start || !end) {
+    //     return res.status(400).json({
+    //       error: true,
+    //       message: "Please pass a start and end date",
+    //     });
+    //   }
+    // }
 
     let criteria;
 
@@ -72,7 +84,13 @@ dropoffController.dropOffs = async (req, res) => {
           { Category: { $regex: `.*${key}.*`, $options: "i" } },
         ],
       };
-    } else {
+    } else if (start || end) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createdAt: {
@@ -80,9 +98,26 @@ dropoffController.dropOffs = async (req, res) => {
           $lt: endDate,
         },
       };
+    } else {
+      criteria = {};
     }
 
-    if (state) criteria.state = state;
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log("criteria", criteria);
 
     const totalResult = await scheduleDropModel.countDocuments(criteria);
 
@@ -121,14 +156,22 @@ dropoffController.companydropOffs = async (req, res) => {
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    if (!key) {
-      if (!start || !end) {
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
         return res.status(400).json({
           error: true,
-          message: "Please pass a start and end date",
+          message: "Start date cannot be greater than end date",
         });
       }
     }
+    // if (!key) {
+    //   if (!start || !end) {
+    //     return res.status(400).json({
+    //       error: true,
+    //       message: "Please pass a start and end date",
+    //     });
+    //   }
+    // }
 
     if (key) {
       criteria = {
@@ -145,7 +188,13 @@ dropoffController.companydropOffs = async (req, res) => {
         ],
         organisation,
       };
-    } else {
+    } else if (start || end) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createdAt: {
@@ -154,6 +203,8 @@ dropoffController.companydropOffs = async (req, res) => {
         },
         organisation,
       };
+    } else {
+      criteria = {};
     }
 
     console.log("c", criteria);
@@ -329,6 +380,10 @@ dropoffController.rewardDropSystem = async (req, res) => {
     }, 0);
     console.log("pricing", pricing);
 
+    const ref = randomstring.generate({
+      length: 7,
+      charset: "numeric",
+    });
     const t = await transactionModel.create({
       weight: totalWeight,
       coin: totalpointGained,
@@ -342,6 +397,8 @@ dropoffController.rewardDropSystem = async (req, res) => {
       organisation: organisation._id,
       scheduleId,
       type: "pickup schedule",
+      state: scheduler.state || "",
+      ref_id: ref,
     });
 
     const message = {
@@ -349,11 +406,13 @@ dropoffController.rewardDropSystem = async (req, res) => {
       contents: {
         en: `You have just been credited ${totalpointGained} for your drop off`,
       },
-      include_player_ids: [`${scheduler.onesignal_id}`],
+      channel_for_external_user_ids: "push",
+      include_external_user_ids: [scheduler.onesignal_id],
+      //include_player_ids: [`${scheduler.onesignal_id}`],
     };
 
     await notificationModel.create({
-      title: "Schedule completed",
+      title: "Dropoff Schedule completed",
       lcd: scheduler.lcd,
       message: `You have just been credited ${totalpointGained} for your drop off`,
       schedulerId: scheduler._id,
@@ -394,9 +453,25 @@ dropoffController.rewardDropSystem = async (req, res) => {
         },
       }
     );
+
+    // store the user activity for both scheduler and collector
+    // collector
+    await activitesModel.create({
+      userId: collector._id,
+      message: `Dropoff completed. Reference ID: ${t.ref_id}`,
+      activity_type: "dropoff",
+    });
+
+    //scheduler
+    await activitesModel.create({
+      userType: "client",
+      userId: scheduler._id,
+      message: `Dropoff completed. Reference ID: ${t.ref_id}`,
+      activity_type: "dropoff",
+    });
     return res.status(200).json({
       error: false,
-      message: "Transaction completed successfully",
+      message: "Dropoff completed successfully",
       data: totalpointGained,
       dd: totalWeight,
     });
@@ -435,6 +510,7 @@ dropoffController.scheduledropOffs = async (req, res) => {
 
     const expireDate = moment(data.dropOffDate, "YYYY-MM-DD").add(7, "days");
     data.expiryDuration = expireDate;
+    data.state = user.state || "Lagos";
 
     const schedule = await scheduleDropModel.create(data);
 
@@ -463,6 +539,14 @@ dropoffController.scheduledropOffs = async (req, res) => {
         last_logged_in: new Date(),
       }
     );
+
+    //scheduler
+    await activitesModel.create({
+      userType: "client",
+      userId: user._id,
+      message: `Dropoff scheduled to ${schedule.organisation}`,
+      activity_type: "dropoff",
+    });
 
     return res.status(200).json({
       error: false,

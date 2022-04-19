@@ -76,6 +76,9 @@ const scheduleDrop = new Schema({
     type: Date,
     required: true,
   },
+  state: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now(),

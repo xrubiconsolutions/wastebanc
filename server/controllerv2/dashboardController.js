@@ -35,11 +35,20 @@ const bodyValidate = (req, res) => {
 };
 
 dashboardController.cardMapData = async (req, res) => {
-  const { user } = req;
-  const currentScope = user.locationScope;
-
   try {
+    const { user } = req;
+    const currentScope = user.locationScope;
     const { start, end } = req.query;
+
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+    }
+    
     const [startDate, endDate] = [new Date(start), new Date(end)];
     let criteria = {
       createdAt: {
@@ -105,6 +114,14 @@ dashboardController.companyCardMapData = async (req, res) => {
 
   try {
     const { start, end, state } = req.query;
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+    }
     const [startDate, endDate] = [new Date(start), new Date(end)];
     const { companyName: organisation } = req.user;
 
@@ -152,7 +169,6 @@ dashboardController.companyCardMapData = async (req, res) => {
 
 dashboardController.recentPickups = async (req, res) => {
   try {
-    let state;
     const { user } = req;
     const currentScope = user.locationScope;
     let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
@@ -165,6 +181,15 @@ dashboardController.recentPickups = async (req, res) => {
         return res.status(400).json({
           error: true,
           message: "Please pass a start and end date",
+        });
+      }
+    }
+
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
         });
       }
     }
@@ -254,6 +279,15 @@ dashboardController.newUsers = async (req, res) => {
         return res.status(400).json({
           error: true,
           message: "Please pass a start and end date",
+        });
+      }
+    }
+
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
         });
       }
     }
@@ -355,6 +389,15 @@ dashboardController.newAggregators = async (req, res) => {
       }
     }
 
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+    }
+
     let criteria;
     if (key) {
       criteria = {
@@ -443,6 +486,14 @@ dashboardController.collectormapData = async (req, res) => {
     const { start, end } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
 
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+    }
     let criteria = {
       createdAt: {
         $gte: startDate,
@@ -502,6 +553,14 @@ dashboardController.chartData = async (req, res) => {
         error: true,
         message: "Please pass a start and end date",
       });
+    }
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
     }
     const { states } = req.user;
     let criteria = {

@@ -75,6 +75,9 @@ const transaction_Schema = {
   state: {
     type: String,
   },
+  ref_id: {
+    type: Number,
+  },
 };
 
 module.exports = MONGOOSE.model("transaction", transaction_Schema);
