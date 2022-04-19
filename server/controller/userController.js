@@ -2530,19 +2530,25 @@ userController.totalGender = async (REQUEST, RESPONSE) => {
         state: {
           $in: user.states,
         },
-        gender: "male",
+        //gender: "male",
         roles: "client",
       };
     } else {
       criteria = {
         state: currentScope,
-        gender: "male",
+        //gender: "male",
         roles: "client",
       };
     }
 
-    const totalMales = await MODEL.userModel.find(criteria).countDocuments();
-    const totalFemales = await MODEL.userModel.find(criteria).countDocuments();
+    const totalMales = await MODEL.userModel.find({
+      ...criteria,
+      gender: "male"
+    }).countDocuments();
+    const totalFemales = await MODEL.userModel.find({
+      ...criteria,
+      gender: "female"
+    }).countDocuments();
     return RESPONSE.status(200).json({
       message: "Total users",
       data: {
