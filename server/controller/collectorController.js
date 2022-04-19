@@ -21,8 +21,7 @@ collectorController.registerCollector = (REQUEST, RESPONSE) => {
     if (ERR) {
       console.log(ERR);
       return RESPONSE.jsonp(COMMON_FUN.sendError(ERR));
-    }
-    else {
+    } else {
       dataToSave.password = PASSWORD;
       var errors = {};
       MODEL.collectorModel
@@ -348,6 +347,7 @@ collectorController.checkTotalMissed = (REQUEST, RESPONSE) => {
 
 collectorController.updateCollector = async (REQUEST, RESPONSE) => {
   try {
+    console.log("body", REQUEST.body);
     /* check user exist or not*/
     let checkUserExist = await MODEL.collectorModel.findOne(
       { email: REQUEST.body.email },

@@ -295,6 +295,7 @@ let messageLogs = (error, success) => {
 const checkRequestErrs = (req, res, next) => {
   const errs = validationResult(req);
   if (errs.isEmpty()) return next();
+  console.log("error", error);
   return res.status(422).json({
     error: true,
     statusCode: 422,
