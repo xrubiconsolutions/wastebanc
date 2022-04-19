@@ -41,6 +41,9 @@ const notification_Schema = new Schema({
     type: String,
     default: "",
   },
+  dropOffId: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

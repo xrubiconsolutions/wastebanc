@@ -72,6 +72,9 @@ const transaction_Schema = {
   organisation: {
     type: String,
   },
+  state: {
+    type: String,
+  },
 };
 
 module.exports = MONGOOSE.model("transaction", transaction_Schema);

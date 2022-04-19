@@ -5,7 +5,8 @@ let auth = require("../../util/auth");
 const express = require("express");
 const { body, query, check, param } = require("express-validator");
 const authorization = require("../../middleware/authorization");
-
+const { checkRequestErrs } = require("../../util/commonFunction");
+const scheduleValidator = require("../../validators/scheduleValidators");
 const ProtectedRoutes = express.Router();
 
 // ProtectedRoutes.use((req, res, next) =>{
@@ -44,8 +45,10 @@ const ProtectedRoutes = express.Router();
  ***** @param APP (express instance)*****
  ****************************************/
 module.exports = (APP) => {
-  APP.route("/api/schedule").post(
+  APP.route("/api/v2/schedule").post(
     auth.userValidation,
+    scheduleValidator.bookPickUp,
+    checkRequestErrs,
     CONTROLLER.scheduleController.schedule
   );
 
@@ -114,7 +117,10 @@ module.exports = (APP) => {
     CONTROLLER.scheduleController.userComplete
   );
 
-  APP.route("/api/user/delete").post(authorization(),CONTROLLER.scheduleController.userDelete);
+  APP.route("/api/user/delete").post(
+    authorization(),
+    CONTROLLER.scheduleController.userDelete
+  );
 
   APP.route("/api/user/cancel").post(CONTROLLER.scheduleController.userCancel);
 

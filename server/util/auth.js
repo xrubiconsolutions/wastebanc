@@ -16,7 +16,7 @@ validateUser.userValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  console.log("req", req.headers.authorization.split(" ")[1]);
+  ////console.log("req", req.headers.authorization.split(" ")[1]);
   const token = req.headers.authorization.split(" ")[1];
 
   if (!token) {
@@ -34,7 +34,7 @@ validateUser.userValidation = async (req, res, NEXT) => {
   }
 
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
-  console.log("valid", validated);
+  ////console.log("valid", validated);
   if (Date.now() >= validated.exp * 1000) {
     return res.status(401).json({
       error: true,
@@ -101,7 +101,7 @@ validateUser.userCollectorData = async (req, res, NEXT) => {
   }
 
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
-  console.log("valid", validated);
+  ////console.log("valid", validated);
 
   if (Date.now() >= validated.exp * 1000) {
     return res.status(401).json({
@@ -171,7 +171,7 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
     }
 
     var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
-    console.log("valid", validated);
+    //console.log("valid", validated);
 
     if (Date.now() >= validated.exp * 1000) {
       return res.status(401).json({
@@ -183,7 +183,7 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
 
     const user = await MODEL.organisationModel.findById(validated.userId);
     if (!user) {
-      console.log("here");
+      //console.log("here");
       return res.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -210,7 +210,7 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     res.status(500).json({
       error: true,
       message: "An error occurred",
@@ -247,7 +247,7 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
   }
 
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
-  console.log("valid", validated.userId);
+  //console.log("valid", validated.userId);
 
   if (Date.now() >= validated.exp * 1000) {
     return res.status(401).json({
@@ -259,7 +259,7 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
 
   const user = await MODEL.collectorModel.findById(validated.userId);
   if (!user) {
-    console.log("here 1");
+    //console.log("here 1");
     return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -268,7 +268,7 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
   }
 
   if (user.status === "disable") {
-    console.log("here 2");
+    //console.log("here 2");
     return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -280,7 +280,7 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
     req.user = user;
     NEXT();
   } else {
-    console.log("here 3");
+    //console.log("here 3");
     return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -320,7 +320,7 @@ validateUser.adminValidation = async (req, res, NEXT) => {
   }
 
   var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
-  console.log("valid", validated);
+  //console.log("valid", validated);
 
   if (Date.now() >= validated.exp * 1000) {
     return res.status(401).json({
@@ -419,7 +419,7 @@ validateUser.adminPakamValidation = async (req, res, NEXT) => {
     req.user = user;
     NEXT();
   } else {
-    console.log("here");
+    //console.log("here");
     return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,

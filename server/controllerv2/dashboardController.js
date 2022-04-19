@@ -35,11 +35,11 @@ const bodyValidate = (req, res) => {
 };
 
 dashboardController.cardMapData = async (req, res) => {
-  bodyValidate(req, res);
-  const { states } = req.user;
+  const { user } = req;
+  const currentScope = user.locationScope;
 
   try {
-    const { start, end, state } = req.query;
+    const { start, end } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
     let criteria = {
       createdAt: {
@@ -48,7 +48,22 @@ dashboardController.cardMapData = async (req, res) => {
       },
     };
 
-    if (state) criteria.state = state;
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log("criteria", criteria);
 
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
@@ -77,7 +92,7 @@ dashboardController.cardMapData = async (req, res) => {
       },
     });
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     return res.status(500).json({
       error: true,
       message: "An error occurred",
@@ -86,7 +101,7 @@ dashboardController.cardMapData = async (req, res) => {
 };
 
 dashboardController.companyCardMapData = async (req, res) => {
-  bodyValidate(req, res);
+  //bodyValidate(req, res);
 
   try {
     const { start, end, state } = req.query;
@@ -137,7 +152,10 @@ dashboardController.companyCardMapData = async (req, res) => {
 
 dashboardController.recentPickups = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    let state;
+    const { user } = req;
+    const currentScope = user.locationScope;
+    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
@@ -150,7 +168,6 @@ dashboardController.recentPickups = async (req, res) => {
         });
       }
     }
-    const { states } = req.user;
 
     let criteria;
     if (key) {
@@ -164,19 +181,34 @@ dashboardController.recentPickups = async (req, res) => {
           { phone: { $regex: `.*${key}.*`, $options: "i" } },
           { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        state: { $in: states },
       };
-    } else {
+    } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createdAt: {
           $gte: startDate,
           $lt: endDate,
         },
-        state: { $in: states },
       };
+    } else {
+      criteria = {};
     }
-    if (state) criteria.state = state;
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log(criteria);
 
     const totalResult = await scheduleModel.countDocuments(criteria);
 
@@ -209,7 +241,10 @@ dashboardController.recentPickups = async (req, res) => {
 
 dashboardController.newUsers = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    const { user } = req;
+    const currentScope = user.locationScope;
+
+    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
@@ -222,7 +257,7 @@ dashboardController.newUsers = async (req, res) => {
         });
       }
     }
-    const { states } = req.user;
+    //const { states } = req.user;
 
     let criteria;
     if (key) {
@@ -235,9 +270,9 @@ dashboardController.newUsers = async (req, res) => {
           { email: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         roles: "client",
-        state: { $in: states },
+        //state: { $in: states },
       };
-    } else {
+    } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createAt: {
@@ -245,10 +280,27 @@ dashboardController.newUsers = async (req, res) => {
           $lt: endDate,
         },
         roles: "client",
-        state: { $in: states },
+        // state: { $in: states },
       };
+    } else {
+      criteria = {};
     }
-    if (state) criteria.state = state;
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log(criteria);
 
     const totalResult = await userModel.countDocuments(criteria);
 
@@ -286,6 +338,9 @@ dashboardController.newUsers = async (req, res) => {
 
 dashboardController.newAggregators = async (req, res) => {
   try {
+    const { user } = req;
+    const currentScope = user.locationScope;
+
     let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
@@ -299,7 +354,6 @@ dashboardController.newAggregators = async (req, res) => {
         });
       }
     }
-    const { states } = req.user;
 
     let criteria;
     if (key) {
@@ -313,19 +367,38 @@ dashboardController.newAggregators = async (req, res) => {
           { organisation: { $regex: `.*${key}.*`, $options: "i" } },
           // { IDNumber: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        state: { $in: states },
+        //state: { $in: states },
       };
-    } else {
+    } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createdAt: {
           $gte: startDate,
           $lt: endDate,
         },
-        state: { $in: states },
+        // state: { $in: states },
       };
+    } else {
+      criteria = {};
     }
-    if (state) criteria.state = state;
+
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log(criteria);
+    //if (state) criteria.state = state;
 
     const totalResult = await collectorModel.countDocuments(criteria);
 
@@ -362,19 +435,38 @@ dashboardController.newAggregators = async (req, res) => {
 
 dashboardController.collectormapData = async (req, res) => {
   console.log("here");
-  bodyValidate(req, res);
+
   try {
-    const { start, end, state } = req.query;
+    const { user } = req;
+    const currentScope = user.locationScope;
+
+    const { start, end } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
-    const { states } = req.user;
 
     let criteria = {
       createdAt: {
         $gte: startDate,
         $lt: endDate,
       },
-      state: { $in: states },
+      //state: { $in: states },
     };
+
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log("cri", criteria);
 
     const collectors = await allCollector(criteria);
 

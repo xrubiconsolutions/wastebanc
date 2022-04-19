@@ -15,23 +15,27 @@ const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
 const axios = require("axios");
 const request = require("request");
+const uuid = require("uuid");
 
 class CollectorService {
   static async getCollectors(req, res) {
     try {
-      let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+      const { user } = req;
+      const currentScope = user.locationScope;
+
+      let { page = 1, resultsPerPage = 20, end, start, key } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
 
-      if (!key) {
-        if (!start || !end) {
-          return res.status(400).json({
-            error: true,
-            message: "Please pass a start and end date",
-          });
-        }
-      }
+      // if (!key) {
+      //   if (!start || !end) {
+      //     return res.status(400).json({
+      //       error: true,
+      //       message: "Please pass a start and end date",
+      //     });
+      //   }
+      // }
 
       let criteria;
       if (key) {
@@ -46,7 +50,7 @@ class CollectorService {
             // { IDNumber: key },
           ],
         };
-      } else {
+      } else if (start || end) {
         const [startDate, endDate] = [new Date(start), new Date(end)];
         criteria = {
           createdAt: {
@@ -54,8 +58,27 @@ class CollectorService {
             $lt: endDate,
           },
         };
+      } else {
+        criteria = {};
       }
-      if (state) criteria.state = state;
+
+      if (!currentScope) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid request",
+        });
+      }
+
+      if (currentScope === "All") {
+        criteria.state = {
+          $in: user.states,
+        };
+      } else {
+        criteria.state = currentScope;
+      }
+
+      console.log(criteria);
+      //if (state) criteria.state = state;
 
       const totalResult = await collectorModel.countDocuments(criteria);
       const projection = {
@@ -1046,6 +1069,7 @@ class CollectorService {
 
   static async login(req, res) {
     try {
+      //const onesignal_id = uuid.v1();
       const collector = await collectorModel.findOne({
         phone: req.body.phone,
       });
@@ -1125,11 +1149,16 @@ class CollectorService {
         });
       }
 
+      let signal_id;
+      if (!collector.onesignal_id || collector.onesignal_id === "") {
+        signal_id = uuid.v1();
+      } else {
+        signal_id = collector.onesignal_id;
+      }
       await collectorModel.updateOne(
         { _id: collector._id },
-        { last_logged_in: new Date() }
+        { last_logged_in: new Date(), onesignal_id: signal_id }
       );
-
       const token = authToken(collector);
       return res.status(200).json({
         error: false,
@@ -1148,6 +1177,7 @@ class CollectorService {
           email: collector.email,
           phone: collector.phone,
           address: collector.address,
+          onesignal_id: signal_id,
           gender: collector.gender,
           localGovernment: collector.localGovernment,
           organisation: collector.organisation,
@@ -1193,7 +1223,7 @@ class CollectorService {
           $match: condition,
         },
         {
-          $addFields: { "scheduleId": { "$toObjectId": "$scheduleId" } },
+          $addFields: { scheduleId: { $toObjectId: "$scheduleId" } },
         },
         {
           $lookup: {

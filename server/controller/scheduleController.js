@@ -6,6 +6,7 @@ let COMMON_FUN = require("../util/commonFunction");
 let CONSTANTS = require("../util/constants");
 const moment = require("moment-timezone");
 const mongo = require("mongodb");
+const { sendNotification } = require("../util/commonFunction");
 
 moment().tz("Africa/Lagos", false);
 const { validationResult, body } = require("express-validator");
@@ -13,33 +14,33 @@ var request = require("request");
 
 const OneSignal = require("onesignal-node");
 
-var sendNotification = function (data) {
-  var headers = {
-    "Content-Type": "application/json; charset=utf-8",
-  };
+// var sendNotification = function (data) {
+//   var headers = {
+//     "Content-Type": "application/json; charset=utf-8",
+//   };
 
-  var options = {
-    host: "onesignal.com",
-    port: 443,
-    path: "/api/v1/notifications",
-    method: "POST",
-    headers: headers,
-  };
+//   var options = {
+//     host: "onesignal.com",
+//     port: 443,
+//     path: "/api/v1/notifications",
+//     method: "POST",
+//     headers: headers,
+//   };
 
-  var https = require("https");
-  var req = https.request(options, function (res) {
-    res.on("data", function (data) {
-      console.log(JSON.parse(data));
-    });
-  });
+//   var https = require("https");
+//   var req = https.request(options, function (res) {
+//     res.on("data", function (data) {
+//       console.log(JSON.parse(data));
+//     });
+//   });
 
-  req.on("error", function (e) {
-    console.log(e);
-  });
+//   req.on("error", function (e) {
+//     console.log(e);
+//   });
 
-  req.write(JSON.stringify(data));
-  req.end();
-};
+//   req.write(JSON.stringify(data));
+//   req.end();
+// };
 
 const bodyValidate = (req, res) => {
   // 1. Validate the request coming in
@@ -140,7 +141,8 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
                   contents: {
                     en: `A user in ${lcd} just created a schedule`,
                   },
-                  include_player_ids: [`${recycler[i].onesignal_id} || ' '`],
+                  channel_for_external_user_ids: "push",
+                  include_external_user_ids: [recycler[i].onesignal_id],
                 };
                 sendNotification(message);
                 const datum = {
@@ -171,7 +173,8 @@ scheduleController.schedule = (REQUEST, RESPONSE) => {
         contents: {
           en: `Your schedule has been made successfully`,
         },
-        include_player_ids: [`${result.onesignal_id} || ' '`],
+        channel_for_external_user_ids: "push",
+        include_external_user_ids: [result.onesignal_id],
       };
       console.log("lcd", data.lcd);
 
@@ -411,7 +414,9 @@ scheduleController.acceptCollection = (REQUEST, RESPONSE) => {
                             contents: {
                               en: "A collector just accepted your schedule",
                             },
-                            include_player_ids: [`${result.onesignal_id}`],
+                            channel_for_external_user_ids: "push",
+                            include_external_user_ids: [result.onesignal_id],
+                            //include_player_ids: [`${result.onesignal_id}`],
                           };
 
                           const datum = {
@@ -516,7 +521,9 @@ scheduleController.acceptAllCollections = (REQUEST, RESPONSE) => {
                       contents: {
                         en: "A collector just accepted your schedule",
                       },
-                      include_player_ids: [`${result.onesignal_id}`],
+                      channel_for_external_user_ids: "push",
+                      include_external_user_ids: [result.onesignal_id],
+                      //include_player_ids: [`${result.onesignal_id}`],
                     };
 
                     sendNotification(message);
@@ -718,7 +725,11 @@ scheduleController.rewardSystem = (REQUEST, RESPONSE) => {
                                 contents: {
                                   en: "You have just been credited for your schedule",
                                 },
-                                include_player_ids: [`${result.onesignal_id}`],
+                                channel_for_external_user_ids: "push",
+                                include_external_user_ids: [
+                                  result.onesignal_id,
+                                ],
+                                //include_player_ids: [`${result.onesignal_id}`],
                               };
 
                               sendNotification(message);
@@ -1609,7 +1620,9 @@ scheduleController.collectorMissed = (req, res) => {
                 contents: {
                   en: "A collector just missed your schedule. Kindly reschedule this pickup",
                 },
-                include_player_ids: [`${result.onesignal_id}`],
+                channel_for_external_user_ids: "push",
+                include_external_user_ids: [result.onesignal_id],
+                //include_player_ids: [`${result.onesignal_id}`],
               };
 
               sendNotification(message);
