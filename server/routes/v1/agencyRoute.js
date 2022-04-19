@@ -1,5 +1,3 @@
-aggregatorId: collector.aggregatorId || "", "use strict";
-
 const controller = require("../../controller");
 let auth = require("../../util/auth");
 const { body, query, check, param } = require("express-validator");
@@ -54,7 +52,7 @@ module.exports = (APP) => {
     );
 
   APP.route("/api/user/agency-profile").get(
-    companyPakamDataValidation,
+    companyPakamDav1/agencyRoutetaValidation,
     controller.userAgenciesController.getAgencyProfile
   );
 };
