@@ -14,6 +14,7 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const fileUpload = multer();
 //const resumeUpload = multer({ storage: ustorage });
 const userValidator = require("../../validators/userValidator");
+const { adminPakamValidation } = require("../../util/auth");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 
 cloudinary.config({
@@ -164,7 +165,10 @@ module.exports = (APP) => {
 
   APP.route("/api/inactive/user").get(CONTROLLER.userController.userInactivity);
 
-  APP.route("/api/user/total").get(CONTROLLER.userController.totalGender);
+  APP.route("/api/user/total").get(
+    adminPakamValidation,
+    CONTROLLER.userController.totalGender
+  );
 
   APP.route("/api/user/uploadresume").post(
     [

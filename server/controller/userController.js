@@ -2513,18 +2513,36 @@ userController.updateOneSignal = (REQUEST, RESPONSE) => {
 
 userController.totalGender = async (REQUEST, RESPONSE) => {
   try {
-    const totalMales = await MODEL.userModel
-      .find({
+    const { user } = REQUEST;
+    const currentScope = user.locationScope;
+
+    let criteria;
+
+    if (!currentScope) {
+      return REQUEST.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria = {
+        state: {
+          $in: user.states,
+        },
         gender: "male",
         roles: "client",
-      })
-      .countDocuments();
-    const totalFemales = await MODEL.userModel
-      .find({
-        gender: "female",
+      };
+    } else {
+      criteria = {
+        state: currentScope,
+        gender: "male",
         roles: "client",
-      })
-      .countDocuments();
+      };
+    }
+
+    const totalMales = await MODEL.userModel.find(criteria).countDocuments();
+    const totalFemales = await MODEL.userModel.find(criteria).countDocuments();
     return RESPONSE.status(200).json({
       message: "Total users",
       data: {
