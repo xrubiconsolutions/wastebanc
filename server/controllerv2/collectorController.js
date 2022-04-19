@@ -1159,7 +1159,7 @@ class CollectorService {
             profile_picture: collector.profile_picture,
             pin_id: send.data.pinId,
             token,
-            aggregatorId: collector.aggregatorId,
+            aggregatorId: collector.aggregatorId || "",
           },
         });
       }
@@ -1198,7 +1198,7 @@ class CollectorService {
           organisation: collector.organisation,
           profile_picture: collector.profile_picture,
           token,
-          aggregatorId: collector.aggregatorId,
+          aggregatorId: collector.aggregatorId || "",
         },
       });
     } catch (error) {
