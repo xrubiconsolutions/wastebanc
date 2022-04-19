@@ -294,7 +294,8 @@ class UserService {
         lcd: body.lga,
         uType: body.uType,
         organisationType: body.organisation,
-        onesignal_id: body.onesignal_id,
+        //onesignal_id: body.onesignal_id,
+        address: body.address,
       });
 
       //fine

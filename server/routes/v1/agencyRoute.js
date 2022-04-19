@@ -1,4 +1,4 @@
-"use strict";
+aggregatorId: collector.aggregatorId || "", "use strict";
 
 const controller = require("../../controller");
 let auth = require("../../util/auth");
@@ -54,7 +54,7 @@ module.exports = (APP) => {
     );
 
   APP.route("/api/user/agency-profile").get(
-    auth.adminPakamValidation,
+    companyPakamDataValidation,
     controller.userAgenciesController.getAgencyProfile
   );
 };
