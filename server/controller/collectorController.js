@@ -421,6 +421,7 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
               MODEL.organisationModel
                 .findOne({ companyName: REQUEST.body.organisation })
                 .then((organisation) => {
+                  console.log("org", organisation);
                   MODEL.collectorModel.updateOne(
                     { email: user.email },
                     { $set: { areaOfAccess: organisation.areaOfAccess } },
