@@ -116,7 +116,7 @@ module.exports = {
   ],
 
   rewardUser: [
-    body("collectorId").notEmpty().withMessage("collectorId is required"),
+    //body("collectorId").notEmpty().withMessage("collectorId is required"),
     body("categories")
       .notEmpty()
       .withMessage("categories")
