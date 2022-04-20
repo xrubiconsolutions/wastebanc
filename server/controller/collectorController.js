@@ -237,7 +237,7 @@ collectorController.collectorAnalysis = async (REQUEST, RESPONSE) => {
     });
 
     const accepted = await MODEL.scheduleModel.countDocuments({
-      completionStatus: "accept",
+      collectorStatus: "accept",
       collectedBy: collectorID,
     });
 
