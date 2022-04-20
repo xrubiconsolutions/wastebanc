@@ -672,7 +672,7 @@ class CollectorService {
           lat: create.lat,
           pin_id: send.data.pinId,
           token,
-          aggregatorId: collector.aggregatorId,
+          aggregatorId: create.aggregatorId,
         },
       });
     } catch (error) {
