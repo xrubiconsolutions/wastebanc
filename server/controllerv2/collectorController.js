@@ -515,6 +515,7 @@ class CollectorService {
 
   static async register(req, res) {
     try {
+      const onesignal_id = uuid.v1().toString();
       const body = req.body;
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
@@ -611,6 +612,7 @@ class CollectorService {
         lat: body.lat || "",
         organisation: body.organisation || "",
         aggregatorId: "",
+        onesignal_id,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -1169,7 +1171,7 @@ class CollectorService {
 
       let signal_id;
       if (!collector.onesignal_id || collector.onesignal_id === "") {
-        signal_id = uuid.v1();
+        signal_id = uuid.v1().toString();
       } else {
         signal_id = collector.onesignal_id;
       }

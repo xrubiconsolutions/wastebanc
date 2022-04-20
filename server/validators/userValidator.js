@@ -107,6 +107,6 @@ module.exports = {
     body("lga").notEmpty().withMessage("lga is required"),
     body("uType").notEmpty().withMessage("uType is required"),
     body("organisation").optional(),
-    body("onesignal_id").notEmpty().withMessage("onesignal_id is required"),
+    //body("onesignal_id").notEmpty().withMessage("onesignal_id is required"),
   ],
 };
