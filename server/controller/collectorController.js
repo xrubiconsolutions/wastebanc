@@ -241,6 +241,10 @@ collectorController.collectorAnalysis = async (REQUEST, RESPONSE) => {
       collectedBy: collectorID,
     });
 
+    const transactions = await MODEL.transactionModel.countDocuments({
+      completedBy: collectorID,
+    });
+
     return RESPONSE.status(200).json({
       error: true,
       message: "success",
@@ -248,6 +252,7 @@ collectorController.collectorAnalysis = async (REQUEST, RESPONSE) => {
         completed,
         missed,
         accepted,
+        transactions,
       },
     });
   } catch (error) {
