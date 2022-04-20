@@ -336,12 +336,13 @@ dropoffController.rewardDropSystem = async (req, res) => {
         cat = organisation.categories.find(
           (c) => c.name.toLowerCase() === category.name.toLowerCase()
         );
-        if (!cat) {
-          return res.status(400).json({
-            error: true,
-            message: `${category.name} not found as a waste category for organisation`,
-          });
-        }
+        console.log("cat", cat);
+        // if (!cat) {
+        //   return res.status(400).json({
+        //     error: true,
+        //     message: `${category.name} not found as a waste category for organisation`,
+        //   });
+        // }
         const p = parseFloat(category.quantity) * Number(cat.price);
         console.log("quantity", parseFloat(category.quantity));
         pricing.push(p);

@@ -303,12 +303,13 @@ class ScheduleService {
           cat = organisation.categories.find(
             (c) => c.name.toLowerCase() === category.name.toLowerCase()
           );
-          if (!cat) {
-            return res.status(400).json({
-              error: true,
-              message: `${category.name} not found as a waste category for organisation`,
-            });
-          }
+          // if (!cat) {
+          //   return res.status(400).json({
+          //     error: true,
+          //     message: `${category.name} not found as a waste category for organisation`,
+          //   });
+          // }
+          console.log("cat", cat);
           const p = parseFloat(category.quantity) * Number(cat.price);
           //console.log("quantity", parseFloat(category.quantity));
           pricing.push(p);
