@@ -248,7 +248,7 @@ collectorController.collectorAnalysis = async (REQUEST, RESPONSE) => {
     return RESPONSE.status(200).json({
       error: true,
       message: "success",
-      date: {
+      data: {
         completed,
         missed,
         accepted,
