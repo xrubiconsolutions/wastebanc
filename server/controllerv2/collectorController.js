@@ -465,6 +465,8 @@ class CollectorService {
         {
           companyVerified: true,
           approvedBy: companyId,
+          status: "active",
+          organisation: companyName,
         },
         projection
       );
@@ -496,6 +498,7 @@ class CollectorService {
         {
           companyVerified: false,
           organisation: "",
+          approvedBy: "",
         },
         projection
       );
