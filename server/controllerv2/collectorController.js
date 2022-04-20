@@ -454,7 +454,7 @@ class CollectorService {
     try {
       const collector = await collectorModel.findById(collectorId);
 
-      if (collector.verified === true)
+      if (collector.companyVerified === true)
         return res.status(200).json({
           error: false,
           message: "Collector already approved",
