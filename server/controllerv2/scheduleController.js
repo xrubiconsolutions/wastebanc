@@ -241,7 +241,7 @@ class ScheduleService {
 
   static async rewardSystem(req, res) {
     try {
-      const collectorId = req.body.collectorId;
+      const collectorId = req.user._id;
       const categories = req.body.categories;
       const scheduleId = req.body.scheduleId;
 
@@ -275,6 +275,7 @@ class ScheduleService {
       }
 
       const collector = await collectorModel.findById(collectorId);
+      console.log("collector", collector);
       if (!collector || collector.verified === false) {
         return res.status(400).json({
           error: true,

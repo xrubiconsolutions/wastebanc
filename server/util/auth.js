@@ -14,7 +14,7 @@ let validateUser = {};
  ********************************/
 validateUser.userValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
-    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    return res.status(401).jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
   ////console.log("req", req.headers.authorization.split(" ")[1]);
   const token = req.headers.authorization.split(" ")[1];
@@ -81,7 +81,7 @@ validateUser.userValidation = async (req, res, NEXT) => {
 
 validateUser.userCollectorData = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
-    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    return res.status(401).jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
 
   const token = req.headers.authorization.split(" ")[1];
@@ -151,7 +151,7 @@ validateUser.userCollectorData = async (req, res, NEXT) => {
 validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
   try {
     if (!req.headers.authorization) {
-      return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+      return res.status(401).jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
     }
 
     const token = req.headers.authorization.split(" ")[1];
@@ -227,7 +227,7 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
 
 validateUser.recyclerValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
-    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    return res.status(401).jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
 
   const token = req.headers.authorization.split(" ")[1];
@@ -257,7 +257,9 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
     });
   }
 
+  console.log("id", validated.userId);
   const user = await MODEL.collectorModel.findById(validated.userId);
+  console.log("user", user);
   if (!user) {
     //console.log("here 1");
     return res.status(401).json({
