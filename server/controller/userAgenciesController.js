@@ -414,8 +414,13 @@ agenciesController.setLocationScope = async (req, res) => {
 agenciesController.getAgencyProfile = async (req, res) => {
   // destructure to remove password and last logged in from data
   const { password, last_logged_in, ...data } = req.user.toObject();
-
   try {
+    if (data.roles === "company")
+      return res.status(200).json({
+        error: false,
+        message: "success!",
+        data,
+      });
     const claims = await MODEL.roleModel
       .findById(data.role)
       .populate({
