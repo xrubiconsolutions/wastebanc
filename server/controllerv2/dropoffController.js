@@ -333,17 +333,17 @@ dropoffController.rewardDropSystem = async (req, res) => {
     console.log("categories", categories);
     for (let category of categories) {
       if (organisation.categories.length !== 0) {
-        cat = organisation.categories.find(
-          (c) => c.name.toLowerCase() === category.name.toLowerCase()
+        const c = organisation.categories.find(
+          (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
         );
-        console.log("cat", cat);
+        console.log("cat", cc);
         // if (!cat) {
         //   return res.status(400).json({
         //     error: true,
         //     message: `${category.name} not found as a waste category for organisation`,
         //   });
         // }
-        const p = parseFloat(category.quantity) * Number(cat.price);
+        const p = parseFloat(category.quantity) * Number(c.price);
         console.log("quantity", parseFloat(category.quantity));
         pricing.push(p);
       } else {
