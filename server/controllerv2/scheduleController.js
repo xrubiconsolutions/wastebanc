@@ -301,7 +301,7 @@ class ScheduleService {
         if (organisation.categories.length !== 0) {
           console.log("here");
           cat = organisation.categories.find(
-            (c) => c.name.toLowerCase() === category.name
+            (c) => c.name.toLowerCase() === category.name.toLowerCase()
           );
           if (!cat) {
             return res.status(400).json({
