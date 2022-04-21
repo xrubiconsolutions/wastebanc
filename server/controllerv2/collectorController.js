@@ -497,7 +497,6 @@ class CollectorService {
         { _id: collectorId, organisation },
         {
           companyVerified: false,
-          organisation: "",
           approvedBy: "",
         },
         projection
