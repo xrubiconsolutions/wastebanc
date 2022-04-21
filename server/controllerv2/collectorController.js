@@ -1291,6 +1291,77 @@ class CollectorService {
       return res.status(500).json({ error: true, message: "An error occured" });
     }
   }
+
+  static async updateCollector(req, res) {
+    try {
+      const { user } = req;
+      let organisation = user.organisation;
+      if (req.body.organisation) {
+        organisation = req.body.organisation;
+      }
+      const org = await organisationModel.findOne({
+        companyName: organisation,
+      });
+
+      if (!org) {
+        return res.status(400).json({
+          error: true,
+          message: "Select an organisation",
+        });
+      }
+
+      let email;
+
+      if (req.body.email) {
+        email = req.body.email.trim().toLowerCase();
+      } else {
+        email = user.email.trim().toLowerCase();
+      }
+
+      let fullname;
+      if (req.body.fullname) {
+        fullname = req.body.fullname.trim().toLowerCase();
+      } else {
+        fullname = user.fullname.trim().toLowerCase();
+      }
+
+      await collectorModel.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            email,
+            phone: user.phone,
+            gender: req.body.gender || user.gender,
+            address: req.body.address || user.address,
+            fullname,
+            state: req.body.state || user.state,
+            place: req.body.place || user.place,
+            aggregtorId: req.body.aggregtorId || user.aggregtorId,
+            organisation: req.body.organisation || user.organisation,
+            localGovernment: req.body.localGovernment || user.localGovernment,
+            profile_picture: req.body.profile_picture || user.profile_picture,
+            areaOfAccess: org.areaOfAccess || user.areaOfAccess || [],
+          },
+        }
+      );
+
+      user.gender = req.body.gender || user.gender;
+      user.address = req.body.address || user.address;
+      user.fullname = req.body.fullname || user.fullname;
+      user.state = req.body.state || user.state;
+      user.place = req.body.place || user.place;
+      user.aggregatorId = req.body.aggregtorId || user.aggregtorId;
+      user.organisation = req.body.organisation || user.organisation;
+      user.localGovernment = req.body.localGovernment || user.localGovernment;
+      user.profile_picture = req.body.profile_picture || user.profile_picture;
+      user.areaOfAccess = org.areaOfAccess || user.areaOfAccess || [];
+
+      return res.status(200).json(user);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
 }
 
 module.exports = CollectorService;

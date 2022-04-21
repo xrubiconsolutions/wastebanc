@@ -23,7 +23,7 @@ module.exports = (APP) => {
     CONTROLLER.collectorController.resendVerification
   );
 
-  APP.route("/api/collector/update").post(
+  APP.route("/api/v2/collector/update").post(
     CONTROLLER.collectorController.updateCollector
   );
 

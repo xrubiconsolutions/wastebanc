@@ -302,10 +302,12 @@ class ScheduleService {
           const c = organisation.categories.find(
             (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
           );
-          console.log("cat", cc);
-          const p = parseFloat(category.quantity) * Number(c.price);
-          console.log("quantity", parseFloat(category.quantity));
-          pricing.push(p);
+          if (c) {
+            console.log("cat", cc);
+            const p = parseFloat(category.quantity) * Number(c.price);
+            console.log("quantity", parseFloat(category.quantity));
+            pricing.push(p);
+          }
         } else {
           console.log("here2");
           var cc =
