@@ -596,7 +596,7 @@ class ScheduleService {
         collectors.map(async (collector) => {
           if (!collector.onesignal_id || collector.onesignal_id !== "") {
             const message = {
-              app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+              app_id: "565970dc-d44a-456f-aab7-3f57e0504ff4",
               contents: {
                 en: `A user in ${schedule.lcd} just created a schedule`,
               },

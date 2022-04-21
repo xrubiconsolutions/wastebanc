@@ -35,7 +35,7 @@ const organisation_Schema = new Schema({
     required: true,
   },
   phone: {
-    type: String,
+    type: Number,
     required: true,
   },
   roles: {
