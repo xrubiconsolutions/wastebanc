@@ -30,6 +30,13 @@ module.exports = (APP) => {
     dropoffController.deleteDropOff
   );
 
+  APP.route("/api/v2/company/dropoffs/location").delete(
+    companyPakamDataValidation,
+    deleteDropOff,
+    checkRequestErrs,
+    dropoffController.removeDropLocation
+  );
+
   APP.route("/api/v2/company/dropoffs/location").post(
     companyPakamDataValidation,
     createDropOffLocation,

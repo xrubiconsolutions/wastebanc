@@ -128,9 +128,11 @@ const organisation_Schema = new Schema({
   },
   country: {
     type: String,
+    default: "Nigeria",
   },
   state: {
     type: String,
+    default: "Lagos",
   },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);

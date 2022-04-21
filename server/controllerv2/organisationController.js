@@ -291,8 +291,6 @@ organisationController.create = async (req, res) => {
     body.password = await encryptPassword(password);
     body.email = email.toLowerCase();
     body.phone = Number(body.phone);
-    body.country = "Nigeria";
-    body.state = "Lagos";
     const org = await organisationModel.create(body);
     sgMail.setApiKey(
       "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"

@@ -247,6 +247,35 @@ dropoffController.addDropOffLocation = async (req, res) => {
   }
 };
 
+dropoffController.removeDropLocation = async (req, res) => {
+  try {
+    const { user } = req;
+    const { dropOffId } = req.body;
+    const drop = await dropOffModel.findOneAndDelete({
+      _id: dropOffId,
+      organisationId: user._id,
+    });
+
+    if (!drop) {
+      return res.status(400).json({
+        error: true,
+        message: "Drop off location not found",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "Drop off location deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 dropoffController.rewardDropSystem = async (req, res) => {
   const collectorId = req.body.collectorId;
   const categories = req.body.categories;
