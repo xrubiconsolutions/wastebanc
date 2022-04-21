@@ -466,7 +466,7 @@ class CollectorService {
           companyVerified: true,
           approvedBy: companyId,
           status: "active",
-          organisation: companyName,
+          organisation: organisation,
         },
         projection
       );

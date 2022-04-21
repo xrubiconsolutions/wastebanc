@@ -299,19 +299,12 @@ class ScheduleService {
       //console.log("organisation", organisation);
       for (let category of categories) {
         if (organisation.categories.length !== 0) {
-          console.log("here");
-          cat = organisation.categories.find(
-            (c) => c.name.toLowerCase() === category.name.toLowerCase()
+          const c = organisation.categories.find(
+            (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
           );
-          // if (!cat) {
-          //   return res.status(400).json({
-          //     error: true,
-          //     message: `${category.name} not found as a waste category for organisation`,
-          //   });
-          // }
-          console.log("cat", cat);
-          const p = parseFloat(category.quantity) * Number(cat.price);
-          //console.log("quantity", parseFloat(category.quantity));
+          console.log("cat", cc);
+          const p = parseFloat(category.quantity) * Number(c.price);
+          console.log("quantity", parseFloat(category.quantity));
           pricing.push(p);
         } else {
           console.log("here2");

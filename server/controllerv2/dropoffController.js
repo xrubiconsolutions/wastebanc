@@ -14,34 +14,6 @@ const { sendNotification } = require("../util/commonFunction");
 const randomstring = require("randomstring");
 moment().tz("Africa/Lagos", false);
 
-// var sendNotification = function (data) {
-//   var headers = {
-//     "Content-Type": "application/json; charset=utf-8",
-//   };
-
-//   var options = {
-//     host: "onesignal.com",
-//     port: 443,
-//     path: "/api/v1/notifications",
-//     method: "POST",
-//     headers: headers,
-//   };
-
-//   var https = require("https");
-//   var req = https.request(options, function (res) {
-//     res.on("data", function (data) {
-//       console.log(JSON.parse(data));
-//     });
-//   });
-
-//   req.on("error", function (e) {
-//     console.log(e);
-//   });
-
-//   req.write(JSON.stringify(data));
-//   req.end();
-// };
-
 dropoffController.dropOffs = async (req, res) => {
   try {
     const { user } = req;
@@ -332,17 +304,13 @@ dropoffController.rewardDropSystem = async (req, res) => {
     console.log("organisation", organisation);
     console.log("categories", categories);
     for (let category of categories) {
+      console.log("category", category.name.toLowerCase());
+      console.log("org cat", organisation.categories);
       if (organisation.categories.length !== 0) {
         const c = organisation.categories.find(
           (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
         );
         console.log("cat", cc);
-        // if (!cat) {
-        //   return res.status(400).json({
-        //     error: true,
-        //     message: `${category.name} not found as a waste category for organisation`,
-        //   });
-        // }
         const p = parseFloat(category.quantity) * Number(c.price);
         console.log("quantity", parseFloat(category.quantity));
         pricing.push(p);

@@ -24,7 +24,13 @@ const collectorModel = require("../models/collectorModel");
 
 organisationController.types = async (req, res) => {
   try {
-    const types = await organisationTypeModel.find({}).sort({ createdAt: -1 });
+    const types = await organisationTypeModel
+      .find({
+        name: {
+          $ne: "individual",
+        },
+      })
+      .sort({ createdAt: -1 });
     return res.status(200).json({
       error: false,
       message: "success",
@@ -749,8 +755,8 @@ organisationController.dropOffPakam = async (req, res) => {
         page,
         resultsPerPage,
         totalPages: Math.ceil(totalResults / resultsPerPage),
-      }
-    })
+      },
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
