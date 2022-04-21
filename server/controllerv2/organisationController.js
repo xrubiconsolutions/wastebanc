@@ -157,16 +157,27 @@ organisationController.getOrganisationCompleted = async (req, res) => {
 
 organisationController.listOrganisation = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    const { user } = req;
+    const currentScope = user.locationScope;
+    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    if (!key) {
-      if (!start || !end) {
+    // if (!key) {
+    //   if (!start || !end) {
+    //     return res.status(400).json({
+    //       error: true,
+    //       message: "Please pass a start and end date",
+    //     });
+    //   }
+    // }
+
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
         return res.status(400).json({
           error: true,
-          message: "Please pass a start and end date",
+          message: "Start date cannot be greater than end date",
         });
       }
     }
@@ -191,7 +202,13 @@ organisationController.listOrganisation = async (req, res) => {
           },
         ],
       };
-    } else {
+    } else if (start || end) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createAt: {
@@ -199,14 +216,32 @@ organisationController.listOrganisation = async (req, res) => {
           $lt: endDate,
         },
       };
+    } else {
+      criteria = {};
     }
 
-    if (state) criteria.state = state;
+    //if (state) criteria.state = state;
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log("criteria", criteria);
 
     const totalResult = await organisationModel.countDocuments(criteria);
     const organisations = await organisationModel
       .find(criteria, { password: 0 })
-      .sort({ createdAt: -1 })
+      .sort({ createAt: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);
 
