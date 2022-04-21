@@ -232,7 +232,7 @@ collectorController.collectorAnalysis = async (REQUEST, RESPONSE) => {
     });
 
     const completedDrop = await MODEL.scheduleDropModel.countDocuments({
-      completionStatuse: "completed",
+      completionStatus: "completed",
       collectedBy: collectorID,
     });
 
