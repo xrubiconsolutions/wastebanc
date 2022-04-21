@@ -231,6 +231,13 @@ collectorController.collectorAnalysis = async (REQUEST, RESPONSE) => {
       collectedBy: collectorID,
     });
 
+    const completedDrop = await MODEL.ScheduleDropModel.countDocuments({
+      completionStatuse: "completed",
+      collectedBy: collectorID,
+    });
+
+    const totalCompleted = completed + completedDrop;
+
     const missed = await MODEL.scheduleModel.countDocuments({
       completionStatus: "missed",
       collectedBy: collectorID,
@@ -249,7 +256,7 @@ collectorController.collectorAnalysis = async (REQUEST, RESPONSE) => {
       error: true,
       message: "success",
       data: {
-        completed,
+        completed: totalCompleted,
         missed,
         accepted,
         transactions,

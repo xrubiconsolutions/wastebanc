@@ -75,6 +75,7 @@ const collector_Schema = new Schema({
   },
   companyVerified: {
     type: Boolean,
+    default: false,
   },
   aggregatorId: {
     type: String,

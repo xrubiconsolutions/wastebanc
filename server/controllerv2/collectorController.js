@@ -1336,7 +1336,7 @@ class CollectorService {
             fullname,
             state: req.body.state || user.state,
             place: req.body.place || user.place,
-            aggregtorId: req.body.aggregtorId || user.aggregtorId,
+            aggregatorId: req.body.aggregatorId || user.aggregatorId,
             organisation: req.body.organisation || user.organisation,
             localGovernment: req.body.localGovernment || user.localGovernment,
             profile_picture: req.body.profile_picture || user.profile_picture,
@@ -1350,7 +1350,7 @@ class CollectorService {
       user.fullname = req.body.fullname || user.fullname;
       user.state = req.body.state || user.state;
       user.place = req.body.place || user.place;
-      user.aggregatorId = req.body.aggregtorId || user.aggregtorId;
+      user.aggregatorId = req.body.aggregatorId || user.aggregatorId;
       user.organisation = req.body.organisation || user.organisation;
       user.localGovernment = req.body.localGovernment || user.localGovernment;
       user.profile_picture = req.body.profile_picture || user.profile_picture;
