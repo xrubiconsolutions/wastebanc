@@ -231,10 +231,12 @@ collectorController.collectorAnalysis = async (REQUEST, RESPONSE) => {
       collectedBy: collectorID,
     });
 
-    const completedDrop = await MODEL.ScheduleDropModel.countDocuments({
+    const completedDrop = await MODEL.scheduleDropModel.countDocuments({
       completionStatuse: "completed",
       collectedBy: collectorID,
     });
+
+    console.log("drop", completedDrop);
 
     const totalCompleted = completed + completedDrop;
 
