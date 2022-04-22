@@ -1626,6 +1626,16 @@ scheduleController.collectorMissed = (req, res) => {
               };
 
               sendNotification(message);
+
+              MODEL.notificationModel({
+                title: "Schedule missed",
+                lcd: result.lcd,
+                message:
+                  "A collector just missed your schedule. Kindly reschedule this pickup",
+                schedulerId: result._id,
+              }).save({}, (err, data) => {
+                console.log("notification missed", data);
+              });
             });
           return res.status(200).json({
             message: "You missed this schedule",
