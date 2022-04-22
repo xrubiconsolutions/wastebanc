@@ -359,7 +359,7 @@ class ScheduleService {
         recycler: collector.fullname,
         aggregatorId: collector.aggregatorId,
         organisation: collector.organisation,
-        organisation: organisation._id,
+        organisationID: organisation._id,
         scheduleId: schedule._id,
         type: "pickup schedule",
         state: scheduler.state || "",

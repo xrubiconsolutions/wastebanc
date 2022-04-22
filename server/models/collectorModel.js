@@ -69,6 +69,7 @@ const collector_Schema = new Schema({
   },
   state: {
     type: String,
+    default: "Lagos",
   },
   place: {
     type: String,

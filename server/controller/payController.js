@@ -55,13 +55,80 @@ payController.resolveAccount = (req, res) => {
   );
 };
 
+// payController.saveR = async (req, res) => {
+//   try {
+//     const receipt = { ...REQUEST.body };
+//     let cardID = REQUEST.body.cardID;
+//     let amount = REQUEST.body.amount;
+//     let balance;
+
+//     const user = await MODEL.userModel.findOne({ cardID });
+//     if (!user) {
+//       return res.status(400).json({
+//         message: "Enter a valid card ID",
+//       });
+//     }
+
+//     balance = Number(user.availablePoints) - Number(amount);
+
+//     if (balance < 0) {
+//       return res.status(406).json({
+//         message: "You don't have enough points to complete this transaction",
+//       });
+//     }
+
+//     const allTransations = await MODEL.transactionModel.find({
+//       paid: false,
+//       requestedForPayment: false,
+//       cardID: cardID,
+//     });
+
+//     await Promise.all(
+//       allTransations.map(async (tran) => {
+//         await MODEL.userModel.updateOne(
+//           { _id: user._id },
+//           {
+//             availablePoints: balance,
+//           }
+//         );
+//         const storePaymentRequest = await MODEL.payModel({
+//           ...receipt,
+//           aggregatorName: tran.recycler || " ",
+//           aggregatorId: tran.aggregatorId || " ",
+//           aggregatorOrganisation: tran.organisation || " ",
+//           scheduleId: tran.scheduleId || " ",
+//           quantityOfWaste: tran.weight || " ",
+//           amount: tran.coin,
+//           organisation: tran.organisationID || tran.organisation,
+//           status: user.state,
+//         });
+
+//         await MODEL.transactionModel.updateOne(
+//           { _id: tran._id },
+//           {
+//             $set: {
+//               requestedForPayment: true,
+//             },
+//           }
+//         );
+
+//         const organisation = await MODEL.organisationModel.findOne({
+//           companyName: tran.organisation,
+//         });
+//       })
+//     );
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json({
+//       error: true,
+//       message: "An error occurred",
+//     });
+//   }
+// };
+
 payController.saveReceipt = (REQUEST, RESPONSE) => {
   let errors = {};
   const receipt = { ...REQUEST.body };
-  // let userId = REQUEST.body.userId;
-  // let fullname = REQUEST.body.fullname;
-  // let bankAcNo = REQUEST.body.bankAcNo;
-  // let bankName = REQUEST.body.bankName;
   let cardID = REQUEST.body.cardID;
   let amount = REQUEST.body.amount;
   var balance;
@@ -96,7 +163,9 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
                   scheduleId: unpaidFees[i].scheduleId || " ",
                   quantityOfWaste: unpaidFees[i].weight || " ",
                   amount: unpaidFees[i].coin,
-                  organisation: unpaidFees[i].organisationID,
+                  organisationID: unpaidFees[i].organisationID,
+                  organisation: unpaidFees[i].organisation,
+                  status: result.state,
                 }).save({}, (err, results) => {
                   MODEL.transactionModel.updateOne(
                     { _id: unpaidFees[i]._id },
@@ -194,7 +263,9 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
                   scheduleId: unpaidFees[i].scheduleId || " ",
                   quantityOfWaste: unpaidFees[i].weight || " ",
                   amount: unpaidFees[i].coin,
-                  organisation: unpaidFees[i].organisationID,
+                  organisationID: unpaidFees[i].organisationID,
+                  organisation: unpaidFees[i].organisation,
+                  status: result.state,
                 }).save({}, (err, result) => {
                   if (err) {
                     return RESPONSE.status(400).json({

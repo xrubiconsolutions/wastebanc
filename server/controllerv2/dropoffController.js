@@ -395,7 +395,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       recycler: collector.fullname,
       aggregatorId: collector.aggregatorId,
       organisation: collector.organisation,
-      organisation: organisation._id,
+      organisationID: organisation._id,
       scheduleId,
       type: "pickup schedule",
       state: scheduler.state || "",
