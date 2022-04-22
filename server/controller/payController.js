@@ -173,7 +173,7 @@ payController.saveR = async (req, res) => {
   }
 };
 
-// new charity function
+// new charity function nn
 payController.charityP = async (req, res) => {
   try {
     const receipt = { ...req.body };
