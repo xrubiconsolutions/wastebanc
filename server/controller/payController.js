@@ -111,6 +111,7 @@ payController.saveR = async (req, res) => {
           organisation: tran.organisation,
           organisationID: tran.organisationID,
           status: user.state,
+          userPhone: user.phone,
         });
         console.log("stored payment", storePaymentRequest);
 
@@ -211,6 +212,7 @@ payController.charityP = async (req, res) => {
       }
     );
 
+    //help
     const allTransations = await MODEL.transactionModel.find({
       paid: false,
       requestedForPayment: false,
@@ -236,7 +238,10 @@ payController.charityP = async (req, res) => {
           organisation: tran.organisation,
           organisationID: tran.organisationID,
           status: user.state,
+          userPhone: user.phone,
         });
+
+        console.log("store", storePaymentRequest);
 
         await MODEL.transactionModel.updateOne(
           { _id: tran._id },
