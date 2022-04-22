@@ -48,7 +48,7 @@ dashboardController.cardMapData = async (req, res) => {
         });
       }
     }
-    
+
     const [startDate, endDate] = [new Date(start), new Date(end)];
     let criteria = {
       createdAt: {
@@ -148,6 +148,7 @@ dashboardController.companyCardMapData = async (req, res) => {
       message: "success",
       data: {
         schedules,
+        totalSchedules: schedules.length,
         totalPending,
         totalMissed,
         totalCompleted,
