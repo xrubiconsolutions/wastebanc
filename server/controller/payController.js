@@ -56,6 +56,7 @@ payController.resolveAccount = (req, res) => {
   );
 };
 
+// new save receipt function
 payController.saveR = async (req, res) => {
   try {
     const receipt = { ...REQUEST.body };
@@ -172,6 +173,7 @@ payController.saveR = async (req, res) => {
   }
 };
 
+// new charity function
 payController.charityP = async (req, res) => {
   try {
     const receipt = { ...REQUEST.body };
