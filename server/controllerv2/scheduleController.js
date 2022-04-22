@@ -43,6 +43,15 @@ class ScheduleService {
       // }
 
       let criteria;
+      let collectorStatus = { $ne: "" };
+      if (completionStatus === "accepted") {
+        collectorStatus = "accept";
+        completionStatus = "pending";
+      }
+      if (completionStatus === "pending") {
+        collectorStatus = "decline";
+        completionStatus = "pending";
+      }
       if (key) {
         criteria = {
           $or: [
@@ -54,6 +63,7 @@ class ScheduleService {
             { phone: { $regex: `.*${key}.*`, $options: "i" } },
             { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
           ],
+          collectorStatus,
           completionStatus,
         };
       } else if (start || end) {
@@ -69,6 +79,7 @@ class ScheduleService {
             $gte: startDate,
             $lt: endDate,
           },
+          collectorStatus,
           completionStatus,
         };
       } else {
@@ -194,6 +205,13 @@ class ScheduleService {
       });
 
     const [startDate, endDate] = [new Date(start), new Date(end)];
+    let statusCriteria = {};
+    let collectorStatus = { $ne: "" };
+    if (completionStatus === "accepted") {
+      collectorStatus = "accept";
+      completionStatus = "pending";
+    }
+
     const criteria = key
       ? {
           $or: [
@@ -204,7 +222,8 @@ class ScheduleService {
             { phone: { $regex: `.*${key}.*`, $options: "i" } },
             { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
           ],
-          completionStatus,
+          collectorStatus,
+          completionStaus,
           organisation,
         }
       : {
@@ -214,7 +233,9 @@ class ScheduleService {
           },
           organisation,
           completionStatus,
+          collectorStatus,
         };
+    console.log("Criteria: ", criteria);
 
     try {
       // get length of schedules with criteria
