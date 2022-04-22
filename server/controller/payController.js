@@ -111,6 +111,7 @@ payController.saveR = async (req, res) => {
           organisation: tran.organisation,
           organisationID: tran.organisationID,
           status: user.state,
+          userPhone: user.phone,
         });
         console.log("stored payment", storePaymentRequest);
 
@@ -236,6 +237,7 @@ payController.charityP = async (req, res) => {
           organisation: tran.organisation,
           organisationID: tran.organisationID,
           status: user.state,
+          userPhone: user.phone,
         });
 
         console.log("store", storePaymentRequest);
