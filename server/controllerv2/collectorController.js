@@ -810,7 +810,7 @@ class CollectorService {
 
   static async getCompanyWasteStats(req, res) {
     let { start, end, state } = req.query;
-    let { _id: organisation } = req.user;
+    let { companyName: organisation } = req.user;
     organisation = organisation.toString();
     if (!start || !end) {
       return res.status(400).json({
