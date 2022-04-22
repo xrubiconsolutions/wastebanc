@@ -860,7 +860,7 @@ class CollectorService {
             $sum: 1,
           },
           totalWeight: {
-            $sum: "$weight",
+            $sum: { $toInt: "$weight" },
           },
         },
       },
