@@ -12,6 +12,7 @@ let CONSTANTS = require("../util/constants");
 var request = require("request");
 const payModel = require("../models/payModel");
 var ObjectId = require("mongodb").ObjectID;
+const axios = require("axios");
 
 payController.getBanks = (req, res) => {
   request(
@@ -55,76 +56,238 @@ payController.resolveAccount = (req, res) => {
   );
 };
 
-// payController.saveR = async (req, res) => {
-//   try {
-//     const receipt = { ...REQUEST.body };
-//     let cardID = REQUEST.body.cardID;
-//     let amount = REQUEST.body.amount;
-//     let balance;
+payController.saveR = async (req, res) => {
+  try {
+    const receipt = { ...REQUEST.body };
+    let cardID = REQUEST.body.cardID;
+    let amount = REQUEST.body.amount;
+    let balance;
 
-//     const user = await MODEL.userModel.findOne({ cardID });
-//     if (!user) {
-//       return res.status(400).json({
-//         message: "Enter a valid card ID",
-//       });
-//     }
+    const user = await MODEL.userModel.findOne({ cardID });
+    if (!user) {
+      return res.status(400).json({
+        message: "Enter a valid card ID",
+      });
+    }
 
-//     balance = Number(user.availablePoints) - Number(amount);
+    if (Number(user.availablePoints) < 0) {
+      return res.status(400).json({
+        message: "You don't have enough points to complete this transaction",
+      });
+    }
 
-//     if (balance < 0) {
-//       return res.status(406).json({
-//         message: "You don't have enough points to complete this transaction",
-//       });
-//     }
+    if (Number(user.availablePoints) < 5000) {
+      return res.status(400).json({
+        message: "You don't have enough points to complete this transaction",
+      });
+    }
 
-//     const allTransations = await MODEL.transactionModel.find({
-//       paid: false,
-//       requestedForPayment: false,
-//       cardID: cardID,
-//     });
+    balance = Number(user.availablePoints) - Number(amount);
 
-//     await Promise.all(
-//       allTransations.map(async (tran) => {
-//         await MODEL.userModel.updateOne(
-//           { _id: user._id },
-//           {
-//             availablePoints: balance,
-//           }
-//         );
-//         const storePaymentRequest = await MODEL.payModel({
-//           ...receipt,
-//           aggregatorName: tran.recycler || " ",
-//           aggregatorId: tran.aggregatorId || " ",
-//           aggregatorOrganisation: tran.organisation || " ",
-//           scheduleId: tran.scheduleId || " ",
-//           quantityOfWaste: tran.weight || " ",
-//           amount: tran.coin,
-//           organisation: tran.organisationID || tran.organisation,
-//           status: user.state,
-//         });
+    const allTransations = await MODEL.transactionModel.find({
+      paid: false,
+      requestedForPayment: false,
+      cardID: cardID,
+    });
 
-//         await MODEL.transactionModel.updateOne(
-//           { _id: tran._id },
-//           {
-//             $set: {
-//               requestedForPayment: true,
-//             },
-//           }
-//         );
+    await MODEL.userMode.updateOne(
+      { _id: user._id },
+      {
+        availablePoints: balance,
+      }
+    );
 
-//         const organisation = await MODEL.organisationModel.findOne({
-//           companyName: tran.organisation,
-//         });
-//       })
-//     );
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({
-//       error: true,
-//       message: "An error occurred",
-//     });
-//   }
-// };
+    await Promise.all(
+      allTransations.map(async (tran) => {
+        await MODEL.userModel.updateOne(
+          { _id: user._id },
+          {
+            availablePoints: balance,
+          }
+        );
+        const storePaymentRequest = await MODEL.payModel({
+          ...receipt,
+          aggregatorName: tran.recycler || " ",
+          aggregatorId: tran.aggregatorId || " ",
+          aggregatorOrganisation: tran.organisation || " ",
+          scheduleId: tran.scheduleId || " ",
+          quantityOfWaste: tran.weight || " ",
+          amount: tran.coin,
+          organisation: tran.organisation,
+          organisationID: tran.organisationID,
+          status: user.state,
+        });
+
+        await MODEL.transactionModel.updateOne(
+          { _id: tran._id },
+          {
+            $set: {
+              requestedForPayment: true,
+            },
+          }
+        );
+
+        const organisation = await MODEL.organisationModel.findOne({
+          companyName: tran.organisation,
+        });
+
+        var phoneNo = String(organisation.phone);
+        var data = {
+          to: `234${phoneNo}`,
+          from: "N-Alert",
+          sms: `Dear ${tran.organisation}, a user named ${receipt.fullname} just requested for a payout of ${unpaidFees[i].coin}, kindly attend to the payment.`,
+          type: "plain",
+          api_key:
+            "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+          channel: "dnd",
+        };
+
+        var options = {
+          method: "POST",
+          url: "https://termii.com/api/sms/send",
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+          body: JSON.stringify(data),
+        };
+
+        const send = await axios.post(options.url, options.body, {
+          headers: options.headers,
+        });
+
+        console.log("res", send.data);
+      })
+    );
+
+    return res.status(200).json({
+      error: false,
+      message: "payment requested successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+payController.charityP = async (req, res) => {
+  try {
+    const receipt = { ...REQUEST.body };
+    let cardID = REQUEST.body.cardID;
+    let amount = REQUEST.body.amount;
+    var balance;
+
+    const user = await MODEL.userModel.findOne({ cardID });
+    if (!user) {
+      return res.status(400).json({
+        message: "Enter a valid card ID",
+      });
+    }
+
+    if (Number(user.availablePoints) < 0) {
+      return res.status(400).json({
+        message: "You don't have enough points to complete this transaction",
+      });
+    }
+
+    if (Number(user.availablePoints) < 5000) {
+      return res.status(400).json({
+        message: "You don't have enough points to complete this transaction",
+      });
+    }
+
+    balance = Number(user.availablePoints) - Number(amount);
+
+    await MODEL.userMode.updateOne(
+      { _id: user._id },
+      {
+        availablePoints: balance,
+      }
+    );
+
+    const allTransations = await MODEL.transactionModel.find({
+      paid: false,
+      requestedForPayment: false,
+      cardID: cardID,
+    });
+
+    await Promise.all(
+      allTransations.map(async (tran) => {
+        await MODEL.userModel.updateOne(
+          { _id: user._id },
+          {
+            availablePoints: balance,
+          }
+        );
+        const storePaymentRequest = await MODEL.charityModel({
+          ...receipt,
+          aggregatorName: tran.recycler || " ",
+          aggregatorId: tran.aggregatorId || " ",
+          aggregatorOrganisation: tran.organisation || " ",
+          scheduleId: tran.scheduleId || " ",
+          quantityOfWaste: tran.weight || " ",
+          amount: tran.coin,
+          organisation: tran.organisation,
+          organisationID: tran.organisationID,
+          status: user.state,
+        });
+
+        await MODEL.transactionModel.updateOne(
+          { _id: tran._id },
+          {
+            $set: {
+              requestedForPayment: true,
+              paymentResolution: "charity",
+            },
+          }
+        );
+
+        // const organisation = await MODEL.organisationModel.findOne({
+        //   companyName: tran.organisation,
+        // });
+
+        // var phoneNo = String(organisation.phone);
+        // var data = {
+        //   to: `234${phoneNo}`,
+        //   from: "N-Alert",
+        //   sms: `Dear ${tran.organisation}, a user named ${receipt.fullname} just requested for a payout of ${unpaidFees[i].coin}, kindly attend to the payment.`,
+        //   type: "plain",
+        //   api_key:
+        //     "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+        //   channel: "dnd",
+        // };
+
+        // var options = {
+        //   method: "POST",
+        //   url: "https://termii.com/api/sms/send",
+        //   headers: {
+        //     "Content-Type": ["application/json", "application/json"],
+        //   },
+        //   body: JSON.stringify(data),
+        // };
+
+        // const send = await axios.post(options.url, options.body, {
+        //   headers: options.headers,
+        // });
+
+        console.log("res", send.data);
+      })
+    );
+
+    return res.status(200).json({
+      error: false,
+      message: "payment successfully made to charity",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
 
 payController.saveReceipt = (REQUEST, RESPONSE) => {
   let errors = {};
