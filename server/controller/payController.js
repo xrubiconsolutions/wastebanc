@@ -112,6 +112,7 @@ payController.saveR = async (req, res) => {
           organisationID: tran.organisationID,
           status: user.state,
         });
+        console.log("stored payment", storePaymentRequest);
 
         await MODEL.transactionModel.updateOne(
           { _id: tran._id },
