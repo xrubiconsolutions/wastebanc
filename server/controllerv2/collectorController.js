@@ -454,7 +454,7 @@ class CollectorService {
     try {
       const collector = await collectorModel.findById(collectorId);
 
-      if (collector.verified === true)
+      if (collector.companyVerified === true)
         return res.status(200).json({
           error: false,
           message: "Collector already approved",
@@ -465,6 +465,8 @@ class CollectorService {
         {
           companyVerified: true,
           approvedBy: companyId,
+          status: "active",
+          organisation: organisation,
         },
         projection
       );
@@ -495,7 +497,7 @@ class CollectorService {
         { _id: collectorId, organisation },
         {
           companyVerified: false,
-          organisation: "",
+          approvedBy: "",
         },
         projection
       );
@@ -512,6 +514,7 @@ class CollectorService {
 
   static async register(req, res) {
     try {
+      const onesignal_id = uuid.v1().toString();
       const body = req.body;
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
@@ -608,6 +611,7 @@ class CollectorService {
         lat: body.lat || "",
         organisation: body.organisation || "",
         aggregatorId: "",
+        onesignal_id,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -667,7 +671,7 @@ class CollectorService {
           lat: create.lat,
           pin_id: send.data.pinId,
           token,
-          aggregatorId: collector.aggregatorId,
+          aggregatorId: create.aggregatorId,
         },
       });
     } catch (error) {
@@ -1166,7 +1170,7 @@ class CollectorService {
 
       let signal_id;
       if (!collector.onesignal_id || collector.onesignal_id === "") {
-        signal_id = uuid.v1();
+        signal_id = uuid.v1().toString();
       } else {
         signal_id = collector.onesignal_id;
       }
@@ -1282,6 +1286,77 @@ class CollectorService {
           totalPages: Math.ceil(totalResult / resultsPerPage),
         },
       });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
+
+  static async updateCollector(req, res) {
+    try {
+      const { user } = req;
+      let organisation = user.organisation;
+      if (req.body.organisation) {
+        organisation = req.body.organisation;
+      }
+      const org = await organisationModel.findOne({
+        companyName: organisation,
+      });
+
+      if (!org) {
+        return res.status(400).json({
+          error: true,
+          message: "Select an organisation",
+        });
+      }
+
+      let email;
+
+      if (req.body.email) {
+        email = req.body.email.trim().toLowerCase();
+      } else {
+        email = user.email.trim().toLowerCase();
+      }
+
+      let fullname;
+      if (req.body.fullname) {
+        fullname = req.body.fullname.trim().toLowerCase();
+      } else {
+        fullname = user.fullname.trim().toLowerCase();
+      }
+
+      await collectorModel.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            email,
+            phone: user.phone,
+            gender: req.body.gender || user.gender,
+            address: req.body.address || user.address,
+            fullname,
+            state: req.body.state || user.state,
+            place: req.body.place || user.place,
+            aggregatorId: req.body.aggregatorId || user.aggregatorId,
+            organisation: req.body.organisation || user.organisation,
+            localGovernment: req.body.localGovernment || user.localGovernment,
+            profile_picture: req.body.profile_picture || user.profile_picture,
+            areaOfAccess: org.areaOfAccess || user.areaOfAccess || [],
+          },
+        }
+      );
+
+      user.gender = req.body.gender || user.gender;
+      user.address = req.body.address || user.address;
+      user.fullname = req.body.fullname || user.fullname;
+      user.state = req.body.state || user.state;
+      user.place = req.body.place || user.place;
+      user.aggregatorId = req.body.aggregatorId || user.aggregatorId;
+      user.organisation = req.body.organisation || user.organisation;
+      user.localGovernment = req.body.localGovernment || user.localGovernment;
+      user.profile_picture = req.body.profile_picture || user.profile_picture;
+      user.areaOfAccess = org.areaOfAccess || user.areaOfAccess || [];
+
+      return res.status(200).json(user);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: true, message: "An error occured" });

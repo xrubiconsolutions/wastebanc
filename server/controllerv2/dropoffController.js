@@ -14,34 +14,6 @@ const { sendNotification } = require("../util/commonFunction");
 const randomstring = require("randomstring");
 moment().tz("Africa/Lagos", false);
 
-// var sendNotification = function (data) {
-//   var headers = {
-//     "Content-Type": "application/json; charset=utf-8",
-//   };
-
-//   var options = {
-//     host: "onesignal.com",
-//     port: 443,
-//     path: "/api/v1/notifications",
-//     method: "POST",
-//     headers: headers,
-//   };
-
-//   var https = require("https");
-//   var req = https.request(options, function (res) {
-//     res.on("data", function (data) {
-//       console.log(JSON.parse(data));
-//     });
-//   });
-
-//   req.on("error", function (e) {
-//     console.log(e);
-//   });
-
-//   req.write(JSON.stringify(data));
-//   req.end();
-// };
-
 dropoffController.dropOffs = async (req, res) => {
   try {
     const { user } = req;
@@ -275,6 +247,35 @@ dropoffController.addDropOffLocation = async (req, res) => {
   }
 };
 
+dropoffController.removeDropLocation = async (req, res) => {
+  try {
+    const { user } = req;
+    const { dropOffId } = req.body;
+    const drop = await dropOffModel.findOneAndDelete({
+      _id: dropOffId,
+      organisationId: user._id,
+    });
+
+    if (!drop) {
+      return res.status(400).json({
+        error: true,
+        message: "Drop off location not found",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "Drop off location deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 dropoffController.rewardDropSystem = async (req, res) => {
   const collectorId = req.body.collectorId;
   const categories = req.body.categories;
@@ -332,19 +333,19 @@ dropoffController.rewardDropSystem = async (req, res) => {
     console.log("organisation", organisation);
     console.log("categories", categories);
     for (let category of categories) {
+      console.log("category", category.name.toLowerCase());
+      console.log("org cat", organisation.categories);
       if (organisation.categories.length !== 0) {
-        cat = organisation.categories.find(
-          (c) => c.name.toLowerCase() === category.name
+        const c = organisation.categories.find(
+          (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
         );
-        if (!cat) {
-          return res.status(400).json({
-            error: true,
-            message: `${category.name} not found as a waste category for organisation`,
-          });
+
+        if (c) {
+          console.log("cat", cc);
+          const p = parseFloat(category.quantity) * Number(c.price);
+          console.log("quantity", parseFloat(category.quantity));
+          pricing.push(p);
         }
-        const p = parseFloat(category.quantity) * Number(cat.price);
-        console.log("quantity", parseFloat(category.quantity));
-        pricing.push(p);
       } else {
         var cc =
           category.name === "nylonSachet"
@@ -394,7 +395,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       recycler: collector.fullname,
       aggregatorId: collector.aggregatorId,
       organisation: collector.organisation,
-      organisation: organisation._id,
+      organisationID: organisation._id,
       scheduleId,
       type: "pickup schedule",
       state: scheduler.state || "",

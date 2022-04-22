@@ -72,6 +72,9 @@ const transaction_Schema = {
   organisation: {
     type: String,
   },
+  organisationID:{
+    type: String,
+  },
   state: {
     type: String,
   },

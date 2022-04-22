@@ -22,7 +22,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/register").post(
-    // userValidation,
+    userValidator.register,
     checkRequestErrs,
     UserService.register
   );

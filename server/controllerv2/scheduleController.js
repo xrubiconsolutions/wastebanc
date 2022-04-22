@@ -320,19 +320,15 @@ class ScheduleService {
       //console.log("organisation", organisation);
       for (let category of categories) {
         if (organisation.categories.length !== 0) {
-          console.log("here");
-          cat = organisation.categories.find(
-            (c) => c.name.toLowerCase() === category.name
+          const c = organisation.categories.find(
+            (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
           );
-          if (!cat) {
-            return res.status(400).json({
-              error: true,
-              message: `${category.name} not found as a waste category for organisation`,
-            });
+          if (c) {
+            console.log("cat", cc);
+            const p = parseFloat(category.quantity) * Number(c.price);
+            console.log("quantity", parseFloat(category.quantity));
+            pricing.push(p);
           }
-          const p = parseFloat(category.quantity) * Number(cat.price);
-          //console.log("quantity", parseFloat(category.quantity));
-          pricing.push(p);
         } else {
           console.log("here2");
           var cc =
@@ -384,7 +380,7 @@ class ScheduleService {
         recycler: collector.fullname,
         aggregatorId: collector.aggregatorId,
         organisation: collector.organisation,
-        organisation: organisation._id,
+        organisationID: organisation._id,
         scheduleId: schedule._id,
         type: "pickup schedule",
         state: scheduler.state || "",
@@ -621,7 +617,7 @@ class ScheduleService {
         collectors.map(async (collector) => {
           if (!collector.onesignal_id || collector.onesignal_id !== "") {
             const message = {
-              app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+              app_id: "565970dc-d44a-456f-aab7-3f57e0504ff4",
               contents: {
                 en: `A user in ${schedule.lcd} just created a schedule`,
               },

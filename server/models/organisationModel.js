@@ -35,7 +35,7 @@ const organisation_Schema = new Schema({
     required: true,
   },
   phone: {
-    type: String,
+    type: Number,
     required: true,
   },
   roles: {
@@ -128,9 +128,11 @@ const organisation_Schema = new Schema({
   },
   country: {
     type: String,
+    default: "Nigeria",
   },
   state: {
     type: String,
+    default: "Lagos",
   },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);

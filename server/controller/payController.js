@@ -12,6 +12,7 @@ let CONSTANTS = require("../util/constants");
 var request = require("request");
 const payModel = require("../models/payModel");
 var ObjectId = require("mongodb").ObjectID;
+const axios = require("axios");
 
 payController.getBanks = (req, res) => {
   request(
@@ -55,13 +56,246 @@ payController.resolveAccount = (req, res) => {
   );
 };
 
+// new save receipt function
+//God pls work
+payController.saveR = async (req, res) => {
+  try {
+    const receipt = { ...req.body };
+    let cardID = req.body.cardID;
+    let amount = req.body.amount;
+    let balance;
+
+    const user = await MODEL.userModel.findOne({ cardID });
+    if (!user) {
+      return res.status(400).json({
+        message: "Enter a valid card ID",
+      });
+    }
+
+    if (Number(user.availablePoints) < 0) {
+      return res.status(400).json({
+        message: "You don't have enough points to complete this transaction",
+      });
+    }
+
+    if (Number(user.availablePoints) < 5000) {
+      return res.status(400).json({
+        message: "You don't have enough points to complete this transaction",
+      });
+    }
+
+    balance = Number(user.availablePoints) - Number(amount);
+
+    const allTransations = await MODEL.transactionModel.find({
+      paid: false,
+      requestedForPayment: false,
+      cardID: cardID,
+    });
+
+    await Promise.all(
+      allTransations.map(async (tran) => {
+        await MODEL.userModel.updateOne(
+          { _id: user._id },
+          {
+            availablePoints: balance,
+          }
+        );
+        const storePaymentRequest = await MODEL.payModel.create({
+          ...receipt,
+          aggregatorName: tran.recycler || " ",
+          aggregatorId: tran.aggregatorId || " ",
+          aggregatorOrganisation: tran.organisation || " ",
+          scheduleId: tran.scheduleId || " ",
+          quantityOfWaste: tran.weight || " ",
+          amount: tran.coin,
+          organisation: tran.organisation,
+          organisationID: tran.organisationID,
+          status: user.state,
+        });
+        console.log("stored payment", storePaymentRequest);
+
+        await MODEL.transactionModel.updateOne(
+          { _id: tran._id },
+          {
+            $set: {
+              requestedForPayment: true,
+            },
+          }
+        );
+
+        const organisation = await MODEL.organisationModel.findOne({
+          companyName: tran.organisation,
+        });
+
+        //so help
+        var phoneNo = String(organisation.phone);
+        var data = {
+          to: `234${phoneNo}`,
+          from: "N-Alert",
+          sms: `Dear ${tran.organisation}, a user named ${receipt.fullname} just requested for a payout of ${tran.coin}, kindly attend to the payment.`,
+          type: "plain",
+          api_key:
+            "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+          channel: "dnd",
+        };
+
+        var options = {
+          method: "POST",
+          url: "https://termii.com/api/sms/send",
+          headers: {
+            "Content-Type": ["application/json", "application/json"],
+          },
+          body: JSON.stringify(data),
+        };
+
+        const send = await axios.post(options.url, options.body, {
+          headers: options.headers,
+        });
+
+        console.log("res", send.data);
+      })
+    );
+
+    await MODEL.userModel.updateOne(
+      { _id: user._id },
+      {
+        availablePoints: balance,
+      }
+    );
+    return res.status(200).json({
+      error: false,
+      message: "payment requested successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+// new charity function nn
+payController.charityP = async (req, res) => {
+  try {
+    const receipt = { ...req.body };
+    let cardID = req.body.cardID;
+    let amount = req.body.amount;
+    var balance;
+
+    const user = await MODEL.userModel.findOne({ cardID });
+    if (!user) {
+      return res.status(400).json({
+        message: "Enter a valid card ID",
+      });
+    }
+
+    if (Number(user.availablePoints) < 0) {
+      return res.status(400).json({
+        message: "You don't have enough points to complete this transaction",
+      });
+    }
+
+    if (Number(user.availablePoints) < 5000) {
+      return res.status(400).json({
+        message: "You don't have enough points to complete this transaction",
+      });
+    }
+
+    balance = Number(user.availablePoints) - Number(amount);
+
+    await MODEL.userModel.updateOne(
+      { _id: user._id },
+      {
+        availablePoints: balance,
+      }
+    );
+
+    const allTransations = await MODEL.transactionModel.find({
+      paid: false,
+      requestedForPayment: false,
+      cardID: cardID,
+    });
+
+    await Promise.all(
+      allTransations.map(async (tran) => {
+        await MODEL.userModel.updateOne(
+          { _id: user._id },
+          {
+            availablePoints: balance,
+          }
+        );
+        const storePaymentRequest = await MODEL.charityModel.create({
+          ...receipt,
+          aggregatorName: tran.recycler || " ",
+          aggregatorId: tran.aggregatorId || " ",
+          aggregatorOrganisation: tran.organisation || " ",
+          scheduleId: tran.scheduleId || " ",
+          quantityOfWaste: tran.weight || " ",
+          amount: tran.coin,
+          organisation: tran.organisation,
+          organisationID: tran.organisationID,
+          status: user.state,
+        });
+
+        await MODEL.transactionModel.updateOne(
+          { _id: tran._id },
+          {
+            $set: {
+              requestedForPayment: true,
+              paymentResolution: "charity",
+            },
+          }
+        );
+
+        // const organisation = await MODEL.organisationModel.findOne({
+        //   companyName: tran.organisation,
+        // });
+
+        // var phoneNo = String(organisation.phone);
+        // var data = {
+        //   to: `234${phoneNo}`,
+        //   from: "N-Alert",
+        //   sms: `Dear ${tran.organisation}, a user named ${receipt.fullname} just requested for a payout of ${unpaidFees[i].coin}, kindly attend to the payment.`,
+        //   type: "plain",
+        //   api_key:
+        //     "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+        //   channel: "dnd",
+        // };
+
+        // var options = {
+        //   method: "POST",
+        //   url: "https://termii.com/api/sms/send",
+        //   headers: {
+        //     "Content-Type": ["application/json", "application/json"],
+        //   },
+        //   body: JSON.stringify(data),
+        // };
+
+        // const send = await axios.post(options.url, options.body, {
+        //   headers: options.headers,
+        // });
+
+        console.log("res", send.data);
+      })
+    );
+
+    return res.status(200).json({
+      error: false,
+      message: "payment successfully made to charity",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 payController.saveReceipt = (REQUEST, RESPONSE) => {
   let errors = {};
   const receipt = { ...REQUEST.body };
-  // let userId = REQUEST.body.userId;
-  // let fullname = REQUEST.body.fullname;
-  // let bankAcNo = REQUEST.body.bankAcNo;
-  // let bankName = REQUEST.body.bankName;
   let cardID = REQUEST.body.cardID;
   let amount = REQUEST.body.amount;
   var balance;
@@ -96,7 +330,9 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
                   scheduleId: unpaidFees[i].scheduleId || " ",
                   quantityOfWaste: unpaidFees[i].weight || " ",
                   amount: unpaidFees[i].coin,
-                  organisation: unpaidFees[i].organisationID,
+                  organisationID: unpaidFees[i].organisationID,
+                  organisation: unpaidFees[i].organisation,
+                  status: result.state,
                 }).save({}, (err, results) => {
                   MODEL.transactionModel.updateOne(
                     { _id: unpaidFees[i]._id },
@@ -194,7 +430,9 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
                   scheduleId: unpaidFees[i].scheduleId || " ",
                   quantityOfWaste: unpaidFees[i].weight || " ",
                   amount: unpaidFees[i].coin,
-                  organisation: unpaidFees[i].organisationID,
+                  organisationID: unpaidFees[i].organisationID,
+                  organisation: unpaidFees[i].organisation,
+                  status: result.state,
                 }).save({}, (err, result) => {
                   if (err) {
                     return RESPONSE.status(400).json({

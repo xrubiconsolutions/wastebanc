@@ -180,8 +180,9 @@ class UserService {
   }
 
   static async register(req, res) {
-    bodyValidate(req, res);
+    //bodyValidate(req, res);
     try {
+      const onesignal_id = uuid.v1().toString();
       const body = req.body;
       const checkPhone = await userModel.findOne({
         phone: body.phone,
@@ -296,6 +297,7 @@ class UserService {
         organisationType: body.organisation,
         //onesignal_id: body.onesignal_id,
         address: body.address,
+        onesignal_id,
       });
 
       //fine
@@ -624,7 +626,11 @@ class UserService {
       let signal_id;
 
       console.log("user id", user.onesignal_id);
-      if (user.onesignal_id === "" || user.onesignal_id === " ") {
+      if (
+        !user.onesignal_id ||
+        user.onesignal_id === "" ||
+        user.onesignal_id === " "
+      ) {
         signal_id = uuid.v1().toString();
         console.log("changing", signal_id);
         await userModel.updateOne(

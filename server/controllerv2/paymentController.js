@@ -5,6 +5,8 @@ const { bodyValidate } = require("../util/constants");
 
 paymentController.paymentHistory = async (req, res) => {
   try {
+    const { user } = req;
+    const currentScope = user.locationScope;
     let {
       page = 1,
       resultsPerPage = 20,
@@ -12,20 +14,20 @@ paymentController.paymentHistory = async (req, res) => {
       end,
       paid,
       key,
-      state,
+      // state,
     } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    if (!key) {
-      if (!start || !end) {
-        return res.status(400).json({
-          error: true,
-          message: "Please pass a start and end date",
-        });
-      }
-    }
+    // if (!key) {
+    //   if (!start || !end) {
+    //     return res.status(400).json({
+    //       error: true,
+    //       message: "Please pass a start and end date",
+    //     });
+    //   }
+    // }
 
     let criteria;
     if (key) {
@@ -37,7 +39,13 @@ paymentController.paymentHistory = async (req, res) => {
         ],
         paid,
       };
-    } else {
+    } else if (start || end) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createdAt: {
@@ -46,8 +54,26 @@ paymentController.paymentHistory = async (req, res) => {
         },
         paid,
       };
+    } else {
+      criteria = {};
     }
-    if (state) criteria.state = state;
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log(criteria);
+    //if (state) criteria.state = state;
 
     const totalResult = await payModel.countDocuments(criteria);
 
@@ -79,19 +105,21 @@ paymentController.paymentHistory = async (req, res) => {
 
 paymentController.charityHistory = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    const { user } = req;
+    const currentScope = user.locationScope;
+    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
-    if (!key) {
-      if (!start || !end) {
-        return res.status(400).json({
-          error: true,
-          message: "Please pass a start and end date",
-        });
-      }
-    }
+    // if (!key) {
+    //   if (!start || !end) {
+    //     return res.status(400).json({
+    //       error: true,
+    //       message: "Please pass a start and end date",
+    //     });
+    //   }
+    // }
 
     let criteria;
 
@@ -106,7 +134,13 @@ paymentController.charityHistory = async (req, res) => {
           // { amount: { $regex: `.*${ParseInt(key)}.*`, $options: "i" } },
         ],
       };
-    } else {
+    } else if (start || end) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
       const [startDate, endDate] = [new Date(start), new Date(end)];
       criteria = {
         createdAt: {
@@ -114,8 +148,27 @@ paymentController.charityHistory = async (req, res) => {
           $lt: endDate,
         },
       };
+    } else {
+      criteria = {};
     }
-    if (state) criteria.state = state;
+
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log(criteria);
+    //if (state) criteria.state = state;
 
     const totalResult = await charityModel.countDocuments(criteria);
     const charities = await charityModel

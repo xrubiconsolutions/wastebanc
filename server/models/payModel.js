@@ -29,6 +29,9 @@ const pay_Schema = {
     type: String,
     required: true,
   },
+  organisationID:{
+    type: String
+  },
   paid: {
     type: Boolean,
     default: false,
@@ -64,6 +67,10 @@ const pay_Schema = {
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  state: {
+    type: String,
+    default: "Lagos",
   },
 };
 

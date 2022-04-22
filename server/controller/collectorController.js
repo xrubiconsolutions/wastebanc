@@ -222,70 +222,112 @@ collectorController.checkCompleted = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
-collectorController.collectorAnalysis = (REQUEST, RESPONSE) => {
-  var completed;
-  var missed;
-  var transactions;
-  var accepted;
+collectorController.collectorAnalysis = async (REQUEST, RESPONSE) => {
+  try {
+    const collectorID = REQUEST.query.ID;
 
-  const collectorID = REQUEST.query.ID;
+    const completed = await MODEL.scheduleModel.countDocuments({
+      completionStatus: "completed",
+      collectedBy: collectorID,
+    });
 
-  MODEL.userModel.updateOne(
-    { _id: REQUEST.query.ID },
-    { last_logged_in: new Date() },
-    (res) => {
-      console.log("Logged date updated", new Date());
-    }
-  );
+    const completedDrop = await MODEL.scheduleDropModel.countDocuments({
+      completionStatus: "completed",
+      collectedBy: collectorID,
+    });
 
-  MODEL.scheduleModel
-    .find({ completionStatus: "completed", collectedBy: collectorID })
-    .sort({ _id: -1 })
-    .then((schedules) => {
-      completed = schedules.length;
-      MODEL.scheduleModel
-        .find({ completionStatus: "missed", collectedBy: collectorID })
-        .then((schedules) => {
-          missed = schedules.length;
-          MODEL.transactionModel
-            .find({ completedBy: collectorID })
-            .then((transaction) => {
-              transactions = transaction.length;
+    console.log("drop", completedDrop);
 
-              // res.status(200).jsonp(transaction)
-              MODEL.scheduleModel
-                .find({ collectorStatus: "accept", collectedBy: collectorID })
-                .then((schedules) => {
-                  accepted = schedules.length;
-                  RESPONSE.status(200).jsonp(
-                    COMMON_FUN.sendSuccess(
-                      CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
-                      {
-                        completed: completed,
-                        transactions: transactions,
-                        accepted: accepted,
-                        missed: missed,
-                      }
-                    )
-                  );
-                })
-                .catch((err) =>
-                  RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err))
-                );
-            })
-            .catch((err) => res.status(500).jsonp(err));
+    const totalCompleted = completed + completedDrop;
 
-          // RESPONSE.status(200).jsonp(
-          //   COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
-          // );
-        })
-        .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+    const missed = await MODEL.scheduleModel.countDocuments({
+      completionStatus: "missed",
+      collectedBy: collectorID,
+    });
 
-      // RESPONSE.status(200).jsonp(
-      //   COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules.length)
-      // );
-    })
-    .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+    const accepted = await MODEL.scheduleModel.countDocuments({
+      collectorStatus: "accept",
+      collectedBy: collectorID,
+    });
+
+    const transactions = await MODEL.transactionModel.countDocuments({
+      completedBy: collectorID,
+    });
+
+    return RESPONSE.status(200).json({
+      error: true,
+      message: "success",
+      data: {
+        completed: totalCompleted,
+        missed,
+        accepted,
+        transactions,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return RESPONSE.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+
+  // MODEL.userModel.updateOne(
+  //   { _id: REQUEST.query.ID },
+  //   { last_logged_in: new Date() },
+  //   (res) => {
+  //     console.log("Logged date updated", new Date());
+  //   }
+  // );
+
+  // MODEL.scheduleModel
+  //   .find({ completionStatus: "completed", collectedBy: collectorID })
+  //   .sort({ _id: -1 })
+  //   .then((schedules) => {
+  //     completed = schedules.length;
+  //     MODEL.scheduleModel
+  //       .find({ completionStatus: "missed", collectedBy: collectorID })
+  //       .then((schedules) => {
+  //         missed = schedules.length;
+  //         MODEL.transactionModel
+  //           .find({ completedBy: collectorID })
+  //           .then((transaction) => {
+  //             transactions = transaction.length;
+
+  //             // res.status(200).jsonp(transaction)
+  //             MODEL.scheduleModel
+  //               .find({ collectorStatus: "accept", collectedBy: collectorID })
+  //               .then((schedules) => {
+  //                 accepted = schedules.length;
+  //                 RESPONSE.status(200).jsonp(
+  //                   COMMON_FUN.sendSuccess(
+  //                     CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+  //                     {
+  //                       completed: completed,
+  //                       transactions: transactions,
+  //                       accepted: accepted,
+  //                       missed: missed,
+  //                     }
+  //                   )
+  //                 );
+  //               })
+  //               .catch((err) =>
+  //                 RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err))
+  //               );
+  //           })
+  //           .catch((err) => res.status(500).jsonp(err));
+
+  //         // RESPONSE.status(200).jsonp(
+  //         //   COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+  //         // );
+  //       })
+  //       .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
+
+  //     // RESPONSE.status(200).jsonp(
+  //     //   COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules.length)
+  //     // );
+  //   })
+  //   .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
 collectorController.checkTotalCompleted = (REQUEST, RESPONSE) => {
@@ -388,6 +430,7 @@ collectorController.updateCollector = async (REQUEST, RESPONSE) => {
               MODEL.organisationModel
                 .findOne({ companyName: REQUEST.body.organisation })
                 .then((organisation) => {
+                  console.log("org", organisation);
                   MODEL.collectorModel.updateOne(
                     { email: user.email },
                     { $set: { areaOfAccess: organisation.areaOfAccess } },
