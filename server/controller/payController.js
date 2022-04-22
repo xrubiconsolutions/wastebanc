@@ -130,7 +130,7 @@ payController.saveR = async (req, res) => {
         var data = {
           to: `234${phoneNo}`,
           from: "N-Alert",
-          sms: `Dear ${tran.organisation}, a user named ${receipt.fullname} just requested for a payout of ${unpaidFees[i].coin}, kindly attend to the payment.`,
+          sms: `Dear ${tran.organisation}, a user named ${receipt.fullname} just requested for a payout of ${tran.coin}, kindly attend to the payment.`,
           type: "plain",
           api_key:
             "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
