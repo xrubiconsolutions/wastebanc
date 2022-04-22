@@ -100,7 +100,7 @@ payController.saveR = async (req, res) => {
             availablePoints: balance,
           }
         );
-        const storePaymentRequest = await MODEL.payModel({
+        const storePaymentRequest = await MODEL.payModel.create({
           ...receipt,
           aggregatorName: tran.recycler || " ",
           aggregatorId: tran.aggregatorId || " ",
@@ -225,7 +225,7 @@ payController.charityP = async (req, res) => {
             availablePoints: balance,
           }
         );
-        const storePaymentRequest = await MODEL.charityModel({
+        const storePaymentRequest = await MODEL.charityModel.create({
           ...receipt,
           aggregatorName: tran.recycler || " ",
           aggregatorId: tran.aggregatorId || " ",
