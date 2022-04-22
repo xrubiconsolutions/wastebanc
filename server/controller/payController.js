@@ -92,13 +92,6 @@ payController.saveR = async (req, res) => {
       cardID: cardID,
     });
 
-    await MODEL.userModel.updateOne(
-      { _id: user._id },
-      {
-        availablePoints: balance,
-      }
-    );
-
     await Promise.all(
       allTransations.map(async (tran) => {
         await MODEL.userModel.updateOne(
@@ -161,6 +154,12 @@ payController.saveR = async (req, res) => {
       })
     );
 
+    await MODEL.userModel.updateOne(
+      { _id: user._id },
+      {
+        availablePoints: balance,
+      }
+    );
     return res.status(200).json({
       error: false,
       message: "payment requested successfully",
