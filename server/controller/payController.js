@@ -91,7 +91,7 @@ payController.saveR = async (req, res) => {
       cardID: cardID,
     });
 
-    await MODEL.userMode.updateOne(
+    await MODEL.userModel.updateOne(
       { _id: user._id },
       {
         availablePoints: balance,
@@ -202,7 +202,7 @@ payController.charityP = async (req, res) => {
 
     balance = Number(user.availablePoints) - Number(amount);
 
-    await MODEL.userMode.updateOne(
+    await MODEL.userModel.updateOne(
       { _id: user._id },
       {
         availablePoints: balance,
