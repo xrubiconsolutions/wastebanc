@@ -212,6 +212,7 @@ payController.charityP = async (req, res) => {
       }
     );
 
+    //help
     const allTransations = await MODEL.transactionModel.find({
       paid: false,
       requestedForPayment: false,
