@@ -57,6 +57,7 @@ payController.resolveAccount = (req, res) => {
 };
 
 // new save receipt function
+//God pls work
 payController.saveR = async (req, res) => {
   try {
     const receipt = { ...req.body };
