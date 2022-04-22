@@ -59,9 +59,9 @@ payController.resolveAccount = (req, res) => {
 // new save receipt function
 payController.saveR = async (req, res) => {
   try {
-    const receipt = { ...REQUEST.body };
-    let cardID = REQUEST.body.cardID;
-    let amount = REQUEST.body.amount;
+    const receipt = { ...req.body };
+    let cardID = req.body.cardID;
+    let amount = req.body.amount;
     let balance;
 
     const user = await MODEL.userModel.findOne({ cardID });
@@ -176,9 +176,9 @@ payController.saveR = async (req, res) => {
 // new charity function
 payController.charityP = async (req, res) => {
   try {
-    const receipt = { ...REQUEST.body };
-    let cardID = REQUEST.body.cardID;
-    let amount = REQUEST.body.amount;
+    const receipt = { ...req.body };
+    let cardID = req.body.cardID;
+    let amount = req.body.amount;
     var balance;
 
     const user = await MODEL.userModel.findOne({ cardID });
