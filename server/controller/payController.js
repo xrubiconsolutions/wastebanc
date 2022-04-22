@@ -238,6 +238,8 @@ payController.charityP = async (req, res) => {
           status: user.state,
         });
 
+        console.log("store", storePaymentRequest);
+
         await MODEL.transactionModel.updateOne(
           { _id: tran._id },
           {
