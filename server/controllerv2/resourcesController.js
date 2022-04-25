@@ -1,5 +1,6 @@
 const { resourcesModel } = require("../models");
 
+// resource
 class Resources_Service {
   static async addResource(req, res) {
     try {
