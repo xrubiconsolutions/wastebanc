@@ -753,8 +753,8 @@ class CollectorService {
         message: "Please pass a start and end date or a search key",
       });
 
-    let { _id: organisationID } = req.user;
-    organisationID = organisationID.toString();
+    let { companyName: organisation } = req.user;
+    organisation = organisation.toString();
     let criteria;
 
     if (key) {
@@ -764,7 +764,7 @@ class CollectorService {
           { aggregatorId: { $regex: `.*${key}.*`, $options: "i" } },
           { recycler: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        organisationID,
+        organisation,
       };
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -773,7 +773,7 @@ class CollectorService {
           $gte: startDate,
           $lt: endDate,
         },
-        organisationID,
+        organisation,
       };
     }
 
@@ -810,7 +810,7 @@ class CollectorService {
 
   static async getCompanyWasteStats(req, res) {
     let { start, end, state } = req.query;
-    let { _id: organisation } = req.user;
+    let { companyName: organisation } = req.user;
     organisation = organisation.toString();
     if (!start || !end) {
       return res.status(400).json({
@@ -860,7 +860,7 @@ class CollectorService {
             $sum: 1,
           },
           totalWeight: {
-            $sum: "$weight",
+            $sum: { $toInt: "$weight" },
           },
         },
       },

@@ -19,7 +19,6 @@ module.exports = {
   payOutModel: require("./payOutModel"),
   versionModel: require("./versionModel"),
   geofenceModel: require("./geofenceModel"),
-
   dropOffModel: require("./dropOffModel"),
   charityModel: require("./charityModel"),
   scheduleDropModel: require("./scheduleDropModel"),
@@ -37,4 +36,5 @@ module.exports = {
   organisationBinModel: require("./organisationBin"),
   collectorBinModel: require("./collectorBin"),
   verificationModel: require("./verificationModel"),
+  resourcesModel: require("./resourcesModel"),
 };

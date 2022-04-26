@@ -223,7 +223,7 @@ class ScheduleService {
             { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           collectorStatus,
-          completionStaus,
+          completionStatus,
           organisation,
         }
       : {

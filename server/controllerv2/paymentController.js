@@ -238,6 +238,8 @@ paymentController.getCompanyOutstanding = async (req, res) => {
     };
   }
 
+  console.log(criteria);
+
   try {
     // totalResult count
     const totalResult = await transactionModel.countDocuments(criteria);
@@ -308,6 +310,7 @@ paymentController.companyCharityHistory = async (req, res) => {
       };
     }
     if (state) criteria.state = state;
+    console.log("criteria", criteria);
 
     const totalResult = await charityModel.countDocuments(criteria);
     const charities = await charityModel
@@ -338,11 +341,26 @@ paymentController.companyCharityHistory = async (req, res) => {
 
 paymentController.companyPaymentHistory = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, key, state } = req.query;
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      start,
+      end,
+      key,
+      state,
+      paid,
+    } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
+    if (paid && paid === "true") {
+      paid = true;
+    } else if (paid && paid === "false") {
+      paid = false;
+    } else {
+      paid = false;
+    }
     if (!key) {
       if (!start || !end) {
         return res.status(400).json({
@@ -353,7 +371,7 @@ paymentController.companyPaymentHistory = async (req, res) => {
     }
 
     let criteria;
-    let { _id: organisation } = req.user;
+    let { companyName: organisation } = req.user;
     organisation = organisation.toString();
 
     if (key) {
@@ -363,7 +381,7 @@ paymentController.companyPaymentHistory = async (req, res) => {
           { userPhone: { $regex: `.*${key}.*`, $options: "i" } },
           { bankAcNo: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        paid: true,
+        paid,
         organisation,
       };
     } else {
@@ -373,11 +391,12 @@ paymentController.companyPaymentHistory = async (req, res) => {
           $gte: startDate,
           $lt: endDate,
         },
-        paid: true,
+        paid,
         organisation,
       };
     }
     if (state) criteria.state = state;
+    console.log("criteria", criteria);
 
     const totalResult = await payModel.countDocuments(criteria);
 

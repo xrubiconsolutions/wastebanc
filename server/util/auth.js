@@ -16,57 +16,67 @@ validateUser.userValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
     return res.status(401).jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
-  const token = req.headers.authorization.split(" ")[1];
 
-  if (!token) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+  try {
+    const token = req.headers.authorization.split(" ")[1];
 
-  if (token === "undefined" || token === null || token === undefined) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+    if (!token) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
 
-  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
-  ////console.log("valid", validated);
-  if (Date.now() >= validated.exp * 1000) {
+    if (token === "undefined" || token === null || token === undefined) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
+
+    var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
+    ////console.log("valid", validated);
+    if (Date.now() >= validated.exp * 1000) {
+      return res.status(401).json({
+        error: true,
+        message: "Token time out. Login again",
+        statusCode: 401,
+      });
+    }
+
+    const user = await MODEL.userModel.findById(validated.userId);
+    if (!user) {
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+
+    if (user.status === "disable") {
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+
+    if (user.roles === "client") {
+      req.user = user;
+      NEXT();
+    } else {
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+  } catch (error) {
+    console.log(error);
     return res.status(401).json({
       error: true,
-      message: "Token time out. Login again",
+      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 401,
-    });
-  }
-
-  const user = await MODEL.userModel.findById(validated.userId);
-  if (!user) {
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
-    });
-  }
-
-  if (user.status === "disable") {
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
-    });
-  }
-
-  if (user.roles === "client") {
-    req.user = user;
-    NEXT();
-  } else {
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
     });
   }
 
@@ -210,9 +220,11 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
     }
   } catch (error) {
     //console.log(error);
-    res.status(500).json({
+    console.log(error);
+    return res.status(401).json({
       error: true,
-      message: "An error occurred",
+      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+      statusCode: 401,
     });
   }
 
@@ -229,38 +241,68 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
     return res.status(401).jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
 
-  const token = req.headers.authorization.split(" ")[1];
+  try {
+    const token = req.headers.authorization.split(" ")[1];
 
-  if (!token) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+    if (!token) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
 
-  if (token === "undefined" || token === null || token === undefined) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+    if (token === "undefined" || token === null || token === undefined) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
 
-  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
-  //console.log("valid", validated.userId);
+    var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
+    //console.log("valid", validated.userId);
 
-  if (Date.now() >= validated.exp * 1000) {
-    return res.status(401).json({
-      error: true,
-      message: "Token time out. Login again",
-      statusCode: 401,
-    });
-  }
+    if (Date.now() >= validated.exp * 1000) {
+      return res.status(401).json({
+        error: true,
+        message: "Token time out. Login again",
+        statusCode: 401,
+      });
+    }
 
-  console.log("id", validated.userId);
-  const user = await MODEL.collectorModel.findById(validated.userId);
-  console.log("user", user);
-  if (!user) {
-    //console.log("here 1");
+    console.log("id", validated.userId);
+    const user = await MODEL.collectorModel.findById(validated.userId);
+    console.log("user", user);
+    if (!user) {
+      //console.log("here 1");
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 401,
+      });
+    }
+
+    if (user.status === "disable") {
+      //console.log("here 2");
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 401,
+      });
+    }
+
+    if (user.roles === "collector" || user.roles === "company") {
+      req.user = user;
+      NEXT();
+    } else {
+      //console.log("here 3");
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 401,
+      });
+    }
+  } catch (error) {
+    console.log(error);
     return res.status(401).json({
       error: true,
       message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
@@ -268,26 +310,6 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
     });
   }
 
-  if (user.status === "disable") {
-    //console.log("here 2");
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 401,
-    });
-  }
-
-  if (user.roles === "collector" || user.roles === "company") {
-    req.user = user;
-    NEXT();
-  } else {
-    //console.log("here 3");
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 401,
-    });
-  }
   //   let status = res.headers.authorization
   //     ? JWT.decode(res.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
   //     : JWT.decode(res.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
@@ -304,58 +326,67 @@ validateUser.adminValidation = async (req, res, NEXT) => {
     return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
 
-  const token = req.headers.authorization.split(" ")[1];
+  try {
+    const token = req.headers.authorization.split(" ")[1];
 
-  if (!token) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+    if (!token) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
 
-  if (token === "undefined" || token === null) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+    if (token === "undefined" || token === null) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
 
-  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
-  //console.log("valid", validated);
+    var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
+    //console.log("valid", validated);
 
-  if (Date.now() >= validated.exp * 1000) {
+    if (Date.now() >= validated.exp * 1000) {
+      return res.status(401).json({
+        error: true,
+        message: "Token time out. Login again",
+        statusCode: 401,
+      });
+    }
+
+    const user = await MODEL.userModel.findById(validated.userId);
+    if (!user) {
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+
+    if (user.status === "disable") {
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+
+    if (user.roles === "analytics-admin" || user.roles === "admin") {
+      req.user = user;
+      NEXT();
+    } else {
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 401,
+      });
+    }
+  } catch (error) {
+    console.log(error);
     return res.status(401).json({
       error: true,
-      message: "Token time out. Login again",
+      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 401,
-    });
-  }
-
-  const user = await MODEL.userModel.findById(validated.userId);
-  if (!user) {
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
-    });
-  }
-
-  if (user.status === "disable") {
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
-    });
-  }
-
-  if (user.roles === "analytics-admin" || user.roles === "admin") {
-    req.user = user;
-    NEXT();
-  } else {
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
     });
   }
 
@@ -369,62 +400,71 @@ validateUser.adminValidation = async (req, res, NEXT) => {
 
 validateUser.adminPakamValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
-    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    return res.status(401).jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
 
-  const token = req.headers.authorization.split(" ")[1];
+  try {
+    const token = req.headers.authorization.split(" ")[1];
 
-  if (!token) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+    if (!token) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
 
-  if (token === "undefined" || token === null || token === undefined) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+    if (token === "undefined" || token === null || token === undefined) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
 
-  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
+    var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
-  if (Date.now() >= validated.exp * 1000) {
+    if (Date.now() >= validated.exp * 1000) {
+      return res.status(401).json({
+        error: true,
+        message: "Token time out. Login again",
+        statusCode: 401,
+      });
+    }
+
+    const user = await MODEL.userModel.findById(validated.userId);
+
+    if (!user) {
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+
+    if (user.status === "disable") {
+      return res.status(401).json({
+        error: true,
+        message: "Account disabled, Please contact support team",
+        statusCode: 403,
+      });
+    }
+
+    if (user.roles === "admin") {
+      req.user = user;
+      NEXT();
+    } else {
+      //console.log("here");
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+  } catch (error) {
+    console.log(error);
     return res.status(401).json({
       error: true,
-      message: "Token time out. Login again",
+      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 401,
-    });
-  }
-
-  const user = await MODEL.userModel.findById(validated.userId);
-
-  if (!user) {
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
-    });
-  }
-
-  if (user.status === "disable") {
-    return res.status(401).json({
-      error: true,
-      message: "Account disabled, Please contact support team",
-      statusCode: 403,
-    });
-  }
-
-  if (user.roles === "admin") {
-    req.user = user;
-    NEXT();
-  } else {
-    //console.log("here");
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
     });
   }
 
@@ -438,60 +478,69 @@ validateUser.adminPakamValidation = async (req, res, NEXT) => {
 
 validateUser.companyValidation = async (req, res, NEXT) => {
   if (!req.headers.authorization) {
-    return res.jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+    return res.status(401).jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
   }
 
-  const token = req.headers.authorization.split(" ")[1];
+  try {
+    const token = req.headers.authorization.split(" ")[1];
 
-  if (!token) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+    if (!token) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
 
-  if (token === "undefined" || token === null || token === undefined) {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid token",
-    });
-  }
+    if (token === "undefined" || token === null || token === undefined) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
 
-  var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
+    var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
 
-  if (Date.now() >= validated.exp * 1000) {
+    if (Date.now() >= validated.exp * 1000) {
+      return res.status(401).json({
+        error: true,
+        message: "Token time out. Login again",
+        statusCode: 401,
+      });
+    }
+
+    const user = await MODEL.organisationModel.findById(validated.userId);
+    if (!user) {
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+
+    if (user.status === "disable") {
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+
+    if (user.roles === "company") {
+      req.user = user;
+      NEXT();
+    } else {
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+  } catch (error) {
+    console.log(error);
     return res.status(401).json({
       error: true,
-      message: "Token time out. Login again",
+      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
       statusCode: 401,
-    });
-  }
-
-  const user = await MODEL.organisationModel.findById(validated.userId);
-  if (!user) {
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
-    });
-  }
-
-  if (user.status === "disable") {
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
-    });
-  }
-
-  if (user.roles === "company") {
-    req.user = user;
-    NEXT();
-  } else {
-    return res.status(401).json({
-      error: true,
-      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-      statusCode: 403,
     });
   }
 
