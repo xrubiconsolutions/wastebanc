@@ -14,4 +14,5 @@ module.exports = function (app) {
   require("./paymentRoutes")(app);
   require("./lcdAreaRoutes")(app);
   require("./organisationRoutes")(app);
+  require("./verificationRoutes")(app);
 };
