@@ -134,5 +134,9 @@ const organisation_Schema = new Schema({
     type: String,
     default: "Lagos",
   },
+  isDisabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);

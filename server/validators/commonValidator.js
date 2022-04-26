@@ -36,4 +36,11 @@ module.exports = {
       .isArray()
       .withMessage("notificationIds should be an array of ids"),
   ],
+  companyId: [
+    param("companyId")
+      .notEmpty()
+      .withMessage("companyId is required")
+      .isMongoId()
+      .withMessage("companyId id is invalid"),
+  ],
 };

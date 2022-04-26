@@ -801,4 +801,94 @@ organisationController.dropOffPakam = async (req, res) => {
     });
   }
 };
+
+organisationController.disableCompany = async (req, res) => {
+  const { companyId } = req.params;
+  try {
+    const company = await organisationModel.findById(companyId);
+
+    // return error if company is not found
+    if (!company)
+      return res.status(404).json({
+        error: true,
+        message: "Company account not found!",
+      });
+
+    // return if account is already disabled
+    if (company.isDisabled)
+      return res.status(200).json({
+        error: false,
+        message: "Company account already disabled!",
+      });
+
+    // disable company account
+    company.isDisabled = true;
+    await company.save();
+
+    // disable all collectors account within organisation
+    await collectorModel.updateMany(
+      {
+        organisation: company.companyName,
+      },
+      { isDisabled: true }
+    );
+
+    // return success response
+    return res.status(200).json({
+      error: false,
+      message: "Company disabled successfully!",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+};
+
+organisationController.enableCompany = async (req, res) => {
+  const { companyId } = req.params;
+  try {
+    const company = await organisationModel.findById(companyId);
+
+    // return error if company is not found
+    if (!company)
+      return res.status(404).json({
+        error: true,
+        message: "Company account not found!",
+      });
+
+    // return if account is already disabled
+    if (!company.isDisabled)
+      return res.status(200).json({
+        error: false,
+        message: "Company account already enabled!",
+      });
+
+    // enable company account
+    company.isDisabled = false;
+    await company.save();
+
+    // disable all collectors account within organisation
+    await collectorModel.updateMany(
+      {
+        organisation: company.companyName,
+      },
+      { isDisabled: false }
+    );
+
+    // return success response
+    return res.status(200).json({
+      error: false,
+      message: "Company enabled successfully!",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+};
 module.exports = organisationController;

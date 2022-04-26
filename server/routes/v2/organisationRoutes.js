@@ -9,6 +9,7 @@ const {
 // const { bodyValidate } = require("../../util/commonFunction");
 const { body, query, check, param } = require("express-validator");
 const organisationValidators = require("../../validators/organisationValidators");
+const { companyId } = require("../../validators/commonValidator");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 
 module.exports = (APP) => {
@@ -76,5 +77,19 @@ module.exports = (APP) => {
   APP.route("/api/v2/organisation/dropoff/locations").get(
     adminPakamValidation,
     organisationController.dropOffPakam
+  );
+
+  APP.route("/api/v2/organisation/disable/:companyId").put(
+    adminPakamValidation,
+    companyId,
+    checkRequestErrs,
+    organisationController.disableCompany
+  );
+
+  APP.route("/api/v2/organisation/enable/:companyId").put(
+    adminPakamValidation,
+    companyId,
+    checkRequestErrs,
+    organisationController.enableCompany
   );
 };

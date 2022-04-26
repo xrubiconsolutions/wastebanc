@@ -133,6 +133,10 @@ const collector_Schema = new Schema({
   country: {
     type: String,
   },
+  isDisabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = MONGOOSE.model("Collector", collector_Schema);
