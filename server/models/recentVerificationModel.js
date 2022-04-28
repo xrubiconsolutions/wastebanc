@@ -2,11 +2,13 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const { VERIFICATION_TYPES } = require("../util/constants");
 
-const VerificationSchema = new Schema(
+const RecentVerificationSchema = new Schema(
   {
-    userId: {
-      type: Schema.ObjectId,
-      required: true,
+    email: {
+      type: String,
+    },
+    phone: {
+      type: String,
     },
     verificationType: {
       type: String,
@@ -23,7 +25,7 @@ const VerificationSchema = new Schema(
     status: {
       type: String,
       default: "PENDING",
-      enum: ["PENDING", "VERIFIED", "NOT_VERIFIED"],
+      enum: ["PENDING", "NOT_VERIFIED"],
     },
     attempts: {
       type: Number,
@@ -34,11 +36,14 @@ const VerificationSchema = new Schema(
 );
 
 /* Set expiry time to be 5mins after verification doc creation **/
-VerificationSchema.pre("save", function (next) {
+RecentVerificationSchema.pre("save", function (next) {
   if (this.expiryTime) next();
   const FIVE_MIN_LATER = Date.now() + 1000 * 60 * 5;
   this.expiryTime = FIVE_MIN_LATER;
   next();
 });
 
-module.exports = mongoose.model("verification", VerificationSchema);
+module.exports = mongoose.model(
+  "recent_verification",
+  RecentVerificationSchema
+);
