@@ -1,4 +1,5 @@
 const { body, param, query } = require("express-validator");
+const { ROLES_ENUM } = require("../util/constants");
 
 module.exports = {
   login: [
@@ -108,5 +109,30 @@ module.exports = {
     body("uType").notEmpty().withMessage("uType is required"),
     body("organisation").optional(),
     //body("onesignal_id").notEmpty().withMessage("onesignal_id is required"),
+  ],
+
+  passwordReset: [
+    body("email")
+      .trim()
+      .custom((email, { req }) => {
+        if (!(email || req.body.phone))
+          throw new Error("Email or phone number is required");
+        return true;
+      }),
+    body("password").custom((password, { req }) => {
+      if (!(password || req.body.confirmPassword))
+        throw new Error("password and confirmPassword are both required");
+      if (password !== req.body.confirmPassword)
+        throw new Error("password and confirmPassword do not match");
+      return true;
+    }),
+    body("role")
+      .trim()
+      .notEmpty()
+      .withMessage("Role is required")
+      .isString()
+      .withMessage("type must be a string")
+      .isIn(ROLES_ENUM)
+      .withMessage(`Role must be among: ${ROLES_ENUM}`),
   ],
 };

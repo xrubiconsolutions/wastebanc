@@ -156,11 +156,21 @@ class VerificationService {
         EXPIRED: "Expiration time exceeded",
         NOT_FOUND: "No log found",
         WRONG_TOKEN: "Token does not match",
+        ALREADY_VERIFIED: "Token already verified",
       });
       if (!verification) return { error: true, type: ERROR_OBJ.NOT_FOUND };
 
       // destructure some entry value
-      const { expiryTime, token: _token, attempts } = verification.toObject();
+      const {
+        expiryTime,
+        token: _token,
+        attempts,
+        status,
+      } = verification.toObject();
+
+      // return message if allready verified
+      if (status === "VERIFIED")
+        return { error: true, type: ERROR_OBJ.ALREADY_VERIFIED };
 
       if (attempts > MAX_ATTEMPT) {
         verification.status === "NOT_VERIFIED";
@@ -179,6 +189,7 @@ class VerificationService {
       }
 
       if (_token !== token) {
+        // delete token after failed and exhausted attempt trials
         if (attempts === MAX_ATTEMPT) {
           await verification.delete();
         }
@@ -196,11 +207,11 @@ class VerificationService {
       //   verify request if all conditions are met
       verification.status = "VERIFIED";
       await verification.save();
-      const result = await verificationLogModel(logData);
+      // const result = await verificationLogModel(logData);
 
       return {
         error: false,
-        data: result,
+        data: verification,
       };
     } catch (error) {
       console.log(error);
