@@ -3,16 +3,16 @@ const {
   recentVerificationModel,
   userModel,
   collectorModel,
+  organisationModel,
 } = require("../models");
 const COMMON_FUN = require("../util/commonFunction");
-const { VERIFICATION_OBJ } = require("../util/constants");
-
-const ROLES_ENUM = Object.freeze(["COLLECTOR", "CLIENT", "ADMIN"]);
+const { VERIFICATION_OBJ, ROLES_ENUM } = require("../util/constants");
 
 class VerificationService {
   static async requestAuthToken(req, res) {
     const { email, phone, role } = req.body;
     try {
+      // fetch user account based email/phone and role
       const account = await VerificationService.findAccount(
         email ? { email } : { phone },
         role
@@ -24,10 +24,11 @@ class VerificationService {
           message: "Account not found!",
         });
 
-      // create verification log
+      // create recent verification
       const data = await VerificationService.createVerification(
         email ? { email } : { phone },
-        VERIFICATION_OBJ.AUTH
+        VERIFICATION_OBJ.AUTH,
+        role
       );
       //   return response
       return res.status(201).json({
@@ -46,29 +47,35 @@ class VerificationService {
   static async authTokenVerify(req, res) {
     const { verificationType, token, role, email, phone } = req.body;
     try {
+      // find user account based on email/phone and role
       const user = await VerificationService.findAccount(
         email ? { email } : { phone },
         role
       );
 
+      //  return error if account not found
       if (!user)
         return res.status(404).json({
           error: true,
           message: "Account not found!",
         });
 
+      // verify the token
       const { error, type, data } = await VerificationService.verifyToken(
         email ? { email } : { phone },
         verificationType,
         token,
         role
       );
+
+      // return verification error is it exist
       if (error)
         return res.status(200).json({
           error: true,
           message: type,
         });
 
+      // return success message
       return res.status(200).json({
         error: false,
         message: "Token Verified!",
@@ -82,10 +89,10 @@ class VerificationService {
     }
   }
 
-  static async createVerification(field, verificationType = "") {
+  static async createVerification(field, verificationType = "", role = "") {
     // generate token and construct log details
     const token = COMMON_FUN.generateRandomString();
-    const logDetails = { verificationType, token, ...field };
+    const logDetails = { verificationType, token, userRole: role, ...field };
 
     try {
       // delete exisiting verification document for user
@@ -106,10 +113,11 @@ class VerificationService {
   static async createVerificationLog(
     userId = "",
     verificationType = "",
-    token = ""
+    token = "",
+    role = ""
   ) {
     // generate token and construct log details
-    const logDetails = { userId, verificationType, token };
+    const logDetails = { userId, verificationType, token, userRole: role };
 
     try {
       // create verification log
@@ -134,6 +142,7 @@ class VerificationService {
     const logDetails = {
       ...field,
       verificationType,
+      userRole: role,
     };
     const now = Date.now();
     const MAX_ATTEMPT = 5;
@@ -177,13 +186,17 @@ class VerificationService {
       }
 
       const account = await VerificationService.findAccount(field, role);
-      const logData = { userId: account._id, verificationType, token };
+      const logData = {
+        userId: account._id,
+        verificationType,
+        token,
+        userRole: role,
+      };
 
       //   verify request if all conditions are met
-      const result = await verificationLogModel.create(logData);
-
-      // delete verification entry
-      await verification.delete();
+      verification.status = "VERIFIED";
+      await verification.save();
+      const result = await verificationLogModel(logData);
 
       return {
         error: false,
@@ -198,7 +211,7 @@ class VerificationService {
   static async findAccount(field, role) {
     try {
       let account;
-      // find user account
+      // find user account based on provided role
       switch (role) {
         case ROLES_ENUM[0]:
           account = await collectorModel.findOne(field);
@@ -208,6 +221,9 @@ class VerificationService {
           break;
         case ROLES_ENUM[2]:
           account = await userModel.findOne(field);
+          break;
+        case ROLES_ENUM[3]:
+          account = await organisationModel.findOne(field);
           break;
         default:
       }

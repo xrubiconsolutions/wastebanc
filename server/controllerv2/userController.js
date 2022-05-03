@@ -1,5 +1,10 @@
 const incidentModel = require("../models/incidentModel");
-const { userModel, organisationTypeModel } = require("../models");
+const {
+  userModel,
+  recentVerificationModel,
+  verificationLogModel,
+  organisationTypeModel,
+} = require("../models");
 const {
   sendResponse,
   bodyValidate,
@@ -685,6 +690,14 @@ class UserService {
         error: true,
         message: "An error occurred",
       });
+    }
+  }
+
+  static async passwordReset(req, res) {
+    const { email, phone, newPassword } = req.body;
+    try {
+    } catch (error) {
+      console.log;
     }
   }
 }

@@ -1,12 +1,17 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const { VERIFICATION_TYPES } = require("../util/constants");
+const { VERIFICATION_TYPES, ROLES_ENUM } = require("../util/constants");
 
 const VerificationSchema = new Schema(
   {
     userId: {
       type: Schema.ObjectId,
       required: true,
+    },
+    userRole: {
+      type: String,
+      required: true,
+      enum: ROLES_ENUM,
     },
     verificationType: {
       type: String,

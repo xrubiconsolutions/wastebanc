@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const { VERIFICATION_TYPES } = require("../util/constants");
+const { VERIFICATION_TYPES, ROLES_ENUM } = require("../util/constants");
 
 const RecentVerificationSchema = new Schema(
   {
@@ -9,6 +9,11 @@ const RecentVerificationSchema = new Schema(
     },
     phone: {
       type: String,
+    },
+    userRole: {
+      type: String,
+      required: true,
+      enum: ROLES_ENUM,
     },
     verificationType: {
       type: String,
@@ -25,7 +30,7 @@ const RecentVerificationSchema = new Schema(
     status: {
       type: String,
       default: "PENDING",
-      enum: ["PENDING", "NOT_VERIFIED"],
+      enum: ["PENDING", "VERIFIED", "NOT_VERIFIED"],
     },
     attempts: {
       type: Number,

@@ -1,6 +1,5 @@
 const { body, query } = require("express-validator");
-const { VERIFICATION_TYPES } = require("../util/constants");
-const ROLES_ENUM = Object.freeze(["COLLECTOR", "CLIENT", "ADMIN"]);
+const { VERIFICATION_TYPES, ROLES_ENUM } = require("../util/constants");
 
 module.exports = {
   authVerification: [
