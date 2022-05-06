@@ -148,7 +148,7 @@ validateUser.userCollectorData = async (req, res, NEXT) => {
     });
   }
 
-  //   let status = res.headers.authorization
+//   let status = res.headers.authorization
   //     ? JWT.decode(res.headers.authorization, CONSTANTS.SERVER.JWT_SECRET_KEY)
   //     : JWT.decode(res.query.api_key, CONSTANTS.SERVER.JWT_SECRET_KEY);
   //   (validated && validated.roles === "admin") ||

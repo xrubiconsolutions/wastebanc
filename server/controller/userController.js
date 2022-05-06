@@ -2541,14 +2541,18 @@ userController.totalGender = async (REQUEST, RESPONSE) => {
       };
     }
 
-    const totalMales = await MODEL.userModel.find({
-      ...criteria,
-      gender: "male"
-    }).countDocuments();
-    const totalFemales = await MODEL.userModel.find({
-      ...criteria,
-      gender: "female"
-    }).countDocuments();
+    const totalMales = await MODEL.userModel
+      .find({
+        ...criteria,
+        gender: "male",
+      })
+      .countDocuments();
+    const totalFemales = await MODEL.userModel
+      .find({
+        ...criteria,
+        gender: "female",
+      })
+      .countDocuments();
     return RESPONSE.status(200).json({
       message: "Total users",
       data: {
@@ -2703,7 +2707,7 @@ userController.adminLogin = async (req, res) => {
       { _id: user._id },
       { last_logged_in: new Date() }
     );
-    const token = COMMON_FUN.authToken(user);
+    const token = COMMON_FUN.adminToken(user);
 
     return res.status(200).json({
       error: false,

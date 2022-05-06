@@ -257,6 +257,12 @@ let createToken = (objData) => {
 
 const authToken = (user) => {
   return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
+    expiresIn: "3h",
+  });
+};
+
+const adminToken = (user) => {
+  return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
     expiresIn: "7h",
   });
 };
@@ -380,6 +386,7 @@ module.exports = {
   replaceValueFromString: replaceValueFromString,
   messageLogs: messageLogs,
   authToken,
+  adminToken,
   comparePassword,
   encryptPassword,
   checkRequestErrs,

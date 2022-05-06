@@ -263,7 +263,7 @@ organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
                 );
               else {
                 var jwtToken =
-                  COMMON_FUN.createToken(USER); /** creating jwt token */
+                  COMMON_FUN.adminToken(USER); /** creating jwt token */
                 USER.token = jwtToken;
                 if (USER.licence_active == false) {
                   return RESPONSE.status(400).json({
