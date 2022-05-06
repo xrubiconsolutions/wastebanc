@@ -100,7 +100,7 @@ module.exports = (APP) => {
   APP.route("/api/update/ads").post(CONTROLLER.userController.updateAdvert);
 
   APP.route("/api/view/ads").get(
-    auth.userValidation,
+    auth.userRecyclerCheck,
     CONTROLLER.userController.adsLook
   );
 
