@@ -22,7 +22,7 @@ module.exports = (APP) => {
 
   APP.route("/api/v2/company/update").put(
     companyPakamDataValidation,
-    organisationValidators.organisationUpdate,
+    organisationValidators.companyUpdate,
     checkRequestErrs,
     organisationController.updateProfile
   );
