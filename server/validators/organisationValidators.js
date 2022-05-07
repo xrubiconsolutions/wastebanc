@@ -93,6 +93,21 @@ module.exports = {
       .withMessage("price should be integer"),
   ],
 
+  companyUpdate: [
+    body("categories")
+      .optional()
+      .isArray()
+      .withMessage("categories should be an array"),
+    body("categories.*.name")
+      .optional()
+      .isString()
+      .withMessage("name should be string"),
+    body("categories.*.price")
+      .optional()
+      .isInt()
+      .withMessage("price should be integer"),
+  ],
+
   organisationAggregators: [
     param("organisation")
       .notEmpty()
