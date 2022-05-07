@@ -712,5 +712,130 @@ validateUser.userCheck = (req, res, NEXT) => {
   });
 };
 
+validateUser.userRecyclerCheck = async (req, res, NEXT) => {
+  if (!req.headers.authorization) {
+    return res.status(401).jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
+  }
+
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+
+    if (!token) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
+
+    if (token === "undefined" || token === null || token === undefined) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid token",
+      });
+    }
+
+    var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
+    //console.log("valid", validated.userId);
+
+    if (Date.now() >= validated.exp * 1000) {
+      return res.status(401).json({
+        error: true,
+        message: "Token time out. Login again",
+        statusCode: 401,
+      });
+    }
+
+    console.log("id", validated.userId);
+
+    const collector = await MODEL.collectorModel.findById(validated.userId);
+    const user = await MODEL.userModel.findById(validated.userId);
+
+    console.log("user", user);
+    if (user) {
+      if (user.status === "disable") {
+        return res.status(401).json({
+          error: true,
+          message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+          statusCode: 403,
+        });
+      }
+
+      if (user.roles === "client") {
+        req.user = user;
+        NEXT();
+        return;
+      } else {
+        return res.status(401).json({
+          error: true,
+          message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+          statusCode: 403,
+        });
+      }
+      console.log("here1");
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    } else if (collector) {
+      if (collector.status === "disable") {
+        return res.status(401).json({
+          error: true,
+          message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+          statusCode: 403,
+        });
+      }
+
+      if (collector.roles === "collector") {
+        req.user = user;
+        NEXT();
+        return;
+      } else {
+        return res.status(401).json({
+          error: true,
+          message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+          statusCode: 403,
+        });
+      }
+    } else {
+      console.log("here1");
+      return res.status(401).json({
+        error: true,
+        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        statusCode: 403,
+      });
+    }
+
+    // if (user.status === "disable" || collector.status === "disable") {
+    //   return res.status(401).json({
+    //     error: true,
+    //     message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+    //     statusCode: 403,
+    //   });
+    // }
+
+    // if (user.roles === "client") {
+    //   req.user = user;
+    //   NEXT();
+    // } else if (collector.roles === "collector") {
+    //   req.user = user;
+    //   NEXT();
+    // } else {
+    //   return res.status(401).json({
+    //     error: true,
+    //     message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+    //     statusCode: 403,
+    //   });
+    // }
+  } catch (error) {
+    console.log(error);
+    return res.status(401).json({
+      error: true,
+      message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+      statusCode: 401,
+    });
+  }
+};
+
 /* export userControllers */
 module.exports = validateUser;

@@ -1,12 +1,24 @@
 const { resourcesModel } = require("../models");
+const thumbnail = require("youtube-thumbnail");
 
+// resource
 class Resources_Service {
   static async addResource(req, res) {
     try {
+      let watchCode;
+      if (Array.isArray(req.body.youtubeId)) {
+        watchCode = req.body.youtubeId[0];
+      } else {
+        watchCode = req.body.youtubeId;
+      }
+      const youtubeURL = `https://www.youtube.com/watch?v=${watchCode}`;
+      const generateThumbnail = thumbnail(youtubeURL);
+      //console.log("thumbnail", generateThumbnail.high.url);
       const store = await resourcesModel.create({
         title: req.body.title,
         message: req.body.message,
-        url: req.body.url,
+        url: req.body.youtubeId,
+        thumbnail: generateThumbnail.high.url,
       });
       return res.status(200).json({
         error: false,
@@ -71,27 +83,36 @@ class Resources_Service {
 
   static async updateResource(req, res) {
     try {
-      const resource = await resourceModel.findById(req.query.resourceId);
+      const resource = await resourcesModel.findById(req.params.resourceId);
       if (!resource) {
         return res.status(400).json({
           error: true,
           message: "Resource not found",
         });
       }
-      await resourceModel.updateOne(
+
+      let url;
+      if (req.params.resourceId) {
+        const youtubeURL = `https://www.youtube.com/watch?v=${req.params.resourceId}`;
+        const generateThumbnail = thumbnail(youtubeURL);
+        url = generateThumbnail.high.url;
+      } else {
+        url = resource.url;
+      }
+      await resourcesModel.updateOne(
         { _id: resource._id },
         {
-          title: data.title || resource.title,
-          message: data.message || resource.message,
-          url: data.url || resource.url,
-          show: data.show || resource.show,
+          title: req.body.title || resource.title,
+          message: req.body.message || resource.message,
+          url,
+          show: req.body.show || resource.show,
         }
       );
 
-      resource.title = data.title || resource.title;
-      resource.message = data.message || resource.message;
-      resource.url = data.url || resource.url;
-      resource.show = data.show || resource.show;
+      resource.title = req.body.title || resource.title;
+      resource.message = req.body.message || resource.message;
+      resource.url = req.body.url || resource.url;
+      resource.show = req.body.show || resource.show;
 
       return res.status(200).json({
         error: false,
@@ -109,8 +130,8 @@ class Resources_Service {
 
   static async removeResource(req, res) {
     try {
-      const remove = await resourceModel.deleteOne({
-        _id: req.body.resourceId,
+      const remove = await resourcesModel.deleteOne({
+        _id: req.params.resourceId,
       });
 
       if (!remove) {

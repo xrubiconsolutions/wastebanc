@@ -3,6 +3,7 @@ const Schema = MONGOOSE.Schema;
 
 const resourceModel = new Schema({
   title: { type: String },
+  thumbnail: { type: String},
   message: { type: String },
   url: { type: String },
   show: { type: Boolean, default: true },

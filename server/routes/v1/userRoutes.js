@@ -99,7 +99,10 @@ module.exports = (APP) => {
 
   APP.route("/api/update/ads").post(CONTROLLER.userController.updateAdvert);
 
-  APP.route("/api/view/ads").get(CONTROLLER.userController.adsLook);
+  APP.route("/api/view/ads").get(
+    auth.userRecyclerCheck,
+    CONTROLLER.userController.adsLook
+  );
 
   APP.route("/api/android/users").get(
     auth.adminValidation,
