@@ -831,7 +831,7 @@ organisationController.disableCompany = async (req, res) => {
       {
         organisation: company.companyName,
       },
-      { isDisabled: true }
+      { status: "disabled" }
     );
 
     // return success response
@@ -876,7 +876,7 @@ organisationController.enableCompany = async (req, res) => {
       {
         organisation: company.companyName,
       },
-      { isDisabled: false }
+      { status: "active" }
     );
 
     // return success response

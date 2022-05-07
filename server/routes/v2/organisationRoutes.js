@@ -20,6 +20,13 @@ module.exports = (APP) => {
     organisationController.changePassword
   );
 
+  APP.route("/api/v2/organisation/update").put(
+    companyPakamDataValidation,
+    organisationValidators.organisationUpdate,
+    checkRequestErrs,
+    organisationController.updateProfile
+  );
+
   APP.route("/api/v2/waste/collection").get(
     adminPakamValidation,
     organisationController.getOrganisationCompleted
@@ -72,13 +79,6 @@ module.exports = (APP) => {
     organisationValidators.orgId,
     checkRequestErrs,
     organisationController.remove
-  );
-
-  APP.route("/api/v2/organisation/update").put(
-    companyPakamDataValidation,
-    organisationValidators.organisationUpdate,
-    checkRequestErrs,
-    organisationController.updateProfile
   );
 
   APP.route("/api/v2/organisation/dropoff/locations").get(
