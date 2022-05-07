@@ -13,6 +13,13 @@ const { companyId } = require("../../validators/commonValidator");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 
 module.exports = (APP) => {
+  APP.route("/api/v2/organisation/update-password").put(
+    companyPakamDataValidation,
+    organisationValidators.changePassword,
+    checkRequestErrs,
+    organisationController.changePassword
+  );
+
   APP.route("/api/v2/waste/collection").get(
     adminPakamValidation,
     organisationController.getOrganisationCompleted

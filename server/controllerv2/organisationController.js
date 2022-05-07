@@ -15,6 +15,7 @@ const {
   bodyValidate,
   encryptPassword,
   generateRandomString,
+  comparePassword,
 } = require("../util/commonFunction");
 const sgMail = require("@sendgrid/mail");
 const request = require("request");
@@ -891,4 +892,37 @@ organisationController.enableCompany = async (req, res) => {
     });
   }
 };
+
+organisationController.changePassword = async (req, res) => {
+  const { _id: companyId, password } = req.user;
+  const { currentPassword, newPassword } = req.body;
+  try {
+    // return error if passwords don't match
+    const passwordMatch = await comparePassword(currentPassword, password);
+    if (!passwordMatch)
+      return res.status(400).json({
+        error: true,
+        message: "Current password is incorrect!",
+      });
+
+    // update account with new password
+    const passwordHash = await encryptPassword(newPassword);
+    const account = await organisationModel.findById(companyId);
+    account.password = passwordHash;
+    await account.save();
+
+    // return success message
+    return res.status(200).json({
+      error: false,
+      message: "Password changed successfully!",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+};
+
 module.exports = organisationController;
