@@ -46,4 +46,10 @@ module.exports = (APP) => {
   APP.route("/api/world/locations").get(
     controller.locationController.worldlocations
   );
+
+  APP.route("/api/v2/lga").get(controller.locationController.getLGA);
+
+  APP.route("/api/v2/lcd/accessArea").get(
+    controller.locationController.accessArea
+  );
 };

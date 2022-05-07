@@ -217,4 +217,49 @@ locationController.worldlocations = async (req, res) => {
     });
   }
 };
+
+locationController.getLGA = async (req, res) => {
+  try {
+    const { state = "Lagos" } = req.query;
+    const results = await MODEL.localGovernmentModel
+      .find({
+        state,
+      })
+      .select({ lga: 1 });
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: results,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+locationController.accessArea = async (req, res) => {
+  try {
+    const { state = "Lagos", lga } = req.query;
+    const results = await MODEL.localGovernmentModel
+      .find({
+        state,
+        lga,
+      })
+      .select({ lcd: 1 });
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: results,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
 module.exports = locationController;
