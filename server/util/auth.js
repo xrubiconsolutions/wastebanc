@@ -200,10 +200,10 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
       });
     }
 
-    if (user.status === "disable") {
+    if (user.isDisabled) {
       return res.status(401).json({
         error: true,
-        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        message: "Your account is currently disabled! contact customer service",
         statusCode: 401,
       });
     }
@@ -281,11 +281,11 @@ validateUser.recyclerValidation = async (req, res, NEXT) => {
       });
     }
 
-    if (user.status === "disable") {
+    if (user.status === "disabled") {
       //console.log("here 2");
       return res.status(401).json({
         error: true,
-        message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
+        message: "Your account is currently disabled! contact customer service",
         statusCode: 401,
       });
     }

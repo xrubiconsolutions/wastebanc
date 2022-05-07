@@ -20,7 +20,7 @@ module.exports = (APP) => {
     organisationController.changePassword
   );
 
-  APP.route("/api/v2/organisation/update").put(
+  APP.route("/api/v2/company/update").put(
     companyPakamDataValidation,
     organisationValidators.organisationUpdate,
     checkRequestErrs,
