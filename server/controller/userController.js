@@ -2703,6 +2703,7 @@ userController.adminLogin = async (req, res) => {
       });
     }
 
+    const firstLogin = user.last_logged_in ? false : true;
     await MODEL.userModel.updateOne(
       { _id: user._id },
       { last_logged_in: new Date() }
@@ -2732,6 +2733,7 @@ userController.adminLogin = async (req, res) => {
         cardID: user.cardID,
         lcd: user.lcd,
         last_logged_in: user.last_logged_in,
+        firstLogin,
         token,
         claims,
       },

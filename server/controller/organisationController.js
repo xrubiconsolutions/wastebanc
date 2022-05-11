@@ -252,7 +252,7 @@ organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
         ? COMMON_FUN.decryptPswrd(
             REQUEST.body.password,
             USER.password,
-            (ERR, MATCHED) => {
+            async (ERR, MATCHED) => {
               if (ERR)
                 return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
               else if (!MATCHED)
@@ -271,7 +271,15 @@ organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
                       "Your licence expired. Kindly contact support for difficulty in renewal",
                   });
                 }
-                return RESPONSE.jsonp(USER);
+                const firstLogin = USER.last_logged_in ? false : true;
+                const { password, resetToken, ...data } = USER;
+                await MODEL.organisationModel.updateOne(
+                  {
+                    email: REQUEST.body.email,
+                  },
+                  { last_logged_in: new Date() }
+                );
+                return RESPONSE.jsonp({ ...data, firstLogin });
               }
             }
           )
