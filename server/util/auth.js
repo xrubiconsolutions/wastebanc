@@ -35,7 +35,7 @@ validateUser.userValidation = async (req, res, NEXT) => {
     }
 
     var validated = jwt_decode(req.headers.authorization.split(" ")[1]);
-    ////console.log("valid", validated);
+    console.log("valid", validated);
     if (Date.now() >= validated.exp * 1000) {
       return res.status(401).json({
         error: true,

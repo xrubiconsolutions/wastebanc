@@ -25,11 +25,41 @@ class CharityOrganisationService {
   }
 
   static async getCharityOrganisations(req, res) {
+    let { page = 1, resultsPerPage = 20, key = "" } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    const criteria = key
+      ? {
+          $or: [
+            { name: { $regex: `.*${key}.*`, $options: "i" } },
+            { bank: { $regex: `.*${key}.*`, $options: "i" } },
+          ],
+        }
+      : {};
+
     try {
-      const charityOrganisations = await charityOrganisationModel.find();
+      // get length of organisations with criteria
+      const totalResult = await charityOrganisationModel.countDocuments(
+        criteria
+      );
+
+      const charityOrganisations = await charityOrganisationModel
+        .find(criteria)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
       return res.status(200).json({
         error: false,
-        data: charityOrganisations,
+        data: {
+          charityOrganisations,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
       });
     } catch (error) {
       console.log(error);
