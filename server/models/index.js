@@ -37,4 +37,5 @@ module.exports = {
   collectorBinModel: require("./collectorBin"),
   verificationModel: require("./verificationModel"),
   resourcesModel: require("./resourcesModel"),
+  charityOrganisationModel: require("./charityOrganisationModel"),
 };

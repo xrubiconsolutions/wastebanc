@@ -16,4 +16,5 @@ module.exports = function (app) {
   require("./organisationRoutes")(app);
   require("./verificationRoutes")(app);
   require("./resourcesRoutes")(app);
+  require("./charityOrganisationRoutes")(app);
 };
