@@ -669,6 +669,7 @@ const completed = async (criteria) => {
   const totalCompleted = await scheduleModel.countDocuments({
     ...criteria,
     completionStatus: "completed",
+    collectorStatus: "accepted",
   });
   return totalCompleted;
 };
@@ -685,6 +686,7 @@ const pending = async (criteria) => {
   const totalPending = await scheduleModel.countDocuments({
     ...criteria,
     completionStatus: "pending",
+    collectorStatus: "decline",
   });
   return totalPending;
 };
