@@ -138,5 +138,9 @@ const organisation_Schema = new Schema({
     type: Boolean,
     default: false,
   },
+  last_logged_in: {
+    type: Date,
+    default: null,
+  },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);

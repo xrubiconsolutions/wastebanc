@@ -460,4 +460,39 @@ agenciesController.getAgencyProfile = async (req, res) => {
   }
 };
 
+agenciesController.changePassword = async (req, res) => {
+  const { _id: adminId, password } = req.user;
+  const { currentPassword, newPassword } = req.body;
+  try {
+    // return error if passwords don't match
+    const passwordMatch = await COMMON_FUN.comparePassword(
+      currentPassword,
+      password
+    );
+    if (!passwordMatch)
+      return res.status(400).json({
+        error: true,
+        message: "Current password is incorrect!",
+      });
+
+    // update account with new password
+    const passwordHash = await COMMON_FUN.encryptPassword(newPassword);
+    const account = await MODEL.userModel.findById(adminId);
+    account.password = passwordHash;
+    await account.save();
+
+    // return success message
+    return res.status(200).json({
+      error: false,
+      message: "Password changed successfully!",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+};
+
 module.exports = agenciesController;

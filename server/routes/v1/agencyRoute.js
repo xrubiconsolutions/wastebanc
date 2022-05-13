@@ -60,4 +60,11 @@ module.exports = (APP) => {
     companyPakamDataValidation,
     controller.userAgenciesController.getAgencyProfile
   );
+
+  APP.route("/api/user/agencies/update-password").put(
+    auth.adminPakamValidation,
+    userValidator.changePassword,
+    checkRequestErrs,
+    controller.userAgenciesController.changePassword
+  );
 };

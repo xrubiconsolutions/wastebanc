@@ -13,6 +13,20 @@ const { companyId } = require("../../validators/commonValidator");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 
 module.exports = (APP) => {
+  APP.route("/api/v2/organisation/update-password").put(
+    companyPakamDataValidation,
+    organisationValidators.changePassword,
+    checkRequestErrs,
+    organisationController.changePassword
+  );
+
+  APP.route("/api/v2/company/update").put(
+    companyPakamDataValidation,
+    organisationValidators.companyUpdate,
+    checkRequestErrs,
+    organisationController.updateProfile
+  );
+
   APP.route("/api/v2/waste/collection").get(
     adminPakamValidation,
     organisationController.getOrganisationCompleted
@@ -65,13 +79,6 @@ module.exports = (APP) => {
     organisationValidators.orgId,
     checkRequestErrs,
     organisationController.remove
-  );
-
-  APP.route("/api/v2/organisation/update").put(
-    companyPakamDataValidation,
-    organisationValidators.organisationUpdate,
-    checkRequestErrs,
-    organisationController.updateProfile
   );
 
   APP.route("/api/v2/organisation/dropoff/locations").get(

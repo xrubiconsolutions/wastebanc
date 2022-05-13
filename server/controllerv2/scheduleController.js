@@ -106,6 +106,9 @@ class ScheduleService {
 
       const totalResult = await scheduleModel.countDocuments(criteria);
 
+      const skip = (page - 1) * resultsPerPage;
+      
+      console.log("skip", skip);
       // get all schedules within range
       const schedules = await scheduleModel
         .find(criteria)

@@ -93,6 +93,21 @@ module.exports = {
       .withMessage("price should be integer"),
   ],
 
+  companyUpdate: [
+    body("categories")
+      .optional()
+      .isArray()
+      .withMessage("categories should be an array"),
+    body("categories.*.name")
+      .optional()
+      .isString()
+      .withMessage("name should be string"),
+    body("categories.*.price")
+      .optional()
+      .isInt()
+      .withMessage("price should be integer"),
+  ],
+
   organisationAggregators: [
     param("organisation")
       .notEmpty()
@@ -107,5 +122,26 @@ module.exports = {
       .withMessage("orgId is required")
       .isString()
       .withMessage("orgId is string"),
+  ],
+
+  changePassword: [
+    body("currentPassword")
+      .notEmpty()
+      .withMessage("currentPassword is required")
+      .isString()
+      .withMessage("current password must be a string")
+      .isLength({
+        min: 6,
+      })
+      .withMessage("password must be greater than 5 characters"),
+    body("newPassword")
+      .notEmpty()
+      .withMessage("newPassword is required")
+      .isString()
+      .withMessage("password must be a string")
+      .isLength({
+        min: 6,
+      })
+      .withMessage("password must be greater than 5 characters"),
   ],
 };

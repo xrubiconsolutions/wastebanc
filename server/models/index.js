@@ -38,4 +38,5 @@ module.exports = {
   verificationLogModel: require("./verificationLogModel"),
   resourcesModel: require("./resourcesModel"),
   recentVerificationModel: require("./recentVerificationModel"),
+  charityOrganisationModel: require("./charityOrganisationModel"),
 };

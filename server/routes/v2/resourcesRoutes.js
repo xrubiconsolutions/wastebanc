@@ -28,6 +28,14 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/resources").get(ResourcesCtrl.listResources);
-  APP.route("/api/resource/:resourceId").get(ResourcesCtrl.findResource);
-  APP.route("/api/resource/:resourceId").delete(ResourcesCtrl.removeResource);
+  APP.route("/api/resource/:resourceId").get(
+    resourceId,
+    checkRequestErrs,
+    ResourcesCtrl.findResource
+  );
+  APP.route("/api/resource/:resourceId").delete(
+    resourceId,
+    checkRequestErrs,
+    ResourcesCtrl.removeResource
+  );
 };

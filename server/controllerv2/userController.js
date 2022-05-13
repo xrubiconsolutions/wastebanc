@@ -682,6 +682,7 @@ class UserService {
           cardID: user.cardID,
           lcd: user.lcd,
           last_logged_in: user.last_logged_in,
+          firstLogin: user.last_logged_in ? false : true,
           token,
         },
       });
