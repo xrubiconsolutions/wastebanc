@@ -248,7 +248,7 @@ locationController.accessArea = async (req, res) => {
         state,
         lga,
       })
-      .select({ lcd: 1 });
+      .select({ lcd: 1, slug: 1 });
     return res.status(200).json({
       error: false,
       message: "success",
