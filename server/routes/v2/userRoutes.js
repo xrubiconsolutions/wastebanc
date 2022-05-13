@@ -40,7 +40,7 @@ module.exports = (APP) => {
   APP.route("/api/verify").post(UserService.verifyOTP);
 
   APP.route("/api/login").post(UserService.login);
-  APP.route("/api/password-reset").put(
+  APP.route("/api/v2/password-reset").put(
     userValidator.passwordReset,
     checkRequestErrs,
     UserService.resetPassword

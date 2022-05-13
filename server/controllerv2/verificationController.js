@@ -70,7 +70,7 @@ class VerificationService {
 
       // return verification error is it exist
       if (error)
-        return res.status(200).json({
+        return res.status(400).json({
           error: true,
           message: type,
         });
@@ -148,13 +148,12 @@ class VerificationService {
     const MAX_ATTEMPT = 5;
     try {
       const verification = await recentVerificationModel.findOne(logDetails);
-      let state = { attemptsExceeded: false, expired: false };
 
       //   error types
       const ERROR_OBJ = Object.freeze({
         ATTEMPTS_EXCEEDED: "Allowed Attempts Exceeded",
         EXPIRED: "Expiration time exceeded",
-        NOT_FOUND: "No log found",
+        NOT_FOUND: "Token log not found",
         WRONG_TOKEN: "Token does not match",
         ALREADY_VERIFIED: "Token already verified",
       });
