@@ -11,6 +11,15 @@ const { validationResult, body } = require("express-validator");
 //   CountryContext,
 // } = require("twilio/lib/rest/pricing/v1/phoneNumber/country");
 
+const removeObjDuplicate = (arr, field) => {
+  const result = arr.reduce((acc, current) => {
+    const doExist = acc.find((d) => d[field] === current[field]);
+    if (!doExist) return [...acc, current];
+    return acc;
+  }, []);
+  return result;
+};
+
 const bodyValidate = (req, res) => {
   // 1. Validate the request coming in
   // console.log(req.body);
@@ -226,10 +235,13 @@ locationController.getLGA = async (req, res) => {
         state,
       })
       .select({ lga: 1 });
+
+    const data = removeObjDuplicate(results, "lga");
+
     return res.status(200).json({
       error: false,
       message: "success",
-      data: results,
+      data,
     });
   } catch (error) {
     console.log(error);
@@ -249,6 +261,9 @@ locationController.accessArea = async (req, res) => {
         lga,
       })
       .select({ lcd: 1, slug: 1 });
+
+    const data = removeObjDuplicate(results, "lcd");
+
     return res.status(200).json({
       error: false,
       message: "success",
