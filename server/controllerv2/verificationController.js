@@ -1,13 +1,18 @@
-const { verificationModel, userModel, collectorModel } = require("../models");
+const {
+  verificationLogModel,
+  recentVerificationModel,
+  userModel,
+  collectorModel,
+  organisationModel,
+} = require("../models");
 const COMMON_FUN = require("../util/commonFunction");
-const { VERIFICATION_OBJ } = require("../util/constants");
-
-const ROLES_ENUM = Object.freeze(["COLLECTOR", "CLIENT", "ADMIN"]);
+const { VERIFICATION_OBJ, ROLES_ENUM } = require("../util/constants");
 
 class VerificationService {
   static async requestAuthToken(req, res) {
     const { email, phone, role } = req.body;
     try {
+      // fetch user account based email/phone and role
       const account = await VerificationService.findAccount(
         email ? { email } : { phone },
         role
@@ -19,16 +24,16 @@ class VerificationService {
           message: "Account not found!",
         });
 
-      // create verification log
-      const data = await VerificationService.createVerificationLog(
-        account._id,
-        VERIFICATION_OBJ.AUTH
+      // create recent verification
+      const data = await VerificationService.createVerification(
+        email ? { email } : { phone },
+        VERIFICATION_OBJ.AUTH,
+        role
       );
       //   return response
       return res.status(201).json({
         error: false,
-        message: "success",
-        data,
+        message: "Reset token sent successfully!",
       });
     } catch (error) {
       console.log(error);
@@ -40,34 +45,40 @@ class VerificationService {
   }
 
   static async authTokenVerify(req, res) {
-    const { verificationId, token, role, email, phone } = req.body;
+    const { verificationType, token, role, email, phone } = req.body;
     try {
+      // find user account based on email/phone and role
       const user = await VerificationService.findAccount(
         email ? { email } : { phone },
         role
       );
 
+      //  return error if account not found
       if (!user)
         return res.status(404).json({
           error: true,
           message: "Account not found!",
         });
 
+      // verify the token
       const { error, type, data } = await VerificationService.verifyToken(
-        user._id,
-        verificationId,
-        token
+        email ? { email } : { phone },
+        verificationType,
+        token,
+        role
       );
+
+      // return verification error is it exist
       if (error)
-        return res.status(200).json({
+        return res.status(400).json({
           error: true,
           message: type,
         });
 
+      // return success message
       return res.status(200).json({
         error: false,
         message: "Token Verified!",
-        data,
       });
     } catch (error) {
       console.log(error);
@@ -78,14 +89,16 @@ class VerificationService {
     }
   }
 
-  static async createVerificationLog(userId = "", verificationType = "") {
+  static async createVerification(field, verificationType = "", role = "") {
     // generate token and construct log details
     const token = COMMON_FUN.generateRandomString();
-    const logDetails = { userId, verificationType, token };
+    const logDetails = { verificationType, token, userRole: role, ...field };
 
     try {
+      // delete exisiting verification document for user
+      await recentVerificationModel.deleteMany({ ...field, verificationType });
       // create verification log
-      const result = await verificationModel.create(logDetails);
+      const result = await recentVerificationModel.create(logDetails);
       // remove token and other values from result
       const { __v, updatedAt, token: t, ...data } = result.toObject();
 
@@ -97,28 +110,66 @@ class VerificationService {
     }
   }
 
-  static async verifyToken(userId = "", verificationId = "", token = "") {
+  static async createVerificationLog(
+    userId = "",
+    verificationType = "",
+    token = "",
+    role = ""
+  ) {
+    // generate token and construct log details
+    const logDetails = { userId, verificationType, token, userRole: role };
+
+    try {
+      // create verification log
+      const result = await verificationLogModel.create(logDetails);
+      // remove token and other values from result
+      const { __v, updatedAt, token: t, ...data } = result.toObject();
+
+      //   return log doc
+      return Promise.resolve(data);
+    } catch (error) {
+      console.log(error);
+      return Promise.reject(error);
+    }
+  }
+
+  static async verifyToken(
+    field,
+    verificationType = "",
+    token = "",
+    role = ""
+  ) {
     const logDetails = {
-      userId,
-      _id: COMMON_FUN.convertIdToMongooseId(verificationId),
+      ...field,
+      verificationType,
+      userRole: role,
     };
     const now = Date.now();
     const MAX_ATTEMPT = 5;
     try {
-      const verification = await verificationModel.findOne(logDetails);
-      let state = { attemptsExceeded: false, expired: false };
+      const verification = await recentVerificationModel.findOne(logDetails);
 
       //   error types
       const ERROR_OBJ = Object.freeze({
         ATTEMPTS_EXCEEDED: "Allowed Attempts Exceeded",
         EXPIRED: "Expiration time exceeded",
-        NOT_FOUND: "No log found",
+        NOT_FOUND: "Token log not found",
         WRONG_TOKEN: "Token does not match",
+        ALREADY_VERIFIED: "Token already verified",
       });
       if (!verification) return { error: true, type: ERROR_OBJ.NOT_FOUND };
 
       // destructure some entry value
-      const { expiryTime, token: _token, attempts } = verification.toObject();
+      const {
+        expiryTime,
+        token: _token,
+        attempts,
+        status,
+      } = verification.toObject();
+
+      // return message if allready verified
+      if (status === "VERIFIED")
+        return { error: true, type: ERROR_OBJ.ALREADY_VERIFIED };
 
       if (attempts > MAX_ATTEMPT) {
         verification.status === "NOT_VERIFIED";
@@ -132,22 +183,30 @@ class VerificationService {
 
       //check token validity
       if (now > expiryTime) {
-        verification.status === "NOT_VERIFIED";
-        await verification.save();
+        await verification.delete();
         return { error: true, type: ERROR_OBJ.EXPIRED };
       }
 
       if (_token !== token) {
+        // delete token after failed and exhausted attempt trials
         if (attempts === MAX_ATTEMPT) {
-          verification.status === "NOT_VERIFIED";
-          await verification.save();
+          await verification.delete();
         }
         return { error: true, type: ERROR_OBJ.WRONG_TOKEN };
       }
 
+      const account = await VerificationService.findAccount(field, role);
+      const logData = {
+        userId: account._id,
+        verificationType,
+        token,
+        userRole: role,
+      };
+
       //   verify request if all conditions are met
       verification.status = "VERIFIED";
       await verification.save();
+      // const result = await verificationLogModel(logData);
 
       return {
         error: false,
@@ -162,7 +221,7 @@ class VerificationService {
   static async findAccount(field, role) {
     try {
       let account;
-      // find user account
+      // find user account based on provided role
       switch (role) {
         case ROLES_ENUM[0]:
           account = await collectorModel.findOne(field);
@@ -172,6 +231,9 @@ class VerificationService {
           break;
         case ROLES_ENUM[2]:
           account = await userModel.findOne(field);
+          break;
+        case ROLES_ENUM[3]:
+          account = await organisationModel.findOne(field);
           break;
         default:
       }

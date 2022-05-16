@@ -1,5 +1,10 @@
 const incidentModel = require("../models/incidentModel");
-const { userModel, organisationTypeModel } = require("../models");
+const {
+  userModel,
+  recentVerificationModel,
+  verificationLogModel,
+  organisationTypeModel,
+} = require("../models");
 const {
   sendResponse,
   bodyValidate,
@@ -11,6 +16,7 @@ const { STATUS_MSG } = require("../util/constants");
 const request = require("request");
 const axios = require("axios");
 const uuid = require("uuid");
+const VerificationService = require("./verificationController");
 
 class UserService {
   static async getClients(req, res) {
@@ -685,6 +691,78 @@ class UserService {
       return res.status(500).json({
         error: true,
         message: "An error occurred",
+      });
+    }
+  }
+
+  static async resetPassword(req, res) {
+    const { email, phone, password, confirmPassword, role } = req.body;
+
+    try {
+      // get user account
+      const account = await VerificationService.findAccount(
+        email ? { email } : { phone },
+        role
+      );
+
+      //  return error if account not found
+      if (!account)
+        return res.status(404).json({
+          error: true,
+          message: "Account not found!",
+        });
+
+      //return error if passwords do not match
+      if (password !== confirmPassword) {
+        return res.status(400).json({
+          error: true,
+          message: "Passwords do not match",
+        });
+      }
+      const field = email ? { email } : { phone };
+      // get verification details
+      const criteria = {
+        verificationType: "AUTH",
+        userRole: role,
+        status: "VERIFIED",
+        ...field,
+      };
+      const verification = await recentVerificationModel.findOne(criteria);
+
+      // return error if data not found
+      if (!verification)
+        return res.status(400).json({
+          error: true,
+          message: "Reset Verification invalid, do request for new token",
+        });
+      console.log("The verification obj: ", verification, verification.token);
+
+      // archive verification data in log
+      const log = await VerificationService.createVerificationLog(
+        account._id,
+        "AUTH",
+        verification.token,
+        role
+      );
+
+      // generate password hash and update account password
+      const passwordHash = await encryptPassword(password);
+      account.password = passwordHash;
+      await account.save();
+
+      // delete verification data after archiving it
+      await recentVerificationModel.deleteOne(criteria);
+
+      // send success message
+      return res.status(200).json({
+        error: false,
+        message: "Password reset success!",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occured",
       });
     }
   }
