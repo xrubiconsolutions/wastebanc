@@ -599,6 +599,25 @@ class CollectorService {
         }
       }
 
+      let organisationName;
+      let organisationId;
+      if (body.organisation) {
+        const org = await organisationModel.findOne({
+          companyName: body.organisation.trim(),
+        });
+        if (!org) {
+          return res.status(400).json({
+            error: true,
+            message: "Invalid organisation passed",
+          });
+        }
+        organisationName = org.companyName;
+        organisationId = org._id.toString();
+      } else {
+        organisationName = "";
+        organsationId = "";
+      }
+
       const create = await collectorModel.create({
         fullname: body.fullname,
         email: body.email || "",
@@ -609,7 +628,8 @@ class CollectorService {
         state: body.state,
         long: body.long || "",
         lat: body.lat || "",
-        organisation: body.organisation || "",
+        organisation: organisationName,
+        organisationId: organisationId,
         aggregatorId: "",
         onesignal_id,
       });
@@ -1295,19 +1315,21 @@ class CollectorService {
   static async updateCollector(req, res) {
     try {
       const { user } = req;
-      let organisation = user.organisation;
+      let organisation = user.organisation || "";
+      let organisationId = user.organisationId || "";
       if (req.body.organisation) {
         organisation = req.body.organisation;
-      }
-      const org = await organisationModel.findOne({
-        companyName: organisation,
-      });
-
-      if (!org) {
-        return res.status(400).json({
-          error: true,
-          message: "Select an organisation",
+        const org = await organisationModel.findOne({
+          companyName: organisation,
         });
+
+        if (!org) {
+          return res.status(400).json({
+            error: true,
+            message: "Invalid organisation passed",
+          });
+        }
+        organisationId = org._id.toString();
       }
 
       let email;
@@ -1338,6 +1360,7 @@ class CollectorService {
             place: req.body.place || user.place,
             aggregatorId: req.body.aggregatorId || user.aggregatorId,
             organisation: req.body.organisation || user.organisation,
+            organisationId: organisationId,
             localGovernment: req.body.localGovernment || user.localGovernment,
             profile_picture: req.body.profile_picture || user.profile_picture,
             areaOfAccess: org.areaOfAccess || user.areaOfAccess || [],
@@ -1357,6 +1380,42 @@ class CollectorService {
       user.areaOfAccess = org.areaOfAccess || user.areaOfAccess || [];
 
       return res.status(200).json(user);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
+
+  // assign organisatioId to all collectors
+  static async assignOrganisationId(req, res) {
+    try {
+      const allCollectors = await collectorModel.find({
+        $or: [{ organisation: { $ne: null } }, { organisation: "" }],
+      });
+
+      if (allCollectors.length > 0) {
+        await Promise.all(
+          allCollectors.map(async (collector) => {
+            if (collector.organisation) {
+              const collectOrg = await organisationModel.findOne({
+                companyName: collector.organisation,
+              });
+              if (collectOrg) {
+                await collectorModel.updateOne(
+                  { _id: collector._id },
+                  {
+                    $set: {
+                      organisationId: collectOrg._id.toString(),
+                    },
+                  }
+                );
+              }
+            }
+          })
+        );
+      }
+
+      return res.status(200).json({ message: "Done" });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: true, message: "An error occured" });

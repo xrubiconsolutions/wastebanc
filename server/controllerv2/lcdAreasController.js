@@ -221,4 +221,45 @@ areasController.remove = async (req, res) => {
   }
 };
 
+areasController.scriptArea = async (req, res) => {
+  try {
+    const alllCDA = await localGovernmentModel.find({});
+
+    console.log("alllCDA", alllCDA);
+    if (alllCDA.length > 0) {
+      await Promise.all(
+        alllCDA.map(async (lga) => {
+          if (lga.slug) {
+            let localgov = lga.lga;
+            let lcd = lga.lcd;
+
+            if (localgov.includes(" ")) {
+              localgov = localgov.replace(" ", "-").toLowerCase();
+            } else if (lcd.includes(" ")) {
+              lcd = lcd.replace(" ", "-").toLowerCase();
+            } else {
+              localgov = localgov.toLowerCase();
+              lcd = lcd.toLowerCase();
+            }
+            const slug = `${localgov}-${lcd}`;
+            await localGovernmentModel.updateOne(
+              { _id: lga._id },
+              {
+                $set: {
+                  slug,
+                },
+              }
+            );
+          }
+        })
+      );
+    }
+    return res.status(200).json({ message: "Done" });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+};
+
 module.exports = areasController;

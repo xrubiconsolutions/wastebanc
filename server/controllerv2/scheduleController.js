@@ -107,8 +107,7 @@ class ScheduleService {
       const totalResult = await scheduleModel.countDocuments(criteria);
 
       const skip = (page - 1) * resultsPerPage;
-      
-      console.log("skip", skip);
+
       // get all schedules within range
       const schedules = await scheduleModel
         .find(criteria)
@@ -479,7 +478,19 @@ class ScheduleService {
   static async smartRoute(req, res) {
     try {
       const { user } = req;
-      const collectorAccessArea = user.areaOfAccess;
+      let areaOfAccess;
+      if (user.organisationId) {
+        const organisation = await organisationModel.findById(
+          user.organisationId
+        );
+        if (organisation) {
+          areaOfAccess = organisation.areaOfAccess;
+        }
+      } else {
+        areaOfAccess = user.areaOfAccess;
+      }
+      
+      const collectorAccessArea = areaOfAccess;
       let geofencedSchedules = [];
       let active_today = new Date();
       active_today.setHours(0);

@@ -132,4 +132,6 @@ module.exports = (APP) => {
     recyclerValidation,
     CollectorService.recentTransaction
   );
+
+  APP.route("/api/collector/script").get(CollectorService.assignOrganisationId);
 };

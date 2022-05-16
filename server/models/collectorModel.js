@@ -64,6 +64,9 @@ const collector_Schema = new Schema({
   organisation: {
     type: String,
   },
+  organisationId: {
+    type: String,
+  },
   IdNumber: {
     type: String,
   },

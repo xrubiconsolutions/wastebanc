@@ -366,6 +366,15 @@ const sendNotification = function (data) {
   req.end();
 };
 
+const removeObjDuplicate = (arr, field) => {
+  const result = arr.reduce((acc, current) => {
+    const doExist = acc.find((d) => d[field] === current[field]);
+    if (!doExist) return [...acc, current];
+    return acc;
+  }, []);
+  return result;
+};
+
 /*exporting all object from here*/
 module.exports = {
   sendError: sendError,
@@ -393,4 +402,5 @@ module.exports = {
   sendResponse,
   bodyValidate,
   sendNotification,
+  removeObjDuplicate,
 };
