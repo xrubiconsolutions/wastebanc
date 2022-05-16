@@ -1314,6 +1314,7 @@ class CollectorService {
 
   static async updateCollector(req, res) {
     try {
+      const token = req.headers.authorization.split(" ")[1];
       const { user } = req;
       let organisation = user.organisation || "";
       let organisationId = user.organisationId || "";
@@ -1356,6 +1357,7 @@ class CollectorService {
             gender: req.body.gender || user.gender,
             address: req.body.address || user.address,
             fullname,
+            country: req.body.country || user.country,
             state: req.body.state || user.state,
             place: req.body.place || user.place,
             aggregatorId: req.body.aggregatorId || user.aggregatorId,
@@ -1372,14 +1374,15 @@ class CollectorService {
       user.address = req.body.address || user.address;
       user.fullname = req.body.fullname || user.fullname;
       user.state = req.body.state || user.state;
+      user.country = req.body.country || user.country;
       user.place = req.body.place || user.place;
       user.aggregatorId = req.body.aggregatorId || user.aggregatorId;
       user.organisation = req.body.organisation || user.organisation;
       user.localGovernment = req.body.localGovernment || user.localGovernment;
       user.profile_picture = req.body.profile_picture || user.profile_picture;
       user.areaOfAccess = organisation.areaOfAccess || user.areaOfAccess || [];
-
-      return res.status(200).json(user);
+      //user.token = token;
+      return res.status(200).json({ user: user, token });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: true, message: "An error occured" });
