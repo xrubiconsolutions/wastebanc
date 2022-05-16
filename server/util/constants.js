@@ -534,11 +534,12 @@ let MAIL_STATUS = {
 };
 
 /** Verificatiomn Types */
-const VERIFICATION_TYPES = Object.freeze(["AUTH"]);
+const VERIFICATION_TYPES = Object.freeze(["AUTH", "PAYMENT"]);
 const VERIFICATION_OBJ = Object.freeze({
   AUTH: "AUTH",
   PAYMENT: "PAYMENT",
 });
+const ROLES_ENUM = Object.freeze(["COLLECTOR", "CLIENT", "ADMIN", "COMPANY"]);
 
 /***********************************
  ****** Application Constants ******
@@ -553,6 +554,7 @@ let APP_CONSTANTS = {
   MAIL_STATUS: MAIL_STATUS,
   VERIFICATION_TYPES,
   VERIFICATION_OBJ,
+  ROLES_ENUM,
 };
 
 /** Exporting APP CONSTANTS **/

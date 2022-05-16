@@ -35,7 +35,8 @@ module.exports = {
   organisationTypeModel: require("./organisationTypeModel"),
   organisationBinModel: require("./organisationBin"),
   collectorBinModel: require("./collectorBin"),
-  verificationModel: require("./verificationModel"),
+  verificationLogModel: require("./verificationLogModel"),
   resourcesModel: require("./resourcesModel"),
+  recentVerificationModel: require("./recentVerificationModel"),
   charityOrganisationModel: require("./charityOrganisationModel"),
 };

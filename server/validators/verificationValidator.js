@@ -1,6 +1,5 @@
 const { body, query } = require("express-validator");
-
-const ROLES_ENUM = Object.freeze(["COLLECTOR", "CLIENT", "ADMIN"]);
+const { VERIFICATION_TYPES, ROLES_ENUM } = require("../util/constants");
 
 module.exports = {
   authVerification: [
@@ -36,12 +35,12 @@ module.exports = {
       .withMessage("type must be a string")
       .isIn(ROLES_ENUM)
       .withMessage(`Role must be among: ${ROLES_ENUM}`),
-    body("verificationId")
+    body("verificationType")
       .trim()
       .notEmpty()
-      .withMessage("verificationId is required")
-      .isString()
-      .withMessage("type must be a string"),
+      .withMessage("verificationType is required")
+      .isIn(VERIFICATION_TYPES)
+      .withMessage(`Type must be among: ${VERIFICATION_TYPES}`),
     body("token")
       .trim()
       .notEmpty()
