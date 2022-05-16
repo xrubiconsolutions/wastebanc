@@ -483,13 +483,14 @@ class ScheduleService {
         const organisation = await organisationModel.findById(
           user.organisationId
         );
+        //console.log("user organisation", organisation);
         if (organisation) {
           areaOfAccess = organisation.areaOfAccess;
         }
       } else {
         areaOfAccess = user.areaOfAccess;
       }
-      
+
       const collectorAccessArea = areaOfAccess;
       let geofencedSchedules = [];
       let active_today = new Date();

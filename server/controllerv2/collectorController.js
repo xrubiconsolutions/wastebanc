@@ -1363,7 +1363,7 @@ class CollectorService {
             organisationId: organisationId,
             localGovernment: req.body.localGovernment || user.localGovernment,
             profile_picture: req.body.profile_picture || user.profile_picture,
-            areaOfAccess: org.areaOfAccess || user.areaOfAccess || [],
+            areaOfAccess: organisation.areaOfAccess || user.areaOfAccess || [],
           },
         }
       );
@@ -1377,7 +1377,7 @@ class CollectorService {
       user.organisation = req.body.organisation || user.organisation;
       user.localGovernment = req.body.localGovernment || user.localGovernment;
       user.profile_picture = req.body.profile_picture || user.profile_picture;
-      user.areaOfAccess = org.areaOfAccess || user.areaOfAccess || [];
+      user.areaOfAccess = organisation.areaOfAccess || user.areaOfAccess || [];
 
       return res.status(200).json(user);
     } catch (error) {
