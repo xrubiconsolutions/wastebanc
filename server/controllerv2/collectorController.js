@@ -1315,7 +1315,8 @@ class CollectorService {
   static async updateCollector(req, res) {
     try {
       const token = req.headers.authorization.split(" ")[1];
-      const { user } = req;
+      let { user } = req;
+
       let organisation = user.organisation || "";
       let organisationId = user.organisationId || "";
       if (req.body.organisation) {
@@ -1355,6 +1356,7 @@ class CollectorService {
             email,
             phone: user.phone,
             gender: req.body.gender || user.gender,
+            dateOfBirth: req.body.dateOfBirth || user.dateOfBirth,
             address: req.body.address || user.address,
             fullname,
             country: req.body.country || user.country,
@@ -1370,19 +1372,51 @@ class CollectorService {
         }
       );
 
-      user.gender = req.body.gender || user.gender;
-      user.address = req.body.address || user.address;
-      user.fullname = req.body.fullname || user.fullname;
-      user.state = req.body.state || user.state;
-      user.country = req.body.country || user.country;
-      user.place = req.body.place || user.place;
-      user.aggregatorId = req.body.aggregatorId || user.aggregatorId;
-      user.organisation = req.body.organisation || user.organisation;
-      user.localGovernment = req.body.localGovernment || user.localGovernment;
-      user.profile_picture = req.body.profile_picture || user.profile_picture;
-      user.areaOfAccess = organisation.areaOfAccess || user.areaOfAccess || [];
+      // user.gender = req.body.gender || user.gender;
+      // user.address = req.body.address || user.address;
+      // user.fullname = req.body.fullname || user.fullname;
+      // user.state = req.body.state || user.state;
+      // user.country = req.body.country || user.country;
+      // user.place = req.body.place || user.place;
+      // user.aggregatorId = req.body.aggregatorId || user.aggregatorId;
+      // user.organisation = req.body.organisation || user.organisation;
+      // user.localGovernment = req.body.localGovernment || user.localGovernment;
+      // user.profile_picture = req.body.profile_picture || user.profile_picture;
+      // user.areaOfAccess = organisation.areaOfAccess || user.areaOfAccess || [];
       //user.token = token;
-      return res.status(200).json({ user: user, token });
+      const newUser = {
+        _id: user._id,
+        fullname: req.body.fullname || user.fullname,
+        address: req.body.address || user.address,
+        place: req.body.place || user.place,
+        email: user.email,
+        phone: user.phone,
+        roles: user.roles,
+        busy: user.busy,
+        createdAt: user.createdAt,
+        countryCode: user.countryCode,
+        verified: user.verified,
+        status: user.status,
+        gender: req.body.gender || user.gender,
+        dateOfBirth: req.body.dateOfBirth || user.dateOfBirth,
+        organisation: req.body.organisation || user.organisation,
+        organisationId: user.organisationId,
+        status: req.body.address || user.address,
+        state: req.body.state || user.state,
+        country: req.body.country || user.country,
+        aggregatorId: req.body.aggregatorId || user.aggregatorId,
+        localGovernment: req.body.localGovernment || user.localGovernment,
+        areaOfAccess: organisation.areaOfAccess || user.areaOfAccess || [],
+        approvedBy: user.approvedBy,
+        totalCollected: user.totalCollected,
+        numberOfTripsCompleted: user.numberOfTripsCompleted,
+        lat: user.lat,
+        long: user.long,
+        onesignal_id: user.onesignal_id,
+        profile_picture: req.body.profile_picture || user.profile_picture,
+        token,
+      };
+      return res.status(200).json(newUser);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: true, message: "An error occured" });
