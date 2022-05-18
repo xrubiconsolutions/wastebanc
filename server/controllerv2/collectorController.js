@@ -632,6 +632,7 @@ class CollectorService {
         organisationId: organisationId,
         aggregatorId: "",
         onesignal_id,
+        dateOfBirth: body.dateOfBirth || "",
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -1168,6 +1169,7 @@ class CollectorService {
             _id: collector._id,
             verified: collector.verified,
             countryCode: collector.countryCode,
+            dateOfBirth: collector.dateOfBirth,
             status: collector.status,
             areaOfAccess: collector.areasOfAccess,
             approvedBy: collector.approvedBy,
@@ -1214,6 +1216,7 @@ class CollectorService {
           numberOfTripsCompleted: collector.numberOfTripsCompleted,
           fullname: collector.fullname,
           email: collector.email,
+          dateOfBirth: collector.dateOfBirth,
           phone: collector.phone,
           address: collector.address,
           onesignal_id: signal_id,
@@ -1391,6 +1394,7 @@ class CollectorService {
         place: req.body.place || user.place,
         email: user.email,
         phone: user.phone,
+        dateOfBirth: req.body.dateOfBirth || user.dateOfBirth,
         roles: user.roles,
         busy: user.busy,
         createdAt: user.createdAt,
