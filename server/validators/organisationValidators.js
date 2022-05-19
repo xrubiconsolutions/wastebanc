@@ -57,6 +57,11 @@ module.exports = {
       .withMessage("location is required")
       .isString()
       .withMessage("location should be string"),
+    body("country")
+      .optional()
+      .isString()
+      .withMessage("country should be string"),
+    body("state").optional().isString().withMessage("state should be string"),
   ],
 
   organisationId: [

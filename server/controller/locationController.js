@@ -255,12 +255,17 @@ locationController.getLGA = async (req, res) => {
 locationController.accessArea = async (req, res) => {
   try {
     const { state = "Lagos", lga } = req.query;
-    const results = await MODEL.localGovernmentModel
-      .find({
+    let results;
+    if (lga) {
+      results = await MODEL.localGovernmentModel.find({
         state,
         lga,
-      })
-      .select({ lcd: 1, slug: 1 });
+      });
+    } else {
+      results = await MODEL.localGovernmentModel.find({
+        state,
+      });
+    }
 
     const data = removeObjDuplicate(results, "lcd");
 
