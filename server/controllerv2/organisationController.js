@@ -922,6 +922,7 @@ organisationController.changePassword = async (req, res) => {
     const passwordHash = await encryptPassword(newPassword);
     const account = await organisationModel.findById(companyId);
     account.password = passwordHash;
+    account.firstLogin = false;
     await account.save();
 
     // return success message

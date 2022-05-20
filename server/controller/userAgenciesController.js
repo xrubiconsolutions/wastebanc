@@ -479,6 +479,7 @@ agenciesController.changePassword = async (req, res) => {
     const passwordHash = await COMMON_FUN.encryptPassword(newPassword);
     const account = await MODEL.userModel.findById(adminId);
     account.password = passwordHash;
+    account.firstLogin = false;
     await account.save();
 
     // return success message

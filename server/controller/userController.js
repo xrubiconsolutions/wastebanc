@@ -2642,6 +2642,8 @@ userController.adminLogin = async (req, res) => {
       email,
     });
 
+    console.log("user", user);
+
     if (!user) {
       console.log("here");
       return res.status(400).json({
@@ -2703,41 +2705,73 @@ userController.adminLogin = async (req, res) => {
       });
     }
 
-    const firstLogin = user.last_logged_in ? false : true;
-    await MODEL.userModel.updateOne(
-      { _id: user._id },
-      { last_logged_in: new Date() }
-    );
     const token = COMMON_FUN.adminToken(user);
+    const firstLogin = user.last_logged_in ? false : true;
+    if (user.firstLogin && user.firstLogin === true) {
+      console.log("happen 1");
+      return res.status(200).json({
+        error: false,
+        message: "Please change password",
+        statusCode: 200,
+        data: {
+          _id: user._id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          fullname: user.fullname,
+          email: user.email,
+          phone: user.phone,
+          othernames: user.othernames,
+          address: user.address,
+          roles: user.roles,
+          displayRole: user.displayRole,
+          countryCode: user.countryCode,
+          verified: user.verified,
+          availablePoints: user.availablePoints,
+          rafflePoints: user.rafflePoints,
+          schedulePoints: user.schedulePoints,
+          cardID: user.cardID,
+          lcd: user.lcd,
+          //last_logged_in: user.last_logged_in,
+          firstLogin: true,
+          token,
+          claims,
+        },
+      });
+    } else {
+      await MODEL.userModel.updateOne(
+        { _id: user._id },
+        { last_logged_in: new Date() }
+      );
 
-    return res.status(200).json({
-      error: false,
-      message: "Login successfull",
-      statusCode: 200,
-      data: {
-        _id: user._id,
-        firstname: user.firstname,
-        lastname: user.lastname,
-        fullname: user.fullname,
-        email: user.email,
-        phone: user.phone,
-        othernames: user.othernames,
-        address: user.address,
-        roles: user.roles,
-        displayRole: user.displayRole,
-        countryCode: user.countryCode,
-        verified: user.verified,
-        availablePoints: user.availablePoints,
-        rafflePoints: user.rafflePoints,
-        schedulePoints: user.schedulePoints,
-        cardID: user.cardID,
-        lcd: user.lcd,
-        last_logged_in: user.last_logged_in,
-        firstLogin,
-        token,
-        claims,
-      },
-    });
+      return res.status(200).json({
+        error: false,
+        message: "Login successfull",
+        statusCode: 200,
+        data: {
+          _id: user._id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          fullname: user.fullname,
+          email: user.email,
+          phone: user.phone,
+          othernames: user.othernames,
+          address: user.address,
+          roles: user.roles,
+          displayRole: user.displayRole,
+          countryCode: user.countryCode,
+          verified: user.verified,
+          availablePoints: user.availablePoints,
+          rafflePoints: user.rafflePoints,
+          schedulePoints: user.schedulePoints,
+          cardID: user.cardID,
+          lcd: user.lcd,
+          last_logged_in: user.last_logged_in,
+          firstLogin: false,
+          token,
+          claims,
+        },
+      });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({
