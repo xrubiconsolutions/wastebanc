@@ -485,7 +485,7 @@ class ScheduleService {
         );
         //console.log("user organisation", organisation);
         if (organisation) {
-          areaOfAccess = organisation.areaOfAccess;
+          areaOfAccess = organisation.streetOfAccess;
         }
       } else {
         areaOfAccess = user.areaOfAccess;

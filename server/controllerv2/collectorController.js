@@ -601,6 +601,7 @@ class CollectorService {
 
       let organisationName;
       let organisationId;
+      let areaOfAccess = [];
       if (body.organisation) {
         const org = await organisationModel.findOne({
           companyName: body.organisation.trim(),
@@ -613,9 +614,11 @@ class CollectorService {
         }
         organisationName = org.companyName;
         organisationId = org._id.toString();
+        areaOfAccess = org.streetOfAccess;
       } else {
         organisationName = "";
         organsationId = "";
+        areaOfAccess = [];
       }
 
       const create = await collectorModel.create({
@@ -631,6 +634,7 @@ class CollectorService {
         organisation: organisationName,
         organisationId: organisationId,
         aggregatorId: "",
+        areaOfAccess,
         onesignal_id,
         dateOfBirth: body.dateOfBirth || "",
       });
@@ -1370,7 +1374,8 @@ class CollectorService {
             organisationId: organisationId,
             localGovernment: req.body.localGovernment || user.localGovernment,
             profile_picture: req.body.profile_picture || user.profile_picture,
-            areaOfAccess: organisation.areaOfAccess || user.areaOfAccess || [],
+            areaOfAccess:
+              organisation.streetOfAccess || user.areaOfAccess || [],
           },
         }
       );
