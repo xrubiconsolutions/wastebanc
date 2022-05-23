@@ -63,7 +63,7 @@ const schedulePick = new Schema({
   },
   completionStatus: {
     type: String,
-    enum: ["completed", "pending", "missed", "cancelled"],
+    enum: ["completed", "pending", "missed", "cancelled","deleted"],
     default: "pending",
   },
   organisation: {

@@ -1379,10 +1379,23 @@ scheduleController.userDelete = async (req, resp) => {
   console.log("auth", user);
 
   try {
-    const remove = await MODEL.scheduleModel.findOneAndDelete({
-      _id: new mongo.ObjectId(scheduleID),
-      client: user.email,
-    });
+    // const remove = await MODEL.scheduleModel.findOneAndDelete({
+    //   _id: new mongo.ObjectId(scheduleID),
+    //   client: user.email,
+    // });
+
+    const remove = await MODEL.scheduleModel.findOneAndUpdate(
+      {
+        _id: new mongo.ObjectId(scheduleID),
+        client: user.email,
+      },
+      {
+        $set: {
+          completionStatus: "deleted",
+        },
+      }
+    );
+
     console.log("deleted remove", remove);
     return resp.status(200).jsonp({
       statusCode: 200,
