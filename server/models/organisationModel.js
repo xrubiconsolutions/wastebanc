@@ -146,5 +146,9 @@ const organisation_Schema = new Schema({
     type: Boolean,
     default: true,
   },
+  allowPickers: {
+    type: Boolean,
+    default: false,
+  },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);

@@ -497,6 +497,7 @@ organisationController.update = async (req, res) => {
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
         categories: req.body.categories || organisation.categories,
         location: req.body.location || organisation.location,
+       // allowPickers: req.body.allowPickers || organisation.allowPickers,
       }
     );
 
@@ -938,5 +939,24 @@ organisationController.changePassword = async (req, res) => {
     });
   }
 };
+
+organisationController.allowsPickers = async(req, res)=> {
+  try{
+    const organisations = await organisationModel.findOne({
+      allowPickers: true
+    })
+
+    return res.status(200).json({
+      error: false,
+      message:"success",
+      data: organisations
+    })
+  }catch(error){
+    return res.status(400).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+}
 
 module.exports = organisationController;

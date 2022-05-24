@@ -10,6 +10,7 @@ const {
   encryptPassword,
   authToken,
   comparePassword,
+  generateRandomString,
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
@@ -23,7 +24,14 @@ class CollectorService {
       const { user } = req;
       const currentScope = user.locationScope;
 
-      let { page = 1, resultsPerPage = 20, end, start, key } = req.query;
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        end,
+        start,
+        key,
+        collectorType = "collector",
+      } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
@@ -68,6 +76,7 @@ class CollectorService {
         criteria = {};
       }
 
+      criteria.collectorType = collectorType;
       if (!currentScope) {
         return res.status(400).json({
           error: true,
@@ -163,6 +172,7 @@ class CollectorService {
   static async getCompanyCollectors(req, res) {
     const { companyName: organisation } = req.user;
     // log
+    const { collectorType = "collector" } = req.query;
     try {
       let {
         page = 1,
@@ -215,6 +225,8 @@ class CollectorService {
       } else criteria = { organisation, companyVerified };
       if (state) criteria.state = state;
 
+      criteria.collectorType = collectorType;
+
       const totalResult = await collectorModel.countDocuments(criteria);
       const projection = {
         roles: 0,
@@ -248,6 +260,7 @@ class CollectorService {
 
   static async getGeoFencedCoordinates(req, res) {
     const { _id: organisationId } = req.user;
+    const { collectorType = "collector" } = req.query;
     let { paginated = false, page = 1, resultsPerPage = 20 } = req.query;
 
     // handle query param values conversion
@@ -263,7 +276,7 @@ class CollectorService {
       });
       // return error if data doesn't exist for company
       if (!coordinateData)
-        return res.status(404).json({
+        return res.status(400).json({
           error: true,
           message: "Geo fence coordinates not found for organisation",
         });
@@ -278,6 +291,7 @@ class CollectorService {
         const coordinateData = await geofenceModel
           .find({
             organisationId,
+            collectorType,
           })
           .sort({ createdAt: -1 })
           .skip((page - 1) * resultsPerPage)
@@ -299,6 +313,7 @@ class CollectorService {
         //send all coordinates
         const coordinateData = await geofenceModel.find({
           organisationId,
+          collectorType,
         });
 
         // send all data
@@ -519,6 +534,7 @@ class CollectorService {
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
       });
+      // handle the collector already register so a verification token can be resent
       if (checkPhone) {
         if (checkPhone.verified) {
           return res.status(400).json({
@@ -680,7 +696,7 @@ class CollectorService {
           verified: create.verified,
           countryCode: create.countryCode,
           status: create.status,
-          areaOfAccess: create.areasOfAccess,
+          areaOfAccess: create.areaOfAccess,
           approvedBy: create.approvedBy,
           totalCollected: create.totalCollected,
           numberOfTripsCompleted: create.numberOfTripsCompleted,
@@ -710,11 +726,14 @@ class CollectorService {
 
   static async getCompanyCollectorStats(req, res) {
     const { companyName: organisation } = req.user;
+    const { collectorType = "collector" } = req.query;
     try {
       // count verified collectors
       const verifiedCount = await collectorModel.countDocuments({
         verified: true,
         organisation,
+        companyVerified: true,
+        collectorType,
       });
 
       // count male company collectors
@@ -722,6 +741,8 @@ class CollectorService {
         gender: "male",
         organisation,
         verified: true,
+        companyVerified: true,
+        collectorType,
       });
 
       // count female company collectors
@@ -729,6 +750,8 @@ class CollectorService {
         gender: "female",
         organisation,
         verified: true,
+        companyVerified: true,
+        collectorType,
       });
 
       // count new company collectors withon 30 days
@@ -739,11 +762,15 @@ class CollectorService {
           $gte: ONE_MONTH_AGO,
         },
         organisation,
+        companyVerified: true,
+        collectorType,
       });
 
       // get all company collectors
       const collectors = await collectorModel.find({
         organisation,
+        //companyVerified: true,
+        collectorType,
       });
 
       return res.status(200).json({
@@ -1465,6 +1492,127 @@ class CollectorService {
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
+
+  static async registerPicker(req, res) {
+    try {
+      const onesignal_id = uuid.v1().toString();
+      const body = req.body;
+      const checkPhone = await collectorModel.findOne({
+        phone: body.phone,
+      });
+      if (checkPhone) {
+        return res.status(400).json({
+          error: true,
+          message: "Phone number already exist",
+        });
+      }
+
+      if (body.email) {
+        const checkEmail = await collectorModel.findOne({
+          email: body.email,
+        });
+        if (checkEmail) {
+          return res.status(400).json({
+            error: true,
+            message: "Email already in use",
+          });
+        }
+      }
+
+      let organisationName = "";
+      let organisationId = "";
+      let areaOfAccess = [];
+
+      if (body.organisation) {
+        const org = await organisationModel.findById(body.organisation);
+        if (!org) {
+          return res.status(400).json({
+            error: true,
+            message: "Invalid organisation passed",
+          });
+        }
+
+        if (org.allowPickers === false) {
+          return res.status(400).json({
+            error: true,
+            message: "Organisation do not allow waste pickers",
+          });
+        }
+        organisationName = org.companyName;
+        organisationId = org._id.toString();
+        areaOfAccess = org.streetOfAccess;
+      }
+
+      let password = generateRandomString();
+      const hashpassword = await encryptPassword(password);
+      const create = await collectorModel.create({
+        fullname: body.fullname,
+        email: body.email,
+        verified: true,
+        phone: body.phone,
+        password: hashpassword,
+        gender: body.gender,
+        country: body.country,
+        state: body.state,
+        organisation: organisationName,
+        organisationId: organisationId,
+        dateOfBirth: body.dateOfBirth || "",
+        areaOfAccess,
+        "account.accountName": body.accountName || "",
+        "account.accountNo": body.accountNo || "",
+        "account.bankName": body.bankName || "",
+        "account.bankSortCode": body.sortCode || "",
+        collectorType: "waste-picker",
+        address: body.address,
+      });
+
+      const phoneNo = String(create.phone).substring(1, 11);
+      const msg = {
+        api_key:
+          "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+        type: "plain",
+        to: `+234${phoneNo}`,
+        from: "N-Alert",
+        channel: "dnd",
+        sms: `Welcome to pakam, Your Password is ${password}`,
+      };
+      const url = "https://api.ng.termii.com/api/sms/send";
+
+      const sendSMS = await axios.post(url, JSON.stringify(msg), {
+        headers: {
+          "Content-Type": ["application/json", "application/json"],
+        },
+      });
+
+      console.log("sms sent", sendSMS);
+
+      return res.status(200).json({
+        error: false,
+        message: "Waste Picker created successfully",
+        data: {
+          _id: create._id,
+          verified: create.verified,
+          countryCode: create.countryCode,
+          status: create.status,
+          areaOfAccess: create.areaOfAccess,
+          approvedBy: create.approvedBy,
+          totalCollected: create.totalCollected,
+          numberOfTripsCompleted: create.numberOfTripsCompleted,
+          fullname: create.fullname,
+          email: create.email,
+          phone: create.phone,
+          address: create.address,
+          organisation: create.organisation,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
     }
   }
 }

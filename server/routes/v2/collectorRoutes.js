@@ -134,4 +134,11 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/collector/script").get(CollectorService.assignOrganisationId);
+
+  APP.route("/api/wastePicker/register").post(
+    adminPakamValidation,
+    collectorValidator.createPicker,
+    checkRequestErrs,
+    CollectorService.registerPicker
+  );
 };

@@ -17,7 +17,7 @@ const collector_Schema = new Schema({
   },
   email: {
     type: String,
-    unique: true,
+    //unique: true,
   },
   phone: {
     type: String,
@@ -25,6 +25,10 @@ const collector_Schema = new Schema({
     unique: true,
   },
   roles: {
+    type: String,
+    default: "collector",
+  },
+  collectorType: {
     type: String,
     default: "collector",
   },
@@ -98,6 +102,10 @@ const collector_Schema = new Schema({
     type: Number,
     default: 0,
   },
+  totalCollectedCur: {
+    type: Number,
+    default: 0,
+  },
   numberOfTripsCompleted: {
     type: Number,
     default: 0,
@@ -139,6 +147,16 @@ const collector_Schema = new Schema({
   isDisabled: {
     type: Boolean,
     default: false,
+  },
+  account: {
+    accountName: { type: String },
+    accountNo: { type: String },
+    bankName: { type: String },
+    bankSortCode: { type: String },
+  },
+  firstLogin: {
+    type: Boolean,
+    default: true,
   },
 });
 
