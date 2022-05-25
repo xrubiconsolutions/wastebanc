@@ -1299,6 +1299,7 @@ class CollectorService {
           profile_picture: collector.profile_picture,
           token,
           aggregatorId: collector.aggregatorId || "",
+          firstLogin: collector.firstLogin,
         },
       });
     } catch (error) {
