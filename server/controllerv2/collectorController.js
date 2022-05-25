@@ -1465,7 +1465,7 @@ class CollectorService {
     }
   }
 
-  // assign organisatioId to all collectors
+  // script assign organisatioId to all collectors
   static async assignOrganisationId(req, res) {
     try {
       const allCollectors = await collectorModel.find({
@@ -1623,7 +1623,7 @@ class CollectorService {
     }
   }
 
-  // assign waste picker to organisation
+  // assign waste pickers to organisation
   static async assignToOrganiation(req, res) {
     try {
       const body = req.body;
@@ -1690,6 +1690,7 @@ class CollectorService {
     }
   }
 
+  // unassign waste pickers to organisation
   static async unassignFromOrganisation(req, res) {
     try {
       const { pickerId } = req.body;
