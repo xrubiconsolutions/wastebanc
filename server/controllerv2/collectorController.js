@@ -1245,6 +1245,7 @@ class CollectorService {
               _id: collector._id,
               verified: collector.verified,
               countryCode: collector.countryCode,
+              collectorType: collector.collectorType,
               status: collector.status,
               areaOfAccess: collector.areasOfAccess,
               approvedBy: collector.approvedBy,
