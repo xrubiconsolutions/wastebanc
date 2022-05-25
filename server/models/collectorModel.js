@@ -17,7 +17,7 @@ const collector_Schema = new Schema({
   },
   email: {
     type: String,
-    //unique: true,
+    unique: true,
   },
   phone: {
     type: String,
@@ -158,10 +158,10 @@ const collector_Schema = new Schema({
     type: Boolean,
     default: true,
   },
-  terms_condition:{
+  terms_condition: {
     type: Boolean,
     default: false,
-  }
+  },
 });
 
 module.exports = MONGOOSE.model("Collector", collector_Schema);

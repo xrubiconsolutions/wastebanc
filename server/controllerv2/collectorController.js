@@ -4,6 +4,7 @@ const organisationModel = require("../models/organisationModel");
 const scheduleModel = require("../models/scheduleModel");
 const transactionModel = require("../models/transactionModel");
 const dropOffModel = require("../models/dropOffModel");
+const passwordsModel = require("../models/passwordsModel");
 const {
   sendResponse,
   bodyValidate,
@@ -1554,6 +1555,7 @@ class CollectorService {
         });
       }
 
+      let email;
       if (body.email) {
         const checkEmail = await collectorModel.findOne({
           email: body.email,
@@ -1564,6 +1566,13 @@ class CollectorService {
             message: "Email already in use",
           });
         }
+        email = body.email;
+      } else {
+        console.log("here");
+        email =
+          body.fullname.split("").join("") +
+          Math.floor(Math.random() + 100) +
+          "@xrubicon.com";
       }
 
       let organisationName = "";
@@ -1590,11 +1599,19 @@ class CollectorService {
         areaOfAccess = org.streetOfAccess;
       }
 
+      console.log("email", email);
+
       let password = generateRandomString();
       const hashpassword = await encryptPassword(password);
+      const aggregatorId = generateRandomString();
+
+      await passwordsModel.create({
+        user: req.body.phone,
+        password,
+      });
       const create = await collectorModel.create({
         fullname: body.fullname,
-        email: body.email,
+        email,
         verified: true,
         phone: body.phone,
         password: hashpassword,
@@ -1612,6 +1629,7 @@ class CollectorService {
         collectorType: "waste-picker",
         address: body.address,
         onesignal_id,
+        aggregatorId: aggregatorId,
       });
 
       const phoneNo = String(create.phone).substring(1, 11);
