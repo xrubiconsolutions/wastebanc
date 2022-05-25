@@ -1389,6 +1389,7 @@ class CollectorService {
         fullname = user.fullname.trim().toLowerCase();
       }
 
+      console.log('body', req.body);
       await collectorModel.updateOne(
         { _id: user._id },
         {
