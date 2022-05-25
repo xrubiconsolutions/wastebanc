@@ -10,7 +10,8 @@ module.exports = {
       .withMessage("invalid id")
       .custom(async (val) => {
         const collector = await collectorModel.findById(val);
-        if (!collector) throw new Error("collector with id not found");
+        if (!collector)
+          throw new Error("collector/waste picker with id not found");
         return true;
       }),
   ],
@@ -65,5 +66,14 @@ module.exports = {
       .optional()
       .isString()
       .withMessage("organisation should be string"),
+  ],
+
+  assignPicker: [
+    body("pickerId").notEmpty().withMessage("pickerId is required"),
+    body("organisationId").notEmpty().withMessage("organisationId is required"),
+  ],
+
+  unassignPicker: [
+    body("pickerId").notEmpty().withMessage("pickerId is required"),
   ],
 };

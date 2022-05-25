@@ -402,7 +402,7 @@ class CollectorService {
       if (collector.status === "disable") {
         return res.status(200).json({
           error: false,
-          message: "Aggregator already enabled",
+          message: "Aggregator already disabled",
         });
       }
 
@@ -464,7 +464,11 @@ class CollectorService {
 
   static async approveCollector(req, res) {
     const { collectorId } = req.body;
-    const { _id: companyId, companyName: organisation } = req.user;
+    const {
+      _id: companyId,
+      companyName: organisation,
+      streetOfAccess: accessArea,
+    } = req.user;
     const projection = { password: 0, _v: 0 };
     try {
       const collector = await collectorModel.findById(collectorId);
@@ -480,8 +484,9 @@ class CollectorService {
         {
           companyVerified: true,
           approvedBy: companyId,
-          status: "active",
+          //status: "active",
           organisation: organisation,
+          areaOfAccess: accessArea,
         },
         projection
       );
@@ -513,6 +518,7 @@ class CollectorService {
         {
           companyVerified: false,
           approvedBy: "",
+          areaOfAccess: [],
         },
         projection
       );
@@ -1566,6 +1572,7 @@ class CollectorService {
         "account.bankSortCode": body.sortCode || "",
         collectorType: "waste-picker",
         address: body.address,
+        onesignal_id,
       });
 
       const phoneNo = String(create.phone).substring(1, 11);
@@ -1605,6 +1612,131 @@ class CollectorService {
           phone: create.phone,
           address: create.address,
           organisation: create.organisation,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  // assign waste picker to organisation
+  static async assignToOrganiation(req, res) {
+    try {
+      const body = req.body;
+      const organisation = await organisationModel.findById(
+        body.organisationId
+      );
+      if (!organisation) {
+        return res.status(400).json({
+          error: true,
+          message: "Organisation not found",
+        });
+      }
+      const picker = await collectorModel.findById(body.pickerId);
+      if (!picker) {
+        return res.status(400).json({
+          error: true,
+          message: "Waster picker not found",
+        });
+      }
+
+      if (picker.organisation !== "") {
+        return res.status(400).json({
+          error: true,
+          message: "Waster picker already assigned to an organisation",
+        });
+      }
+
+      const update = await collectorModel.updateOne(
+        { _id: picker._id },
+        {
+          organisation: organisation.companyName,
+          organisationId: organisation._id.toString(),
+          approvedBy: organisation._id.toString(),
+        }
+      );
+
+      console.log("assigned", update);
+
+      return res.status(200).json({
+        error: false,
+        message: "Waste Picker assigned successfully",
+        data: {
+          _id: picker._id,
+          verified: picker.verified,
+          countryCode: picker.countryCode,
+          status: picker.status,
+          areaOfAccess: picker.areaOfAccess,
+          approvedBy: picker.approvedBy,
+          totalCollected: picker.totalCollected,
+          numberOfTripsCompleted: picker.numberOfTripsCompleted,
+          fullname: picker.fullname,
+          email: picker.email,
+          phone: picker.phone,
+          address: picker.address,
+          organisation: organisation.companyName,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async unassignFromOrganisation(req, res) {
+    try {
+      const { pickerId } = req.body;
+      const picker = await collectorModel.findById(pickerId);
+      if (!picker) {
+        return res.status(400).json({
+          error: true,
+          message: "Waster picker not found",
+        });
+      }
+
+      if (picker.organisation === "") {
+        return res.status(400).json({
+          error: true,
+          message: "Waster picker not yet assigned to an organisation",
+        });
+      }
+
+      const update = await collectorModel.updateOne(
+        { _id: picker._id },
+        {
+          organisation: "",
+          organisationId: "",
+          approvedBy: "",
+          companyVerified: false,
+        }
+      );
+
+      console.log("assigned", update);
+
+      return res.status(200).json({
+        error: false,
+        message: "Waste Picker unassigned successfully",
+        data: {
+          _id: picker._id,
+          verified: picker.verified,
+          countryCode: picker.countryCode,
+          status: picker.status,
+          areaOfAccess: picker.areaOfAccess,
+          approvedBy: picker.approvedBy,
+          totalCollected: picker.totalCollected,
+          numberOfTripsCompleted: picker.numberOfTripsCompleted,
+          fullname: picker.fullname,
+          email: picker.email,
+          phone: picker.phone,
+          address: picker.address,
+          organisation: "",
         },
       });
     } catch (error) {
