@@ -79,7 +79,7 @@ module.exports = (APP) => {
   );
 
   // enable collector on company dashboard
-  APP.route("/api/v2/collector/enable/:collectorId").put(
+  APP.route("/api/v2/company/collector/enable/:collectorId").put(
     // [param("collectorId").notEmpty().withMessage("collectorId is required")],
     companyPakamDataValidation,
     collectorValidator.verifyCollector,
@@ -88,7 +88,7 @@ module.exports = (APP) => {
   );
 
   // disable collector on company dashboard
-  APP.route("/api/v2/collector/disable/:collectorId").put(
+  APP.route("/api/v2/company/collector/disable/:collectorId").put(
     //[param("collectorId").notEmpty().withMessage("collectorId is required")],
     companyPakamDataValidation,
     collectorValidator.verifyCollector,
@@ -172,5 +172,11 @@ module.exports = (APP) => {
     collectorValidator.unassignPicker,
     checkRequestErrs,
     CollectorService.unassignFromOrganisation
+  );
+
+  APP.route("/api/collector/changepassword").post(
+    collectorValidator.changePassword,
+    checkRequestErrs,
+    CollectorService.changePassword
   );
 };

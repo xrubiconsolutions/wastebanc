@@ -76,4 +76,11 @@ module.exports = {
   unassignPicker: [
     body("pickerId").notEmpty().withMessage("pickerId is required"),
   ],
+
+  changePassword: [
+      body('phone').notEmpty().withMessage("phone is required").isString().withMessage("phone should be string"),
+      body('oldPassword').notEmpty().withMessage("oldPassword is required").isString().withMessage("oldPassword should be string"),
+      body("newPassword").notEmpty().withMessage("newPassword is required").isString().withMessage("newPassword should be string"),
+      body("confirmPassword").notEmpty().withMessage("confirmPassword is required").isString().withMessage("confirmPassword should string")
+  ]
 };

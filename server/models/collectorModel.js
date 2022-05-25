@@ -158,6 +158,10 @@ const collector_Schema = new Schema({
     type: Boolean,
     default: true,
   },
+  terms_condition:{
+    type: Boolean,
+    default: false,
+  }
 });
 
 module.exports = MONGOOSE.model("Collector", collector_Schema);

@@ -1233,11 +1233,46 @@ class CollectorService {
       } else {
         signal_id = collector.onesignal_id;
       }
+
+      const token = authToken(collector);
+
+      if (collector.collectorType === "waste-picker") {
+        if (collector.firstLogin) {
+          return res.status(200).json({
+            error: false,
+            message: "Please change current password",
+            data: {
+              _id: collector._id,
+              verified: collector.verified,
+              countryCode: collector.countryCode,
+              status: collector.status,
+              areaOfAccess: collector.areasOfAccess,
+              approvedBy: collector.approvedBy,
+              totalCollected: collector.totalCollected,
+              numberOfTripsCompleted: collector.numberOfTripsCompleted,
+              fullname: collector.fullname,
+              email: collector.email,
+              dateOfBirth: collector.dateOfBirth,
+              phone: collector.phone,
+              address: collector.address,
+              onesignal_id: signal_id,
+              gender: collector.gender,
+              localGovernment: collector.localGovernment,
+              organisation: collector.organisation,
+              profile_picture: collector.profile_picture,
+              token,
+              aggregatorId: collector.aggregatorId || "",
+              firstLogin: collector.firstLogin,
+            },
+          });
+        }
+      }
+
       await collectorModel.updateOne(
         { _id: collector._id },
         { last_logged_in: new Date(), onesignal_id: signal_id }
       );
-      const token = authToken(collector);
+
       return res.status(200).json({
         error: false,
         message: "Collector login successfull",
@@ -1245,6 +1280,7 @@ class CollectorService {
         data: {
           _id: collector._id,
           verified: collector.verified,
+          collectorType: collector.collectorType,
           countryCode: collector.countryCode,
           status: collector.status,
           areaOfAccess: collector.areasOfAccess,
@@ -1389,7 +1425,7 @@ class CollectorService {
         fullname = user.fullname.trim().toLowerCase();
       }
 
-      console.log('body', req.body);
+      console.log("body", req.body);
       await collectorModel.updateOne(
         { _id: user._id },
         {
@@ -1740,6 +1776,60 @@ class CollectorService {
           address: picker.address,
           organisation: "",
         },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  // change password
+  static async changePassword(req, res) {
+    try {
+      const user = await collectorModel.findOne({
+        phone: req.body.phone.trim(),
+      });
+
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid phone passed",
+        });
+      }
+
+      if (!(await comparePassword(req.body.oldPassword, user.password))) {
+        return res.status(400).json({
+          error: true,
+          message: "incorrect old password",
+          statusCode: 400,
+        });
+      }
+
+      if (req.body.newPassword.trim() !== req.body.confirmPassword.trim()) {
+        return res.status(400).json({
+          error: true,
+          message: "confirm password does not match new password",
+        });
+      }
+
+      const newPassword = await encryptPassword(req.body.newPassword);
+
+      const update = await collectorModel.updateOne(
+        { _id: user._id },
+        {
+          password: newPassword,
+          firstLogin: false,
+        }
+      );
+
+      console.log("update", update);
+
+      return res.status(200).json({
+        error: false,
+        message: "Password changed successfully",
       });
     } catch (error) {
       console.log(error);

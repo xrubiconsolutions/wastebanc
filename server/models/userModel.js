@@ -171,6 +171,10 @@ const user_Schema = new Schema({
     type: Boolean,
     default: true,
   },
+  terms_condition:{
+    type: Boolean,
+    default: false,
+  }
 });
 
 user_Schema.pre("save", function (next) {
