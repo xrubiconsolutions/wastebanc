@@ -1,4 +1,4 @@
-const { cateoryModel } = require("../models");
+const { categoryModel } = require("../models");
 class rewardService {
   static async houseHold(categories, organisation) {
     try {
@@ -66,13 +66,18 @@ class rewardService {
     }
   }
 
-  //   static async picker(categories, organisation) {
-  //     for (let category of categories) {
-  //       const c = organisation.categories.find((cc)=> cc.name.toLowerCase() === category.name.toLowerCase());
-  //       if(c){
-  //           // get waste picker price on that category
-  //           const category = await
-  //       }
+  // static async picker(categories, organisation) {
+  //   for (let category of categories) {
+  //     const c = organisation.categories.find((cc)=> cc.name.toLowerCase() === category.name.toLowerCase());
+  //     if(c){
+  //         // get waste picker price on that category
+  //         const c = await cateoryModel.findOne({
+  //             name: c.name.toLowerCase()
+  //         })
+  //         if(category){
+  //             const p = parseFloat(category.quantity) * Number()
+  //         }
   //     }
   //   }
+  // }
 }

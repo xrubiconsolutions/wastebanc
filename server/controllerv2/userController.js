@@ -653,7 +653,7 @@ class UserService {
       }
 
       const token = authToken(user);
-      delete user.password;
+      delete user.password;w
       return res.status(200).json({
         error: false,
         message: "Login successfull",
