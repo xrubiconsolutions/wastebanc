@@ -47,7 +47,7 @@ const getSlug = (data) => {
 };
 
 categoryController.addCategory = async (req, res) => {
-  bodyValidate(req, res);
+  //bodyValidate(req, res);
   try {
     const name = req.body.name;
     const value = getSlug(req.body.name);
@@ -64,6 +64,7 @@ categoryController.addCategory = async (req, res) => {
     const store = await MODEL.categoryModel.create({
       name,
       value,
+      wastepicker: req.body.wasterpicker,
     });
 
     return res.status(200).json({
@@ -97,7 +98,7 @@ categoryController.allCategories = async (req, res) => {
 };
 
 categoryController.getCategory = async (req, res) => {
-  bodyValidate(req, res);
+  //bodyValidate(req, res);
   try {
     const catId = req.params.catId;
     const cat = await MODEL.categoryModel.findById(catId);
@@ -121,10 +122,10 @@ categoryController.getCategory = async (req, res) => {
 };
 
 categoryController.updateCategory = async (req, res) => {
-  bodyValidate(req, res);
+  //bodyValidate(req, res);
   try {
     const catId = req.params.catId;
-    const name = req.body.name;
+
     const cat = await MODEL.categoryModel.findById(catId);
     if (!cat) {
       return res.status(400).json({
@@ -132,8 +133,15 @@ categoryController.updateCategory = async (req, res) => {
         statusCode: 400,
       });
     }
-    const update = await MODEL.categoryModel.updateOne(cat._id, { name });
+    const name = req.body.name || cat.name;
+    const pickerPrice = req.body.wastepicker || cat.wastepicker;
+
+    const update = await MODEL.categoryModel.updateOne(cat._id, {
+      name,
+      wastepicker: pickerPrice,
+    });
     cat.name = name;
+    cat.wastepicker = pickerPrice;
     return res.status(200).json({
       message: "Category updated successfully",
       statusCode: 200,
@@ -148,7 +156,7 @@ categoryController.updateCategory = async (req, res) => {
 };
 
 categoryController.deleteCategory = async (req, res) => {
-  bodyValidate(req, res);
+  //bodyValidate(req, res);
   try {
     const catId = req.params.catId;
     const cat = await MODEL.categoryModel.findById(catId);

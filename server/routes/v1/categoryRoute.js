@@ -2,11 +2,14 @@
 let CONTROLLER = require("../../controller");
 let auth = require("../../util/auth");
 const { body, query, check, param } = require("express-validator");
+const categoryValidator = require("../../validators/categoryValidator");
+const { checkRequestErrs } = require("../../util/commonFunction.js");
 
 module.exports = (APP) => {
   APP.route("/api/category/add").post(
     auth.adminPakamValidation,
-    [check("name", "name is required").isString()],
+    categoryValidator.createCategory,
+    checkRequestErrs,
     CONTROLLER.categoryController.addCategory
   );
 
@@ -14,21 +17,21 @@ module.exports = (APP) => {
     CONTROLLER.categoryController.allCategories
   );
   APP.route("/api/category/:catId").get(
-    [param("catId", "catId is required")],
+    categoryValidator.categoryId,
+    checkRequestErrs,
     CONTROLLER.categoryController.getCategory
   );
 
   APP.route("/api/category/:catId").put(
-    [
-      param("catId", "catId is required"),
-      check("name", "name must be string").optional().isString(),
-    ],
+    categoryValidator.updateCategory,
+    checkRequestErrs,
     CONTROLLER.categoryController.updateCategory
   );
 
   APP.route("/api/category/:catId").delete(
     auth.adminPakamValidation,
-    [param("catId", "catId is required")],
+    categoryValidator.categoryId,
+    checkRequestErrs,
     CONTROLLER.categoryController.deleteCategory
   );
 };

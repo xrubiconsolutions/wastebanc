@@ -4,12 +4,14 @@ const organisationModel = require("../models/organisationModel");
 const scheduleModel = require("../models/scheduleModel");
 const transactionModel = require("../models/transactionModel");
 const dropOffModel = require("../models/dropOffModel");
+const passwordsModel = require("../models/passwordsModel");
 const {
   sendResponse,
   bodyValidate,
   encryptPassword,
   authToken,
   comparePassword,
+  generateRandomString,
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const { validationResult, body } = require("express-validator");
@@ -23,7 +25,14 @@ class CollectorService {
       const { user } = req;
       const currentScope = user.locationScope;
 
-      let { page = 1, resultsPerPage = 20, end, start, key } = req.query;
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        end,
+        start,
+        key,
+        collectorType = "collector",
+      } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
@@ -68,6 +77,7 @@ class CollectorService {
         criteria = {};
       }
 
+      criteria.collectorType = collectorType;
       if (!currentScope) {
         return res.status(400).json({
           error: true,
@@ -163,6 +173,7 @@ class CollectorService {
   static async getCompanyCollectors(req, res) {
     const { companyName: organisation } = req.user;
     // log
+    const { collectorType = "collector" } = req.query;
     try {
       let {
         page = 1,
@@ -215,6 +226,8 @@ class CollectorService {
       } else criteria = { organisation, companyVerified };
       if (state) criteria.state = state;
 
+      criteria.collectorType = collectorType;
+
       const totalResult = await collectorModel.countDocuments(criteria);
       const projection = {
         roles: 0,
@@ -248,6 +261,7 @@ class CollectorService {
 
   static async getGeoFencedCoordinates(req, res) {
     const { _id: organisationId } = req.user;
+    const { collectorType = "collector" } = req.query;
     let { paginated = false, page = 1, resultsPerPage = 20 } = req.query;
 
     // handle query param values conversion
@@ -263,7 +277,7 @@ class CollectorService {
       });
       // return error if data doesn't exist for company
       if (!coordinateData)
-        return res.status(404).json({
+        return res.status(400).json({
           error: true,
           message: "Geo fence coordinates not found for organisation",
         });
@@ -278,6 +292,7 @@ class CollectorService {
         const coordinateData = await geofenceModel
           .find({
             organisationId,
+            collectorType,
           })
           .sort({ createdAt: -1 })
           .skip((page - 1) * resultsPerPage)
@@ -299,6 +314,7 @@ class CollectorService {
         //send all coordinates
         const coordinateData = await geofenceModel.find({
           organisationId,
+          collectorType,
         });
 
         // send all data
@@ -387,7 +403,7 @@ class CollectorService {
       if (collector.status === "disable") {
         return res.status(200).json({
           error: false,
-          message: "Aggregator already enabled",
+          message: "Aggregator already disabled",
         });
       }
 
@@ -449,7 +465,11 @@ class CollectorService {
 
   static async approveCollector(req, res) {
     const { collectorId } = req.body;
-    const { _id: companyId, companyName: organisation } = req.user;
+    const {
+      _id: companyId,
+      companyName: organisation,
+      streetOfAccess: accessArea,
+    } = req.user;
     const projection = { password: 0, _v: 0 };
     try {
       const collector = await collectorModel.findById(collectorId);
@@ -465,8 +485,9 @@ class CollectorService {
         {
           companyVerified: true,
           approvedBy: companyId,
-          status: "active",
+          //status: "active",
           organisation: organisation,
+          areaOfAccess: accessArea,
         },
         projection
       );
@@ -498,6 +519,7 @@ class CollectorService {
         {
           companyVerified: false,
           approvedBy: "",
+          areaOfAccess: [],
         },
         projection
       );
@@ -519,6 +541,7 @@ class CollectorService {
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
       });
+      // handle the collector already register so a verification token can be resent
       if (checkPhone) {
         if (checkPhone.verified) {
           return res.status(400).json({
@@ -599,6 +622,28 @@ class CollectorService {
         }
       }
 
+      let organisationName;
+      let organisationId;
+      let areaOfAccess = [];
+      if (body.organisation) {
+        const org = await organisationModel.findOne({
+          companyName: body.organisation.trim(),
+        });
+        if (!org) {
+          return res.status(400).json({
+            error: true,
+            message: "Invalid organisation passed",
+          });
+        }
+        organisationName = org.companyName;
+        organisationId = org._id.toString();
+        areaOfAccess = org.streetOfAccess;
+      } else {
+        organisationName = "";
+        organsationId = "";
+        areaOfAccess = [];
+      }
+
       const create = await collectorModel.create({
         fullname: body.fullname,
         email: body.email || "",
@@ -609,9 +654,12 @@ class CollectorService {
         state: body.state,
         long: body.long || "",
         lat: body.lat || "",
-        organisation: body.organisation || "",
+        organisation: organisationName,
+        organisationId: organisationId,
         aggregatorId: "",
+        areaOfAccess,
         onesignal_id,
+        dateOfBirth: body.dateOfBirth || "",
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -655,7 +703,7 @@ class CollectorService {
           verified: create.verified,
           countryCode: create.countryCode,
           status: create.status,
-          areaOfAccess: create.areasOfAccess,
+          areaOfAccess: create.areaOfAccess,
           approvedBy: create.approvedBy,
           totalCollected: create.totalCollected,
           numberOfTripsCompleted: create.numberOfTripsCompleted,
@@ -685,11 +733,14 @@ class CollectorService {
 
   static async getCompanyCollectorStats(req, res) {
     const { companyName: organisation } = req.user;
+    const { collectorType = "collector" } = req.query;
     try {
       // count verified collectors
       const verifiedCount = await collectorModel.countDocuments({
         verified: true,
         organisation,
+        companyVerified: true,
+        collectorType,
       });
 
       // count male company collectors
@@ -697,6 +748,8 @@ class CollectorService {
         gender: "male",
         organisation,
         verified: true,
+        companyVerified: true,
+        collectorType,
       });
 
       // count female company collectors
@@ -704,6 +757,8 @@ class CollectorService {
         gender: "female",
         organisation,
         verified: true,
+        companyVerified: true,
+        collectorType,
       });
 
       // count new company collectors withon 30 days
@@ -714,11 +769,15 @@ class CollectorService {
           $gte: ONE_MONTH_AGO,
         },
         organisation,
+        companyVerified: true,
+        collectorType,
       });
 
       // get all company collectors
       const collectors = await collectorModel.find({
         organisation,
+        //companyVerified: true,
+        collectorType,
       });
 
       return res.status(200).json({
@@ -1148,6 +1207,7 @@ class CollectorService {
             _id: collector._id,
             verified: collector.verified,
             countryCode: collector.countryCode,
+            dateOfBirth: collector.dateOfBirth,
             status: collector.status,
             areaOfAccess: collector.areasOfAccess,
             approvedBy: collector.approvedBy,
@@ -1174,11 +1234,47 @@ class CollectorService {
       } else {
         signal_id = collector.onesignal_id;
       }
+
+      const token = authToken(collector);
+
+      if (collector.collectorType === "waste-picker") {
+        if (collector.firstLogin) {
+          return res.status(200).json({
+            error: false,
+            message: "Please change current password",
+            data: {
+              _id: collector._id,
+              verified: collector.verified,
+              countryCode: collector.countryCode,
+              collectorType: collector.collectorType,
+              status: collector.status,
+              areaOfAccess: collector.areasOfAccess,
+              approvedBy: collector.approvedBy,
+              totalCollected: collector.totalCollected,
+              numberOfTripsCompleted: collector.numberOfTripsCompleted,
+              fullname: collector.fullname,
+              email: collector.email,
+              dateOfBirth: collector.dateOfBirth,
+              phone: collector.phone,
+              address: collector.address,
+              onesignal_id: signal_id,
+              gender: collector.gender,
+              localGovernment: collector.localGovernment,
+              organisation: collector.organisation,
+              profile_picture: collector.profile_picture,
+              token,
+              aggregatorId: collector.aggregatorId || "",
+              firstLogin: collector.firstLogin,
+            },
+          });
+        }
+      }
+
       await collectorModel.updateOne(
         { _id: collector._id },
         { last_logged_in: new Date(), onesignal_id: signal_id }
       );
-      const token = authToken(collector);
+
       return res.status(200).json({
         error: false,
         message: "Collector login successfull",
@@ -1186,6 +1282,7 @@ class CollectorService {
         data: {
           _id: collector._id,
           verified: collector.verified,
+          collectorType: collector.collectorType,
           countryCode: collector.countryCode,
           status: collector.status,
           areaOfAccess: collector.areasOfAccess,
@@ -1194,6 +1291,7 @@ class CollectorService {
           numberOfTripsCompleted: collector.numberOfTripsCompleted,
           fullname: collector.fullname,
           email: collector.email,
+          dateOfBirth: collector.dateOfBirth,
           phone: collector.phone,
           address: collector.address,
           onesignal_id: signal_id,
@@ -1203,6 +1301,7 @@ class CollectorService {
           profile_picture: collector.profile_picture,
           token,
           aggregatorId: collector.aggregatorId || "",
+          firstLogin: collector.firstLogin,
         },
       });
     } catch (error) {
@@ -1294,20 +1393,24 @@ class CollectorService {
 
   static async updateCollector(req, res) {
     try {
-      const { user } = req;
-      let organisation = user.organisation;
+      const token = req.headers.authorization.split(" ")[1];
+      let { user } = req;
+
+      let organisation = user.organisation || "";
+      let organisationId = user.organisationId || "";
       if (req.body.organisation) {
         organisation = req.body.organisation;
-      }
-      const org = await organisationModel.findOne({
-        companyName: organisation,
-      });
-
-      if (!org) {
-        return res.status(400).json({
-          error: true,
-          message: "Select an organisation",
+        const org = await organisationModel.findOne({
+          companyName: organisation,
         });
+
+        if (!org) {
+          return res.status(400).json({
+            error: true,
+            message: "Invalid organisation passed",
+          });
+        }
+        organisationId = org._id.toString();
       }
 
       let email;
@@ -1315,7 +1418,7 @@ class CollectorService {
       if (req.body.email) {
         email = req.body.email.trim().toLowerCase();
       } else {
-        email = user.email.trim().toLowerCase();
+        email = user.email;
       }
 
       let fullname;
@@ -1325,6 +1428,7 @@ class CollectorService {
         fullname = user.fullname.trim().toLowerCase();
       }
 
+      console.log("body", req.body);
       await collectorModel.updateOne(
         { _id: user._id },
         {
@@ -1332,34 +1436,427 @@ class CollectorService {
             email,
             phone: user.phone,
             gender: req.body.gender || user.gender,
+            dateOfBirth: req.body.dateOfBirth || user.dateOfBirth,
             address: req.body.address || user.address,
             fullname,
+            country: req.body.country || user.country,
             state: req.body.state || user.state,
             place: req.body.place || user.place,
             aggregatorId: req.body.aggregatorId || user.aggregatorId,
             organisation: req.body.organisation || user.organisation,
+            organisationId: organisationId,
             localGovernment: req.body.localGovernment || user.localGovernment,
             profile_picture: req.body.profile_picture || user.profile_picture,
-            areaOfAccess: org.areaOfAccess || user.areaOfAccess || [],
+            areaOfAccess:
+              organisation.streetOfAccess || user.areaOfAccess || [],
           },
         }
       );
 
-      user.gender = req.body.gender || user.gender;
-      user.address = req.body.address || user.address;
-      user.fullname = req.body.fullname || user.fullname;
-      user.state = req.body.state || user.state;
-      user.place = req.body.place || user.place;
-      user.aggregatorId = req.body.aggregatorId || user.aggregatorId;
-      user.organisation = req.body.organisation || user.organisation;
-      user.localGovernment = req.body.localGovernment || user.localGovernment;
-      user.profile_picture = req.body.profile_picture || user.profile_picture;
-      user.areaOfAccess = org.areaOfAccess || user.areaOfAccess || [];
-
-      return res.status(200).json(user);
+      // user.gender = req.body.gender || user.gender;
+      // user.address = req.body.address || user.address;
+      // user.fullname = req.body.fullname || user.fullname;
+      // user.state = req.body.state || user.state;
+      // user.country = req.body.country || user.country;
+      // user.place = req.body.place || user.place;
+      // user.aggregatorId = req.body.aggregatorId || user.aggregatorId;
+      // user.organisation = req.body.organisation || user.organisation;
+      // user.localGovernment = req.body.localGovernment || user.localGovernment;
+      // user.profile_picture = req.body.profile_picture || user.profile_picture;
+      // user.areaOfAccess = organisation.areaOfAccess || user.areaOfAccess || [];
+      //user.token = token;
+      const newUser = {
+        _id: user._id,
+        fullname: req.body.fullname || user.fullname,
+        address: req.body.address || user.address,
+        place: req.body.place || user.place,
+        email: user.email,
+        phone: user.phone,
+        dateOfBirth: req.body.dateOfBirth || user.dateOfBirth,
+        roles: user.roles,
+        busy: user.busy,
+        createdAt: user.createdAt,
+        countryCode: user.countryCode,
+        verified: user.verified,
+        status: user.status,
+        gender: req.body.gender || user.gender,
+        dateOfBirth: req.body.dateOfBirth || user.dateOfBirth,
+        organisation: req.body.organisation || user.organisation,
+        organisationId: user.organisationId,
+        status: req.body.address || user.address,
+        state: req.body.state || user.state,
+        country: req.body.country || user.country,
+        aggregatorId: req.body.aggregatorId || user.aggregatorId,
+        localGovernment: req.body.localGovernment || user.localGovernment,
+        areaOfAccess: organisation.areaOfAccess || user.areaOfAccess || [],
+        approvedBy: user.approvedBy,
+        totalCollected: user.totalCollected,
+        numberOfTripsCompleted: user.numberOfTripsCompleted,
+        lat: user.lat,
+        long: user.long,
+        onesignal_id: user.onesignal_id,
+        profile_picture: req.body.profile_picture || user.profile_picture,
+        token,
+      };
+      return res.status(200).json(newUser);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
+
+  // script assign organisatioId to all collectors
+  static async assignOrganisationId(req, res) {
+    try {
+      const allCollectors = await collectorModel.find({
+        $or: [{ organisation: { $ne: null } }, { organisation: "" }],
+      });
+
+      if (allCollectors.length > 0) {
+        await Promise.all(
+          allCollectors.map(async (collector) => {
+            if (collector.organisation) {
+              const collectOrg = await organisationModel.findOne({
+                companyName: collector.organisation,
+              });
+              if (collectOrg) {
+                await collectorModel.updateOne(
+                  { _id: collector._id },
+                  {
+                    $set: {
+                      organisationId: collectOrg._id.toString(),
+                    },
+                  }
+                );
+              }
+            }
+          })
+        );
+      }
+
+      return res.status(200).json({ message: "Done" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ error: true, message: "An error occured" });
+    }
+  }
+
+  static async registerPicker(req, res) {
+    try {
+      const onesignal_id = uuid.v1().toString();
+      const body = req.body;
+      const checkPhone = await collectorModel.findOne({
+        phone: body.phone,
+      });
+      if (checkPhone) {
+        return res.status(400).json({
+          error: true,
+          message: "Phone number already exist",
+        });
+      }
+
+      let email;
+      if (body.email) {
+        const checkEmail = await collectorModel.findOne({
+          email: body.email,
+        });
+        if (checkEmail) {
+          return res.status(400).json({
+            error: true,
+            message: "Email already in use",
+          });
+        }
+        email = body.email;
+      } else {
+        console.log("here");
+        email =
+          body.fullname.split("").join("") +
+          Math.floor(Math.random() + 100) +
+          "@xrubicon.com";
+      }
+
+      let organisationName = "";
+      let organisationId = "";
+      let areaOfAccess = [];
+
+      if (body.organisation) {
+        const org = await organisationModel.findById(body.organisation);
+        if (!org) {
+          return res.status(400).json({
+            error: true,
+            message: "Invalid organisation passed",
+          });
+        }
+
+        if (org.allowPickers === false) {
+          return res.status(400).json({
+            error: true,
+            message: "Organisation do not allow waste pickers",
+          });
+        }
+        organisationName = org.companyName;
+        organisationId = org._id.toString();
+        areaOfAccess = org.streetOfAccess;
+      }
+
+      console.log("email", email);
+
+      let password = generateRandomString();
+      const hashpassword = await encryptPassword(password);
+      const aggregatorId = generateRandomString();
+
+      await passwordsModel.create({
+        user: req.body.phone,
+        password,
+      });
+      const create = await collectorModel.create({
+        fullname: body.fullname,
+        email,
+        verified: true,
+        phone: body.phone,
+        password: hashpassword,
+        gender: body.gender,
+        country: body.country,
+        state: body.state,
+        organisation: organisationName,
+        organisationId: organisationId,
+        dateOfBirth: body.dateOfBirth || "",
+        areaOfAccess,
+        "account.accountName": body.accountName || "",
+        "account.accountNo": body.accountNo || "",
+        "account.bankName": body.bankName || "",
+        "account.bankSortCode": body.sortCode || "",
+        collectorType: "waste-picker",
+        address: body.address,
+        onesignal_id,
+        aggregatorId: aggregatorId,
+      });
+
+      const phoneNo = String(create.phone).substring(1, 11);
+      const msg = {
+        api_key:
+          "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+        type: "plain",
+        to: `+234${phoneNo}`,
+        from: "N-Alert",
+        channel: "dnd",
+        sms: `Welcome to pakam, Your Password is ${password}`,
+      };
+      const url = "https://api.ng.termii.com/api/sms/send";
+
+      const sendSMS = await axios.post(url, JSON.stringify(msg), {
+        headers: {
+          "Content-Type": ["application/json", "application/json"],
+        },
+      });
+
+      console.log("sms sent", sendSMS);
+
+      return res.status(200).json({
+        error: false,
+        message: "Waste Picker created successfully",
+        data: {
+          _id: create._id,
+          verified: create.verified,
+          countryCode: create.countryCode,
+          status: create.status,
+          areaOfAccess: create.areaOfAccess,
+          approvedBy: create.approvedBy,
+          totalCollected: create.totalCollected,
+          numberOfTripsCompleted: create.numberOfTripsCompleted,
+          fullname: create.fullname,
+          email: create.email,
+          phone: create.phone,
+          address: create.address,
+          organisation: create.organisation,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  // assign waste pickers to organisation
+  static async assignToOrganiation(req, res) {
+    try {
+      const body = req.body;
+      const organisation = await organisationModel.findById(
+        body.organisationId
+      );
+      if (!organisation) {
+        return res.status(400).json({
+          error: true,
+          message: "Organisation not found",
+        });
+      }
+      const picker = await collectorModel.findById(body.pickerId);
+      if (!picker) {
+        return res.status(400).json({
+          error: true,
+          message: "Waster picker not found",
+        });
+      }
+
+      if (picker.organisation !== "") {
+        return res.status(400).json({
+          error: true,
+          message: "Waster picker already assigned to an organisation",
+        });
+      }
+
+      const update = await collectorModel.updateOne(
+        { _id: picker._id },
+        {
+          organisation: organisation.companyName,
+          organisationId: organisation._id.toString(),
+          approvedBy: organisation._id.toString(),
+        }
+      );
+
+      console.log("assigned", update);
+
+      return res.status(200).json({
+        error: false,
+        message: "Waste Picker assigned successfully",
+        data: {
+          _id: picker._id,
+          verified: picker.verified,
+          countryCode: picker.countryCode,
+          status: picker.status,
+          areaOfAccess: picker.areaOfAccess,
+          approvedBy: picker.approvedBy,
+          totalCollected: picker.totalCollected,
+          numberOfTripsCompleted: picker.numberOfTripsCompleted,
+          fullname: picker.fullname,
+          email: picker.email,
+          phone: picker.phone,
+          address: picker.address,
+          organisation: organisation.companyName,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  // unassign waste pickers to organisation
+  static async unassignFromOrganisation(req, res) {
+    try {
+      const { pickerId } = req.body;
+      const picker = await collectorModel.findById(pickerId);
+      if (!picker) {
+        return res.status(400).json({
+          error: true,
+          message: "Waster picker not found",
+        });
+      }
+
+      if (picker.organisation === "") {
+        return res.status(400).json({
+          error: true,
+          message: "Waster picker not yet assigned to an organisation",
+        });
+      }
+
+      const update = await collectorModel.updateOne(
+        { _id: picker._id },
+        {
+          organisation: "",
+          organisationId: "",
+          approvedBy: "",
+          companyVerified: false,
+        }
+      );
+
+      console.log("assigned", update);
+
+      return res.status(200).json({
+        error: false,
+        message: "Waste Picker unassigned successfully",
+        data: {
+          _id: picker._id,
+          verified: picker.verified,
+          countryCode: picker.countryCode,
+          status: picker.status,
+          areaOfAccess: picker.areaOfAccess,
+          approvedBy: picker.approvedBy,
+          totalCollected: picker.totalCollected,
+          numberOfTripsCompleted: picker.numberOfTripsCompleted,
+          fullname: picker.fullname,
+          email: picker.email,
+          phone: picker.phone,
+          address: picker.address,
+          organisation: "",
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  // change password
+  static async changePassword(req, res) {
+    try {
+      const user = await collectorModel.findOne({
+        phone: req.body.phone.trim(),
+      });
+
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid phone passed",
+        });
+      }
+
+      if (!(await comparePassword(req.body.oldPassword, user.password))) {
+        return res.status(400).json({
+          error: true,
+          message: "incorrect old password",
+          statusCode: 400,
+        });
+      }
+
+      if (req.body.newPassword.trim() !== req.body.confirmPassword.trim()) {
+        return res.status(400).json({
+          error: true,
+          message: "confirm password does not match new password",
+        });
+      }
+
+      const newPassword = await encryptPassword(req.body.newPassword);
+
+      const update = await collectorModel.updateOne(
+        { _id: user._id },
+        {
+          password: newPassword,
+          firstLogin: false,
+        }
+      );
+
+      console.log("update", update);
+
+      return res.status(200).json({
+        error: false,
+        message: "Password changed successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
     }
   }
 }

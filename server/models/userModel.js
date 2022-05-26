@@ -167,6 +167,14 @@ const user_Schema = new Schema({
   locationScope: {
     type: String,
   },
+  firstLogin: {
+    type: Boolean,
+    default: true,
+  },
+  terms_condition:{
+    type: Boolean,
+    default: false,
+  }
 });
 
 user_Schema.pre("save", function (next) {

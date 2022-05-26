@@ -271,15 +271,24 @@ organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
                       "Your licence expired. Kindly contact support for difficulty in renewal",
                   });
                 }
+
                 const firstLogin = USER.last_logged_in ? false : true;
                 const { password, resetToken, ...data } = USER;
-                await MODEL.organisationModel.updateOne(
-                  {
-                    email: REQUEST.body.email,
-                  },
-                  { last_logged_in: new Date() }
-                );
-                return RESPONSE.jsonp({ ...data, firstLogin });
+                if (USER.firstLogin && USER.firstLogin === true) {
+                  return RESPONSE.jsonp({
+                    message: "Please change password",
+                    ...data,
+                    firstLogin: true,
+                  });
+                } else {
+                  await MODEL.organisationModel.updateOne(
+                    {
+                      email: REQUEST.body.email,
+                    },
+                    { last_logged_in: new Date() }
+                  );
+                  return RESPONSE.jsonp({ ...data, firstLogin: false });
+                }
               }
             }
           )

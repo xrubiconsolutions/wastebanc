@@ -9,6 +9,7 @@ const {
   collectorBinModel,
   organisationBinModel,
   dropOffModel,
+  localGovernmentModel,
 } = require("../models");
 const {
   sendResponse,
@@ -310,7 +311,7 @@ organisationController.create = async (req, res) => {
       text: `
 Congratulations, you have been approved by Pakam and have been on-boarded to the Pakam waste management ecosystem.
 
-Kindly use the following login details to sign in to your  Pakam Company Dashboard.
+Kindly use the following login details to sign in to your Pakam Company Dashboard.
 
 
 Email: ${org.email}
@@ -360,24 +361,36 @@ Pakam Team
     await sgMail.send(msg);
 
     const areas = org.areaOfAccess;
-    areas.map((area) => {
-      request.get(
-        {
-          url: `https://maps.googleapis.com/maps/api/geocode/json?address=${area}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
-        },
-        function (error, response, body) {
-          const result = JSON.parse(body);
-          const LatLong = result.results.map((a) => ({
-            formatted_address: a.formatted_address,
-            geometry: a.geometry,
-          }));
-          geofenceModel.create({
-            organisationId: org._id,
-            data: LatLong,
+    if (areas.length > 0) {
+      await Promise.all(
+        areas.map(async (area) => {
+          const lcd = await localGovernmentModel.findOne({
+            slug: area,
           });
-        }
+
+          if (lcd) {
+            request.get(
+              {
+                url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
+              },
+              function (error, response, body) {
+                const result = JSON.parse(body);
+                console.log("map result", result);
+                const LatLong = result.results.map((a) => ({
+                  formatted_address: a.formatted_address,
+                  geometry: a.geometry,
+                }));
+                geofenceModel.create({
+                  organisationId: org._id,
+                  data: LatLong,
+                });
+              }
+            );
+          }
+        })
       );
-    });
+    }
+
     delete org.password;
     return res.status(200).json({
       error: false,
@@ -490,6 +503,7 @@ organisationController.update = async (req, res) => {
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
         categories: req.body.categories || organisation.categories,
         location: req.body.location || organisation.location,
+       // allowPickers: req.body.allowPickers || organisation.allowPickers,
       }
     );
 
@@ -915,6 +929,7 @@ organisationController.changePassword = async (req, res) => {
     const passwordHash = await encryptPassword(newPassword);
     const account = await organisationModel.findById(companyId);
     account.password = passwordHash;
+    account.firstLogin = false;
     await account.save();
 
     // return success message
@@ -930,5 +945,24 @@ organisationController.changePassword = async (req, res) => {
     });
   }
 };
+
+organisationController.allowsPickers = async(req, res)=> {
+  try{
+    const organisations = await organisationModel.findOne({
+      allowPickers: true
+    })
+
+    return res.status(200).json({
+      error: false,
+      message:"success",
+      data: organisations
+    })
+  }catch(error){
+    return res.status(400).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+}
 
 module.exports = organisationController;

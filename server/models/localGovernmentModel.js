@@ -17,6 +17,9 @@ const localGovernment_Schema = new Schema({
     type: String,
     required: true,
   },
+  slug: {
+    type: String,
+  },
   country: {
     type: String,
   },

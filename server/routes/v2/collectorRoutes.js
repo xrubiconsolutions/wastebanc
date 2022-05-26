@@ -78,6 +78,24 @@ module.exports = (APP) => {
     CollectorService.disableCollector
   );
 
+  // enable collector on company dashboard
+  APP.route("/api/v2/company/collector/enable/:collectorId").put(
+    // [param("collectorId").notEmpty().withMessage("collectorId is required")],
+    companyPakamDataValidation,
+    collectorValidator.verifyCollector,
+    checkRequestErrs,
+    CollectorService.enableCollector
+  );
+
+  // disable collector on company dashboard
+  APP.route("/api/v2/company/collector/disable/:collectorId").put(
+    //[param("collectorId").notEmpty().withMessage("collectorId is required")],
+    companyPakamDataValidation,
+    collectorValidator.verifyCollector,
+    checkRequestErrs,
+    CollectorService.disableCollector
+  );
+
   APP.route("/api/collector/register").post(
     collectorValidator.createCollector,
     checkRequestErrs,
@@ -131,5 +149,34 @@ module.exports = (APP) => {
   APP.route("/api/collector/recent/transactions").get(
     recyclerValidation,
     CollectorService.recentTransaction
+  );
+
+  APP.route("/api/collector/script").get(CollectorService.assignOrganisationId);
+
+  APP.route("/api/wastepicker/register").post(
+    adminPakamValidation,
+    collectorValidator.createPicker,
+    checkRequestErrs,
+    CollectorService.registerPicker
+  );
+
+  APP.route("/api/wastepicker/assign").post(
+    adminPakamValidation,
+    collectorValidator.assignPicker,
+    checkRequestErrs,
+    CollectorService.assignToOrganiation
+  );
+
+  APP.route("/api/wastepicker/unassign").post(
+    adminPakamValidation,
+    collectorValidator.unassignPicker,
+    checkRequestErrs,
+    CollectorService.unassignFromOrganisation
+  );
+
+  APP.route("/api/collector/changepassword").post(
+    collectorValidator.changePassword,
+    checkRequestErrs,
+    CollectorService.changePassword
   );
 };

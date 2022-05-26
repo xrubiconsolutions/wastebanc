@@ -43,4 +43,6 @@ module.exports = (APP) => {
     adminPakamValidation,
     lcdAreasController.getLcd
   );
+
+  APP.route("/api/v2/areas/script").get(lcdAreasController.scriptArea);
 };

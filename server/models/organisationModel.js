@@ -142,5 +142,13 @@ const organisation_Schema = new Schema({
     type: Date,
     default: null,
   },
+  firstLogin: {
+    type: Boolean,
+    default: true,
+  },
+  allowPickers: {
+    type: Boolean,
+    default: false,
+  },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);

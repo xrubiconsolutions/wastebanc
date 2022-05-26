@@ -59,7 +59,7 @@ class Resources_Service {
 
   static async findResource(req, res) {
     try {
-      const resource = await resourceModel.findById(req.query.resourceId);
+      const resource = await resourcesModel.findById(req.params.resourceId);
       if (!resource) {
         return res.status(400).json({
           error: true,

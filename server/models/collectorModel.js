@@ -28,6 +28,10 @@ const collector_Schema = new Schema({
     type: String,
     default: "collector",
   },
+  collectorType: {
+    type: String,
+    default: "collector",
+  },
   busy: {
     type: Boolean,
     default: false,
@@ -64,6 +68,9 @@ const collector_Schema = new Schema({
   organisation: {
     type: String,
   },
+  organisationId: {
+    type: String,
+  },
   IdNumber: {
     type: String,
   },
@@ -92,6 +99,10 @@ const collector_Schema = new Schema({
     default: null,
   },
   totalCollected: {
+    type: Number,
+    default: 0,
+  },
+  totalCollectedCur: {
     type: Number,
     default: 0,
   },
@@ -134,6 +145,20 @@ const collector_Schema = new Schema({
     type: String,
   },
   isDisabled: {
+    type: Boolean,
+    default: false,
+  },
+  account: {
+    accountName: { type: String },
+    accountNo: { type: String },
+    bankName: { type: String },
+    bankSortCode: { type: String },
+  },
+  firstLogin: {
+    type: Boolean,
+    default: true,
+  },
+  terms_condition: {
     type: Boolean,
     default: false,
   },
