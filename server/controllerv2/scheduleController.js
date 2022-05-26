@@ -12,6 +12,7 @@ const { STATUS_MSG } = require("../util/constants");
 const moment = require("moment-timezone");
 const { sendNotification } = require("../util/commonFunction");
 const randomstring = require("randomstring");
+const rewardService = require("../services/rewardService");
 
 moment().tz("Africa/Lagos", false);
 
@@ -264,7 +265,8 @@ class ScheduleService {
 
   static async rewardSystem(req, res) {
     try {
-      const collectorId = req.user._id;
+      const { user } = req;
+      const collectorId = user._id;
       const categories = req.body.categories;
       const scheduleId = req.body.scheduleId;
 
@@ -319,53 +321,76 @@ class ScheduleService {
 
       let pricing = [];
       let cat;
-      //console.log("organisation", organisation);
-      for (let category of categories) {
-        if (organisation.categories.length !== 0) {
-          const c = organisation.categories.find(
-            (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
-          );
-          if (c) {
-            console.log("cat", cc);
-            const p = parseFloat(category.quantity) * Number(c.price);
-            console.log("quantity", parseFloat(category.quantity));
-            pricing.push(p);
-          }
-        } else {
-          console.log("here2");
-          var cc =
-            category.name === "nylonSachet"
-              ? "nylon"
-              : category.name === "glassBottle"
-              ? "glass"
-              : category.name.length < 4
-              ? category.name.substring(0, category.name.length)
-              : category.name.substring(0, category.name.length - 1);
+      //moved the loop to a service
 
-          var organisationCheck = JSON.parse(JSON.stringify(organisation));
-          //console.log("organisation check here", organisationCheck);
-          for (let val in organisationCheck) {
-            //console.log("category check here", cc);
-            if (val.includes(cc)) {
-              const equivalent = !!organisationCheck[val]
-                ? organisationCheck[val]
-                : 1;
-              console.log("equivalent here", equivalent);
-              const p = parseFloat(category.quantity) * equivalent;
-              pricing.push(p);
-            }
-          }
-        }
+      //console.log("organisation", organisation);
+      // for (let category of categories) {
+      //   if (organisation.categories.length !== 0) {
+      //     const c = organisation.categories.find(
+      //       (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
+      //     );
+      //     if (c) {
+      //       console.log("cat", cc);
+      //       const p = parseFloat(category.quantity) * Number(c.price);
+      //       console.log("quantity", parseFloat(category.quantity));
+      //       pricing.push(p);
+      //     }
+      //   } else {
+      //     console.log("here2");
+      //     var cc =
+      //       category.name === "nylonSachet"
+      //         ? "nylon"
+      //         : category.name === "glassBottle"
+      //         ? "glass"
+      //         : category.name.length < 4
+      //         ? category.name.substring(0, category.name.length)
+      //         : category.name.substring(0, category.name.length - 1);
+
+      //     var organisationCheck = JSON.parse(JSON.stringify(organisation));
+      //     //console.log("organisation check here", organisationCheck);
+      //     for (let val in organisationCheck) {
+      //       //console.log("category check here", cc);
+      //       if (val.includes(cc)) {
+      //         const equivalent = !!organisationCheck[val]
+      //           ? organisationCheck[val]
+      //           : 1;
+      //         console.log("equivalent here", equivalent);
+      //         const p = parseFloat(category.quantity) * equivalent;
+      //         pricing.push(p);
+      //       }
+      //     }
+      //   }
+      // }
+
+      // const totalpointGained = pricing.reduce((a, b) => {
+      //   return parseFloat(a) + parseFloat(b);
+      // }, 0);
+
+      // const totalWeight = categories.reduce((a, b) => {
+      //   return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
+      // }, 0);
+      // console.log("pricing", pricing);
+
+      const householdReward = await rewardService.houseHold(
+        categories,
+        organisation
+      );
+      if (householdReward.error) {
+        return res.status(400).json(householdReward);
       }
 
-      const totalpointGained = pricing.reduce((a, b) => {
-        return parseFloat(a) + parseFloat(b);
-      }, 0);
+      let pickerGain = 0;
+      if (user.collectorType == "waste-picker") {
+        const pickerReward = await rewardService.picker(
+          categories,
+          organisation
+        );
+        if (pickerReward.error) {
+          return res.status(400).json(pickerReward);
+        }
 
-      const totalWeight = categories.reduce((a, b) => {
-        return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
-      }, 0);
-      console.log("pricing", pricing);
+        pickerGain = pickerReward.totalpointGained;
+      }
 
       const ref = randomstring.generate({
         length: 7,
@@ -373,8 +398,9 @@ class ScheduleService {
       });
 
       const t = await transactionModel.create({
-        weight: totalWeight,
-        coin: totalpointGained,
+        weight: householdReward.totalWeight,
+        coin: householdReward.totalpointGained,
+        wastePickerCoin: pickerGain,
         cardID: scheduler._id,
         completedBy: collectorId,
         categories,
@@ -393,7 +419,7 @@ class ScheduleService {
       const message = {
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
-          en: `You have just been credited ${totalpointGained} for the pickup`,
+          en: `You have just been credited ${householdReward.totalpointGained} for the pickup`,
         },
         channel_for_external_user_ids: "push",
         include_external_user_ids: [scheduler.onesignal_id],
@@ -427,7 +453,8 @@ class ScheduleService {
         { email: scheduler.email },
         {
           $set: {
-            availablePoints: scheduler.availablePoints + totalpointGained,
+            availablePoints:
+              scheduler.availablePoints + householdReward.totalpointGained,
             schedulePoints: scheduler.schedulePoints + 1,
           },
         }
@@ -440,6 +467,7 @@ class ScheduleService {
             totalCollected: collector.totalCollected + totalWeight,
             numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
             busy: false,
+            pointGained: pickerGain,
             last_logged_in: new Date(),
           },
         }

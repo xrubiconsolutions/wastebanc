@@ -653,7 +653,8 @@ class UserService {
       }
 
       const token = authToken(user);
-      delete user.password;w
+      delete user.password;
+
       return res.status(200).json({
         error: false,
         message: "Login successfull",
@@ -687,7 +688,7 @@ class UserService {
         },
       });
     } catch (error) {
-      console.log(error.getMessage());
+      console.log(error);
       return res.status(500).json({
         error: true,
         message: "An error occurred",

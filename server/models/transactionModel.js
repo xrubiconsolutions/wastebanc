@@ -9,7 +9,9 @@ const transaction_Schema = {
     type: Number,
     required: true,
   },
-
+  userId: {
+    type: String,
+  },
   fullname: {
     type: String,
     required: true,

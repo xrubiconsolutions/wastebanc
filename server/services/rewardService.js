@@ -66,18 +66,49 @@ class rewardService {
     }
   }
 
-  // static async picker(categories, organisation) {
-  //   for (let category of categories) {
-  //     const c = organisation.categories.find((cc)=> cc.name.toLowerCase() === category.name.toLowerCase());
-  //     if(c){
-  //         // get waste picker price on that category
-  //         const c = await cateoryModel.findOne({
-  //             name: c.name.toLowerCase()
-  //         })
-  //         if(category){
-  //             const p = parseFloat(category.quantity) * Number()
-  //         }
-  //     }
-  //   }
-  // }
+  static async picker(categories, organisation) {
+    try {
+      for (let category of categories) {
+        const c = organisation.categories.find(
+          (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
+        );
+        if (c) {
+          // get waste picker price on that category
+          const systemPricing = await cateoryModel.findOne({
+            name: c.name.toLowerCase(),
+          });
+          if (systemPricing) {
+            const p =
+              parseFloat(category.quantity) * Number(systemPricing.wastepicker);
+            pricing.push(p);
+          }
+        } else {
+          const p = parseFloat(category.quantity) * 0;
+          pricing.push(p);
+        }
+      }
+
+      const totalpointGained = pricing.reduce((a, b) => {
+        return parseFloat(a) + parseFloat(b);
+      }, 0);
+
+      const totalWeight = categories.reduce((a, b) => {
+        return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
+      }, 0);
+
+      return {
+        error: false,
+        totalpointGained,
+        totalWeight,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        error: true,
+        message: "An error occurred,Please contact support team",
+      };
+    }
+  }
 }
+
+module.exports = rewardService;
