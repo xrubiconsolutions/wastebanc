@@ -9,6 +9,7 @@ let auth = require("../../util/auth");
 module.exports = (APP) => {
   APP.route("/api/all/banks").get(CONTROLLER.payController.getBanks);
 
+  // account number resolver
   APP.route("/api/resolve/account").get(
     CONTROLLER.payController.resolveAccount
   );
