@@ -299,7 +299,7 @@ class ScheduleService {
 
       const collector = await collectorModel.findById(collectorId);
       console.log("collector", collector);
-      if (!collector || collector.verified === false) {
+      if (!collector || collector.companyVerified === false) {
         return res.status(400).json({
           error: true,
           message: "Collector not found or has not be verified",
@@ -453,7 +453,7 @@ class ScheduleService {
         activity_type: "pickup",
       });
 
-      //scheduler
+      //house hold user
       await activitesModel.create({
         userType: "client",
         userId: scheduler._id,

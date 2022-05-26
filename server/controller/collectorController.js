@@ -182,9 +182,14 @@ collectorController.loginCollector = (REQUEST, RESPONSE) => {
 };
 
 collectorController.checkAccepted = (REQUEST, RESPONSE) => {
-  const collectorID = REQUEST.query.ID;
+  console.log("login user", REQUEST.user);
+  const collectorID = REQUEST.query.ID || REQUEST.user._id;
   MODEL.scheduleModel
-    .find({ collectorStatus: "accept", collectedBy: collectorID })
+    .find({
+      collectorStatus: "accept",
+      completionStatus: "pending",
+      collectedBy: collectorID,
+    })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)

@@ -18,6 +18,10 @@ const transaction_Schema = {
     type: Number,
     required: true,
   },
+  wastePickerCoin: {
+    type: Number,
+    required: true,
+  },
   type: {
     type: String,
   },
@@ -72,7 +76,7 @@ const transaction_Schema = {
   organisation: {
     type: String,
   },
-  organisationID:{
+  organisationID: {
     type: String,
   },
   state: {

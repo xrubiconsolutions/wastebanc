@@ -33,6 +33,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/collector/accepted").get(
+    auth.recyclerValidation,
     CONTROLLER.collectorController.checkAccepted
   );
 

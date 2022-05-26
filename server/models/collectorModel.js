@@ -102,7 +102,7 @@ const collector_Schema = new Schema({
     type: Number,
     default: 0,
   },
-  totalCollectedCur: {
+  pointGained: {
     type: Number,
     default: 0,
   },
