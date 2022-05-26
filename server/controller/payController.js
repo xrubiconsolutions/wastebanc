@@ -51,7 +51,7 @@ payController.resolveAccount = (req, res) => {
     (err, result) => {
       console.log("err=>", err);
       if (err) return res.status(400).json(err);
-      return res.status(200).json(result.body.data);
+      return res.status(200).json(result.body.data || result.body);
     }
   );
 };

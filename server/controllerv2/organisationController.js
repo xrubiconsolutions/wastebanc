@@ -238,25 +238,31 @@ organisationController.listOrganisation = async (req, res) => {
       criteria.state = currentScope;
     }
 
-    console.log("criteria", criteria);
-
     const totalResult = await organisationModel.countDocuments(criteria);
-    const organisations = await organisationModel
-      .find(criteria, { password: 0 })
-      .sort({ createAt: -1 })
-      .skip((page - 1) * resultsPerPage)
-      .limit(resultsPerPage);
+    const organisations =
+      !key && !(start || end)
+        ? await organisationModel.find({}, { password: 0 })
+        : await organisationModel
+            .find(criteria, { password: 0 })
+            .sort({ createAt: -1 })
+            .skip((page - 1) * resultsPerPage)
+            .limit(resultsPerPage);
+
+    const data =
+      !key && !(start || end)
+        ? { organisations }
+        : {
+            organisations,
+            totalResult,
+            page,
+            resultsPerPage,
+            totalPages: Math.ceil(totalResult / resultsPerPage),
+          };
 
     return res.status(200).json({
       error: false,
       message: "success",
-      data: {
-        organisations,
-        totalResult,
-        page,
-        resultsPerPage,
-        totalPages: Math.ceil(totalResult / resultsPerPage),
-      },
+      data,
     });
   } catch (error) {
     console.log(error);
