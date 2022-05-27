@@ -137,18 +137,22 @@ categoryController.updateCategory = async (req, res) => {
     const name = req.body.name || cat.name;
     const pickerPrice = req.body.wastepicker || cat.wastepicker;
 
-    const update = await MODEL.categoryModel.updateOne(cat._id, {
-      name,
-      wastepicker: pickerPrice,
-    });
+    const update = await MODEL.categoryModel.updateOne(
+      { _id: cat._id },
+      {
+        name,
+        wastepicker: pickerPrice,
+      }
+    );
     cat.name = name;
     cat.wastepicker = pickerPrice;
     return res.status(200).json({
       message: "Category updated successfully",
       statusCode: 200,
-      data: update,
+      data: cat,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       message: "Internal server error",
       statusCode: 500,

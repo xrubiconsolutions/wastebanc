@@ -78,6 +78,7 @@ module.exports = (APP) => {
   APP.route("/api/getBalance").get(CONTROLLER.userController.getWalletBalance);
 
   APP.route("/api/user/transactions").get(
+    auth.userValidation,
     CONTROLLER.userController.getUserTransactions
   );
 
