@@ -484,7 +484,7 @@ dashboardController.collectormapData = async (req, res) => {
     const { user } = req;
     const currentScope = user.locationScope;
 
-    const { start, end } = req.query;
+    const { start, end, collectorType = { $ne: "" } } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
 
     if (start || end) {
@@ -500,6 +500,7 @@ dashboardController.collectormapData = async (req, res) => {
         $gte: startDate,
         $lt: endDate,
       },
+      collectorType,
       //state: { $in: states },
     };
 
@@ -517,8 +518,6 @@ dashboardController.collectormapData = async (req, res) => {
     } else {
       criteria.state = currentScope;
     }
-
-    console.log("cri", criteria);
 
     const collectors = await allCollector(criteria);
 
