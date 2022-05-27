@@ -1094,6 +1094,7 @@ userController.resetMobilePassword = (REQUEST, RESPONSE) => {
 //   });
 // };
 
+// added loggedin user id
 userController.getUserTransactions = (req, res) => {
   const cardID = req.query.cardID || req.user._id.toString();
   const PROJECTION = {
