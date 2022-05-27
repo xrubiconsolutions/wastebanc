@@ -32,10 +32,13 @@ class CollectorService {
         start,
         key,
         collectorType = "collector",
+        assigned,
       } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
+      // if (assigned) assigned = assigned === "true" ? true : false;
+      assigned = assigned ? (assigned === "true" ? true : false) : null;
 
       // if (!key) {
       //   if (!start || !end) {
@@ -78,6 +81,8 @@ class CollectorService {
       }
 
       criteria.collectorType = collectorType;
+      if (assigned) criteria.organisation = { $ne: "" };
+      else if (assigned === false) criteria.organisation = "";
       if (!currentScope) {
         return res.status(400).json({
           error: true,
