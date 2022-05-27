@@ -92,31 +92,35 @@ class Resources_Service {
       }
 
       let url;
-      let thumbnail;
+      let thumbnailgen;
       if (req.body.youtubeId) {
+        console.log("here", req.body.youtubeId);
         const youtubeURL = `https://www.youtube.com/watch?v=${req.body.youtubeId}`;
         const generateThumbnail = thumbnail(youtubeURL);
         url = req.body.youtubeId;
-        thumbnail = generateThumbnail.high.url;
+        thumbnailgen = generateThumbnail.high.url;
       } else {
         url = resource.url;
-        thumbnail = resource.thumbnail;
+        thumbnailgen = resource.thumbnail;
       }
+
+      console.log("url", url);
       await resourcesModel.updateOne(
         { _id: resource._id },
         {
           title: req.body.title || resource.title,
           message: req.body.message || resource.message,
           url,
-          thumbnail,
+          thumbnail: thumbnailgen,
           show: req.body.show || resource.show,
         }
       );
 
       resource.title = req.body.title || resource.title;
       resource.message = req.body.message || resource.message;
-      resource.url = req.body.url || resource.url;
+      resource.url = req.body.youtubeId || resource.url;
       resource.show = req.body.show || resource.show;
+      resource.thumbnail = thumbnailgen || resource.thumbnail;
 
       return res.status(200).json({
         error: false,
