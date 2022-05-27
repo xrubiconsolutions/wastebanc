@@ -3,7 +3,7 @@ class rewardService {
   static async houseHold(categories, organisation) {
     try {
       let pricing = [];
-      let cat;
+      //let cat;
 
       for (let category of categories) {
         if (organisation.categories.length !== 0) {
@@ -12,7 +12,7 @@ class rewardService {
           );
           if (c) {
             const p = parseFloat(category.quantity) * Number(c.price);
-            console.log("quantity", parseFloat(category.quantity));
+
             pricing.push(p);
           } else {
             const p = parseFloat(category.quantity) * 0;
@@ -68,25 +68,59 @@ class rewardService {
 
   static async picker(categories, organisation) {
     try {
-      for (let category of categories) {
-        const c = organisation.categories.find(
-          (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
-        );
-        if (c) {
-          // get waste picker price on that category
-          const systemPricing = await cateoryModel.findOne({
-            name: c.name.toLowerCase(),
-          });
-          if (systemPricing) {
-            const p =
-              parseFloat(category.quantity) * Number(systemPricing.wastepicker);
+      let pricing = [];
+
+      await Promise.all(
+        categories.map(async (category) => {
+          console.log("category", category.name.toLowerCase());
+          const c = organisation.categories.find(
+            (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
+          );
+          console.log("c", c);
+          if (c) {
+            console.log("c found", c);
+            // get waste picker price on that category
+            const systemPricing = await categoryModel.findOne({
+              $or: [{ name: category.name }, { value: category.name }],
+            });
+            if (systemPricing) {
+              console.log("system found", systemPricing);
+              const p =
+                parseFloat(category.quantity) *
+                Number(systemPricing.wastepicker);
+              pricing.push(p);
+            } else {
+              console.log("c", c);
+              console.log("system not found", category);
+            }
+          } else {
+            console.log("syste, not found", category);
+            const p = parseFloat(category.quantity) * 0;
             pricing.push(p);
           }
-        } else {
-          const p = parseFloat(category.quantity) * 0;
-          pricing.push(p);
-        }
-      }
+          console.log("picker price", pricing);
+        })
+      );
+
+      //   for (let category of categories) {
+      //     const c = organisation.categories.find(
+      //       (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
+      //     );
+      //     if (c) {
+      //       // get waste picker price on that category
+      //       const systemPricing = await categoryModel.findOne({
+      //         name: c.name.toLowerCase(),
+      //       });
+      //       if (systemPricing) {
+      //         const p =
+      //           parseFloat(category.quantity) * Number(systemPricing.wastepicker);
+      //         pricing.push(p);
+      //       }
+      //     } else {
+      //       const p = parseFloat(category.quantity) * 0;
+      //       pricing.push(p);
+      //     }
+      //   }
 
       const totalpointGained = pricing.reduce((a, b) => {
         return parseFloat(a) + parseFloat(b);

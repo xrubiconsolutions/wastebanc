@@ -257,7 +257,7 @@ let createToken = (objData) => {
 
 const authToken = (user) => {
   return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
-    expiresIn: "3s",
+    expiresIn: "3h",
   });
 };
 
@@ -354,7 +354,7 @@ const sendNotification = function (data) {
   var https = require("https");
   var req = https.request(options, function (res) {
     res.on("data", function (data) {
-      console.log(JSON.parse(data));
+      console.log(data);
     });
   });
 

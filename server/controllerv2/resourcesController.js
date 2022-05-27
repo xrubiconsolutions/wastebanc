@@ -92,12 +92,15 @@ class Resources_Service {
       }
 
       let url;
-      if (req.params.resourceId) {
-        const youtubeURL = `https://www.youtube.com/watch?v=${req.params.resourceId}`;
+      let thumbnail;
+      if (req.body.youtubeId) {
+        const youtubeURL = `https://www.youtube.com/watch?v=${req.body.youtubeId}`;
         const generateThumbnail = thumbnail(youtubeURL);
-        url = generateThumbnail.high.url;
+        url = req.body.youtubeId;
+        thumbnail = generateThumbnail.high.url;
       } else {
         url = resource.url;
+        thumbnail = resource.thumbnail;
       }
       await resourcesModel.updateOne(
         { _id: resource._id },
@@ -105,6 +108,7 @@ class Resources_Service {
           title: req.body.title || resource.title,
           message: req.body.message || resource.message,
           url,
+          thumbnail,
           show: req.body.show || resource.show,
         }
       );

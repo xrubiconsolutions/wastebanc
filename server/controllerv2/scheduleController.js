@@ -428,7 +428,7 @@ class ScheduleService {
       await notificationModel.create({
         title: "Pickup Schedule completed",
         lcd: scheduler.lcd,
-        message: `You have just been credited ${totalpointGained} for your schedule`,
+        message: `You have just been credited ${householdReward.totalpointGained} for your schedule`,
         schedulerId: scheduler._id,
       });
 
@@ -443,7 +443,7 @@ class ScheduleService {
             completionStatus: "completed",
             collectorStatus: "accept",
             collectedBy: collectorId,
-            quantity: totalWeight,
+            quantity: householdReward.totalWeight,
             completionDate: new Date(),
           },
         }
@@ -464,7 +464,8 @@ class ScheduleService {
         { _id: collector._id },
         {
           $set: {
-            totalCollected: collector.totalCollected + totalWeight,
+            totalCollected:
+              collector.totalCollected + householdReward.totalWeight,
             numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
             busy: false,
             pointGained: pickerGain,
@@ -491,8 +492,8 @@ class ScheduleService {
       return res.status(200).json({
         error: false,
         message: "Pickup completed successfully",
-        data: totalpointGained,
-        da: totalWeight,
+        data: householdReward.totalpointGained,
+        da: householdReward.totalWeight,
       });
     } catch (error) {
       console.log(error);
@@ -630,15 +631,12 @@ class ScheduleService {
         });
       }
 
-      if (user.cardID == null) {
-        return (
-          res,
-          status(400).json({
-            error: true,
-            message: "You don't have a valid card ID, contact support for help",
-          })
-        );
-      }
+      // if (user.cardID == null) {
+      //   return res.status(400).json({
+      //     error: true,
+      //     message: "You don't have a valid card ID, contact support for help",
+      //   });
+      // }
 
       const expireDate = moment(data.pickUpDate, "YYYY-MM-DD").add(7, "days");
       data.expiryDuration = expireDate;
