@@ -1859,6 +1859,31 @@ class CollectorService {
       });
     }
   }
+
+  // get collector current point balance
+  static async collectorPointBalance(req, res) {
+    try {
+      const { user } = req;
+      const collector = await collectorModel.findById(user._id);
+      if (!collector) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid collector, please contact support team",
+        });
+      }
+      return res.status(200).json({
+        error: false,
+        message: "Point Balance",
+        data: collector.pointGained,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = CollectorService;

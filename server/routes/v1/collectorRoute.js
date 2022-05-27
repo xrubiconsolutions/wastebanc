@@ -58,6 +58,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/collector/transactions").get(
+    auth.recyclerValidation,
     CONTROLLER.collectorController.getTransactions
   );
 

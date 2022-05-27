@@ -179,4 +179,9 @@ module.exports = (APP) => {
     checkRequestErrs,
     CollectorService.changePassword
   );
+
+  APP.route("/api/collector/point/balance").get(
+    recyclerValidation,
+    CollectorService.collectorPointBalance
+  );
 };

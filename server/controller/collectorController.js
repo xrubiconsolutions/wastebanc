@@ -624,7 +624,7 @@ collectorController.resendVerification = async (REQUEST, RESPONSE) => {
 };
 
 collectorController.getTransactions = (req, res) => {
-  const collectorID = req.query.ID;
+  const collectorID = req.query.ID || req.user._id;
 
   MODEL.transactionModel
     .find({ completedBy: collectorID })
