@@ -61,6 +61,7 @@ categoryController.addCategory = async (req, res) => {
         statusCode: 400,
       });
     }
+    //fixed
     const store = await MODEL.categoryModel.create({
       name,
       value,
