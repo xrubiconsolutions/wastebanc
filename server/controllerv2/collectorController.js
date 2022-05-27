@@ -98,6 +98,8 @@ class CollectorService {
         criteria.state = currentScope;
       }
 
+      //console.log
+
       console.log(criteria);
       //if (state) criteria.state = state;
 
