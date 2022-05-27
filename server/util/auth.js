@@ -21,16 +21,18 @@ validateUser.userValidation = async (req, res, NEXT) => {
     const token = req.headers.authorization.split(" ")[1];
 
     if (!token) {
-      return res.status(400).json({
+      return res.status(401).json({
         error: true,
         message: "Invalid token",
+        statusCode: 401,
       });
     }
 
     if (token === "undefined" || token === null || token === undefined) {
-      return res.status(400).json({
+      return res.status(401).json({
         error: true,
         message: "Invalid token",
+        statusCode: 401,
       });
     }
 
@@ -49,7 +51,7 @@ validateUser.userValidation = async (req, res, NEXT) => {
       return res.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-        statusCode: 403,
+        statusCode: 401,
       });
     }
 
@@ -57,7 +59,7 @@ validateUser.userValidation = async (req, res, NEXT) => {
       return res.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-        statusCode: 403,
+        statusCode: 401,
       });
     }
 
@@ -68,7 +70,7 @@ validateUser.userValidation = async (req, res, NEXT) => {
       return res.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,
-        statusCode: 403,
+        statusCode: 401,
       });
     }
   } catch (error) {
