@@ -184,4 +184,11 @@ module.exports = (APP) => {
     recyclerValidation,
     CollectorService.collectorPointBalance
   );
+
+  APP.route("/api/collector/remove/:collectorId").delete(
+    adminPakamValidation,
+    collectorValidator.checkCollectorId,
+    checkRequestErrs,
+    CollectorService.removeCollector
+  );
 };

@@ -470,6 +470,36 @@ class CollectorService {
     }
   }
 
+  static async removeCollector(req, res) {
+    try {
+      const { collectorId } = req.params;
+      const collector = await collectorModel.findById(collectorId);
+      if (!collector) {
+        return res.status(400).json({
+          error: true,
+          message: "Collector not found",
+        });
+      }
+
+      const remove = await collectorModel.deleteOne({
+        _id: collector._id,
+      });
+
+      console.log("deleted", remove);
+
+      return res.status(200).json({
+        error: false,
+        message: "Collector deleted successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
   static async approveCollector(req, res) {
     const { collectorId } = req.body;
     const {
