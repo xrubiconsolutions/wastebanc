@@ -39,4 +39,5 @@ module.exports = {
   resourcesModel: require("./resourcesModel"),
   recentVerificationModel: require("./recentVerificationModel"),
   charityOrganisationModel: require("./charityOrganisationModel"),
+  tokenModel: require("./tokenModel"),
 };
