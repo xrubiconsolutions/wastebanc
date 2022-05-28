@@ -161,10 +161,18 @@ organisationController.listOrganisation = async (req, res) => {
   try {
     const { user } = req;
     const currentScope = user.locationScope;
-    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      start,
+      end,
+      key,
+      allowPickers,
+    } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
+    if (allowPickers) allowPickers = allowPickers === "true" ? true : false;
 
     // if (!key) {
     //   if (!start || !end) {
@@ -237,11 +245,16 @@ organisationController.listOrganisation = async (req, res) => {
     } else {
       criteria.state = currentScope;
     }
-
+    let pickerCriteria = {};
+    if (typeof allowPickers === "boolean") {
+      criteria.allowPickers = allowPickers;
+      pickerCriteria = { allowPickers };
+    }
     const totalResult = await organisationModel.countDocuments(criteria);
+
     const organisations =
       !key && !(start || end)
-        ? await organisationModel.find({}, { password: 0 })
+        ? await organisationModel.find(pickerCriteria, { password: 0 })
         : await organisationModel
             .find(criteria, { password: 0 })
             .sort({ createAt: -1 })
@@ -503,7 +516,7 @@ organisationController.update = async (req, res) => {
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
         categories: req.body.categories || organisation.categories,
         location: req.body.location || organisation.location,
-       // allowPickers: req.body.allowPickers || organisation.allowPickers,
+        // allowPickers: req.body.allowPickers || organisation.allowPickers,
       }
     );
 
@@ -946,23 +959,23 @@ organisationController.changePassword = async (req, res) => {
   }
 };
 
-organisationController.allowsPickers = async(req, res)=> {
-  try{
+organisationController.allowsPickers = async (req, res) => {
+  try {
     const organisations = await organisationModel.findOne({
-      allowPickers: true
-    })
+      allowPickers: true,
+    });
 
     return res.status(200).json({
       error: false,
-      message:"success",
-      data: organisations
-    })
-  }catch(error){
+      message: "success",
+      data: organisations,
+    });
+  } catch (error) {
     return res.status(400).json({
       error: true,
       message: "An error occured!",
     });
   }
-}
+};
 
 module.exports = organisationController;

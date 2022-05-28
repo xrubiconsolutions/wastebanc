@@ -1708,6 +1708,13 @@ class CollectorService {
         });
       }
 
+      if (organisation.allowPickers === false) {
+        return res.status(400).json({
+          error: true,
+          message: "Organisation do not allow waste pickers",
+        });
+      }
+
       if (picker.organisation !== "") {
         return res.status(400).json({
           error: true,
