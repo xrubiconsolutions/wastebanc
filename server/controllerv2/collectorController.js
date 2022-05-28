@@ -773,9 +773,10 @@ class CollectorService {
     const { collectorType = "collector" } = req.query;
     try {
       // count verified collectors
+      console.log("userid", req.user._id);
       const verifiedCount = await collectorModel.countDocuments({
-        verified: true,
-        organisation,
+        //verified: true,
+        organisationId: req.user._id.toString(),
         companyVerified: true,
         collectorType,
       });
@@ -783,18 +784,18 @@ class CollectorService {
       // count male company collectors
       const maleCount = await collectorModel.countDocuments({
         gender: "male",
-        organisation,
+        organisationId: req.user._id.toString(),
         verified: true,
-        companyVerified: true,
+        //companyVerified: true,
         collectorType,
       });
 
       // count female company collectors
       const femaleCount = await collectorModel.countDocuments({
         gender: "female",
-        organisation,
+        organisationId: req.user._id.toString(),
         verified: true,
-        companyVerified: true,
+        //companyVerified: true,
         collectorType,
       });
 
@@ -805,14 +806,14 @@ class CollectorService {
         createdAt: {
           $gte: ONE_MONTH_AGO,
         },
-        organisation,
-        companyVerified: true,
+        organisationId: req.user._id.toString(),
+        //companyVerified: true,
         collectorType,
       });
 
       // get all company collectors
       const collectors = await collectorModel.find({
-        organisation,
+        organisationId: req.user._id.toString(),
         //companyVerified: true,
         collectorType,
       });

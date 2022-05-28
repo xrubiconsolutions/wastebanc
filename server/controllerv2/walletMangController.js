@@ -69,6 +69,7 @@ class WalletController {
         {
           headers: {
             Channel: "Web",
+            Authorization: "Web",
           },
         }
       );
