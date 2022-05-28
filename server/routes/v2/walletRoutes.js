@@ -14,4 +14,6 @@ module.exports = (APP) => {
     recyclerValidation,
     walletController.OTPRequest
   );
+
+  APP.route("/api/bank/list").get(walletController.bankList);
 };

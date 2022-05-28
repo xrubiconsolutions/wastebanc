@@ -6,7 +6,11 @@ moment().tz("Africa/Lagos", false);
 const axios = require("axios");
 class WalletController {
   // baseurl
-  private static baseURL = "https://pakamapi.sterlingapps.p.azurewebsites.net/";
+  // constructor() {
+  //   this.baseURL = "https://pakamapi.sterlingapps.p.azurewebsites.net/";
+  //   this.key = "Sklqg625*&dltr01r";
+  // }
+
   static async OTPRequest(req, res) {
     try {
       const { user } = req;
@@ -58,16 +62,33 @@ class WalletController {
     }
   }
 
-  // static async bankList(req, res){
-  //   try{
+  static async bankList(req, res) {
+    try {
+      const result = await axios.get(
+        `https://pakamapi.sterlingapps.p.azurewebsites.net/api/Transaction/BankList`,
+        {
+          headers: {
+            Channel: "Web",
+          },
+        }
+      );
 
-  //   }catch(error){
-  //     console.log(error);
-  //     return res.status(500).json({
+      console.log("data", result);
+      const encryptedList = result.data;
 
-  //     })
-  //   }
-  // }
+      return res.status(200).json({
+        error: false,
+        message: "List of banks",
+        data: encryptedList,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = WalletController;
