@@ -185,6 +185,7 @@ module.exports = (APP) => {
     CollectorService.collectorPointBalance
   );
 
+  // deleting of collectors
   APP.route("/api/collector/remove/:collectorId").delete(
     adminPakamValidation,
     collectorValidator.checkCollectorId,

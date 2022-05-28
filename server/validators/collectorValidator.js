@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const collectorModel = require("../models/collectorModel");
 
 module.exports = {
@@ -99,7 +99,6 @@ module.exports = {
       .isString()
       .withMessage("confirmPassword should string"),
   ],
-
   checkCollectorId: [
     param("collectorId").notEmpty().withMessage("collectorId is require"),
   ],
