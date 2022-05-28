@@ -5,6 +5,7 @@ moment().tz("Africa/Lagos", false);
 
 const axios = require("axios");
 class WalletController {
+  // baseurl
   private static baseURL = "https://pakamapi.sterlingapps.p.azurewebsites.net/";
   static async OTPRequest(req, res) {
     try {
