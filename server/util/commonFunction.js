@@ -258,7 +258,7 @@ let createToken = (objData) => {
 
 const authToken = (user) => {
   return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
-    expiresIn: "3h",
+    expiresIn: "3s",
   });
 };
 
@@ -392,8 +392,8 @@ const encryptData = (
   //encryptMessage = encryptMessage.toString('utf-8');
   let key = crypto.pbkdf2Sync(passPhrase, salt, iterations, keySize, "sha1");
   const cipher = crypto.createCipheriv("AES-256-CBC", key, iv);
-  let encrypted = cipher.update(data, "base64", "utf8");
-  encrypted += cipher.final("utf8");
+  let encrypted = cipher.update(data, "utf8", "base64");
+  encrypted += cipher.final("base64");
 
   return encrypted;
 };
