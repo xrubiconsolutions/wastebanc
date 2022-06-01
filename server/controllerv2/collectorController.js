@@ -1667,7 +1667,7 @@ class CollectorService {
         collectorType: "waste-picker",
         address: body.address,
         onesignal_id,
-        aggregatorId: aggregatorId,
+        aggregatorId: body.aggregatorId || "",
       });
 
       const phoneNo = String(create.phone).substring(1, 11);
@@ -1707,6 +1707,7 @@ class CollectorService {
           phone: create.phone,
           address: create.address,
           organisation: create.organisation,
+          aggregatorId: create.aggregatorId,
         },
       });
     } catch (error) {

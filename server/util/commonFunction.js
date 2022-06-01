@@ -8,6 +8,7 @@ const BCRYPT = require("bcryptjs");
 const JWT = require("jsonwebtoken");
 const randomstring = require("randomstring");
 const { validationResult } = require("express-validator");
+const crypto = require("crypto");
 
 /**
  * incrypt password in case user login implementation
@@ -375,6 +376,46 @@ const removeObjDuplicate = (arr, field) => {
   return result;
 };
 
+const encryptData = (
+  data,
+  salt,
+  iv,
+  passPhrase,
+  keySize = 32,
+  iterations = 2
+) => {
+  console.log("data", data);
+  data = JSON.stringify(data);
+  iv = Buffer.from(iv);
+  salt = Buffer.from(salt);
+  //let encryptMessage = Buffer.from(data);
+  //encryptMessage = encryptMessage.toString('utf-8');
+  let key = crypto.pbkdf2Sync(passPhrase, salt, iterations, keySize, "sha1");
+  const cipher = crypto.createCipheriv("AES-256-CBC", key, iv);
+  let encrypted = cipher.update(data, "base64", "utf8");
+  encrypted += cipher.final("utf8");
+
+  return encrypted;
+};
+
+const decryptData = (
+  data,
+  salt,
+  iv,
+  passPhrase,
+  keySize = 32,
+  iterations = 2
+) => {
+  iv = Buffer.from(iv);
+  salt = Buffer.from(salt);
+  let key = crypto.pbkdf2Sync(passPhrase, salt, iterations, keySize, "sha1");
+  const decipher = crypto.createDecipheriv("AES-256-CBC", key, iv);
+  let decrypted = decipher.update(data, "base64", "utf8");
+  decrypted += decipher.final("utf8");
+
+  return JSON.parse(decrypted);
+};
+
 /*exporting all object from here*/
 module.exports = {
   sendError: sendError,
@@ -403,4 +444,6 @@ module.exports = {
   bodyValidate,
   sendNotification,
   removeObjDuplicate,
+  encryptData,
+  decryptData,
 };

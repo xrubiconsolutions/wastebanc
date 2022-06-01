@@ -3,7 +3,14 @@ const { generateRandomString } = require("../util/commonFunction");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
 
+const {
+  BankList,
+  NIPNameInquiry,
+} = require("../modules/partners/sterling/sterlingService");
 const axios = require("axios");
+const forge = require("node-forge");
+const crypto = require("crypto");
+
 class WalletController {
   // baseurl
   // constructor() {
@@ -62,7 +69,7 @@ class WalletController {
     }
   }
 
-  static async bankList(req, res) {
+  static async bankListOO(req, res) {
     try {
       const result = await axios.get(
         `https://pakamapi.sterlingapps.p.azurewebsites.net/api/Transaction/BankList`,
@@ -74,14 +81,75 @@ class WalletController {
         }
       );
 
-      console.log("data", result);
       const encryptedList = result.data;
+
+      let secret_salt = "Sklqg625*&dltr01r";
+      let secret_iv = "Jod0458jpkc34vb9";
+      let passPhrase = "Et2347fdrloln95@#qi";
+      let keySize = 32;
+      let it = 2;
+
+      let iv = Buffer.from(secret_iv);
+
+      let salt = Buffer.from(secret_salt);
+
+      let encryptedMessage = Buffer.from(encryptedList, "base64");
+
+      encryptedMessage = encryptedMessage.toString("utf-8");
+
+      let key = crypto.pbkdf2Sync(passPhrase, salt, it, keySize, "sha1");
+
+      const decipher = crypto.createDecipheriv("AES-256-CBC", key, iv);
+
+      let decrypted = decipher.update(encryptedList, "base64", "utf8");
+      decrypted += decipher.final("utf8");
+      const bankLists = JSON.parse(decrypted);
 
       return res.status(200).json({
         error: false,
         message: "List of banks",
-        data: encryptedList,
+        data: bankLists.Data,
       });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async bankList(req, res) {
+    try {
+      const result = await BankList();
+      console.log(result);
+      if (result.error)
+        return res.status(400).json({ error: true, message: result.message });
+
+      return res
+        .status(200)
+        .json({ error: false, message: result.message, data: result.data });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async verifyAccount(req, res) {
+    try {
+      const result = await NIPNameInquiry(
+        req.body.accountNumber,
+        req.body.BankCode
+      );
+      if (result.error)
+        return res.status(400).json({ error: true, message: result.message });
+
+      return res
+        .status(200)
+        .json({ error: false, message: result.message, data: result.data });
     } catch (error) {
       console.log(error);
       return res.status(500).json({

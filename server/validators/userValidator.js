@@ -155,4 +155,17 @@ module.exports = {
       })
       .withMessage("password must be greater than 5 characters"),
   ],
+
+  accountLookup: [
+    body("accountNumber")
+      .notEmpty()
+      .withMessage("accountNumber is required")
+      .isString()
+      .withMessage("accountNumber should be string"),
+    body("BankCode")
+      .notEmpty()
+      .withMessage("BankCode is required")
+      .isString()
+      .withMessage("BankCode should be string"),
+  ],
 };

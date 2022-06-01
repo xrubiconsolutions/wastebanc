@@ -101,7 +101,12 @@ module.exports = (APP) => {
   APP.route("/api/update/ads").post(CONTROLLER.userController.updateAdvert);
 
   APP.route("/api/view/ads").get(
-    auth.userRecyclerCheck,
+    auth.userValidation,
+    CONTROLLER.userController.adsLook
+  );
+
+  APP.route("/api/collector/view/ads").get(
+    auth.recyclerValidation,
     CONTROLLER.userController.adsLook
   );
 
