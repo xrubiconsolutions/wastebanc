@@ -14,11 +14,12 @@ const SWAGGER = require("./swagger/swagger_lib/swagger-express");
 const PATH = require("path");
 const BOOTSTRAPING = require("../server/util/Bootstraping/Bootstraping");
 const MODEL = require("../server/models");
+// cron job
 const cron = require("node-cron");
 var request = require("request");
 const { AwakeHeroku } = require("awake-heroku");
 const { sendNotification } = require("../server/util/commonFunction");
-const logger = require('morgan');
+const logger = require("morgan");
 
 var nodemailer = require("nodemailer");
 
@@ -471,7 +472,7 @@ app.use(EXPRESS.static("client"));
 app.use(BODY_PARSER.json({ limit: "50mb" }));
 app.use(BODY_PARSER.urlencoded({ limit: "100mb", extended: false }));
 app.use(cors());
-app.use(logger('dev'));
+app.use(logger("dev"));
 
 /** middleware for api's logging with deployment mode */
 let apiLooger = (req, res, next) => {
