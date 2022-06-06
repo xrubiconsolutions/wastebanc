@@ -220,6 +220,7 @@ const NIPFundTransfer = async (
   }
 };
 
+// updates
 const CustomerInformation = async (accountNo) => {
   const partner = await Sterlingkeys();
   const keys = partner.keys;
