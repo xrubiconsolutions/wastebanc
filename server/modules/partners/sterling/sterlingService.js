@@ -372,7 +372,77 @@ const IntraBank = async (
   }
 };
 
-const GenerateVirtualAccount = async (bvn, nin, phoneNumber) => {};
+const GenerateVirtualAccount = async (bvn, nin, phone) => {
+  const partner = await Sterlingkeys();
+  const keys = partner.keys;
+  const data = {
+    BVN: bvn,
+    NIN: nin,
+    PhoneNumber: phone,
+  };
+  const encryptBody = encryptData(
+    data,
+    keys.salt,
+    keys.iv,
+    keys.passPhrase,
+    keys.keySize,
+    keys.iterations
+  );
+
+  try {
+    const result = await axios.post(
+      `${partner.baseUrl}api/CreateAccount/OpenAccount`,
+      { value: encryptBody },
+      {
+        headers: {
+          Channel: "Web",
+          Authorization: "Web",
+          "Content-Type": ["application/json", "application/json"],
+        },
+      }
+    );
+
+    console.log("res", result);
+
+    const encryptedList = result.data;
+    const decryptedList = decryptData(
+      encryptedList,
+      keys.salt,
+      keys.iv,
+      keys.passPhrase,
+      keys.keySize,
+      keys.iterations
+    );
+
+    return {
+      error: false,
+      message: "Account created successfully",
+      data: decryptedList,
+    };
+  } catch (error) {
+    console.log("d", error.response.data);
+    const da = error.response.data;
+    const partner = await Sterlingkeys();
+    const keys = partner.keys;
+    const decryptedList = decryptData(
+      da,
+      keys.salt,
+      keys.iv,
+      keys.passPhrase,
+      keys.keySize,
+      keys.iterations
+    );
+
+    console.log(JSON.parse(decryptedList));
+    const errorData = JSON.parse(decryptedList) || error;
+    console.log("dec", decryptedList);
+    return {
+      error: true,
+      message: errorData.Description || "An error occurred",
+      data: errorData,
+    };
+  }
+};
 
 module.exports = {
   BankList,

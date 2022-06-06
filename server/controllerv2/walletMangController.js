@@ -5,6 +5,7 @@ const {
   encryptData,
   SystemDeductions,
   IntraBank,
+  GenerateVirtualAccount,
 } = require("../util/commonFunction");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
@@ -271,6 +272,26 @@ class WalletController {
         //   // nip transfer
         // }
       }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async openingAccount(req, res) {
+    try {
+      const { bvn, nin, phone } = req.body;
+      const result = await GenerateVirtualAccount(bvn, nin, phone);
+
+      if (result.error)
+        return res.status(400).json({ error: true, message: result.message });
+
+      return res
+        .status(200)
+        .json({ error: false, message: result.message, data: result.data });
     } catch (error) {
       console.log(error);
       return res.status(500).json({

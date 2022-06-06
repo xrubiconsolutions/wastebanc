@@ -176,4 +176,22 @@ module.exports = {
       .isString()
       .withMessage("accountNo should be string"),
   ],
+
+  openAccount: [
+    body("bvn")
+      .notEmpty()
+      .withMessage("bvn is required")
+      .isString()
+      .withMessage("bvn should be string"),
+    body("nin")
+      .notEmpty()
+      .withMessage("nin is required")
+      .isString()
+      .withMessage("nin should be string"),
+    body("phone")
+      .notEmpty()
+      .withMessage("phone is required")
+      .isString()
+      .withMessage("phone is required"),
+  ],
 };
