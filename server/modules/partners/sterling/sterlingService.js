@@ -101,7 +101,7 @@ const NIPNameInquiry = async (
 
     return {
       error: false,
-      message: "Name Inquiry",
+      message: "customer bank details",
       data: JSON.parse(decryptedList),
     };
   } catch (error) {
@@ -121,11 +121,19 @@ const NIPNameInquiry = async (
     console.log(JSON.parse(decryptedList));
     const errorData = JSON.parse(decryptedList) || error;
     console.log("dec", decryptedList);
-    return {
-      error: true,
-      message: errorData.Description || "An error occurred",
-      data: errorData,
-    };
+
+    if (errorData.Description === "Unsuccessful") {
+      return {
+        error: true,
+        message: "Invalid bank details passed",
+      };
+    } else {
+      return {
+        error: true,
+        message: errorData.Description || "An error occurred",
+        data: errorData,
+      };
+    }
   }
 };
 
@@ -260,7 +268,8 @@ const CustomerInformation = async (accountNo) => {
     };
   } catch (error) {
     console.log("d", error);
-    const da = error.response.data.message;
+    const da = error.response.data;
+    console.log("da", da);
     const partner = await Sterlingkeys();
     const keys = partner.keys;
     const decryptedList = decryptData(
@@ -272,13 +281,20 @@ const CustomerInformation = async (accountNo) => {
       keys.iterations
     );
 
-    const errorData = JSON.parse(decryptedList).Message || error;
+    const errorData = JSON.parse(decryptedList) || error;
     console.log("dec", JSON.parse(decryptedList));
-    return {
-      error: true,
-      message: errorData || "An error occurred",
-      data: errorData,
-    };
+    if (errorData.Code === "25") {
+      return {
+        error: true,
+        message: "Account number not a sterling account",
+      };
+    } else {
+      return {
+        error: true,
+        message: errorData || "An error occurred",
+        data: errorData,
+      };
+    }
   }
 };
 

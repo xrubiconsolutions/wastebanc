@@ -156,7 +156,11 @@ class WalletController {
 
       return res
         .status(200)
-        .json({ error: false, message: result.message, data: result.data });
+        .json({
+          error: false,
+          message: result.message,
+          data: result.data.Data,
+        });
     } catch (error) {
       console.log(error);
       return res.status(500).json({
