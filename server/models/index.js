@@ -41,4 +41,6 @@ module.exports = {
   charityOrganisationModel: require("./charityOrganisationModel"),
   tokenModel: require("./tokenModel"),
   partnersModel: require("./partnersModel"),
+  centralAccountModel: require("./centralaccountModel"),
+  systemChargesModel: require("./systemCharges"),
 };

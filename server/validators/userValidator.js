@@ -168,4 +168,12 @@ module.exports = {
       .isString()
       .withMessage("BankCode should be string"),
   ],
+
+  accountNo: [
+    param("accountNo")
+      .notEmpty()
+      .withMessage("accountNo is required")
+      .isString()
+      .withMessage("accountNo should be string"),
+  ],
 };

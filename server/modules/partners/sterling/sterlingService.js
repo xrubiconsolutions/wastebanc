@@ -1,29 +1,15 @@
 const axios = require("axios");
-const { partnersModel } = require("../../../models");
+
 const {
   decryptData,
   encryptData,
   removeObjDuplicate,
+  Sterlingkeys,
 } = require("../../../util/commonFunction");
-
-const keys = async () => {
-  const partner = await partnersModel.findOne({
-    name: "sterling",
-  });
-
-  if (!partner) throw new Error("Partner not found");
-
-  return partner.keys;
-};
 
 const BankList = async () => {
   try {
-    const partner = await partnersModel.findOne({
-      name: "sterling",
-    });
-
-    if (!partner) throw new Error("Partner not found");
-
+    const partner = await Sterlingkeys();
     const keys = partner.keys;
 
     const result = await axios.get(
@@ -46,7 +32,9 @@ const BankList = async () => {
       keys.iterations
     );
 
-    const filteredResult = removeObjDuplicate(decryptedList.Data, "BankCode");
+    const p = JSON.parse(decryptedList);
+    console.log("p", p);
+    const filteredResult = removeObjDuplicate(p.Data, "BankCode");
 
     return {
       error: false,
@@ -57,7 +45,7 @@ const BankList = async () => {
     console.log(error);
     return {
       error: true,
-      message: error.getMessage(),
+      message: error,
       data: null,
     };
   }
@@ -68,23 +56,42 @@ const NIPNameInquiry = async (
   BankCode,
   referenceId = "13435"
 ) => {
+  const partner = await Sterlingkeys();
+  const keys = partner.keys;
+
+  const nipInquiry = {
+    toAccount: accountNumber,
+    referenceId,
+    destinationBankCode: BankCode,
+  };
+
+  const encryptBody = encryptData(
+    nipInquiry,
+    keys.salt,
+    keys.iv,
+    keys.passPhrase,
+    keys.keySize,
+    keys.iterations
+  );
+
   try {
-    const partner = await partnersModel.findOne({
-      name: "sterling",
-    });
+    const partner = await Sterlingkeys();
 
-    if (!partner) throw new Error("Partner not found");
-
-
-    const keys = partner.keys;
-
-
-    const encryptBody = encryptData(
+    const result = await axios.post(
+      `${partner.baseUrl}api/Transaction/NIPNameinquiry`,
+      { value: encryptBody },
       {
-        toAccount: accountNumber,
-        referenceId,
-        destinationBankCode: BankCode,
-      },
+        headers: {
+          Channel: "Web",
+          Authorization: "Web",
+          "Content-Type": ["application/json", "application/json"],
+        },
+      }
+    );
+
+    const encryptedList = result.data;
+    const decryptedList = decryptData(
+      encryptedList,
       keys.salt,
       keys.iv,
       keys.passPhrase,
@@ -92,13 +99,88 @@ const NIPNameInquiry = async (
       keys.iterations
     );
 
+    return {
+      error: false,
+      message: "Name Inquiry",
+      data: JSON.parse(decryptedList),
+    };
+  } catch (error) {
+    console.log("d", error.response.data);
+    const da = error.response.data;
+    const partner = await Sterlingkeys();
+    const keys = partner.keys;
+    const decryptedList = decryptData(
+      da,
+      keys.salt,
+      keys.iv,
+      keys.passPhrase,
+      keys.keySize,
+      keys.iterations
+    );
+
+    console.log(JSON.parse(decryptedList));
+    const errorData = JSON.parse(decryptedList) || error;
+    console.log("dec", decryptedList);
+    return {
+      error: true,
+      message: errorData.Description || "An error occurred",
+      data: errorData,
+    };
+  }
+};
+
+const NIPFundTransfer = async (
+  fromAccount,
+  toAccount,
+  amount,
+  beneficiaryName,
+  customerShowName,
+  channelCode,
+  destinationBankCode,
+  nesid,
+  nersp,
+  beneBVN,
+  beneKycLevel
+) => {
+  const partner = await Sterlingkeys();
+  const keys = partner.keys;
+
+  const NIPFundTransfer = {
+    fromAccount,
+    toAccount,
+    amount,
+    principalIdentifier,
+    referenceCode: "",
+    beneficiaryName,
+    paymentReference,
+    customerShowName,
+    channelCode: "Web",
+    destinationBankCode,
+    nesid,
+    nersp,
+    beneBVN,
+    beneKycLevel,
+    requestId: "1111",
+  };
+
+  const encryptBody = encryptData(
+    NIPFundTransfer,
+    keys.salt,
+    keys.iv,
+    keys.passPhrase,
+    keys.keySize,
+    keys.iterations
+  );
+
+  try {
     const result = await axios.post(
-      `${partner.baseUrl}api/Transaction/NIPNameinquiry`,
-      encryptBody,
+      `${partner.baseUrl}api/Transaction/NIPFunTransfer`,
+      { value: encryptBody },
       {
         headers: {
           Channel: "Web",
           Authorization: "Web",
+          "Content-Type": ["application/json", "application/json"],
         },
       }
     );
@@ -117,61 +199,186 @@ const NIPNameInquiry = async (
 
     return {
       error: false,
-      message: "List of banks",
+      message: "Fund Transfer successfully",
       data: decryptedList,
     };
   } catch (error) {
     console.log(error);
     return {
       error: true,
-      message: error.getMessage(),
-      data: null,
+      message: "Third Party error",
+      data: error.response.data.errors,
     };
   }
 };
-const GenerateVirtualAccount = async (bvn, nin, phoneNumber) => {};
-const NIPFundTransfer = async (
-  fromAccount,
+
+const CustomerInformation = async (accountNo) => {
+  const partner = await Sterlingkeys();
+  const keys = partner.keys;
+  const encryptBody = encryptData(
+    accountNo,
+    keys.salt,
+    keys.iv,
+    keys.passPhrase,
+    keys.keySize,
+    keys.iterations
+  );
+  try {
+    const result = await axios.get(
+      `${partner.baseUrl}api/Transaction/customerInformation/${encryptBody}`,
+      {
+        headers: {
+          Channel: "Web",
+          Authorization: "Web",
+          "Content-Type": ["application/json", "application/json"],
+        },
+      }
+    );
+
+    console.log("res", result);
+
+    if (result.data.status >= 400) {
+      return {
+        error: true,
+        message: result.data.errors,
+      };
+    }
+    const encryptedList = result.data;
+    const decryptedList = decryptData(
+      encryptedList,
+      keys.salt,
+      keys.iv,
+      keys.passPhrase,
+      keys.keySize,
+      keys.iterations
+    );
+
+    return {
+      error: false,
+      message: "List of banks",
+      data: JSON.parse(decryptedList).Data,
+    };
+  } catch (error) {
+    console.log("d", error);
+    const da = error.response.data.message;
+    const partner = await Sterlingkeys();
+    const keys = partner.keys;
+    const decryptedList = decryptData(
+      da,
+      keys.salt,
+      keys.iv,
+      keys.passPhrase,
+      keys.keySize,
+      keys.iterations
+    );
+
+    const errorData = JSON.parse(decryptedList).Message || error;
+    console.log("dec", JSON.parse(decryptedList));
+    return {
+      error: true,
+      message: errorData || "An error occurred",
+      data: errorData,
+    };
+  }
+};
+
+const IntraBank = async (
+  centralAc,
   toAccount,
   amount,
-  beneficiaryName,
-  customerShowName,
-  channelCode,
-  destinationBankCode,
-  beneBVN,
-  beneKycLevel
-) => {};
+  reference,
+  description,
+  beneName,
+  SenderName,
+  CurrencyCode,
+  TransactionType = 26
+) => {
+  const partner = await Sterlingkeys();
+  const keys = partner.keys;
+  const data = {
+    fromAccount: centralAc,
+    ToAccount: toAccount,
+    TransactionType,
+    DifferentTradeValueDate: 0,
+    TransactionAmount: amount,
+    CurrencyCode,
+    PaymentReference: reference,
+    NarrationLine1: description,
+    NarrationLine2: "",
+    BeneficiaryName: beneName,
+    SenderName,
+  };
+  const encryptBody = encryptData(
+    data,
+    keys.salt,
+    keys.iv,
+    keys.passPhrase,
+    keys.keySize,
+    keys.iterations
+  );
+
+  try {
+    const result = await axios.post(
+      `${partner.baseUrl}api/Transaction/IntraBank`,
+      { value: encryptBody },
+      {
+        headers: {
+          Channel: "Web",
+          Authorization: "Web",
+          "Content-Type": ["application/json", "application/json"],
+        },
+      }
+    );
+
+    console.log("res", result);
+
+    const encryptedList = result.data;
+    const decryptedList = decryptData(
+      encryptedList,
+      keys.salt,
+      keys.iv,
+      keys.passPhrase,
+      keys.keySize,
+      keys.iterations
+    );
+
+    return {
+      error: false,
+      message: "Fund Transfer successfully",
+      data: decryptedList,
+    };
+  } catch (error) {
+    console.log("d", error.response.data);
+    const da = error.response.data;
+    const partner = await Sterlingkeys();
+    const keys = partner.keys;
+    const decryptedList = decryptData(
+      da,
+      keys.salt,
+      keys.iv,
+      keys.passPhrase,
+      keys.keySize,
+      keys.iterations
+    );
+
+    console.log(JSON.parse(decryptedList));
+    const errorData = JSON.parse(decryptedList) || error;
+    console.log("dec", decryptedList);
+    return {
+      error: true,
+      message: errorData.Description || "An error occurred",
+      data: errorData,
+    };
+  }
+};
+
+const GenerateVirtualAccount = async (bvn, nin, phoneNumber) => {};
 
 module.exports = {
   BankList,
   NIPNameInquiry,
   GenerateVirtualAccount,
   NIPFundTransfer,
+  CustomerInformation,
+  IntraBank,
 };
-// class sterlingService {
-//   static async keys() {
-//     const partner = await partnersModel.findOne({
-//       name: "sterling",
-//     });
-
-//     if (!partner) throw new Error("Partner not found");
-
-//     return partner.keys;
-//   }
-//   static async bankList() {
-
-//   }
-//   static async NIPNameInquiry() {}
-//   static async generateVirtualAccount(bvn, nin, phoneNumber) {}
-//   static async NIPFundTransfer(
-//     fromAccount,
-//     toAccount,
-//     amount,
-//     beneficiaryName,
-//     customerShowName,
-//     channelCode,
-//     destinationBankCode,
-//     beneBVN,
-//     beneKycLevel
-//   ) {}
-// }

@@ -1198,7 +1198,7 @@ class CollectorService {
       if (!(await comparePassword(req.body.password, collector.password))) {
         return res.status(400).json({
           error: true,
-          message: "Invalid email or password",
+          message: "Invalid credentials",
           statusCode: 400,
         });
       }

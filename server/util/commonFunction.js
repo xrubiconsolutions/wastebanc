@@ -9,7 +9,11 @@ const JWT = require("jsonwebtoken");
 const randomstring = require("randomstring");
 const { validationResult } = require("express-validator");
 const crypto = require("crypto");
-
+const {
+  partnersModel,
+  centralAccountModel,
+  systemChargesModel,
+} = require("../models");
 /**
  * incrypt password in case user login implementation
  * @param {*} userPassword
@@ -384,16 +388,23 @@ const encryptData = (
   keySize = 32,
   iterations = 2
 ) => {
-  console.log("data", data);
-  data = JSON.stringify(data);
+  let stringifydata;
+  if (typeof data === "object") {
+    stringifydata = JSON.stringify(data);
+  } else {
+    stringifydata = data;
+  }
+  //const stringifydata = JSON.stringify(data);
+  console.log("data", stringifydata);
   iv = Buffer.from(iv);
   salt = Buffer.from(salt);
-  //let encryptMessage = Buffer.from(data);
-  //encryptMessage = encryptMessage.toString('utf-8');
+  // let encryptMessage = Buffer.from(stringifydata);
+  // encryptMessage = encryptMessage.toString("utf-8");
   let key = crypto.pbkdf2Sync(passPhrase, salt, iterations, keySize, "sha1");
   const cipher = crypto.createCipheriv("AES-256-CBC", key, iv);
-  let encrypted = cipher.update(data, "utf8", "base64");
+  let encrypted = cipher.update(stringifydata, "utf8", "base64");
   encrypted += cipher.final("base64");
+  console.log("en", encrypted);
 
   return encrypted;
 };
@@ -406,6 +417,7 @@ const decryptData = (
   keySize = 32,
   iterations = 2
 ) => {
+  console.log("data", data);
   iv = Buffer.from(iv);
   salt = Buffer.from(salt);
   let key = crypto.pbkdf2Sync(passPhrase, salt, iterations, keySize, "sha1");
@@ -413,7 +425,32 @@ const decryptData = (
   let decrypted = decipher.update(data, "base64", "utf8");
   decrypted += decipher.final("utf8");
 
-  return JSON.parse(decrypted);
+  return decrypted;
+  //return JSON.parse(decrypted);
+};
+
+const Sterlingkeys = async () => {
+  const partner = await partnersModel.findOne({
+    name: "sterling",
+  });
+
+  if (!partner) throw new Error("Partner not found");
+
+  return partner;
+};
+
+const SystemDeductions = async (amount) => {
+  const systemCharges = await systemChargesModel.findOne({
+    name: "sterling-pickers",
+  });
+
+  if (!systemCharges) {
+    throw new Error("Error getting charges");
+  }
+
+  const percent = (systemCharges.chargePercentage / 100) * Number(amount);
+  const result = percent + systemCharges.chargeAmount;
+  return result;
 };
 
 /*exporting all object from here*/
@@ -446,4 +483,6 @@ module.exports = {
   removeObjDuplicate,
   encryptData,
   decryptData,
+  Sterlingkeys,
+  SystemDeductions,
 };
