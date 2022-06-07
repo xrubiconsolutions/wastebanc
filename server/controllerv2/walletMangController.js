@@ -4,8 +4,6 @@ const {
   decryptData,
   encryptData,
   SystemDeductions,
-  IntraBank,
-  GenerateVirtualAccount,
 } = require("../util/commonFunction");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
@@ -14,6 +12,8 @@ const {
   BankList,
   NIPNameInquiry,
   CustomerInformation,
+  GenerateVirtualAccount,
+  IntraBank,
 } = require("../modules/partners/sterling/sterlingService");
 const axios = require("axios");
 const crypto = require("crypto");
@@ -154,13 +154,11 @@ class WalletController {
       if (result.error)
         return res.status(400).json({ error: true, message: result.message });
 
-      return res
-        .status(200)
-        .json({
-          error: false,
-          message: result.message,
-          data: result.data.Data,
-        });
+      return res.status(200).json({
+        error: false,
+        message: result.message,
+        data: result.data.Data,
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({
