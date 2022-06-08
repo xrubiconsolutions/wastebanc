@@ -8,6 +8,7 @@ const {
   accountLookup,
   accountNo,
   openAccount,
+  nipTransfer,
 } = require("../../validators/userValidator");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 module.exports = (APP) => {
@@ -23,7 +24,7 @@ module.exports = (APP) => {
 
   APP.route("/api/bank/list").get(walletController.bankList);
 
-  APP.route("/api/user/account/lookup").post(
+  APP.route("/api/user/sterling/nipaccount/lookup").post(
     userValidation,
     accountLookup,
     checkRequestErrs,
@@ -37,24 +38,31 @@ module.exports = (APP) => {
     walletController.verifyAccount
   );
 
-  APP.route("/api/user/verify/account/:accountNo").get(
+  APP.route("/api/user/verify/sterling/customer/:accountNo").get(
     accountNo,
     checkRequestErrs,
     walletController.verifyCustomer
   );
 
-  APP.route("/api/collector/openAccount").post(
+  APP.route("/api/collector/sterling/openAccount").post(
     recyclerValidation,
     openAccount,
     checkRequestErrs,
     walletController.openingAccount
   );
 
-  APP.route("/api/user/openAccount").post(
+  APP.route("/api/user/sterling/openAccount").post(
     userValidation,
     openAccount,
     checkRequestErrs,
     walletController.openingAccount
+  );
+
+  APP.route("/api/user/sterling/nip/transfer").post(
+    userValidation,
+    nipTransfer,
+    checkRequestErrs,
+    walletController.nipTransfer
   );
 
   APP.route("/api/encrypt").post(walletController.encrypt);

@@ -168,10 +168,10 @@ let checkDuplicateValuesInArray = (array) => {
 /**
  * Generate random string according to the requirement, it will generate 7 character string
  */
-let generateRandomString = (length = 7) => {
+let generateRandomString = (length = 7, charset = "numeric") => {
   return randomstring.generate({
     length,
-    charset: "numeric",
+    charset,
   });
 };
 

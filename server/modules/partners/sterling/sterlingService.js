@@ -140,15 +140,17 @@ const NIPNameInquiry = async (
 const NIPFundTransfer = async (
   fromAccount,
   toAccount,
+  destinationBankCode,
   amount,
   beneficiaryName,
   customerShowName,
-  channelCode,
-  destinationBankCode,
   nesid,
   nersp,
   beneBVN,
-  beneKycLevel
+  beneKycLevel,
+  requestId,
+  referenceCode,
+  paymentReference,
 ) => {
   const partner = await Sterlingkeys();
   const keys = partner.keys;
@@ -157,8 +159,8 @@ const NIPFundTransfer = async (
     fromAccount,
     toAccount,
     amount,
-    principalIdentifier,
-    referenceCode: "",
+    principalIdentifier: "",
+    referenceCode,
     beneficiaryName,
     paymentReference,
     customerShowName,
@@ -168,7 +170,7 @@ const NIPFundTransfer = async (
     nersp,
     beneBVN,
     beneKycLevel,
-    requestId: "1111",
+    requestId,
   };
 
   const encryptBody = encryptData(
@@ -180,44 +182,73 @@ const NIPFundTransfer = async (
     keys.iterations
   );
 
-  try {
-    const result = await axios.post(
-      `${partner.baseUrl}api/Transaction/NIPFunTransfer`,
-      { value: encryptBody },
-      {
-        headers: {
-          Channel: "Web",
-          Authorization: "Web",
-          "Content-Type": ["application/json", "application/json"],
-        },
-      }
-    );
+  const result = await axios.post(
+    `${partner.baseUrl}api/Transaction/NIPFunTransfer`,
+    { value: encryptBody },
+    {
+      headers: {
+        Channel: "Web",
+        Authorization: "Web",
+        "Content-Type": ["application/json", "application/json"],
+      },
+    }
+  );
 
-    console.log("res", result);
+  console.log("res", result);
 
-    const encryptedList = result.data;
-    const decryptedList = decryptData(
-      encryptedList,
-      keys.salt,
-      keys.iv,
-      keys.passPhrase,
-      keys.keySize,
-      keys.iterations
-    );
+  const encryptedList = result.data;
+  const decryptedList = decryptData(
+    encryptedList,
+    keys.salt,
+    keys.iv,
+    keys.passPhrase,
+    keys.keySize,
+    keys.iterations
+  );
+  return {
+    error: false,
+    message: "Fund Transfer successfully",
+    data: decryptedList,
+  };
 
-    return {
-      error: false,
-      message: "Fund Transfer successfully",
-      data: decryptedList,
-    };
-  } catch (error) {
-    console.log(error);
-    return {
-      error: true,
-      message: "Third Party error",
-      data: error.response.data.errors,
-    };
-  }
+  // try {
+  //   const result = await axios.post(
+  //     `${partner.baseUrl}api/Transaction/NIPFunTransfer`,
+  //     { value: encryptBody },
+  //     {
+  //       headers: {
+  //         Channel: "Web",
+  //         Authorization: "Web",
+  //         "Content-Type": ["application/json", "application/json"],
+  //       },
+  //     }
+  //   );
+
+  //   console.log("res", result);
+
+  //   const encryptedList = result.data;
+  //   const decryptedList = decryptData(
+  //     encryptedList,
+  //     keys.salt,
+  //     keys.iv,
+  //     keys.passPhrase,
+  //     keys.keySize,
+  //     keys.iterations
+  //   );
+
+  //   return {
+  //     error: false,
+  //     message: "Fund Transfer successfully",
+  //     data: decryptedList,
+  //   };
+  // } catch (error) {
+  //   console.log(error);
+  //   return {
+  //     error: true,
+  //     message: "Third Party error",
+  //     data: error.response.data.errors,
+  //   };
+  // }
 };
 
 // updates
@@ -292,7 +323,7 @@ const CustomerInformation = async (accountNo) => {
     } else {
       return {
         error: true,
-        message: errorData || "An error occurred",
+        message: errorData || "Account number not a sterling account",
         data: errorData,
       };
     }
@@ -389,13 +420,13 @@ const IntraBank = async (
   }
 };
 
-const GenerateVirtualAccount = async (bvn, nin, phone) => {
+const GenerateVirtualAccount = async (bvn, nin, phoneNumber) => {
   const partner = await Sterlingkeys();
   const keys = partner.keys;
   const data = {
     BVN: bvn,
     NIN: nin,
-    PhoneNumber: phone,
+    PhoneNumber: phoneNumber,
   };
   const encryptBody = encryptData(
     data,

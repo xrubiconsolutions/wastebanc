@@ -9,6 +9,7 @@ const pay_Schema = {
     type: String,
     required: true,
   },
+  transactionId: [{ type: Schema.Types.ObjectId, ref: "transaction" }],
   fullname: {
     type: String,
     required: true,
@@ -29,8 +30,8 @@ const pay_Schema = {
     type: String,
     required: true,
   },
-  organisationID:{
-    type: String
+  organisationID: {
+    type: String,
   },
   paid: {
     type: Boolean,
@@ -72,6 +73,12 @@ const pay_Schema = {
     type: String,
     default: "Lagos",
   },
+  referenceCode: { type: String },
+  paymentReference: { types: String },
+  customerShowName: { types: String },
+  status: { type: String },
+  reason: { type: String },
+  requestId: { type: String },
 };
 
 module.exports = MONGOOSE.model("pay", pay_Schema);

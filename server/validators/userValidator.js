@@ -194,4 +194,43 @@ module.exports = {
       .isString()
       .withMessage("phone is required"),
   ],
+
+  nipTransfer: [
+    body("OTP")
+      .notEmpty()
+      .withMessage("OTP is required")
+      .isString()
+      .withMessage("OTP should be string"),
+    body("accountNumber")
+      .notEmpty()
+      .withMessage("accountNumber is required")
+      .isString()
+      .withMessage("accountNumber should be string"),
+    body("customerName")
+      .notEmpty()
+      .withMessage("customerName is required")
+      .isString()
+      .withMessage("customerName should be string"),
+    body("bankCode")
+      .notEmpty()
+      .withMessage("bankCode is required")
+      .isString()
+      .withMessage("bankCode should be string"),
+    body("nesid")
+      .notEmpty()
+      .withMessage("nesid is required")
+      .isString()
+      .withMessage("nesid should be string"),
+    body("nersp").optional(),
+    body("bvn")
+      .notEmpty()
+      .withMessage("bvn is required")
+      .isString()
+      .withMessage("bvn should be string"),
+    body("kycLevel")
+      .notEmpty()
+      .withMessage("kycLevel is required")
+      .isString()
+      .withMessage("kycLevel should be string"),
+  ],
 };

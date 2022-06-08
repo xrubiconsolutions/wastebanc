@@ -1,4 +1,9 @@
-const { tokenModel, centralAccountModel } = require("../models");
+const {
+  tokenModel,
+  centralAccountModel,
+  transactionModel,
+  payModel,
+} = require("../models");
 const {
   generateRandomString,
   decryptData,
@@ -14,6 +19,7 @@ const {
   CustomerInformation,
   GenerateVirtualAccount,
   IntraBank,
+  NIPFundTransfer,
 } = require("../modules/partners/sterling/sterlingService");
 const axios = require("axios");
 const crypto = require("crypto");
@@ -299,6 +305,125 @@ class WalletController {
       return res.status(500).json({
         error: true,
         message: "An error occurred",
+      });
+    }
+  }
+
+  static async nipTransfer(req, res) {
+    try {
+      const {
+        OTP,
+        accountNumber,
+        customerName,
+        bankCode,
+        nesid,
+        nersp,
+        bvn,
+        kycLevel,
+      } = req.body;
+      const { user } = req;
+      const amount = user.availablePoints;
+      const token = await tokenModel.findOne({
+        userId: user._id.toString(),
+        token: OTP,
+      });
+
+      if (!token) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid OTP Passed",
+        });
+      }
+
+      console.log("user", user);
+      if (moment() > moment(token.expiryTime)) {
+        return res.status(400).json({
+          error: true,
+          message: "OTP has expired",
+        });
+      }
+      const centralAccount = await centralAccountModel.findOne({});
+
+      if (!centralAccount) {
+        // send out mail or notification to backend developer
+        console.log("cannot find central account");
+        return res.status(400).json({
+          error: true,
+          message:
+            "Payment cannot be processed,Please contact customer service",
+        });
+      }
+
+      if (parseFloat(centralAccount.balance) < 0) {
+        console.log("insufficent balance in central account");
+        return res.status(400).json({
+          error: true,
+          message:
+            "Payment cannot be processed,Please contact customer service",
+        });
+      }
+      if (Number(amount) < 0) {
+        return res.status(400).json({
+          error: true,
+          message: "You don't have enough points to complete this transaction",
+        });
+      }
+
+      if (Number(amount) < 5000) {
+        return res.status(400).json({
+          message: "You don't have enough points to complete this transaction",
+        });
+      }
+
+      const allTransactions = await transactionModel
+        .find({
+          paid: false,
+          requestedForPayment: false,
+          cardID: user._id.toString(),
+        })
+        .select("_id");
+
+      if (allTransactions.length < 0) {
+        return res.status(400).json({
+          error: true,
+          message:
+            "Payment cannot be processed,Please contact customer service",
+        });
+      }
+
+      const requestId = generateRandomString(6, "alphnumeric");
+      const paymentReference = generateRandomString(8, "alphnumeric");
+      const referenceCode = generateRandomString(7);
+
+      // request payment to sterling
+      const result = await NIPFundTransfer(
+        centralAccount.acnumber,
+        accountNumber,
+        bankCode,
+        "10",
+        customerName,
+        requestId,
+        centralAccount.name,
+        nesid,
+        nersp,
+        bvn,
+        kycLevel,
+        referenceCode,
+        paymentReference
+      );
+
+      // store activity
+      return res.status(200).json({
+        error: false,
+        message: "Payment request made successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+        data: result,
       });
     }
   }
