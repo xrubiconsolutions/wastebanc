@@ -297,7 +297,7 @@ const CustomerInformation = async (accountNo) => {
 
     return {
       error: false,
-      message: "List of banks",
+      message: "Customer information",
       data: JSON.parse(decryptedList).Data,
     };
   } catch (error) {
