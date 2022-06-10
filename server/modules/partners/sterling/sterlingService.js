@@ -150,7 +150,7 @@ const NIPFundTransfer = async (
   beneKycLevel,
   requestId,
   referenceCode,
-  paymentReference,
+  paymentReference
 ) => {
   const partner = await Sterlingkeys();
   const keys = partner.keys;
@@ -269,7 +269,7 @@ const CustomerInformation = async (accountNo) => {
       {
         headers: {
           Channel: "Web",
-          Authorization: "Web",
+          Authorization: "Web Pakam1 Test@12",
           "Content-Type": ["application/json", "application/json"],
         },
       }
