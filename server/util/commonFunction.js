@@ -392,7 +392,8 @@ const encryptData = (
   if (typeof data === "object") {
     stringifydata = JSON.stringify(data);
   } else {
-    stringifydata = data;
+    console.log("d", data);
+    stringifydata = data.toString();
   }
   //const stringifydata = JSON.stringify(data);
   console.log("data", stringifydata);
@@ -403,8 +404,11 @@ const encryptData = (
   let key = crypto.pbkdf2Sync(passPhrase, salt, iterations, keySize, "sha1");
   const cipher = crypto.createCipheriv("AES-256-CBC", key, iv);
   let encrypted = cipher.update(stringifydata, "utf8", "base64");
+  console.log("encrypted", encrypted);
   encrypted += cipher.final("base64");
-  console.log("en", encrypted);
+
+  //return Buffer.concat(encrypted[1]);
+  console.log("en", encrypted.toString().replace("/", "Lw"));
 
   return encrypted;
 };
@@ -422,12 +426,23 @@ const decryptData = (
   salt = Buffer.from(salt);
   let key = crypto.pbkdf2Sync(passPhrase, salt, iterations, keySize, "sha1");
   const decipher = crypto.createDecipheriv("AES-256-CBC", key, iv);
+  data = data.toString().replace("Por21Ld", "/");
   let decrypted = decipher.update(data, "base64", "utf8");
   decrypted += decipher.final("utf8");
-
+  console.log("d", decrypted);
   return decrypted;
+  //return decrypted.toString().replace("Por21Ld", "/");
   //return JSON.parse(decrypted);
 };
+
+// const encryptV2 =(data,
+//   salt,
+//   iv,
+//   passPhrase,
+//   keySize = 32,
+//   iterations = 2)=> {
+//     crypto.
+//   }
 
 const Sterlingkeys = async () => {
   const partner = await partnersModel.findOne({

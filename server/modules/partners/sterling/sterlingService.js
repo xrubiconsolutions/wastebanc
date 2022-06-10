@@ -17,7 +17,7 @@ const BankList = async () => {
       {
         headers: {
           Channel: "Web",
-          Authorization: "Web",
+          Authorization: "Web Pakam1 Test@12",
         },
       }
     );
@@ -83,7 +83,7 @@ const NIPNameInquiry = async (
       {
         headers: {
           Channel: "Web",
-          Authorization: "Web",
+          Authorization: "Web Pakam1 Test@12",
           "Content-Type": ["application/json", "application/json"],
         },
       }
@@ -138,39 +138,39 @@ const NIPNameInquiry = async (
 };
 
 const NIPFundTransfer = async (
-  fromAccount,
-  toAccount,
-  destinationBankCode,
-  amount,
-  beneficiaryName,
-  customerShowName,
-  nesid,
-  nersp,
-  beneBVN,
-  beneKycLevel,
-  requestId,
-  referenceCode,
-  paymentReference,
+  centralAccount,
+  receivingAccount,
+  destBankCode,
+  amountToPay,
+  beneName,
+  custShowName,
+  nesidNumber,
+  nerspNumber,
+  BVN,
+  KycLevel,
+  reqId,
+  refCode,
+  payReference
 ) => {
   const partner = await Sterlingkeys();
   const keys = partner.keys;
 
   const NIPFundTransfer = {
-    fromAccount,
-    toAccount,
-    amount,
+    fromAccount: centralAccount,
+    toAccount: receivingAccount,
+    amount: amountToPay,
     principalIdentifier: "",
-    referenceCode,
-    beneficiaryName,
-    paymentReference,
-    customerShowName,
+    referenceCode: refCode,
+    beneficiaryName: beneName,
+    paymentReference: payReference,
+    customerShowName: custShowName,
     channelCode: "Web",
-    destinationBankCode,
-    nesid,
-    nersp,
-    beneBVN,
-    beneKycLevel,
-    requestId,
+    destinationBankCode: destBankCode,
+    nesid: nesidNumber,
+    nersp: nerspNumber,
+    beneBVN: BVN,
+    beneKycLevel: KycLevel,
+    requestId: reqId,
   };
 
   const encryptBody = encryptData(
@@ -182,14 +182,16 @@ const NIPFundTransfer = async (
     keys.iterations
   );
 
+  console.log("en", encryptBody);
+
   const result = await axios.post(
     `${partner.baseUrl}api/Transaction/NIPFunTransfer`,
     { value: encryptBody },
     {
       headers: {
         Channel: "Web",
-        Authorization: "Web",
-        "Content-Type": ["application/json", "application/json"],
+        Authorization: "Web Pakam1 Test@12",
+        "Content-Type": "application/json",
       },
     }
   );
@@ -269,7 +271,7 @@ const CustomerInformation = async (accountNo) => {
       {
         headers: {
           Channel: "Web",
-          Authorization: "Web",
+          Authorization: "Web Pakam1 Test@12",
           "Content-Type": ["application/json", "application/json"],
         },
       }
@@ -372,7 +374,7 @@ const IntraBank = async (
       {
         headers: {
           Channel: "Web",
-          Authorization: "Web",
+          Authorization: "Web Pakam1 Test@12",
           "Content-Type": ["application/json", "application/json"],
         },
       }
@@ -444,7 +446,7 @@ const GenerateVirtualAccount = async (bvn, nin, phoneNumber) => {
       {
         headers: {
           Channel: "Web",
-          Authorization: "Web",
+          Authorization: "Web Pakam1 Test@12",
           "Content-Type": ["application/json", "application/json"],
         },
       }

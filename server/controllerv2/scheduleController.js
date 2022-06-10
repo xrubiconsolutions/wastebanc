@@ -6,6 +6,7 @@ const {
   organisationModel,
   notificationModel,
   activitesModel,
+  centralAccountModel,
 } = require("../models");
 const { sendResponse, bodyValidate } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
