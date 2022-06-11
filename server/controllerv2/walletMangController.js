@@ -290,6 +290,7 @@ class WalletController {
     }
   }
 
+  // account opening
   static async openingAccount(req, res) {
     try {
       const { user } = req;
