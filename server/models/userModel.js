@@ -171,10 +171,12 @@ const user_Schema = new Schema({
     type: Boolean,
     default: true,
   },
-  terms_condition:{
+  terms_condition: {
     type: Boolean,
     default: false,
-  }
+  },
+  accountNo: { type: String },
+  cifNo: { type: String },
 });
 
 user_Schema.pre("save", function (next) {

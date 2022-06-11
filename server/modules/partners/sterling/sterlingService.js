@@ -182,75 +182,44 @@ const NIPFundTransfer = async (
     keys.iterations
   );
 
-  console.log("en", encryptBody);
+  try {
+    const result = await axios.post(
+      `${partner.baseUrl}api/Transaction/NIPFunTransfer`,
+      { value: encryptBody },
+      {
+        headers: {
+          Channel: "Web",
+          Authorization: "Web Pakam1 Test@12",
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-  const result = await axios.post(
-    `${partner.baseUrl}api/Transaction/NIPFunTransfer`,
-    { value: encryptBody },
-    {
-      headers: {
-        Channel: "Web",
-        Authorization: "Web Pakam1 Test@12",
-        "Content-Type": "application/json",
-      },
-    }
-  );
+    console.log("res", result);
 
-  console.log("res", result);
+    const encryptedList = result.data;
+    const decryptedList = decryptData(
+      encryptedList,
+      keys.salt,
+      keys.iv,
+      keys.passPhrase,
+      keys.keySize,
+      keys.iterations
+    );
 
-  const encryptedList = result.data;
-  const decryptedList = decryptData(
-    encryptedList,
-    keys.salt,
-    keys.iv,
-    keys.passPhrase,
-    keys.keySize,
-    keys.iterations
-  );
-  return {
-    error: false,
-    message: "Fund Transfer successfully",
-    data: decryptedList,
-  };
-
-  // try {
-  //   const result = await axios.post(
-  //     `${partner.baseUrl}api/Transaction/NIPFunTransfer`,
-  //     { value: encryptBody },
-  //     {
-  //       headers: {
-  //         Channel: "Web",
-  //         Authorization: "Web",
-  //         "Content-Type": ["application/json", "application/json"],
-  //       },
-  //     }
-  //   );
-
-  //   console.log("res", result);
-
-  //   const encryptedList = result.data;
-  //   const decryptedList = decryptData(
-  //     encryptedList,
-  //     keys.salt,
-  //     keys.iv,
-  //     keys.passPhrase,
-  //     keys.keySize,
-  //     keys.iterations
-  //   );
-
-  //   return {
-  //     error: false,
-  //     message: "Fund Transfer successfully",
-  //     data: decryptedList,
-  //   };
-  // } catch (error) {
-  //   console.log(error);
-  //   return {
-  //     error: true,
-  //     message: "Third Party error",
-  //     data: error.response.data.errors,
-  //   };
-  // }
+    return {
+      error: false,
+      message: "Fund Transfer successfully",
+      data: decryptedList,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      error: true,
+      message: "Third Party error",
+      data: error.response.data.errors,
+    };
+  }
 };
 
 // updates
@@ -340,7 +309,7 @@ const IntraBank = async (
   description,
   beneName,
   SenderName,
-  CurrencyCode,
+  CurrencyCode = "566",
   TransactionType = 26
 ) => {
   const partner = await Sterlingkeys();
@@ -464,11 +433,20 @@ const GenerateVirtualAccount = async (bvn, nin, phoneNumber) => {
       keys.iterations
     );
 
-    return {
-      error: false,
-      message: "Account created successfully",
-      data: decryptedList,
-    };
+    const res = JSON.parse(decryptedList);
+
+    if (res.Code == "00") {
+      return {
+        error: false,
+        message: "Account created successfully",
+        data: res.Data,
+      };
+    } else {
+      return {
+        error: true,
+        message: "Error creating user account",
+      };
+    }
   } catch (error) {
     console.log("d", error.response.data);
     const da = error.response.data;

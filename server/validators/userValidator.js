@@ -233,4 +233,22 @@ module.exports = {
       .isString()
       .withMessage("kycLevel should be string"),
   ],
+
+  intraBankTransfer: [
+    body("OTP")
+      .notEmpty()
+      .withMessage("OTP is required")
+      .isString()
+      .withMessage("OTP should be string"),
+    body("accountNumber")
+      .notEmpty()
+      .withMessage("accountNumber is required")
+      .isString()
+      .withMessage("accountNumber should be string"),
+    body("beneName")
+      .notEmpty()
+      .withMessage("beneName is required")
+      .isString()
+      .withMessage("beneName should be string"),
+  ],
 };

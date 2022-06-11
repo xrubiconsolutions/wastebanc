@@ -3,6 +3,7 @@ const {
   centralAccountModel,
   transactionModel,
   payModel,
+  userModel,
 } = require("../models");
 const {
   generateRandomString,
@@ -291,15 +292,35 @@ class WalletController {
 
   static async openingAccount(req, res) {
     try {
+      const { user } = req;
       const { bvn, nin, phone } = req.body;
+
+      if (user.accountNo)
+        return res.status(400).json({
+          error: true,
+          message: "User already has an account number registered",
+        });
       const result = await GenerateVirtualAccount(bvn, nin, phone);
 
       if (result.error)
         return res.status(400).json({ error: true, message: result.message });
 
-      return res
-        .status(200)
-        .json({ error: false, message: result.message, data: result.data });
+      const updateUser = await userModel.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            accountNo: result.data.AccountNo,
+            cifNo: result.data.cifNo,
+          },
+        }
+      );
+
+      console.log("store user account number", updateUser);
+      return res.status(200).json({
+        error: false,
+        message: result.message,
+        data: { cifoNo: result.data.cifNo, accountNo: result.data.AccountNo },
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -402,17 +423,120 @@ class WalletController {
         bankCode,
         "10",
         customerName,
-        requestId,
         centralAccount.name,
         nesid,
         nersp,
         bvn,
         kycLevel,
+        requestId,
         referenceCode,
         paymentReference
       );
 
+      if (result.error) return res.status(400).json(result);
+
       // store activity
+      return res.status(200).json({
+        error: false,
+        message: "Payment request made successfully",
+        data: result,
+      });
+    } catch (error) {
+      //console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+        data: result,
+      });
+    }
+  }
+
+  static async intraBank(req, res) {
+    try {
+      const { user } = req;
+      const { OTP, accountNumber, beneName } = req.body;
+
+      const amount = user.availablePoints || user.pointGained;
+      const token = await tokenModel.findOne({
+        userId: user._id.toString(),
+        token: OTP,
+      });
+
+      if (!token) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid OTP Passed",
+        });
+      }
+
+      console.log("user", user);
+      if (moment() > moment(token.expiryTime)) {
+        return res.status(400).json({
+          error: true,
+          message: "OTP has expired",
+        });
+      }
+      const centralAccount = await centralAccountModel.findOne({});
+
+      if (!centralAccount) {
+        // send out mail or notification to backend developer
+        console.log("cannot find central account");
+        return res.status(400).json({
+          error: true,
+          message:
+            "Payment cannot be processed,Please contact customer service",
+        });
+      }
+
+      if (parseFloat(centralAccount.balance) < 0) {
+        console.log("insufficent balance in central account");
+        return res.status(400).json({
+          error: true,
+          message:
+            "Payment cannot be processed,Please contact customer service",
+        });
+      }
+      if (Number(amount) < 0) {
+        return res.status(400).json({
+          error: true,
+          message: "You don't have enough points to complete this transaction",
+        });
+      }
+
+      if (Number(amount) < 5000) {
+        return res.status(400).json({
+          message: "You don't have enough points to complete this transaction",
+        });
+      }
+
+      const allTransactions = await transactionModel
+        .find({
+          paid: false,
+          requestedForPayment: false,
+          cardID: user._id.toString(),
+        })
+        .select("_id");
+
+      if (allTransactions.length < 0) {
+        return res.status(400).json({
+          error: true,
+          message:
+            "Payment cannot be processed,Please contact customer service",
+        });
+      }
+
+      const paymentRef = generateRandomString(8, "alphnumeric");
+
+      const result = await IntraBank(
+        centralAccount.acnumber,
+        accountNumber,
+        amount,
+        paymentRef,
+        "Wallet Payment withdrawal",
+        beneName,
+        centralAccount.name
+      );
+
       return res.status(200).json({
         error: false,
         message: "Payment request made successfully",

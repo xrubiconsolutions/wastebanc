@@ -9,6 +9,7 @@ const {
   accountNo,
   openAccount,
   nipTransfer,
+  intraBankTransfer,
 } = require("../../validators/userValidator");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 module.exports = (APP) => {
@@ -63,6 +64,13 @@ module.exports = (APP) => {
     nipTransfer,
     checkRequestErrs,
     walletController.nipTransfer
+  );
+
+  APP.route("/api/user/sterling/intraBank").post(
+    userValidation,
+    intraBankTransfer,
+    checkRequestErrs,
+    walletController.intraBank
   );
 
   APP.route("/api/encrypt").post(walletController.encrypt);
