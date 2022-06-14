@@ -161,6 +161,7 @@ validateUser.userCollectorData = async (req, res, NEXT) => {
 
 validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
   try {
+    //console.log("here");
     if (!req.headers.authorization) {
       return res.status(401).jsonp(CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED);
     }
@@ -193,8 +194,8 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
     }
 
     const user = await MODEL.organisationModel.findById(validated.userId);
+   // console.log("user", user);
     if (!user) {
-      //console.log("here");
       return res.status(401).json({
         error: true,
         message: CONSTANTS.STATUS_MSG.ERROR.UNAUTHORIZED,

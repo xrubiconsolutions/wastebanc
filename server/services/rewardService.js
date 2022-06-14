@@ -143,6 +143,10 @@ class rewardService {
       };
     }
   }
+
+  static calPercentage(point, percentage) {
+    return (percentage / 100) * point;
+  }
 }
 
 module.exports = rewardService;

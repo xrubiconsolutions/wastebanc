@@ -177,6 +177,7 @@ const user_Schema = new Schema({
   },
   accountNo: { type: String },
   cifNo: { type: String },
+  percentageAcc: { type: Number },
 });
 
 user_Schema.pre("save", function (next) {

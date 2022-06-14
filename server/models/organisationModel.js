@@ -82,7 +82,7 @@ const organisation_Schema = new Schema({
   categories: [
     {
       name: { type: String },
-      price: { type: Number, default: 1 },
+      price: { type: Number, default: 0 },
     },
   ],
   canEquivalent: {
@@ -149,6 +149,10 @@ const organisation_Schema = new Schema({
   allowPickers: {
     type: Boolean,
     default: false,
+  },
+  totalCollected: {
+    type: Number,
+    default: 0,
   },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);

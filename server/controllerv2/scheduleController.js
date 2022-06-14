@@ -381,6 +381,7 @@ class ScheduleService {
       }
 
       let pickerGain = 0;
+      let percentageGain = 0;
       if (user.collectorType == "waste-picker") {
         const pickerReward = await rewardService.picker(
           categories,

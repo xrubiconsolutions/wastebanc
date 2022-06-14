@@ -99,4 +99,14 @@ module.exports = (APP) => {
     checkRequestErrs,
     organisationController.enableCompany
   );
+
+  APP.route("/api/v2/organisation/estimated/cost").get(
+    companyPakamDataValidation,
+    organisationController.estimatedCost
+  );
+
+  APP.route("/api/organisation/outstandingbilling").get(
+    companyPakamDataValidation,
+    organisationController.ongoingbilling
+  );
 };

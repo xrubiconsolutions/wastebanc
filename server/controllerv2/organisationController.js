@@ -10,6 +10,7 @@ const {
   organisationBinModel,
   dropOffModel,
   localGovernmentModel,
+  systemChargesModel,
 } = require("../models");
 const {
   sendResponse,
@@ -23,7 +24,7 @@ const request = require("request");
 let dbConfig = require("../../server/config/dbConfig");
 const db = require("../../bin/dbConnection.js");
 const collectorModel = require("../models/collectorModel");
-
+const rewardService = require("../services/rewardService");
 organisationController.types = async (req, res) => {
   try {
     const types = await organisationTypeModel
@@ -516,7 +517,7 @@ organisationController.update = async (req, res) => {
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
         categories: req.body.categories || organisation.categories,
         location: req.body.location || organisation.location,
-        // allowPickers: req.body.allowPickers || organisation.allowPickers,
+        allowPickers: req.body.allowPickers || organisation.allowPickers,
       }
     );
 
@@ -971,6 +972,73 @@ organisationController.allowsPickers = async (req, res) => {
       data: organisations,
     });
   } catch (error) {
+    return res.status(400).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+};
+
+organisationController.estimatedCost = async (req, res) => {
+  try {
+    const { user } = req;
+    const sumData = await transactionModel.find({
+      organisationID: user._id.toString(),
+      organisationPaid: false,
+    });
+
+    const sumTotal = sumData.reduce((pValue, cValue) => {
+      return pValue.coin + cValue.coin;
+    });
+
+    const sumPercentage = rewardService.calPercentage(sumTotal, 10);
+    const sum = sumTotal + sumPercentage;
+
+    return res.status(200).json({
+      error: false,
+      message: "",
+      data: sum,
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(400).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+};
+
+organisationController.ongoingbilling = async (req, res) => {
+  try {
+    const { user } = req;
+    const transactions = await transactionModel.find({
+      organisationID: user._id.toString(),
+      organisationPaid: false,
+    });
+
+    let start, end;
+    if (transactions.length > 0) {
+      // get the highest createdAt and lowest created At
+      let arr = [];
+      transactions.map((d) => {
+        arr.push(d.createdAt);
+      });
+      console.log(arr);
+      end = new Date(Math.max(...arr));
+      start = new Date(Math.min(...arr));
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "Company Billing data",
+      data: {
+        startMonth: start.toUTCString().split(" ").slice(0, 3).join(" "),
+        endMonth: end.toUTCString().split(" ").slice(0, 4).join(" "),
+        transactions,
+      },
+    });
+  } catch (error) {
+    console.log(error);
     return res.status(400).json({
       error: true,
       message: "An error occured!",

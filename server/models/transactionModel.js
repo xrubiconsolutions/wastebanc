@@ -87,6 +87,13 @@ const transaction_Schema = {
   ref_id: {
     type: Number,
   },
+  organisationPaid: {
+    type: Boolean,
+    default: false,
+  },
+  percentage: {
+    type: Number,
+  },
 };
 
 module.exports = MONGOOSE.model("transaction", transaction_Schema);

@@ -162,6 +162,9 @@ const collector_Schema = new Schema({
     type: Boolean,
     default: false,
   },
+  percentageAcc: {
+    type: Number,
+  },
 });
 
 module.exports = MONGOOSE.model("Collector", collector_Schema);
