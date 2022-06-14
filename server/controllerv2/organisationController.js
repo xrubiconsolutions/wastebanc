@@ -1028,6 +1028,7 @@ organisationController.ongoingbilling = async (req, res) => {
       start = new Date(Math.min(...arr));
     }
 
+    // billing
     return res.status(200).json({
       error: false,
       message: "Company Billing data",
