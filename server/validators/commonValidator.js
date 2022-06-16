@@ -40,7 +40,7 @@ module.exports = {
     param("companyId")
       .notEmpty()
       .withMessage("companyId is required")
-      .isMongoId()
+      .isString()
       .withMessage("companyId id is invalid"),
   ],
 };

@@ -11,6 +11,8 @@ const {
   dropOffModel,
   localGovernmentModel,
   systemChargesModel,
+  scheduleModel,
+  scheduleDropModel,
 } = require("../models");
 const {
   sendResponse,
@@ -548,8 +550,17 @@ organisationController.update = async (req, res) => {
 };
 
 organisationController.aggregators = async (req, res) => {
-  bodyValidate(req, res);
+  // bodyValidate(req, res);
   try {
+    const { user } = req;
+    const currentScope = user.locationScope;
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
     let { page = 1, resultsPerPage = 20, state, key } = req.query;
     const { organisation } = req.params;
     if (typeof page === "string") page = parseInt(page);
@@ -576,15 +587,38 @@ organisationController.aggregators = async (req, res) => {
           { organisation: { $regex: `.*${key}.*`, $options: "i" } },
           // { IDNumber: key },
         ],
-        organisation: org.companyName,
+        approvedBy: org._id.toString(),
+      };
+    } else if (start || end) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+        //organisation: org.companyName,
+        approvedBy: org._id.toString(),
       };
     } else {
       criteria = {
-        organisation: org.companyName,
+        //organisation: org.companyName,
+        approvedBy: org._id.toString(),
       };
     }
 
-    if (state) criteria.state = state;
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
     const totalResult = await collectorModel.countDocuments(criteria);
     const projection = {
       roles: 0,
@@ -1036,6 +1070,232 @@ organisationController.ongoingbilling = async (req, res) => {
         startMonth: start.toUTCString().split(" ").slice(0, 3).join(" "),
         endMonth: end.toUTCString().split(" ").slice(0, 4).join(" "),
         transactions,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+};
+
+organisationController.completedSchedule = async (req, res) => {
+  try {
+    const { user } = req;
+    const currentScope = user.locationScope;
+
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      start,
+      end,
+      key,
+      type = "pickup",
+    } = req.query;
+    const { companyId } = req.params;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    let criteria;
+    if (key) {
+      criteria = {
+        $or: [
+          { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+          { address: { $regex: `.*${key}.*`, $options: "i" } },
+          { phone: { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+        organisationCollection: companyId,
+        completionStatus: "completed",
+      };
+    } else if (start || end) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+        organisationCollection: companyId,
+        completionStatus: "completed",
+      };
+    } else {
+      criteria = {
+        ///$and: [{ organisationCollection: companyId }],
+        organisationCollection: companyId,
+        completionStatus: "completed",
+      };
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    const skip = (page - 1) * resultsPerPage;
+
+    console.log("criteria", criteria);
+
+    const aggregators = [
+      {
+        $project: {
+          newId: {
+            $toString: "$_id",
+          },
+          clientId: {
+            $toObjectId: "$clientId",
+          },
+          completionStatus: 1,
+          collectedBy: { $toObjectId: "$collectedBy" },
+          organisationCollection: 1,
+          createdAt: 1,
+          state: 1,
+          scheduleCreator: 1,
+          address: 1,
+          phone: 1,
+          createdAt: 1,
+        },
+      },
+      {
+        $match: criteria,
+      },
+      {
+        $lookup: {
+          from: "transactions",
+          let: { pickupId: "$newId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [{ $eq: ["$scheduleId", "$$pickupId"] }],
+                },
+              },
+            },
+            {
+              $project: {
+                categories: 1,
+                weight: 1,
+                coin: 1,
+                type: 1,
+                paymentResolution: 1,
+                createdAt: 1,
+              },
+            },
+          ],
+          as: "transaction",
+        },
+      },
+      {
+        $unwind: {
+          path: "$transaction",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: { userId: "$clientId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ["$_id", "$$userId"],
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              $project: { username: 1, phone: 1 },
+            },
+          ],
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "collectors",
+          let: { collectorId: "$collectedBy" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ["$_id", "$$collectorId"],
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              $project: { fullname: 1, gender: 1 },
+            },
+          ],
+          as: "collector",
+        },
+      },
+      {
+        $unwind: {
+          path: "$collector",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $limit: resultsPerPage,
+      },
+      {
+        $skip: skip,
+      },
+    ];
+    let schedules, totalResult;
+
+    if (type == "dropoff") {
+      schedules = await scheduleDropModel.aggregate(aggregators);
+      totalResult = await scheduleDropModel.countDocuments(criteria);
+    } else {
+      schedules = await scheduleModel.aggregate(aggregators);
+      totalResult = await scheduleModel.countDocuments(criteria);
+    }
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        schedules,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     });
   } catch (error) {

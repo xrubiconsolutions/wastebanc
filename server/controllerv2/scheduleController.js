@@ -412,7 +412,7 @@ class ScheduleService {
         organisation: collector.organisation,
         organisationID: organisation._id,
         scheduleId: schedule._id,
-        type: "pickup schedule",
+        type: "pickup",
         state: scheduler.state || "",
         ref_id: ref,
       });

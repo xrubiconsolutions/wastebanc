@@ -397,7 +397,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       organisation: collector.organisation,
       organisationID: organisation._id,
       scheduleId,
-      type: "pickup schedule",
+      type: "dropoff",
       state: scheduler.state || "",
       ref_id: ref,
     });
@@ -511,6 +511,7 @@ dropoffController.scheduledropOffs = async (req, res) => {
 
     const expireDate = moment(data.dropOffDate, "YYYY-MM-DD").add(7, "days");
     data.expiryDuration = expireDate;
+    data.clientId = user._id.toString();
     data.state = user.state || "Lagos";
 
     const schedule = await scheduleDropModel.create(data);

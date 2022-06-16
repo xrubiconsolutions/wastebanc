@@ -109,4 +109,11 @@ module.exports = (APP) => {
     companyPakamDataValidation,
     organisationController.ongoingbilling
   );
+
+  APP.route("/api/organisation/completed/schedule/:companyId").get(
+    adminPakamValidation,
+    companyId,
+    checkRequestErrs,
+    organisationController.completedSchedule
+  );
 };
