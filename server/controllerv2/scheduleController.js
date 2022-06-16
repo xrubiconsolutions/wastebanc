@@ -417,7 +417,7 @@ class ScheduleService {
         ref_id: ref,
       });
 
-      // send push notification to household user
+      //  send push notification to household user
       const message = {
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
