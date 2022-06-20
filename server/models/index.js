@@ -43,5 +43,5 @@ module.exports = {
   partnersModel: require("./partnersModel"),
   centralAccountModel: require("./centralaccountModel"),
   systemChargesModel: require("./systemCharges"),
-  companyBillingModel: require("./companyBillingModel"),
+  invoiceModel: require("./invoiceModel"),
 };

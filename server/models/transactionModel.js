@@ -12,6 +12,9 @@ const transaction_Schema = {
   userId: {
     type: String,
   },
+  address: {
+    type: String,
+  },
   fullname: {
     type: String,
     required: true,

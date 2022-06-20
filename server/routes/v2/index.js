@@ -18,4 +18,5 @@ module.exports = function (app) {
   require("./resourcesRoutes")(app);
   require("./charityOrganisationRoutes")(app);
   require("./walletRoutes")(app);
+  require("../../modules/invoicing/invoicing.route")(app);
 };

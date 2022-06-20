@@ -6,6 +6,7 @@
  ***********************************/
 let www = require("./bin/www.js");
 
+const { testListener } = require("./server/modules/EventListeners");
 /***********************************
  * dbConnection.js is a file from **
  * where we are connecting our *****
