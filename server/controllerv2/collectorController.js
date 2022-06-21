@@ -618,8 +618,6 @@ class CollectorService {
           headers: options.headers,
         });
 
-        console.log("res", send.data);
-
         return res.status(200).json({
           error: false,
           message: "Collector created successfully",
@@ -643,6 +641,7 @@ class CollectorService {
             profile_picture: checkPhone.organisation,
             long: checkPhone.long,
             lat: checkPhone.lat,
+            terms_condition: checkPhone.terms_condition,
             token,
           },
         });
@@ -697,6 +696,7 @@ class CollectorService {
         areaOfAccess,
         onesignal_id,
         dateOfBirth: body.dateOfBirth || "",
+        terms_condition: body.terms_condition,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -728,10 +728,6 @@ class CollectorService {
         headers: options.headers,
       });
 
-      console.log("res", send.data);
-
-      console.log("c", create);
-
       return res.status(200).json({
         error: false,
         message: "Collector created successfully",
@@ -755,8 +751,9 @@ class CollectorService {
           long: create.long,
           lat: create.lat,
           pin_id: send.data.pinId,
-          token,
+          terms_condition: create.terms_condition,
           aggregatorId: create.aggregatorId,
+          token,
         },
       });
     } catch (error) {
@@ -1203,6 +1200,14 @@ class CollectorService {
         });
       }
 
+      if (!collector.terms_condition || collector.terms_condition == false) {
+        return res.status(400).json({
+          error: true,
+          message: "Please accept terms and condition",
+          data: { collectorId: collector._id },
+        });
+      }
+
       if (!collector.verified) {
         const phoneNo = String(collector.phone).substring(1, 11);
         const token = authToken(collector);
@@ -1303,6 +1308,7 @@ class CollectorService {
               token,
               aggregatorId: collector.aggregatorId || "",
               firstLogin: collector.firstLogin,
+              terms_condition: collector.terms_condition,
             },
           });
         }
@@ -1337,9 +1343,10 @@ class CollectorService {
           localGovernment: collector.localGovernment,
           organisation: collector.organisation,
           profile_picture: collector.profile_picture,
-          token,
           aggregatorId: collector.aggregatorId || "",
+          terms_condition: collector.terms_condition,
           firstLogin: collector.firstLogin,
+          token,
         },
       });
     } catch (error) {
@@ -1921,6 +1928,70 @@ class CollectorService {
         error: false,
         message: "Point Balance",
         data: collector.pointGained,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async acceptTermsCondition(req, res) {
+    try {
+      const { collectorId } = req.body;
+      const collector = await collectorModel.findOne({ _id: collectorId });
+      if (!collector) {
+        return res.status(400).json({
+          error: true,
+          message: "collector not found",
+        });
+      }
+      await collectorModel.updateOne(
+        { _id: collector._id },
+        {
+          terms_condition: true,
+        }
+      );
+
+      // if (!accept) {
+      //   return res.status(400).json({
+      //     error: true,
+      //     message: "Invaild collector details passed",
+      //   });
+      // }
+
+      const token = authToken(collector);
+
+      return res.status(200).json({
+        error: false,
+        message: "Terms and condition accepted successfully",
+        data: {
+          _id: collector._id,
+          verified: collector.verified,
+          collectorType: collector.collectorType,
+          countryCode: collector.countryCode,
+          status: collector.status,
+          areaOfAccess: collector.areasOfAccess,
+          approvedBy: collector.approvedBy,
+          totalCollected: collector.totalCollected,
+          numberOfTripsCompleted: collector.numberOfTripsCompleted,
+          fullname: collector.fullname,
+          email: collector.email,
+          dateOfBirth: collector.dateOfBirth,
+          phone: collector.phone,
+          address: collector.address,
+          onesignal_id: collector.signal_id,
+          gender: collector.gender,
+          localGovernment: collector.localGovernment,
+          organisation: collector.organisation,
+          profile_picture: collector.profile_picture,
+          aggregatorId: collector.aggregatorId || "",
+          terms_condition: collector.terms_condition,
+          firstLogin: collector.firstLogin,
+          token,
+        },
       });
     } catch (error) {
       console.log(error);

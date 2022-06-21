@@ -250,5 +250,18 @@ module.exports = {
       .withMessage("beneName is required")
       .isString()
       .withMessage("beneName should be string"),
+    body("terms_condition")
+      .notEmpty()
+      .withMessage("terms_condition is required")
+      .isBoolean()
+      .withMessage("terms_condition should either true or false"),
+  ],
+
+  termsCondition: [
+    body("userId")
+      .notEmpty()
+      .withMessage("userId is required")
+      .isString()
+      .withMessage("userId should be string"),
   ],
 };

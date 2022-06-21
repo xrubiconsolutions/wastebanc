@@ -10,6 +10,7 @@ const {
   userValidation,
 } = require("../../util/auth");
 const { body, query, check, param } = require("express-validator");
+const userValidator = require("../../validators/userValidator");
 
 module.exports = (APP) => {
   // APP.route("/api/v2/collectors/map/data").get(
@@ -191,5 +192,12 @@ module.exports = (APP) => {
     collectorValidator.checkCollectorId,
     checkRequestErrs,
     CollectorService.removeCollector
+  );
+
+  // accept terms and conditions
+  APP.route("/api/collector/accept/termscondition").post(
+    collectorValidator.termsCondition,
+    checkRequestErrs,
+    CollectorService.acceptTermsCondition
   );
 };

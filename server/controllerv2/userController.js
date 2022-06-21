@@ -248,6 +248,7 @@ class UserService {
             lga: checkPhone.lga,
             pin_id: send.data.pinId,
             verified: checkPhone.verified,
+            terms_condition: checkPhone.terms_condition || false,
             // uType: create.uType,
             // organisationType: create.organisationType,
             //organisationName: typename.name,
@@ -304,6 +305,7 @@ class UserService {
         //onesignal_id: body.onesignal_id,
         address: body.address,
         onesignal_id,
+        terms_condition: body.terms_condition,
       });
 
       //fine
@@ -363,6 +365,7 @@ class UserService {
           country: create.country,
           state: create.state,
           lga: create.lga,
+          terms_condition: create.terms_condition,
           pin_id: send.data.pinId,
           // uType: create.uType,
           // organisationType: create.organisationType,
@@ -563,6 +566,14 @@ class UserService {
         });
       }
 
+      if (!user.terms_condition || user.terms_condition == false) {
+        return res.status(400).json({
+          error: true,
+          message: "Please accept terms and condition",
+          data: { userId: user._id },
+        });
+      }
+
       if (!user.verified) {
         const phoneNo = String(user.phone).substring(1, 11);
         const token = authToken(user);
@@ -629,6 +640,7 @@ class UserService {
           },
         });
       }
+
       let signal_id;
 
       console.log("user id", user.onesignal_id);
@@ -684,6 +696,7 @@ class UserService {
           lcd: user.lcd,
           last_logged_in: user.last_logged_in,
           firstLogin: user.last_logged_in ? false : true,
+          terms_condition: user.terms_condition,
           token,
         },
       });
@@ -764,6 +777,74 @@ class UserService {
       return res.status(500).json({
         error: true,
         message: "An error occured",
+      });
+    }
+  }
+
+  static async acceptTermsCondition(req, res) {
+    try {
+      const { userId } = req.body;
+      const user = await userModel.findOne({ _id: userId });
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+      await userModel.updateOne(
+        { _id: user._id },
+        {
+          terms_condition: true,
+        }
+      );
+
+      // if (!accept) {
+      //   return res.status(400).json({
+      //     error: true,
+      //     message: "Invaild user",
+      //   });
+      // }
+
+      const token = authToken(user);
+      delete user.password;
+
+      return res.status(200).json({
+        error: false,
+        message: "Terms and condition accepted successfully",
+        data: {
+          _id: user._id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email,
+          phone: user.phone,
+          fullname: user.fullname,
+          gender: user.gender,
+          country: user.country,
+          state: user.state,
+          username: user.username,
+          othernames: user.othernames,
+          address: user.address,
+          profile_picture: user.profile_picture,
+          roles: user.roles,
+          countryCode: user.countryCode,
+          verified: user.verified,
+          availablePoints: user.availablePoints,
+          rafflePoints: user.rafflePoints,
+          schedulePoints: user.schedulePoints,
+          onesignal_id: user.signal_id,
+          cardID: user.cardID,
+          lcd: user.lcd,
+          last_logged_in: user.last_logged_in,
+          firstLogin: user.last_logged_in ? false : true,
+          terms_condition: user.terms_condition,
+          token,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
       });
     }
   }

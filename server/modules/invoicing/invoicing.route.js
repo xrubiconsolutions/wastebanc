@@ -26,6 +26,7 @@ module.exports = (APP) => {
     invoiceController.cardData
   );
 
+  // mark as paid
   APP.route("/api/invoice/:invoiceNumber/markAsPaid").get(
     adminPakamValidation,
     invoiceNumber,

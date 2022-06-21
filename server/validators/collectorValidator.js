@@ -102,4 +102,11 @@ module.exports = {
   checkCollectorId: [
     param("collectorId").notEmpty().withMessage("collectorId is require"),
   ],
+  termsCondition: [
+    body("collectorId")
+      .notEmpty()
+      .withMessage("collectorId is required")
+      .isString()
+      .withMessage("collectorId should be string"),
+  ],
 };

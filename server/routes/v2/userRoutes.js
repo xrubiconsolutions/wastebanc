@@ -45,4 +45,9 @@ module.exports = (APP) => {
     checkRequestErrs,
     UserService.resetPassword
   );
+  APP.route("/api/user/accept/termscondition").post(
+    userValidator.termsCondition,
+    checkRequestErrs,
+    UserService.acceptTermsCondition
+  );
 };
