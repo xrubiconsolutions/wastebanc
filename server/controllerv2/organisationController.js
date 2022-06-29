@@ -27,6 +27,7 @@ let dbConfig = require("../../server/config/dbConfig");
 const db = require("../../bin/dbConnection.js");
 const collectorModel = require("../models/collectorModel");
 const rewardService = require("../services/rewardService");
+const sterlingService = require("../modules/partners/sterling/sterlingService");
 organisationController.types = async (req, res) => {
   try {
     const types = await organisationTypeModel
@@ -1303,6 +1304,19 @@ organisationController.completedSchedule = async (req, res) => {
         totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+};
+
+organisationController.accountDetails = async (req, res) => {
+  try {
+    const sterlingAccount = await sterlingService.bankDetails();
+    return res.status(200).json(sterlingAccount);
   } catch (error) {
     console.log(error);
     return res.status(400).json({

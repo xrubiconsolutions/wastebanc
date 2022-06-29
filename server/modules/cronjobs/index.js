@@ -162,7 +162,7 @@ const cronJobs = () => {
     try {
       // get central bank account details
       const centralAccount = await MODEL.centralAccountModel.findOne({
-        name: "KAREEM MEDINAT MOROHUNRANTI",
+        name: "PAKAM ACCOUNT",
       });
       const accountNo = centralAccount.acnumber;
 

@@ -6,6 +6,7 @@ const {
   removeObjDuplicate,
   Sterlingkeys,
 } = require("../../../util/commonFunction");
+const { centralAccountModel } = require("../../../models");
 
 const BankList = async () => {
   try {
@@ -472,6 +473,20 @@ const GenerateVirtualAccount = async (bvn, nin, phoneNumber) => {
   }
 };
 
+const bankDetails = async () => {
+  const centralAc = await centralAccountModel.findOne({
+    bank: "sterling",
+  });
+  return {
+    error: false,
+    message: "",
+    data: {
+      name: centralAc.name,
+      acnumber: centralAc.acnumber,
+      bank: centralAc.bank,
+    },
+  };
+};
 module.exports = {
   BankList,
   NIPNameInquiry,
@@ -479,4 +494,5 @@ module.exports = {
   NIPFundTransfer,
   CustomerInformation,
   IntraBank,
+  bankDetails,
 };

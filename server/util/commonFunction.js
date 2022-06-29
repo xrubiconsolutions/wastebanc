@@ -426,7 +426,7 @@ const decryptData = (
   salt = Buffer.from(salt);
   let key = crypto.pbkdf2Sync(passPhrase, salt, iterations, keySize, "sha1");
   const decipher = crypto.createDecipheriv("AES-256-CBC", key, iv);
-  data = data.toString().replace("Por21Ld", "/");
+  //data = data.toString().replace("Por21Ld", "/");
   let decrypted = decipher.update(data, "base64", "utf8");
   decrypted += decipher.final("utf8");
   console.log("d", decrypted);

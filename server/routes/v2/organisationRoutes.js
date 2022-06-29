@@ -116,4 +116,9 @@ module.exports = (APP) => {
     checkRequestErrs,
     organisationController.completedSchedule
   );
+
+  APP.route("/api/organisation/account/details").get(
+    companyPakamDataValidation,
+    organisationController.accountDetails
+  );
 };

@@ -9,6 +9,7 @@ const centralAccountModel = new Schema({
   balance: { type: String },
   nipcharge: { type: Number },
   charge: { type: Number },
+  bank: { type: String },
 });
 
 module.exports = MONGOOSE.model("centralaccounts", centralAccountModel);
