@@ -1056,14 +1056,25 @@ organisationController.ongoingbilling = async (req, res) => {
       organisationPaid: false,
     });
 
-    let start, end;
+    let start, end, percentage, subtotal, total;
     if (transactions.length > 0) {
       // get the highest createdAt and lowest created At
       let arr = [];
       transactions.map((d) => {
         arr.push(d.createdAt);
       });
-      console.log(arr);
+      const household = transactions.reduce((pValue, cValue) => {
+        return pValue.coin + cValue.coin;
+      });
+
+      const wastePickersTotal = transactions.reduce((pValue, cValue) => {
+        return pValue.wastePickerCoin + cValue.wastePickerCoin;
+      });
+
+      subtotal = household + wastePickersTotal;
+      percentage = rewardService.calPercentage(subtotal, 10);
+      total = subtotal + percentage;
+
       end = new Date(Math.max(...arr));
       start = new Date(Math.min(...arr));
     }
@@ -1076,6 +1087,9 @@ organisationController.ongoingbilling = async (req, res) => {
         startMonth: start.toUTCString().split(" ").slice(0, 3).join(" "),
         endMonth: end.toUTCString().split(" ").slice(0, 4).join(" "),
         transactions,
+        subtotal,
+        serviceCharge: percentage,
+        total,
       },
     });
   } catch (error) {
