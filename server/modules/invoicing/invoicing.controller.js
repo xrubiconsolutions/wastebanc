@@ -89,6 +89,56 @@ class invoiceController {
       });
     }
   }
+
+  static async outstandingInvoicePayments(req, res) {
+    try {
+      const { user } = req;
+      let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
+      const result = await invoiceService.invoices(
+        page,
+        resultsPerPage,
+        user,
+        key,
+        start,
+        end,
+        "pending"
+      );
+      if (result.error) return res.status(400).json(result);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async completedInvoicePayments(req, res) {
+    try {
+      const { user } = req;
+      let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
+      const result = await invoiceService.invoices(
+        page,
+        resultsPerPage,
+        user,
+        key,
+        start,
+        end,
+        "paid"
+      );
+      if (result.error) return res.status(400).json(result);
+
+      return res.status(200).json(result);
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = invoiceController;

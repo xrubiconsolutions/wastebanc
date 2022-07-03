@@ -1,7 +1,14 @@
 const MODEL = require("../../models");
 const cron = require("node-cron");
 const { CustomerInformation } = require("../partners/sterling/sterlingService");
-
+var nodemailer = require("nodemailer");
+var transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "pakambusiness@gmail.com",
+    pass: "pakambusiness-2000",
+  },
+});
 const cronJobs = () => {
   // make a pickup schedule as missed
   //'01 7 * * *'
@@ -98,13 +105,13 @@ const cronJobs = () => {
             subject: "YOUR ORGANISATION ACCOUNT WILL EXPIRE IN 30 DAYS",
             text: `Your organisation's account will expire in 30 days. Kindly renew your licence or contact support if any issue arise.`,
           };
-          // transporter.sendMail(mailOptions, function (error, info) {
-          //   if (error) {
-          //     console.log(error);
-          //   } else {
-          //     console.log("Email sent: " + info.response);
-          //   }
-          // });
+          transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log("Email sent: " + info.response);
+            }
+          });
         }
       }
     });

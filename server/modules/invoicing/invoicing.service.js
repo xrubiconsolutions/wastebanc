@@ -1,10 +1,17 @@
-const { transactionModel, invoiceModel } = require("../../models");
+const {
+  transactionModel,
+  invoiceModel,
+  organisationModel,
+} = require("../../models");
 const rewardService = require("../../services/rewardService");
 const { generateRandomString } = require("../../util/commonFunction");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
 class invoiceService {
   static async generateInvoice(start, end, companyId, authuser) {
+    const organisation = await organisationModel.findById(companyId);
+
+    if (!organisation) throw new Error("Invalid companyId passed");
     const [startDate, endDate] = [new Date(start), new Date(end)];
     let criteria = {
       createdAt: {
@@ -57,6 +64,7 @@ class invoiceService {
 
     const storeInvoice = await invoiceModel.create({
       companyId,
+      organisationName: organisation.companyName,
       invoiceNumber,
       startDate,
       endDate,
@@ -64,6 +72,7 @@ class invoiceService {
       amount: totalValue,
       serviceCharge: sumPercentage,
       expectedPaymentDate,
+      state,
       //state: authuser.locationScope,
     });
 
@@ -177,6 +186,87 @@ class invoiceService {
     invoice.amountPaid = invoice.amount;
 
     return invoice;
+  }
+
+  static async invoices(page, resultsPerPage, user, key, start, end, status) {
+    const currentScope = user.locationScope;
+    if (!currentScope) {
+      return {
+        error: true,
+        message: "Invalid request",
+      };
+    }
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    let criteria, state;
+    if (key) {
+      criteria = {
+        $or: [
+          { invoiceNumber: { $regex: `.*${key}.*`, $options: "i" } },
+          { amount: { $regex: `.*${key}.*`, $options: "i" } },
+          { serviceCharge: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisationName: { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+      };
+    } else if (start || end) {
+      if (!start || !end) {
+        return {
+          error: true,
+          message: "Please pass a start and end date",
+        };
+      }
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+      };
+    } else {
+      criteria = {};
+    }
+
+    if (currentScope === "All") {
+      state = user.state;
+    } else {
+      state = [currentScope];
+      criteria.state = currentScope;
+    }
+
+    criteria.paidStatus = status;
+    criteria.state = {
+      $in: user.states,
+    };
+
+    const totalResult = await invoiceModel.countDocuments(criteria);
+    const invoices = await invoiceModel
+      .find(criteria)
+      .select([
+        "_id",
+        "invoiceNumber",
+        "organisationName",
+        "amount",
+        "serviceCharge",
+        "paidStatus",
+        "createdAt",
+      ])
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+
+    return {
+      error: false,
+      message: "success",
+      data: {
+        invoices,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      },
+    };
   }
 }
 

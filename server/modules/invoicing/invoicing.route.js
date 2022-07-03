@@ -33,4 +33,14 @@ module.exports = (APP) => {
     checkRequestErrs,
     invoiceController.markInvoice
   );
+
+  APP.route("/api/invoice/outstanding/payment").get(
+    adminPakamValidation,
+    invoiceController.outstandingInvoicePayments
+  );
+
+  APP.route("/api/invoice/completed/payment").get(
+    adminPakamValidation,
+    invoiceController.completedInvoicePayments
+  );
 };

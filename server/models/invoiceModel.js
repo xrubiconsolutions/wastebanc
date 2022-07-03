@@ -6,6 +6,7 @@ const Schema = MONGOOSE.Schema;
 const invoiceSchema = new Schema(
   {
     companyId: { type: Schema.Types.ObjectId, ref: "Organisation" },
+    organisationName: { type: String },
     invoiceNumber: { type: String },
     startDate: { type: Date },
     endDate: { type: Date },
@@ -20,8 +21,8 @@ const invoiceSchema = new Schema(
     approvedDate: { type: Date },
     amountPaid: { type: String },
     balance: { type: String },
-  
     event: { type: String, default: "generated" },
+    state: { type: Array, defaule: [] },
   },
   { timestamps: true }
 );
