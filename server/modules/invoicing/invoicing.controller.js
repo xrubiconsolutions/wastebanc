@@ -139,6 +139,21 @@ class invoiceController {
       });
     }
   }
+
+  static async fetchInvoice(req, res) {
+    try {
+      const { invoiceId } = req.params;
+      const result = await invoiceService.getinvoiceById(invoiceId);
+      if (result.error) return res.status(400).json(result);
+      return res.status(200).json(result);
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = invoiceController;

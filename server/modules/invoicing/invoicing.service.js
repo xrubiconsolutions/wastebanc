@@ -7,6 +7,7 @@ const rewardService = require("../../services/rewardService");
 const { generateRandomString } = require("../../util/commonFunction");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
+const { ObjectId } = require("mongodb");
 class invoiceService {
   static async generateInvoice(start, end, companyId, authuser) {
     const organisation = await organisationModel.findById(companyId);
@@ -62,13 +63,13 @@ class invoiceService {
     const invoiceNumber = geneNo.substring(0, 9);
     const expectedPaymentDate = moment().add(3, "days");
 
-    const storeInvoice = await invoiceModel.create({
-      companyId,
+    await invoiceModel.create({
+      company: companyId,
       organisationName: organisation.companyName,
       invoiceNumber,
       startDate,
       endDate,
-      transactionId: transId,
+      transactions: transId,
       amount: totalValue,
       serviceCharge: sumPercentage,
       expectedPaymentDate,
@@ -266,6 +267,33 @@ class invoiceService {
         resultsPerPage,
         totalPages: Math.ceil(totalResult / resultsPerPage),
       },
+    };
+  }
+
+  static async getinvoiceById(invoiceId) {
+    const invoice = await invoiceModel
+      .findOne({ _id: invoiceId })
+      .populate("company", ["companyName", "email", "phone", "companyTag"])
+      .populate("transactions", [
+        "categories",
+        "category",
+        "type",
+        "weight",
+        "coin",
+        "wastePickerCoin",
+        "type",
+      ]);
+
+    if (!invoice)
+      return {
+        error: true,
+        message: "Invoice Not found",
+      };
+
+    return {
+      error: false,
+      message: "success",
+      data: invoice,
     };
   }
 }

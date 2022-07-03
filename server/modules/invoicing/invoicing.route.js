@@ -3,7 +3,11 @@ const {
   adminPakamValidation,
   companyPakamDataValidation,
 } = require("../../util/auth");
-const { generateInvoice, invoiceNumber } = require("./invoicingValidation");
+const {
+  generateInvoice,
+  invoiceNumber,
+  invoiceId,
+} = require("./invoicingValidation");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 
 module.exports = (APP) => {
@@ -42,5 +46,12 @@ module.exports = (APP) => {
   APP.route("/api/invoice/completed/payment").get(
     adminPakamValidation,
     invoiceController.completedInvoicePayments
+  );
+
+  APP.route("/api/invoice/:invoiceId").get(
+    adminPakamValidation,
+    invoiceId,
+    checkRequestErrs,
+    invoiceController.fetchInvoice
   );
 };

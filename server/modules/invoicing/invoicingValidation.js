@@ -28,4 +28,12 @@ module.exports = {
       .isString()
       .withMessage("invoiceNumber should be string"),
   ],
+
+  invoiceId: [
+    param("invoiceId")
+      .notEmpty()
+      .withMessage("invoiceId is required")
+      .isString()
+      .withMessage("invoiceId should be string"),
+  ],
 };

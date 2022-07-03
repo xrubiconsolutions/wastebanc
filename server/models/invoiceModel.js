@@ -5,12 +5,12 @@ const Schema = MONGOOSE.Schema;
 
 const invoiceSchema = new Schema(
   {
-    companyId: { type: Schema.Types.ObjectId, ref: "Organisation" },
+    company: { type: Schema.Types.ObjectId, ref: "Organisation" },
     organisationName: { type: String },
     invoiceNumber: { type: String },
     startDate: { type: Date },
     endDate: { type: Date },
-    transactionId: [{ type: Schema.Types.ObjectId, ref: "transaction" }],
+    transactions: [{ type: Schema.Types.ObjectId, ref: "transaction" }],
     amount: { type: String },
     serviceCharge: { type: String },
     paidStatus: { type: String, default: "pending" },
