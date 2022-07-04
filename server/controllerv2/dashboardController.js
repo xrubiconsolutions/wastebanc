@@ -5,6 +5,7 @@ const {
   userModel,
   collectorModel,
   categoryModel,
+  organisationModel,
 } = require("../models");
 
 const { sendResponse } = require("../util/commonFunction");
@@ -47,6 +48,11 @@ dashboardController.cardMapData = async (req, res) => {
           message: "Start date cannot be greater than end date",
         });
       }
+    } else {
+      return res.status(400).json({
+        error: true,
+        message: "Start date and end date is required",
+      });
     }
 
     const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -83,6 +89,8 @@ dashboardController.cardMapData = async (req, res) => {
     const totalCompleted = await completed(criteria);
     const totalPending = await pending(criteria);
     const totalCancelled = await cancelled(criteria);
+    const totalWasterPickers = await wastePickers(criteria);
+    const totalOrganisation = await organisation(criteria);
 
     return res.status(200).json({
       error: false,
@@ -95,6 +103,8 @@ dashboardController.cardMapData = async (req, res) => {
         totalCompleted,
         totalCancelled,
         totalDropOff,
+        totalWasterPickers,
+        totalOrganisation,
         totalWastes: Math.ceil(totalWastes),
         totalPayment: Math.ceil(totalPayment),
         totalOutstanding: Math.ceil(totalOutstanding),
@@ -665,12 +675,34 @@ const allSchedules = async (criteria) => {
 };
 
 const completed = async (criteria) => {
+  console.log("com", criteria);
   const totalCompleted = await scheduleModel.countDocuments({
     ...criteria,
     completionStatus: "completed",
     collectorStatus: "accept",
   });
   return totalCompleted;
+};
+
+const organisation = async (criteria) => {
+  const condition = { ...criteria };
+  condition.createAt = condition.createdAt;
+  delete condition.createdAt;
+
+  console.log("org", condition);
+  const totalOrganisation = await organisationModel.countDocuments(condition);
+
+  return totalOrganisation;
+};
+
+const wastePickers = async (criteria) => {
+  console.log("waste", criteria);
+  const totalwastePicker = await collectorModel.countDocuments({
+    ...criteria,
+    collectorType: "waste-picker",
+  });
+
+  return totalwastePicker;
 };
 
 const missed = async (criteria) => {
