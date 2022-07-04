@@ -675,7 +675,6 @@ const allSchedules = async (criteria) => {
 };
 
 const completed = async (criteria) => {
-  console.log("com", criteria);
   const totalCompleted = await scheduleModel.countDocuments({
     ...criteria,
     completionStatus: "completed",
@@ -685,18 +684,15 @@ const completed = async (criteria) => {
 };
 
 const organisation = async (criteria) => {
-  const condition = { ...criteria };
   condition.createAt = condition.createdAt;
   delete condition.createdAt;
 
-  console.log("org", condition);
   const totalOrganisation = await organisationModel.countDocuments(condition);
 
   return totalOrganisation;
 };
 
 const wastePickers = async (criteria) => {
-  console.log("waste", criteria);
   const totalwastePicker = await collectorModel.countDocuments({
     ...criteria,
     collectorType: "waste-picker",
