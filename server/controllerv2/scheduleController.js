@@ -14,7 +14,7 @@ const moment = require("moment-timezone");
 const { sendNotification } = require("../util/commonFunction");
 const randomstring = require("randomstring");
 const rewardService = require("../services/rewardService");
-
+const { logger } = require("../config/logger");
 moment().tz("Africa/Lagos", false);
 
 class ScheduleService {
@@ -34,15 +34,6 @@ class ScheduleService {
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
-
-      // if (!key) {
-      //   if (!start || !end) {
-      //     return res.status(400).json({
-      //       error: true,
-      //       message: "Please pass a start and end date",
-      //     });
-      //   }
-      // }
 
       let criteria;
       let collectorStatus = { $ne: "" };
@@ -102,9 +93,6 @@ class ScheduleService {
       } else {
         criteria.state = currentScope;
       }
-
-      console.log(criteria);
-      //if (state) criteria.state = state;
 
       const totalResult = await scheduleModel.countDocuments(criteria);
 
@@ -498,7 +486,7 @@ class ScheduleService {
         da: householdReward.totalWeight,
       });
     } catch (error) {
-      console.log(error);
+      logger(error);
       return res.status(500).json({
         error: true,
         message: "An error occurred",

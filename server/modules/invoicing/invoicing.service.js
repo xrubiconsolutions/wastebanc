@@ -244,6 +244,7 @@ class invoiceService {
     const totalResult = await invoiceModel.countDocuments(criteria);
     const invoices = await invoiceModel
       .find(criteria)
+      .populate("company", ["companyName", "email", "phone", "companyTag"])
       .select([
         "_id",
         "invoiceNumber",

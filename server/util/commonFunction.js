@@ -13,6 +13,11 @@ const {
   partnersModel,
   centralAccountModel,
   systemChargesModel,
+  transactionModel,
+  notificationModel,
+  scheduleModel,
+  userModel,
+  collectorModel,
 } = require("../models");
 /**
  * incrypt password in case user login implementation
@@ -468,6 +473,43 @@ const SystemDeductions = async (amount) => {
   return result;
 };
 
+const storeTransaction = async (params) => {
+  return await transactionModel.create(params);
+};
+
+const storeNotification = async (params) => {
+  return await notificationModel.create(params);
+};
+
+const updateSchedule = async (params, scheduleId) => {
+  return await scheduleModel.updateOne({ _id: scheduleId }, { $set: params });
+};
+
+const updateUser = async (params, email) => {
+  return await userModel.updateOne({ email }, { $set: params });
+};
+
+const updateCollector = async (params, collectorId) => {
+  return await collectorModel.updateOne({ _id: collectorId }, { $set: params });
+};
+
+const storeActivites = async (params) => {
+  const collector = await activitesModel.create({
+    userId: params.collectorId,
+    message: params.collectorMsg,
+    activity_type: params.activityType,
+  });
+
+  const schedule = await activitesModel.create({
+    userType: "client",
+    userId: params.schedulerId,
+    message: params.scheduleMsg,
+    activity_type: params.activityType,
+  });
+
+  return params;
+};
+
 /*exporting all object from here*/
 module.exports = {
   sendError: sendError,
@@ -500,4 +542,10 @@ module.exports = {
   decryptData,
   Sterlingkeys,
   SystemDeductions,
+  storeTransaction,
+  storeNotification,
+  updateSchedule,
+  updateUser,
+  updateCollector,
+  storeActivites,
 };
