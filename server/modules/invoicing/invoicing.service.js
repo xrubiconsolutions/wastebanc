@@ -174,7 +174,7 @@ class invoiceService {
 
     if (updateToPaid) {
       await transactionModel.updateMany(
-        { _id: { $ni: transactionId } },
+        { _id: { $in: invoice.transactions } },
         {
           organisationPaid: true,
         }
