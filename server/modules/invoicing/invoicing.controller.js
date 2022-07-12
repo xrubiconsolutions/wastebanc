@@ -71,18 +71,19 @@ class invoiceController {
       const { user } = req;
       const { invoiceNumber } = req.params;
       const result = await invoiceService.markAsPaid(invoiceNumber, user);
-      if (invoice === false)
+      if (result.error)
         return res.status(400).json({
           error: true,
-          message: "Invoice not found",
+          message: result.msg
         });
 
       return res.status(200).json({
         error: false,
-        message: "Invoice marked as paid successfully",
-        data: result,
+        message: result.msg,
+        data: result.data,
       });
     } catch (error) {
+      console.log(error);
       logger(error);
       return res.status(500).json({
         error: true,

@@ -162,7 +162,9 @@ class invoiceService {
       invoiceNumber,
     });
 
-    if (!invoice) return false;
+    if (!invoice) return { error: true, msg: "Invoice not found", data: null };
+    if (invoice.paidStatus === "paid")
+      return { error: false, msg: "Invoice already paid for", data: null };
 
     const updateToPaid = await invoiceModel.updateOne({
       paidStatus: "paid",
@@ -186,7 +188,7 @@ class invoiceService {
     invoice.approvedDate = moment();
     invoice.amountPaid = invoice.amount;
 
-    return invoice;
+    return { error: false, msg: "success", data: invoice };
   }
 
   static async invoices(page, resultsPerPage, user, key, start, end, status) {
