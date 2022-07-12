@@ -188,7 +188,11 @@ class invoiceService {
     invoice.approvedDate = moment();
     invoice.amountPaid = invoice.amount;
 
-    return { error: false, msg: "success", data: invoice };
+    return {
+      error: false,
+      msg: "Invoice marked as paid successfully",
+      data: invoice,
+    };
   }
 
   static async invoices(page, resultsPerPage, user, key, start, end, status) {
