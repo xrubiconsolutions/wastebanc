@@ -166,13 +166,16 @@ class invoiceService {
     if (invoice.paidStatus === "paid")
       return { error: false, msg: "Invoice already paid for", data: null };
 
-    const updateToPaid = await invoiceModel.updateOne({
-      paidStatus: "paid",
-      approvedBy: authuser._id,
-      approvedDate: moment(),
-      amountPaid: invoice.amount,
-      balance: "0",
-    });
+    const updateToPaid = await invoiceModel.updateOne(
+      { _id: invoice._id },
+      {
+        paidStatus: "paid",
+        approvedBy: authuser._id,
+        approvedDate: moment(),
+        amountPaid: invoice.amount,
+        balance: "0",
+      }
+    );
 
     if (updateToPaid) {
       await transactionModel.updateMany(
