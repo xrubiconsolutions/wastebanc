@@ -33,12 +33,18 @@ class CollectorService {
         key,
         collectorType = "collector",
         assigned,
+        enabled,
       } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
       // if (assigned) assigned = assigned === "true" ? true : false;
       assigned = assigned ? (assigned === "true" ? true : false) : null;
+      const status = enabled
+        ? enabled === "true"
+          ? "active"
+          : "disable"
+        : { $ne: "" };
 
       // if (!key) {
       //   if (!start || !end) {
@@ -61,6 +67,7 @@ class CollectorService {
             { organisation: { $regex: `.*${key}.*`, $options: "i" } },
             // { IDNumber: key },
           ],
+          status,
         };
       } else if (start || end) {
         if (!start || !end) {
@@ -75,6 +82,7 @@ class CollectorService {
             $gte: startDate,
             $lt: endDate,
           },
+          status,
         };
       } else {
         criteria = {};
