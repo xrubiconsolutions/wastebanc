@@ -193,6 +193,13 @@ class UserService {
       const checkPhone = await userModel.findOne({
         phone: body.phone,
       });
+      if (!body.terms_condition || body.terms_condition == false) {
+        return res.status(200).json({
+          error: true,
+          message: "Please accept terms and condition",
+          data: { userId: user._id },
+        });
+      }
       if (checkPhone) {
         if (checkPhone.verified) {
           return res.status(400).json({
@@ -567,7 +574,7 @@ class UserService {
       }
 
       if (!user.terms_condition || user.terms_condition == false) {
-        return res.status(400).json({
+        return res.status(200).json({
           error: true,
           message: "Please accept terms and condition",
           data: { userId: user._id },
