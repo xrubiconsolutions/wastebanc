@@ -586,6 +586,14 @@ class CollectorService {
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
       });
+
+      if (!body.terms_condition || body.terms_condition == false) {
+        return res.status(200).json({
+          error: false,
+          message: "Please accept terms and condition",
+          data: { collectorId: collector._id },
+        });
+      }
       // handle the collector already register so a verification token can be resent
       if (checkPhone) {
         if (checkPhone.verified) {
