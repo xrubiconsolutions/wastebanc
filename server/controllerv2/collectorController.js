@@ -1209,8 +1209,8 @@ class CollectorService {
       }
 
       if (!collector.terms_condition || collector.terms_condition == false) {
-        return res.status(400).json({
-          error: true,
+        return res.status(200).json({
+          error: false,
           message: "Please accept terms and condition",
           data: { collectorId: collector._id },
         });
