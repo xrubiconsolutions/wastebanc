@@ -1216,6 +1216,7 @@ class CollectorService {
         });
       }
 
+      // res
       if (!collector.terms_condition || collector.terms_condition == false) {
         return res.status(200).json({
           error: true,
