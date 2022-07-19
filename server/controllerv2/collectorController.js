@@ -589,7 +589,7 @@ class CollectorService {
 
       if (!body.terms_condition || body.terms_condition == false) {
         return res.status(200).json({
-          error: false,
+          error: true,
           message: "Please accept terms and condition",
           data: { collectorId: collector._id },
         });
@@ -1218,7 +1218,7 @@ class CollectorService {
 
       if (!collector.terms_condition || collector.terms_condition == false) {
         return res.status(200).json({
-          error: false,
+          error: true,
           message: "Please accept terms and condition",
           data: { collectorId: collector._id },
         });
