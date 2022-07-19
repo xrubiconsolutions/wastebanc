@@ -588,10 +588,11 @@ class CollectorService {
       });
 
       if (!body.terms_condition || body.terms_condition == false) {
-        return res.status(200).json({
+        return res.status(400).json({
           error: true,
           message: "Please accept terms and condition",
           data: { collectorId: collector._id },
+          statusCode: 402,
         });
       }
       // handle the collector already register so a verification token can be resent
@@ -1205,6 +1206,7 @@ class CollectorService {
         return res.status(400).json({
           error: true,
           message: "Invalid credentials",
+          statusCode: 400,
         });
       }
 
@@ -1218,10 +1220,11 @@ class CollectorService {
 
       // res
       if (!collector.terms_condition || collector.terms_condition == false) {
-        return res.status(200).json({
+        return res.status(400).json({
           error: true,
           message: "Please accept terms and condition",
           data: { collectorId: collector._id },
+          statusCode: 402,
         });
       }
 
