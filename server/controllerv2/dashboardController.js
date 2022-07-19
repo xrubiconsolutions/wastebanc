@@ -684,10 +684,10 @@ const completed = async (criteria) => {
 };
 
 const organisation = async (criteria) => {
-  condition.createAt = condition.createdAt;
-  delete condition.createdAt;
+  criteria.createAt = condition.createdAt;
+  delete criteria.createdAt;
 
-  const totalOrganisation = await organisationModel.countDocuments(condition);
+  const totalOrganisation = await organisationModel.countDocuments(criteria);
 
   return totalOrganisation;
 };
