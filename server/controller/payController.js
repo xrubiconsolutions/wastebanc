@@ -16,13 +16,22 @@ const axios = require("axios");
 
 payController.getBanks = (req, res) => {
   request(
+    // {
+    //   url: "https://api.paystack.co/bank",
+    //   method: "GET",
+    //   headers: {
+    //     Accept: "application/json",
+    //     "Accept-Charset": "utf-8",
+    //     Authorization: `Bearer sk_test_a9fa4b3ea294cde982654ac464b9f3e20e90a24c`,
+    //   },
+    //   json: true,
+    // },
     {
-      url: "https://api.paystack.co/bank",
+      url: "https://apiv2.pakam.ng/api/all/banks",
       method: "GET",
       headers: {
         Accept: "application/json",
         "Accept-Charset": "utf-8",
-        Authorization: `Bearer sk_test_a9fa4b3ea294cde982654ac464b9f3e20e90a24c`,
       },
       json: true,
     },
@@ -39,12 +48,11 @@ payController.resolveAccount = (req, res) => {
 
   request(
     {
-      url: `https://api.paystack.co/bank/resolve?account_number=${account_number}&bank_code=${bank_code}`,
+      url: `https://apiv2.pakam.ng/api/resolve/account?account_number=${account_number}&bank_code=${bank_code}`,
       method: "GET",
       headers: {
         Accept: "application/json",
         "Accept-Charset": "utf-8",
-        Authorization: `Bearer sk_test_a9fa4b3ea294cde982654ac464b9f3e20e90a24c`,
       },
       json: true,
     },

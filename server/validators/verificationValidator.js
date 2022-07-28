@@ -48,4 +48,11 @@ module.exports = {
       .isString()
       .withMessage("token must be a string"),
   ],
+  OtpRequest: [
+    body("type")
+      .trim()
+      .notEmpty()
+      .withMessage("type is required")
+      .isIn(["bank", "charity"]),
+  ],
 };
