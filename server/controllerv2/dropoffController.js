@@ -121,7 +121,7 @@ dropoffController.dropOffs = async (req, res) => {
 
 dropoffController.companydropOffs = async (req, res) => {
   try {
-    const { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
     const { companyName: organisation } = req.user;
 
     if (typeof page === "string") page = parseInt(page);
