@@ -16,6 +16,7 @@ const axios = require("axios");
 
 payController.getBanks = (req, res) => {
   request(
+    // update
     // {
     //   url: "https://api.paystack.co/bank",
     //   method: "GET",
