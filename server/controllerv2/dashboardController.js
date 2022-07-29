@@ -684,7 +684,7 @@ const completed = async (criteria) => {
 };
 
 const organisation = async (criteria) => {
-  criteria.createAt = condition.createdAt;
+  criteria.createAt = criteria.createdAt;
   delete criteria.createdAt;
 
   const totalOrganisation = await organisationModel.countDocuments(criteria);
