@@ -146,8 +146,6 @@ organisationController.getOrganisationCompleted = async (req, res) => {
       },
     ]);
 
-    //console.log("d", d);
-
     return res.status(200).json({
       error: false,
       message: "success",
