@@ -862,7 +862,7 @@ organisationController.dropOffPakam = async (req, res) => {
       message: "success",
       data: {
         drops,
-        totalResults,
+        totalResult: totalResults,
         page,
         resultsPerPage,
         totalPages: Math.ceil(totalResults / resultsPerPage),
