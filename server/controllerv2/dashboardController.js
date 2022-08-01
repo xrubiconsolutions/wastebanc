@@ -85,18 +85,23 @@ dashboardController.cardMapData = async (req, res) => {
     const totalDropOff = await dropOffs(criteria);
     const totalMissed = await missed(criteria);
     const totalCompleted = await completed(criteria);
-    const totalPending = await pending(criteria);
+    const initPending = await pending(criteria);
+    const allPending = await scheduleModel.countDocuments({
+      ...criteria,
+      completionStatus: "pending",
+    });
     const totalCancelled = await cancelled(criteria);
     const totalWasterPickers = await wastePickers(criteria);
     const totalOrganisation = await organisation(criteria);
+    const allSchedulesCount = schedules.length + initPending - allPending;
 
     return res.status(200).json({
       error: false,
       message: "success",
       data: {
         schedules,
-        totalSchedules: schedules.length,
-        totalPending,
+        totalSchedules: allSchedulesCount,
+        totalPending: initPending,
         totalMissed,
         totalCompleted,
         totalCancelled,
@@ -687,10 +692,11 @@ const completed = async (criteria) => {
 };
 
 const organisation = async (criteria) => {
-  criteria.createAt = criteria.createdAt;
-  delete criteria.createdAt;
+  const condition = { ...criteria };
+  condition.createAt = condition.createdAt;
+  delete condition.createdAt;
 
-  const totalOrganisation = await organisationModel.countDocuments(criteria);
+  const totalOrganisation = await organisationModel.countDocuments(condition);
 
   return totalOrganisation;
 };

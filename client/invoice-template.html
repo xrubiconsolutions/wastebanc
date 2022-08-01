@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+
+      body {
+        font-family: "Raleway", sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 3%;
+      }
+
+      header {
+        margin-bottom: 4rem;
+      }
+
+      .logo {
+        margin: 0.5rem 0;
+      }
+
+      .logo > a {
+        display: flex;
+        align-items: center;
+        column-gap: 0.4rem;
+        text-decoration: none;
+        color: black;
+      }
+
+      .logo > a > p {
+        font-size: 19px;
+        color: #005900;
+        font-weight: bold;
+      }
+
+      .description {
+        font-weight: 500;
+      }
+
+      .invoice-info td {
+        margin-top: 1.5rem;
+        padding-bottom: 2rem;
+      }
+
+      .invoice-info td:last-of-type {
+        padding-left: 5%;
+      }
+
+      .title {
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 0.3rem;
+      }
+
+      .info-text > p {
+        font-weight: lighter;
+      }
+
+      .summary {
+        margin-bottom: 2em;
+      }
+
+      .summary > p:first-of-type {
+        font-weight: 700;
+        font-size: 18px;
+        color: gray;
+      }
+
+      .summary-data {
+        border-top: 1px solid grey;
+        border-bottom: 1px solid grey;
+        padding: 0.5rem 0;
+        margin: 0.4rem 0;
+      }
+      .total-due {
+        padding-top: 1.5rem;
+        font-weight: bold;
+      }
+
+      .summary-data,
+      .total-due {
+        /* display: flex;
+        justify-content: space-between; */
+      }
+
+      .summary-data:last-of-type,
+      .total-due:last-of-type {
+        text-align: right;
+        padding-right: 0;
+      }
+
+      .font-light {
+        font-weight: 300;
+      }
+
+      table {
+        text-align: left;
+        border-collapse: collapse;
+        /* table-layout: fixed; */
+      }
+
+      table td,
+      th {
+        padding: 0.5rem 0;
+        padding-right: 0.5rem;
+      }
+
+      th {
+        border-top: 1px solid gray;
+        border-bottom: 1px solid gray;
+        font-size: 18px;
+      }
+
+      td {
+        font-weight: 300;
+      }
+    </style>
+    <title>Invoice</title>
+  </head>
+  <body>
+    <table width="100%">
+      <tr>
+        <td width="35">
+          <a href="#" target="_blank">
+            <img
+              src="https://res.cloudinary.com/xrubicon/image/upload/v1647091610/pakam-logo_pddzwg.png"
+              alt="Pakam"
+            />
+          </a>
+        </td>
+        <td class="logo">
+          <a href="#" target="_blank">
+            <p>Pakam</p>
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <p class="description">
+            Final invoice for the June 2022 billing period
+          </p>
+        </td>
+      </tr>
+    </table>
+    <table width="100%">
+      <tr class="invoice-info">
+        <td>
+          <p class="title">From</p>
+          <div class="info-text">
+            <p>Xrubicon solutions</p>
+            <p>127 Ogunlana Drive, Surulere,</p>
+            <p>Nigeria</p>
+          </div>
+        </td>
+        <td>
+          <p class="title">Billed to</p>
+          <div class="info-text">
+            <p>Test Recycle</p>
+            <p>127 Ogunlana Drive, Surulere,</p>
+            <p>Nigeria</p>
+          </div>
+        </td>
+        <td>
+          <p class="title">Details</p>
+          <div class="info-text">
+            <p>43622723</p>
+            <p>June 1, 2022</p>
+            <p>July 3, 2022</p>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="summary">
+          <p>Summary</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="summary-data" colspan="2">
+          <p>Total usage charges</p>
+        </td>
+        <td class="summary-data">
+          <p>&#8358;45,000</p>
+        </td>
+      </tr>
+      <tr>
+        <td class="total-due" colspan="2">
+          <p>Total due</p>
+        </td>
+        <td class="total-due">
+          <p>&#8358;45,000</p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3">
+          <p class="font-light">
+            If you have a credit card on file, it will be automatically charged
+            within 24 hours
+          </p>
+        </td>
+      </tr>
+    </table>
+    <table class="transactions" width="100%">
+      <thead>
+        <tr>
+          <th>Ref No</th>
+          <th>Description</th>
+          <th>Waste Category</th>
+          <th>Weight (Kg)</th>
+          <th>Amount (&#8358;)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <script>
+          const data = [
+            {
+              invoiceNo: 2637338,
+              transactiion: "Payment of Recycles to Adeyemi",
+              category: "Can, plastic, nylons",
+              weight: 8,
+              amount: 20000,
+            },
+            {
+              invoiceNo: 2637338,
+              transactiion: "Payment of Tripoint to Paul",
+              category: "Can, plastic, nylons",
+              weight: 8,
+              amount: 20000,
+            },
+            {
+              invoiceNo: 2637338,
+              transactiion: "Payment of Recycles to Jaiye",
+              category: "Can, plastic, nylons",
+              weight: 8,
+              amount: 20000,
+            },
+            {
+              invoiceNo: 2637338,
+              transactiion: "Payment of Recycles to Adeyemi",
+              category: "Can, plastic, nylons",
+              weight: 8,
+              amount: 20000,
+            },
+            {
+              invoiceNo: 2637338,
+              transactiion: "Payment of Recycles to Dotun",
+              category: "Can, plastic, nylons",
+              weight: 8,
+              amount: 20000,
+            },
+          ];
+
+          let bodyData = data
+            .map(
+              (current) =>
+                `<tr>${Object.values(current)
+                  .map((val) => `<td>${val}</td>`)
+                  .join("")}</tr>`
+            )
+            .join("");
+          console.log({ bodyData });
+          const tbody = document.querySelector(".transactions tbody");
+          tbody.innerHTML = bodyData;
+        </script>
+      </tbody>
+    </table>
+    <!-- <header>
+      <div class="logo">
+          <a href="#" target="_blank" >
+            <img
+              src="https://res.cloudinary.com/xrubicon/image/upload/v1647091610/pakam-logo_pddzwg.png"
+              alt="Pakam"
+            />
+            <p>Pakam</p>
+          </a>
+        </div>
+      
+      </div>
+      <div class="invoice-info">
+        <section>
+          <p class="title">From</p>
+          <div class="info-text">
+            <p>Xrubicon solutions</p>
+            <p>127 Ogunlana Drive, Surulere,</p>
+            <p>Nigeria</p>
+          </div>
+        </section>
+        <section>
+          <p class="title">Billed to</p>
+          <div class="info-text">
+            <p>Test Recycle</p>
+            <p>127 Ogunlana Drive, Surulere,</p>
+            <p>Nigeria</p>
+          </div>
+        </section>
+        <section>
+          <p class="title">Details</p>
+          <div class="info-text">
+            <p>43622723</p>
+            <p>June 1, 2022</p>
+            <p>July 3, 2022</p>
+          </div>
+        </section>
+      </div>
+    </header>
+    <div class="summary">
+      <p>Summary</p>
+      <div class="summary-data">
+        <p>Total usage charges</p>
+        <p>&#8358;45,000</p>
+      </div>
+      <div class="total-due">
+        <p>Total due</p>
+        <p>&#8358;45,000</p>
+      </div>
+      <p class="font-light">If you have a credit card on file, it will be automatically charged within 24 hours</p>
+    </div>
+    <div class="transactions">
+      <table width="100%">
+        <thead>
+          <tr>
+            <th>Ref No</th>
+            <th>Description</th>
+            <th>Waste Category</th>
+            <th>Weight (Kg)</th>
+            <th>Amount (&#8358;)</th>
+          </tr>
+        </thead>
+        <tbody>
+            <script>
+                const data = [
+                    { invoiceNo: 2637338, transactiion: "Payment of Recycles to Adeyemi", category: "Can, plastic, nylons", weight: 8, amount: 20000 },
+                    { invoiceNo: 2637338, transactiion: "Payment of Tripoint to Paul", category: "Can, plastic, nylons", weight: 8, amount: 20000 },
+                    { invoiceNo: 2637338, transactiion: "Payment of Recycles to Jaiye", category: "Can, plastic, nylons", weight: 8, amount: 20000 },
+                    { invoiceNo: 2637338, transactiion: "Payment of Recycles to Adeyemi", category: "Can, plastic, nylons", weight: 8, amount: 20000 },
+                    { invoiceNo: 2637338, transactiion: "Payment of Recycles to Dotun", category: "Can, plastic, nylons", weight: 8, amount: 20000 },
+                ]
+
+                let bodyData = data.map((current) => `<tr>${Object.values(current).map(val => `<td>${val}</td>`).join("")}</tr>`).join("")
+                console.log({bodyData})
+                const tbody = document.querySelector("tbody")
+                tbody.innerHTML = bodyData
+            </script>
+         
+        </tbody>
+      </table>
+    </div> -->
+  </body>
+</html>
+
+<!-- <tr>
+            <td>2637338</td>
+            <td>Payment of Recycles to Adeyemi</td>
+            <td>Can, plastic, nylons</td>
+            <td>8</td>
+            <td>20000</td>
+          </tr>
+          <tr>
+            <td>2637338</td>
+            <td>Payment of Recycles to Adeyemi</td>
+            <td>Can, plastic, nylons</td>
+            <td>8</td>
+            <td>20000</td>
+          </tr>
+          <tr>
+            <td>2637338</td>
+            <td>Payment of Recycles to Adeyemi</td>
+            <td>Can, plastic, nylons</td>
+            <td>8</td>
+            <td>20000</td>
+          </tr>
+          <tr>
+            <td>2637338</td>
+            <td>Payment of Recycles to Adeyemi</td>
+            <td>Can, plastic, nylons</td>
+            <td>8</td>
+            <td>20000</td>
+          </tr> -->

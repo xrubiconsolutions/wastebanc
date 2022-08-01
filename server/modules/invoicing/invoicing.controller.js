@@ -40,6 +40,7 @@ class invoiceController {
         data: sendInvoice,
       });
     } catch (error) {
+      console.log(error);
       logger(error);
       return res.status(500).json({
         error: true,
@@ -74,7 +75,7 @@ class invoiceController {
       if (result.error)
         return res.status(400).json({
           error: true,
-          message: result.msg
+          message: result.msg,
         });
 
       return res.status(200).json({

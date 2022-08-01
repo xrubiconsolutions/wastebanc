@@ -8,6 +8,8 @@ const { generateRandomString } = require("../../util/commonFunction");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
 const { ObjectId } = require("mongodb");
+const invoiceTemplate = require("../../../email-templates/invoice.template");
+const sgMail = require("@sendgrid/mail");
 class invoiceService {
   static async generateInvoice(start, end, companyId, authuser) {
     const organisation = await organisationModel.findById(companyId);
@@ -94,11 +96,26 @@ class invoiceService {
       .findOne({
         invoiceNumber,
       })
-      .populate("Organisation", "companyName", "email")
-      .populate("transaction");
+      .populate("company", "companyName email phone location")
+      .populate("transactions");
 
     if (!invoiceData) return false;
 
+    // prepare invoice template and send invoice
+    const template = invoiceTemplate(invoiceData);
+    sgMail.setApiKey(
+      "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"
+    );
+
+    const msg = {
+      // to: `${invoiceData.company.email}`,
+      to: "ahmodadeora@gmail.com",
+      from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+      subject: "INVOICE",
+      html: template,
+    };
+
+    await sgMail.send(msg);
     return invoiceData;
   }
 
