@@ -40,8 +40,7 @@ class ScheduleService {
       if (completionStatus === "accepted") {
         collectorStatus = "accept";
         completionStatus = "pending";
-      }
-      if (completionStatus === "pending") {
+      } else if (completionStatus === "pending") {
         collectorStatus = "decline";
         completionStatus = "pending";
       }
@@ -97,7 +96,6 @@ class ScheduleService {
       const totalResult = await scheduleModel.countDocuments(criteria);
 
       const skip = (page - 1) * resultsPerPage;
-
       // get all schedules within range
       const schedules = await scheduleModel
         .find(criteria)
