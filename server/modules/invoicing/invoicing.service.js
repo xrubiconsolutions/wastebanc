@@ -108,8 +108,7 @@ class invoiceService {
     );
 
     const msg = {
-      // to: `${invoiceData.company.email}`,
-      to: "ahmodadeora@gmail.com",
+      to: `${invoiceData.company.email}`,
       from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
       subject: "INVOICE",
       html: template,
