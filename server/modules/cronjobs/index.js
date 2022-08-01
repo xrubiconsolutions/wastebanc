@@ -187,7 +187,7 @@ const cronJobs = () => {
     }
   };
   //
-  cron.schedule("0 0-20/1 * * *", fetchAccountStatus);
+  // cron.schedule("0 0-20/1 * * *", fetchAccountStatus);
 };
 
 module.exports = cronJobs;

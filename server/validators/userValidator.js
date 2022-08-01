@@ -13,7 +13,7 @@ module.exports = {
       .withMessage("name is required")
       .isString()
       .withMessage("name should be string"),
-    body("email").notEmpty().withMessage("email is required"),
+    body("email").trim().notEmpty().withMessage("email is required"),
     body("countries")
       .notEmpty()
       .withMessage("countries is required")
@@ -98,7 +98,11 @@ module.exports = {
       .withMessage("phone is required")
       .isNumeric()
       .withMessage("phone should be numeric string"),
-    body("email").optional().isEmail().withMessage("Enter a valid email"),
+    body("email")
+      .trim()
+      .optional()
+      .isEmail()
+      .withMessage("Enter a valid email"),
     body("gender")
       .notEmpty()
       .withMessage("gender is required")

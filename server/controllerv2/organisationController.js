@@ -114,11 +114,18 @@ organisationController.getOrganisationCompleted = async (req, res) => {
 
     if (state) criteria.state = state;
 
-    //console.log("c", criteria);
+    console.log("c", criteria);
     const skip = (page - 1) * resultsPerPage;
     const limit = skip + resultsPerPage;
 
-    const totalResult = await transactionModel.countDocuments(criteria);
+    const totalResult = await transactionModel.aggregate([
+      {
+        $match: criteria,
+      },
+      {
+        $group: { _id: "$organisation", total: { $sum: "$weight" } },
+      },
+    ]);
     const d = await transactionModel.aggregate([
       {
         $match: criteria,
@@ -146,10 +153,10 @@ organisationController.getOrganisationCompleted = async (req, res) => {
       message: "success",
       data: {
         result: d,
-        totalResult,
+        totalResult: totalResult.length,
         page,
         resultsPerPage,
-        totalPages: Math.ceil(totalResult / resultsPerPage),
+        totalPages: Math.ceil(totalResult.length / resultsPerPage),
       },
     });
   } catch (error) {
