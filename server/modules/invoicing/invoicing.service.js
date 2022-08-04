@@ -322,6 +322,169 @@ class invoiceService {
       data: invoice,
     };
   }
+
+  static async getCompanyInvoiceHistory({
+    companyId,
+    page,
+    resultsPerPage,
+    key,
+    start,
+    end,
+  }) {
+    console.log({
+      companyId,
+      page,
+      resultsPerPage,
+      key,
+      start,
+      end,
+    });
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    let criteria, state;
+    if (key) {
+      criteria = {
+        $or: [
+          { invoiceNumber: { $regex: `.*${key}.*`, $options: "i" } },
+          { amount: { $regex: `.*${key}.*`, $options: "i" } },
+          { serviceCharge: { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+        company: ObjectId(companyId),
+        paidStatus: "paid",
+      };
+    } else if (start || end) {
+      if (!start || !end) {
+        return {
+          error: true,
+          message: "Please pass a start and end date",
+        };
+      }
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+        company: ObjectId(companyId),
+        paidStatus: "paid",
+      };
+    } else {
+      criteria = {};
+    }
+
+    const totalResult = await invoiceModel.countDocuments(criteria);
+    const invoices = await invoiceModel
+      .find(criteria)
+      .select(["_id", "invoiceNumber", "amount", "serviceCharge", "createdAt"])
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+
+    return {
+      error: false,
+      message: "success",
+      data: {
+        invoices,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      },
+    };
+    // const response = await invoiceService.paginateResponse({
+    //   model: invoiceModel,
+    //   query: {
+    //     company: ObjectId(companyId),
+    //     paidStatus: "paid",
+    //   },
+    //   searchQuery: {
+    //     $or: [
+    //       { invoiceNumber: { $regex: `.*${key}.*`, $options: "i" } },
+    //       { amount: { $regex: `.*${key}.*`, $options: "i" } },
+    //       { serviceCharge: { $regex: `.*${key}.*`, $options: "i" } },
+    //     ],
+    //   },
+    //   page,
+    //   resultsPerPage,
+    //   key,
+    //   start,
+    //   end,
+    //   filterData: (data) => {
+    //     console.log({ data });
+    //     return data?.select([
+    //       "_id",
+    //       "invoiceNumber",
+    //       "amount",
+    //       "serviceCharge",
+    //       "createdAt",
+    //     ]);
+    //   },
+    // });
+
+    // return response;
+  }
+
+  static async paginateResponse({
+    model,
+    query,
+    searchQuery,
+    page,
+    resultsPerPage,
+    key,
+    start,
+    end,
+    filterData = (data) => data,
+  }) {
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    let criteria;
+    if (key) {
+      criteria = {
+        ...searchQuery,
+        ...query,
+      };
+    } else if (start || end) {
+      if (!start || !end) {
+        return {
+          error: true,
+          message: "Please pass a start and end date",
+        };
+      }
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+        ...query,
+      };
+    } else {
+      criteria = {};
+    }
+    const totalResult = await model.countDocuments(criteria);
+    const data = await model
+      .find(criteria)
+      // data = data
+      .select(["_id", "invoiceNumber", "amount", "serviceCharge", "createdAt"])
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+    return {
+      error: false,
+      message: "success",
+      data: {
+        data,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      },
+    };
+  }
 }
 
 module.exports = invoiceService;

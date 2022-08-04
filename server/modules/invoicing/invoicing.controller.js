@@ -158,6 +158,28 @@ class invoiceController {
       });
     }
   }
+
+  static async fetchCompanyInvoiceRecord(req, res) {
+    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
+    try {
+      const response = await invoiceService.getCompanyInvoiceHistory({
+        companyId: req.user._id,
+        page,
+        resultsPerPage,
+        key,
+        start,
+        end,
+      });
+      return res.status(200).json(response);
+    } catch (error) {
+      logger(error);
+      console.log({ error });
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = invoiceController;
