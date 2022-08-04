@@ -54,4 +54,9 @@ module.exports = (APP) => {
     checkRequestErrs,
     invoiceController.fetchInvoice
   );
+
+  APP.route("/api/invoice/company/history").get(
+    companyPakamDataValidation,
+    invoiceController.fetchCompanyInvoiceRecord
+  );
 };
