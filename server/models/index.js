@@ -44,4 +44,6 @@ module.exports = {
   centralAccountModel: require("./centralaccountModel"),
   systemChargesModel: require("./systemCharges"),
   invoiceModel: require("./invoiceModel"),
+  invoiceModel: require("./organisationLogModel"),
+  organisationLogModel: require("./organisationLogModel"),
 };

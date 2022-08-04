@@ -3,6 +3,7 @@
 let organisationController = {};
 const {
   organisationModel,
+  organisationLogModel,
   organisationTypeModel,
   transactionModel,
   geofenceModel,
@@ -28,6 +29,8 @@ const db = require("../../bin/dbConnection.js");
 const collectorModel = require("../models/collectorModel");
 const rewardService = require("../services/rewardService");
 const sterlingService = require("../modules/partners/sterling/sterlingService");
+const ObjectId = require("mongoose").Types.ObjectId;
+
 organisationController.types = async (req, res) => {
   try {
     const types = await organisationTypeModel
@@ -414,6 +417,10 @@ Pakam Team
     }
 
     delete org.password;
+
+    // add action to log
+    organisationController.addLog("create", req.body, org._id, req.user._id);
+
     return res.status(200).json({
       error: false,
       message: "success",
@@ -460,6 +467,12 @@ organisationController.update = async (req, res) => {
   bodyValidate(req, res);
   try {
     const orgId = req.params.orgId;
+    if (!ObjectId.isValid(orgId))
+      return res.status(422).json({
+        error: true,
+        message: "Organisation id is invalid",
+      });
+
     const organisation = await organisationModel.findOne({
       _id: orgId,
     });
@@ -540,6 +553,14 @@ organisationController.update = async (req, res) => {
       req.body.streetOfAccess || organisation.streetOfAccess;
     organisation.categories = req.body.categories || organisation.categories;
     organisation.location = req.body.location || organisation.location;
+
+    // add action to log
+    organisationController.addLog(
+      "update",
+      req.body,
+      organisation._id,
+      req.user._id
+    );
 
     return res.status(200).json({
       error: false,
@@ -721,6 +742,14 @@ organisationController.remove = async (req, res) => {
         _id: organisation._id,
       });
     }
+
+    // add action to log
+    organisationController.addLog(
+      "delete",
+      null,
+      organisation._id,
+      req.user._id
+    );
     return res.status(200).json({
       error: false,
       message: "Organisation deleted successfully",
@@ -806,6 +835,14 @@ organisationController.updateProfile = async (req, res) => {
       req.body.streetOfAccess || organisation.streetOfAccess;
     organisation.categories = req.body.categories || organisation.categories;
     organisation.location = req.body.location || organisation.location;
+
+    // add action to log
+    organisationController.addLog(
+      "profile_update",
+      req.body,
+      organisation._id,
+      req.user._id
+    );
 
     return res.status(200).json({
       error: false,
@@ -908,6 +945,9 @@ organisationController.disableCompany = async (req, res) => {
       { status: "disabled" }
     );
 
+    // add action to log
+    organisationController.addLog("disable", null, companyId, req.user._id);
+
     // return success response
     return res.status(200).json({
       error: false,
@@ -953,6 +993,9 @@ organisationController.enableCompany = async (req, res) => {
       { status: "active" }
     );
 
+    // add action to log
+    organisationController.addLog("enable", null, companyId, req.user._id);
+
     // return success response
     return res.status(200).json({
       error: false,
@@ -985,6 +1028,14 @@ organisationController.changePassword = async (req, res) => {
     account.password = passwordHash;
     account.firstLogin = false;
     await account.save();
+
+    // add action to log
+    organisationController.addLog(
+      "change_password",
+      { currentPassword, newPassword },
+      companyId,
+      req.user._id
+    );
 
     // return success message
     return res.status(200).json({
@@ -1342,6 +1393,26 @@ organisationController.accountDetails = async (req, res) => {
       error: true,
       message: "An error occured!",
     });
+  }
+};
+
+organisationController.addLog = async (
+  action = "",
+  data = "",
+  organisationId,
+  actionBy = ""
+) => {
+  try {
+    const log = await organisationLogModel.create({
+      action,
+      data,
+      organisation: organisationId,
+      actionBy,
+    });
+    return true;
+  } catch (err) {
+    console.log({ err });
+    return false;
   }
 };
 
