@@ -154,5 +154,9 @@ const organisation_Schema = new Schema({
     type: Number,
     default: 0,
   },
+  systemCharge: {
+    type: Number,
+    default: 10,
+  },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);
