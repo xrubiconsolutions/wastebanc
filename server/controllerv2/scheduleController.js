@@ -366,19 +366,19 @@ class ScheduleService {
         return res.status(400).json(householdReward);
       }
 
-      let pickerGain = 0;
-      let percentageGain = 0;
-      if (user.collectorType == "waste-picker") {
-        const pickerReward = await rewardService.picker(
-          categories,
-          organisation
-        );
-        if (pickerReward.error) {
-          return res.status(400).json(pickerReward);
-        }
+      // let pickerGain = 0;
+      // let percentageGain = 0;
+      // if (user.collectorType == "waste-picker") {
+      //   const pickerReward = await rewardService.picker(
+      //     categories,
+      //     organisation
+      //   );
+      //   if (pickerReward.error) {
+      //     return res.status(400).json(pickerReward);
+      //   }
 
-        pickerGain = pickerReward.totalpointGained;
-      }
+      //   pickerGain = pickerReward.totalpointGained;
+      // }
 
       const ref = randomstring.generate({
         length: 7,
@@ -456,7 +456,6 @@ class ScheduleService {
               collector.totalCollected + householdReward.totalWeight,
             numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
             busy: false,
-            pointGained: pickerGain,
             last_logged_in: new Date(),
           },
         }

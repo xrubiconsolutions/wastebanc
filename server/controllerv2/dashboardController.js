@@ -78,8 +78,6 @@ dashboardController.cardMapData = async (req, res) => {
       criteria.state = currentScope;
     }
 
-    console.log("criteria", criteria);
-
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
     const totalPayment = await totalpayout(criteria);
@@ -221,12 +219,15 @@ dashboardController.recentPickups = async (req, res) => {
         $or: [
           { Category: { $regex: `.*${key}.*`, $options: "i" } },
           { organisation: { $regex: `.*${key}.*`, $options: "i" } },
-          { schuduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+          { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
           { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
           { client: { $regex: `.*${key}.*`, $options: "i" } },
           { phone: { $regex: `.*${key}.*`, $options: "i" } },
           { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
+          { address: { $regex: `.*${key}.*`, $options: "i" } },
         ],
+        completionStatus: "completed",
+        collectorStatus: "accept",
       };
     } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -235,6 +236,8 @@ dashboardController.recentPickups = async (req, res) => {
           $gte: startDate,
           $lt: endDate,
         },
+        completionStatus: "completed",
+        collectorStatus: "accept",
       };
     } else {
       criteria = {};
@@ -721,6 +724,7 @@ const missed = async (criteria) => {
 };
 
 const pending = async (criteria) => {
+  console.log("criteria", criteria);
   const totalPending = await scheduleModel.countDocuments({
     ...criteria,
     completionStatus: "pending",
