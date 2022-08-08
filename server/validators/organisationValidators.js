@@ -118,7 +118,9 @@ module.exports = {
       .notEmpty()
       .withMessage("organisation id is required")
       .isString()
-      .withMessage("organisation id string"),
+      .withMessage("organisation must be a string")
+      .isMongoId()
+      .withMessage("Id invalid"),
   ],
 
   orgId: [

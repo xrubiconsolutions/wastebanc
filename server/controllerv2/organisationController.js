@@ -569,12 +569,18 @@ organisationController.aggregators = async (req, res) => {
       });
     }
 
-    let { page = 1, resultsPerPage = 20, state, key } = req.query;
+    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
     const { organisation } = req.params;
+    if (!organisation)
+      res.status(422).json({
+        error: true,
+        message: "Organisation id is required",
+      });
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
+    console.log({ organisation });
     const org = await organisationModel.findById(organisation);
     if (!org) {
       res.status(400).json({
@@ -651,6 +657,7 @@ organisationController.aggregators = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log({ error });
     return res.status(500).json({
       error: true,
       message: "An error occurred",
