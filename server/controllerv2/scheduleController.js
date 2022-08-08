@@ -366,6 +366,8 @@ class ScheduleService {
         return res.status(400).json(householdReward);
       }
 
+      const pakamPercentage = await rewardService.calPercentage(householdReward.totalpointGained, 10);
+
       // let pickerGain = 0;
       // let percentageGain = 0;
       // if (user.collectorType == "waste-picker") {
@@ -401,6 +403,7 @@ class ScheduleService {
         type: "pickup",
         state: scheduler.state || "",
         ref_id: ref,
+        percentage: pakamPercentage,
       });
 
       //  send push notification to household user
@@ -483,7 +486,6 @@ class ScheduleService {
         da: householdReward.totalWeight,
       });
     } catch (error) {
-      logger(error);
       return res.status(500).json({
         error: true,
         message: "An error occurred",

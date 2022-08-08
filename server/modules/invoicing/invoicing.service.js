@@ -37,7 +37,7 @@ class invoiceService {
     }
 
     let householdTotal = 0,
-      wastePickersTotal = 0,
+      // wastePickersTotal = 0,
       totalValue = 0,
       sumPercentage = 0,
       transId = [];
@@ -49,12 +49,14 @@ class invoiceService {
         return a.coin + b.coin;
       });
 
-      wastePickersTotal = totalResult.reduce((a, b) => {
-        return a.wastePickerCoin + b.wastePickerCoin;
-      });
+      // wastePickersTotal = totalResult.reduce((a, b) => {
+      //   return a.wastePickerCoin + b.wastePickerCoin;
+      // });
 
+      const charges = organisation.systemCharge || 10;
       totalValue = householdTotal + wastePickersTotal;
-      sumPercentage = rewardService.calPercentage(totalValue, 10);
+
+      sumPercentage = rewardService.calPercentage(totalValue, charges);
       totalValue = totalValue + sumPercentage;
 
       transId = totalResult.map((value) => value._id);
@@ -85,7 +87,7 @@ class invoiceService {
       invoiceNumber,
       result: totalResult,
       householdTotal,
-      wastePickersTotal,
+      // wastePickersTotal,
       totalValue,
       sumPercentage,
     };

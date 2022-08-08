@@ -5,7 +5,6 @@ const OrganisationLogSchema = new Schema(
   {
     action: {
       type: String,
-      required: true,
     },
     data: Schema.Types.Mixed,
     organisation: Schema.Types.ObjectId,

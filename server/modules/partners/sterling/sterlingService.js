@@ -185,7 +185,7 @@ const NIPFundTransfer = async (
 
   try {
     const result = await axios.post(
-      `${partner.baseUrl}api/Transaction/NIPFunTransfer`,
+      `${partner.baseUrl}api/Transaction/NIPFundTransfer`,
       { value: encryptBody },
       {
         headers: {

@@ -17,7 +17,7 @@ class invoiceController {
         data: invoiceData,
       });
     } catch (error) {
-      logger(error);
+      console.log(error);
       return res.status(500).json({
         error: true,
         message: "An error occurred",
@@ -41,7 +41,7 @@ class invoiceController {
       });
     } catch (error) {
       console.log(error);
-      logger(error);
+
       return res.status(500).json({
         error: true,
         message: "An error occurred",
@@ -59,7 +59,6 @@ class invoiceController {
         data: result,
       });
     } catch (error) {
-      logger(error);
       return res.status(500).json({
         error: true,
         message: "An error occurred",
@@ -85,7 +84,7 @@ class invoiceController {
       });
     } catch (error) {
       console.log(error);
-      logger(error);
+
       return res.status(500).json({
         error: true,
         message: "An error occurred",
@@ -111,7 +110,7 @@ class invoiceController {
       return res.status(200).json(result);
     } catch (error) {
       console.log("err", error);
-      logger(error);
+
       return res.status(500).json({
         error: true,
         message: "An error occurred",
@@ -151,7 +150,6 @@ class invoiceController {
       if (result.error) return res.status(400).json(result);
       return res.status(200).json(result);
     } catch (error) {
-      logger(error);
       return res.status(500).json({
         error: true,
         message: "An error occurred",
@@ -172,8 +170,7 @@ class invoiceController {
       });
       return res.status(200).json(response);
     } catch (error) {
-      logger(error);
-      console.log({ error });
+      console.log(error);
       return res.status(500).json({
         error: true,
         message: "An error occurred",
