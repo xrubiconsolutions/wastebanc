@@ -78,10 +78,7 @@ class invoiceService {
       serviceCharge: sumPercentage,
       expectedPaymentDate,
       state,
-      //state: authuser.locationScope,
     });
-
-    //console.log("invoice", storeInvoice);
 
     return {
       invoiceNumber,
@@ -96,11 +93,10 @@ class invoiceService {
   static async sendInvoice(invoiceNumber) {
     const invoiceData = await invoiceModel
       .findOne({
-        invoiceNumber: "816364832",
+        invoiceNumber,
       })
       .populate("company", "companyName email phone location")
       .populate("transactions");
-    console.log({ invoiceData });
     if (!invoiceData) return false;
 
     // prepare invoice template and send invoice
@@ -336,6 +332,9 @@ class invoiceService {
     key,
     start,
     end,
+    query = {
+      event: "sent",
+    },
   }) {
     console.log({
       companyId,
@@ -358,7 +357,7 @@ class invoiceService {
           { serviceCharge: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         company: ObjectId(companyId),
-        paidStatus: "paid",
+        ...query,
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -374,16 +373,28 @@ class invoiceService {
           $lt: endDate,
         },
         company: ObjectId(companyId),
-        paidStatus: "paid",
+        ...query,
       };
     } else {
-      criteria = {};
+      criteria = {
+        ...query,
+      };
     }
 
     const totalResult = await invoiceModel.countDocuments(criteria);
     const invoices = await invoiceModel
       .find(criteria)
-      .select(["_id", "invoiceNumber", "amount", "serviceCharge", "createdAt"])
+      .select([
+        "_id",
+        "invoiceNumber",
+        "amount",
+        "serviceCharge",
+        "createdAt",
+        "paidStatus",
+        "startDate",
+        "endDate",
+        "event",
+      ])
       .sort({ createdAt: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);
@@ -441,7 +452,8 @@ class invoiceService {
     key,
     start,
     end,
-    filterData = (data) => data,
+    select,
+    populate,
   }) {
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
@@ -474,8 +486,8 @@ class invoiceService {
     const totalResult = await model.countDocuments(criteria);
     const data = await model
       .find(criteria)
-      // data = data
-      .select(["_id", "invoiceNumber", "amount", "serviceCharge", "createdAt"])
+      .populate(populate)
+      .select(select)
       .sort({ createdAt: -1 })
       .skip((page - 1) * resultsPerPage)
       .limit(resultsPerPage);

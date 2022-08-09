@@ -7,6 +7,7 @@ const {
   generateInvoice,
   invoiceNumber,
   invoiceId,
+  companyId,
 } = require("./invoicingValidation");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 
@@ -58,5 +59,12 @@ module.exports = (APP) => {
   APP.route("/api/invoice/company/history").get(
     companyPakamDataValidation,
     invoiceController.fetchCompanyInvoiceRecord
+  );
+
+  APP.route("/api/invoice/:companyId/history").get(
+    adminPakamValidation,
+    companyId,
+    checkRequestErrs,
+    invoiceController.fetchInvoiceRecord
   );
 };
