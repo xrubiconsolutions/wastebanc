@@ -43,7 +43,7 @@ class WalletController {
         amount: user.availablePoints,
         beneName: user.fullname,
         currency: "NGN",
-        bankName: req.bankName,
+        bankName: req.body.bankName,
         charge: 100,
         type: req.type,
         nesidNumber: req.body.nesidNumber || "",
