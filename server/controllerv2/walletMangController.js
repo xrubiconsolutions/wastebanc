@@ -38,17 +38,17 @@ class WalletController {
       const { user } = req;
       const body = {
         userId: user._id,
-        destinationAccount: req.destinationAccount,
-        destinationBankCode: req.destinationBankCode,
+        destinationAccount: req.body.destinationAccount,
+        destinationBankCode: req.body.destinationBankCode,
         amount: user.availablePoints,
         beneName: user.fullname,
         currency: "NGN",
         bankName: req.bankName,
         charge: 100,
         type: req.type,
-        nesidNumber: req.nesidNumber || "",
-        nerspNumber: req.nerspNumber || "",
-        kycLevel: req.kycLevel || "",
+        nesidNumber: req.body.nesidNumber || "",
+        nerspNumber: req.body.nerspNumber || "",
+        kycLevel: req.body.kycLevel || "",
       };
 
       const result = await axios.post(
