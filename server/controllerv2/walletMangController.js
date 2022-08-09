@@ -13,6 +13,7 @@ const {
 } = require("../util/commonFunction");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
+const axios = require("axios");
 
 const {
   BankList,
@@ -22,7 +23,7 @@ const {
   IntraBank,
   NIPFundTransfer,
 } = require("../modules/partners/sterling/sterlingService");
-const axios = require("axios");
+
 const crypto = require("crypto");
 
 class WalletController {
@@ -32,6 +33,75 @@ class WalletController {
   //   this.key = "Sklqg625*&dltr01r";
   // }
 
+  static async requestOTP(req, res) {
+    try {
+      const { user } = req;
+      const body = {
+        userId: user._id,
+        destinationAccount: req.destinationAccount,
+        destinationBankCode: req.destinationBankCode,
+        amount: req.amount,
+        beneName: user.fullname,
+        currency: "NGN",
+        bankName: req.bankName,
+        charge: req.charge,
+        type: req.type,
+        nesidNumber: req.nesidNumber || "",
+        nerspNumber: req.nerspNumber || "",
+        kycLevel: req.kycLevel || "",
+      };
+
+      const result = await axios.post(
+        "https://apiv2.pakam.ng/api/request/otp",
+        body,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+          },
+        }
+      );
+
+      console.log(result);
+      return res.status(200).json(result);
+    } catch (error) {
+      console.log(error);
+      return res.status(error.httpCode).json({
+        error: true,
+        message: error.message,
+      });
+    }
+  }
+
+  static async requestPayout(req, res) {
+    try {
+      const { user } = req;
+      const body = {
+        userId: user._id,
+        requestId: req.body.requestId,
+        otp: req.body.otp,
+      };
+      const result = await axios.post(
+        "https://apiv2.pakam.ng/api/disbursement/initiate",
+        body,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+          },
+        }
+      );
+
+      console.log(result);
+      return res.status(200).json(result);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: error.message,
+      });
+    }
+  }
   static async OTPRequest(req, res) {
     try {
       const { user } = req;

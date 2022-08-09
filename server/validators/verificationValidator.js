@@ -53,6 +53,49 @@ module.exports = {
       .trim()
       .notEmpty()
       .withMessage("type is required")
-      .isIn(["bank", "charity"]),
+      .isIn(["gain", "charity"]),
+
+    body("destinationAccount")
+      .trim()
+      .notEmpty()
+      .withMessage("destinationAccount is required"),
+
+    body("destinationBankCode")
+      .trim()
+      .notEmpty()
+      .withMessage("destinationBankCode is required"),
+
+    body("amount")
+      .trim()
+      .notEmpty()
+      .withMessage("amount is required")
+      .isInt()
+      .withMessage("amount should be a number"),
+
+    body("bankName")
+      .trim()
+      .notEmpty()
+      .withMessage("bankName is required")
+      .isString(),
+
+    body("charge").trim().notEmpty().withMessage("charge is required").isInt(),
+    body("nesidNumber").trim().optional(),
+    body("nerspNumber").trim().optional(),
+    body("kycLevel").trim().optional(),
+  ],
+  ConfirmOtp: [
+    body("requestId")
+      .trim()
+      .notEmpty()
+      .withMessage("requestId is required")
+      .isString()
+      .withMessage("requestId should be string"),
+
+    body("otp")
+      .trim()
+      .notEmpty()
+      .withMessage("otp is required")
+      .isString()
+      .withMessage("otp is should be string"),
   ],
 };

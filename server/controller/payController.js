@@ -60,6 +60,8 @@ payController.resolveAccount = (req, res) => {
     (err, result) => {
       console.log("err=>", err);
       if (err) return res.status(400).json(err);
+      if (result.body.statusCode && result.body.statusCode >= 400)
+        return res.status(result.body.statusCode).json(result.body);
       return res.status(200).json(result.body.data || result.body);
     }
   );
