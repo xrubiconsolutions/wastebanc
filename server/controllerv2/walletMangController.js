@@ -41,7 +41,7 @@ class WalletController {
         destinationAccount: req.body.destinationAccount,
         destinationBankCode: req.body.destinationBankCode,
         amount: user.availablePoints,
-        beneName: user.fullname,
+        beneName: req.body.beneName || user.fullname,
         currency: "NGN",
         bankName: req.body.bankName,
         charge: 100,
