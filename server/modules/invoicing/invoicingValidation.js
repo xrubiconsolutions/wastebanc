@@ -36,4 +36,13 @@ module.exports = {
       .isString()
       .withMessage("invoiceId should be string"),
   ],
+
+  companyId: [
+    param("companyId")
+      .notEmpty()
+      .withMessage("companyId is required")
+      .isString()
+      .withMessage("companyId should be string")
+      .isMongoId("companyId is invalid"),
+  ],
 };
