@@ -62,10 +62,10 @@ class WalletController {
         }
       );
 
-      console.log(result);
+      console.log("here", result);
       return res.status(200).json(result);
     } catch (error) {
-      console.log(error.data.message);
+      console.log(error);
       return res.status(400).json({
         error: true,
         message: "Error Request OTP",
