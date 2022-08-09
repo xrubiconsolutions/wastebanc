@@ -66,9 +66,9 @@ class WalletController {
       return res.status(200).json(result);
     } catch (error) {
       console.log(error);
-      return res.status(error.httpCode).json({
+      return res.status(400).json({
         error: true,
-        message: error.message,
+        message: "Error Request OTP",
       });
     }
   }
