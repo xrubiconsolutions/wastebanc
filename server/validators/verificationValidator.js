@@ -65,12 +65,12 @@ module.exports = {
       .notEmpty()
       .withMessage("destinationBankCode is required"),
 
-    body("amount")
-      .trim()
-      .notEmpty()
-      .withMessage("amount is required")
-      .isInt()
-      .withMessage("amount should be a number"),
+    // body("amount")
+    //   .trim()
+    //   .notEmpty()
+    //   .withMessage("amount is required")
+    //   .isInt()
+    //   .withMessage("amount should be a number"),
 
     body("bankName")
       .trim()
@@ -78,7 +78,7 @@ module.exports = {
       .withMessage("bankName is required")
       .isString(),
 
-    body("charge").trim().notEmpty().withMessage("charge is required").isInt(),
+    // body("charge").trim().notEmpty().withMessage("charge is required").isInt(),
     body("nesidNumber").trim().optional(),
     body("nerspNumber").trim().optional(),
     body("kycLevel").trim().optional(),
