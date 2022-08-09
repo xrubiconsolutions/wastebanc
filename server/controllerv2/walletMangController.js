@@ -62,7 +62,7 @@ class WalletController {
         }
       );
 
-      console.log("here", result);
+      console.log("here", result.data);
       return res.status(200).json(result);
     } catch (error) {
       console.log(error);
