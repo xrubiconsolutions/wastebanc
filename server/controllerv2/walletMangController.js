@@ -65,22 +65,23 @@ class WalletController {
       console.log("here", result.data);
       return res.status(200).json(result.data);
     } catch (error) {
-      console.log(error);
-      return res.status(400).json({
+      console.log("err", error);
+      return res.status(error.response.status).json({
         error: true,
-        message: "Error Request OTP",
+        message: error.response.data.message,
       });
     }
   }
 
   static async requestPayout(req, res) {
+    const { user } = req;
+    const body = {
+      userId: user._id,
+      requestId: req.body.requestId,
+      otp: req.body.otp,
+    };
+
     try {
-      const { user } = req;
-      const body = {
-        userId: user._id,
-        requestId: req.body.requestId,
-        otp: req.body.otp,
-      };
       const result = await axios.post(
         "https://apiv2.pakam.ng/api/disbursement/initiate",
         body,
@@ -92,13 +93,14 @@ class WalletController {
         }
       );
 
-      console.log(result);
-      return res.status(200).json(result);
+      console.log("res", result);
+
+      return res.status(result.status).json(result.data);
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({
+      console.log("err", error);
+      return res.status(error.response.status).json({
         error: true,
-        message: error.message,
+        message: error.response.data.message,
       });
     }
   }

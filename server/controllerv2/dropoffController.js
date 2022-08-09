@@ -12,6 +12,7 @@ let dropoffController = {};
 const moment = require("moment-timezone");
 const { sendNotification } = require("../util/commonFunction");
 const randomstring = require("randomstring");
+const rewardService = require("../services/rewardService");
 moment().tz("Africa/Lagos", false);
 
 dropoffController.dropOffs = async (req, res) => {
@@ -381,13 +382,17 @@ dropoffController.rewardDropSystem = async (req, res) => {
     }, 0);
     console.log("pricing", pricing);
 
+    const pakamPercentage = rewardService.calPercentage(
+      householdReward.totalpointGained,
+      10
+    );
     const ref = randomstring.generate({
       length: 7,
       charset: "numeric",
     });
     const t = await transactionModel.create({
       weight: totalWeight,
-      coin: totalpointGained,
+      coin: Number(totalpointGained) - Number(pakamPercentage),
       cardID: scheduler._id,
       completedBy: collectorId,
       categories,
@@ -400,12 +405,13 @@ dropoffController.rewardDropSystem = async (req, res) => {
       type: "dropoff",
       state: scheduler.state || "",
       ref_id: ref,
+      percentage: pakamPercentage,
     });
 
     const message = {
       app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
       contents: {
-        en: `You have just been credited ${totalpointGained} for your drop off`,
+        en: `You have just been credited ${t.coin} for your drop off`,
       },
       channel_for_external_user_ids: "push",
       include_external_user_ids: [scheduler.onesignal_id],
@@ -415,7 +421,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
     await notificationModel.create({
       title: "Dropoff Schedule completed",
       lcd: scheduler.lcd,
-      message: `You have just been credited ${totalpointGained} for your drop off`,
+      message: `You have just been credited ${t.coin} for your drop off`,
       schedulerId: scheduler._id,
     });
 
@@ -437,7 +443,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       { email: scheduler.email },
       {
         $set: {
-          availablePoints: scheduler.availablePoints + totalpointGained,
+          availablePoints: scheduler.availablePoints + t.coin,
           schedulePoints: scheduler.schedulePoints + 1,
         },
       }
