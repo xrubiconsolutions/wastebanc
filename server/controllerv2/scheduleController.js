@@ -406,7 +406,7 @@ class ScheduleService {
         return res.status(400).json(householdReward);
       }
 
-      const pakamPercentage = await rewardService.calPercentage(
+      const pakamPercentage = rewardService.calPercentage(
         householdReward.totalpointGained,
         10
       );
@@ -432,8 +432,9 @@ class ScheduleService {
 
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
-        coin: householdReward.totalpointGained,
-        wastePickerCoin: pickerGain,
+        coin:
+          Number(householdReward.totalpointGained) - Number(pakamPercentage),
+        wastePickerCoin: 0,
         cardID: scheduler._id,
         completedBy: collectorId,
         categories,

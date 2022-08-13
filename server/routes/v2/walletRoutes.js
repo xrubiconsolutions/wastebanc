@@ -11,12 +11,24 @@ const {
   nipTransfer,
   intraBankTransfer,
 } = require("../../validators/userValidator");
+const {
+  OtpRequest,
+  ConfirmOtp,
+} = require("../../validators/verificationValidator");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 module.exports = (APP) => {
-  APP.route("/api/user/request/otp").get(
+  APP.route("/api/user/request/otp").post(
     userValidation,
+    OtpRequest,
     checkRequestErrs,
-    walletController.OTPRequest
+    walletController.requestOTP
+  );
+
+  APP.route("/api/user/confirm/otp").post(
+    userValidation,
+    ConfirmOtp,
+    checkRequestErrs,
+    walletController.requestPayout
   );
   APP.route("/api/collector/request/otp").get(
     recyclerValidation,

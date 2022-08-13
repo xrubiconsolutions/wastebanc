@@ -13,6 +13,7 @@ const {
 } = require("../util/commonFunction");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
+const axios = require("axios");
 
 const {
   BankList,
@@ -22,7 +23,7 @@ const {
   IntraBank,
   NIPFundTransfer,
 } = require("../modules/partners/sterling/sterlingService");
-const axios = require("axios");
+
 const crypto = require("crypto");
 
 class WalletController {
@@ -32,6 +33,77 @@ class WalletController {
   //   this.key = "Sklqg625*&dltr01r";
   // }
 
+  static async requestOTP(req, res) {
+    try {
+      const { user } = req;
+      const body = {
+        userId: user._id,
+        destinationAccount: req.body.destinationAccount,
+        destinationBankCode: req.body.destinationBankCode,
+        amount: user.availablePoints,
+        beneName: req.body.beneName || user.fullname,
+        currency: "NGN",
+        bankName: req.body.bankName,
+        charge: 100,
+        type: req.type,
+        nesidNumber: req.body.nesidNumber || "",
+        nerspNumber: req.body.nerspNumber || "",
+        kycLevel: req.body.kycLevel || "",
+      };
+
+      const result = await axios.post(
+        "https://apiv2.pakam.ng/api/request/otp",
+        body,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+          },
+        }
+      );
+
+      console.log("here", result.data);
+      return res.status(200).json(result.data);
+    } catch (error) {
+      console.log("err", error);
+      return res.status(error.response.status).json({
+        error: true,
+        message: error.response.data.message,
+      });
+    }
+  }
+
+  static async requestPayout(req, res) {
+    const { user } = req;
+    const body = {
+      userId: user._id,
+      requestId: req.body.requestId,
+      otp: req.body.otp,
+    };
+
+    try {
+      const result = await axios.post(
+        "https://apiv2.pakam.ng/api/disbursement/initiate",
+        body,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+          },
+        }
+      );
+
+      console.log("res", result);
+
+      return res.status(result.status).json(result.data);
+    } catch (error) {
+      console.log("err", error);
+      return res.status(error.response.status).json({
+        error: true,
+        message: error.response.data.message,
+      });
+    }
+  }
   static async OTPRequest(req, res) {
     try {
       const { user } = req;
