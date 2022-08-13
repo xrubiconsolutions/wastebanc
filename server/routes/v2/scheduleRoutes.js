@@ -56,4 +56,11 @@ module.exports = (APP) => {
     checkRequestErrs,
     ScheduleService.acceptSchedule
   );
+
+  APP.route("/api/v2/schedules/:companyId").get(
+    adminPakamValidation,
+    commonValidator.companyId,
+    checkRequestErrs,
+    ScheduleService.getCompanySchedulesForAdmin
+  );
 };

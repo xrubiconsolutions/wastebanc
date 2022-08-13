@@ -1087,11 +1087,11 @@ organisationController.estimatedCost = async (req, res) => {
 
     const household = sumData.reduce((pValue, cValue) => {
       return pValue.coin + cValue.coin;
-    });
+    }, 0);
 
     const wastePickersTotal = sumData.reduce((pValue, cValue) => {
       return pValue.wastePickerCoin + cValue.wastePickerCoin;
-    });
+    }, 0);
     const sumTotal = household + wastePickersTotal;
 
     const sumPercentage = rewardService.calPercentage(sumTotal, 10);

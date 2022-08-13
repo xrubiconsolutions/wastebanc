@@ -174,24 +174,65 @@ class ScheduleService {
 
   static async getCompanySchedules(req, res) {
     const { companyName: organisation } = req.user;
-    let {
+    try {
+      return ScheduleService.getOrgSchedules(res, {
+        organisation,
+        ...req.query,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occured!",
+      });
+    }
+  }
+
+  static async getCompanySchedulesForAdmin(req, res) {
+    const { companyId } = req.params;
+    try {
+      const company = await organisationModel.findById(companyId);
+      if (!company)
+        return res(404).json({
+          error: true,
+          message: "Organisation with ID not found!",
+        });
+
+      const { companyName: organisation } = company;
+      return ScheduleService.getOrgSchedules(res, {
+        organisation,
+        ...req.query,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occured!",
+      });
+    }
+  }
+
+  static async getOrgSchedules(
+    res,
+    {
+      organisation,
       page = 1,
       resultsPerPage = 20,
       start,
       end,
       completionStatus = { $ne: "" },
       key,
-    } = req.query;
-
+    }
+  ) {
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
     // return error if neither date range nor search key is provided
     if (!key && (!start || !end))
-      return sendResponse(res, {
-        statusCode: 422,
-        customMessage: "Supply a date range (start and end) or key to search",
+      return res.status(422).json({
+        error: true,
+        message: "Supply a date range (start and end) or key to search",
       });
 
     const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -225,7 +266,6 @@ class ScheduleService {
           completionStatus,
           collectorStatus,
         };
-    console.log("Criteria: ", criteria);
 
     try {
       // get length of schedules with criteria
@@ -237,7 +277,7 @@ class ScheduleService {
         .skip((page - 1) * resultsPerPage)
         .limit(resultsPerPage);
 
-      return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
+      return res.status(200).json({
         companySchedules,
         totalResult,
         page,
@@ -246,7 +286,7 @@ class ScheduleService {
       });
     } catch (error) {
       console.log(error);
-      sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+      throw error;
     }
   }
 
@@ -366,7 +406,10 @@ class ScheduleService {
         return res.status(400).json(householdReward);
       }
 
-      const pakamPercentage = await rewardService.calPercentage(householdReward.totalpointGained, 10);
+      const pakamPercentage = await rewardService.calPercentage(
+        householdReward.totalpointGained,
+        10
+      );
 
       // let pickerGain = 0;
       // let percentageGain = 0;
