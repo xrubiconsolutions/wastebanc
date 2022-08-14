@@ -327,8 +327,8 @@ class invoiceService {
 
   static async getCompanyInvoiceHistory({
     companyId,
-    page,
-    resultsPerPage,
+    page = 1,
+    resultsPerPage = 20,
     key,
     start,
     end,
@@ -378,9 +378,11 @@ class invoiceService {
     } else {
       criteria = {
         ...query,
+        company: ObjectId(companyId),
       };
     }
 
+    console.log({ criteria });
     const totalResult = await invoiceModel.countDocuments(criteria);
     const invoices = await invoiceModel
       .find(criteria)

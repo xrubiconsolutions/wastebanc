@@ -158,15 +158,21 @@ class invoiceController {
   }
 
   static async fetchCompanyInvoiceRecord(req, res) {
-    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
+    let { paid } = req.query;
+    const paidStatus = paid
+      ? paid === "true"
+        ? "paid"
+        : "pending"
+      : { $ne: "" };
+
     try {
       const response = await invoiceService.getCompanyInvoiceHistory({
         companyId: req.user._id,
-        page,
-        resultsPerPage,
-        key,
-        start,
-        end,
+        query: {
+          event: "sent",
+          paidStatus,
+        },
+        ...req.query,
       });
       return res.status(200).json(response);
     } catch (error) {
@@ -179,17 +185,21 @@ class invoiceController {
   }
 
   static async fetchInvoiceRecord(req, res) {
-    let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
+    let { paid } = req.query;
     const { companyId } = req.params;
+    const paidStatus = paid
+      ? paid === "true"
+        ? "paid"
+        : "pending"
+      : { $ne: "" };
+
     try {
       const response = await invoiceService.getCompanyInvoiceHistory({
         companyId,
-        page,
-        resultsPerPage,
-        key,
-        start,
-        end,
-        query: {},
+        query: {
+          paidStatus,
+        },
+        ...req.query,
       });
       return res.status(200).json(response);
     } catch (error) {
