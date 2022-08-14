@@ -335,6 +335,7 @@ class invoiceService {
     query = {
       event: "sent",
     },
+    populate = [],
   }) {
     console.log({
       companyId,
@@ -382,10 +383,10 @@ class invoiceService {
       };
     }
 
-    console.log({ criteria });
     const totalResult = await invoiceModel.countDocuments(criteria);
     const invoices = await invoiceModel
       .find(criteria)
+      .populate(...populate)
       .select([
         "_id",
         "invoiceNumber",

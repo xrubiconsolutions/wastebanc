@@ -172,6 +172,7 @@ class invoiceController {
           event: "sent",
           paidStatus,
         },
+
         ...req.query,
       });
       return res.status(200).json(response);
@@ -199,6 +200,7 @@ class invoiceController {
         query: {
           paidStatus,
         },
+        populate: ["company", "companyName"],
         ...req.query,
       });
       return res.status(200).json(response);
