@@ -38,6 +38,8 @@ class UserService {
             { gender: { $regex: `.*${key}.*`, $options: "i" } },
             { phone: { $regex: `.*${key}.*`, $options: "i" } },
             { email: { $regex: `.*${key}.*`, $options: "i" } },
+            { address: { $regex: `.*${key}.*`, $options: "i" } },
+            { lcd: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           roles: "client",
         };
@@ -82,7 +84,7 @@ class UserService {
 
       // get clients based on page
       const users = await userModel
-        .find(criteria)
+        .find(criteria, { password: 0 })
         //.populate("organisationType", "name")
         .sort({ createAt: -1 })
         .skip((page - 1) * resultsPerPage)
