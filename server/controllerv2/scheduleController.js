@@ -188,8 +188,23 @@ class ScheduleService {
     }
   }
 
+  // returns completed pickup and dropoff schedules for an organisation
+  // from the admin dashboard
   static async getCompanySchedulesForAdmin(req, res) {
     const { companyId } = req.params;
+    let { key, start, end, type = "pickup" } = req.query;
+
+    if (!key && (!start || !end))
+      return res.status(422).json({
+        error: true,
+        message: "Supply a date range (start and end) or key to search",
+      });
+
+    const searchFields = ["scheduleCreator", "address", "lcd"];
+    const { criteria, page, resultsPerPage } =
+      ScheduleService.extractPaginationCriteria(req, {
+        type: type === "pickup" ? "pickup schedule" : "dropoff",
+      });
     try {
       const company = await organisationModel.findById(companyId);
       if (!company)
@@ -198,11 +213,101 @@ class ScheduleService {
           message: "Organisation with ID not found!",
         });
 
-      const { companyName: organisation } = company;
-      return ScheduleService.getOrgSchedules(res, {
-        organisation,
-        ...req.query,
+      const { _id: organisation } = company;
+      const aggregation = [
+        {
+          $match: {
+            organisation: organisation.toString(),
+            ...criteria,
+          },
+        },
+        {
+          $project: {
+            schedule: {
+              $toObjectId: "$scheduleId",
+            },
+            ref_id: 1,
+            type: 1,
+          },
+        },
+        {
+          $lookup: !key
+            ? {
+                from: type === "pickup" ? "schedulepicks" : "scheduledrops",
+                localField: "schedule",
+                foreignField: "_id",
+                as: "schedule",
+              }
+            : {
+                from: type === "pickup" ? "schedulepicks" : "scheduledrops",
+                let: { schedule: "$schedule" },
+                pipeline: [
+                  {
+                    $match: {
+                      $expr: {
+                        $and: [
+                          { $eq: ["$_id", "$$schedule"] },
+                          {
+                            $or: searchFields.map((field) => ({
+                              $regexMatch: {
+                                input: `$${field}`,
+                                regex: `.*${key}.*`,
+                                options: "i",
+                              },
+                            })),
+                            // [
+                            //   {
+                            //     $regexMatch: {
+                            //       input: "$organisation",
+                            //       regex: `.*${key}.*`,
+                            //       options: "i",
+                            //     },
+                            //   },
+                            //   {
+                            //     $regexMatch: {
+                            //       input: "$scheduleCreator",
+                            //       regex: `.*${key}.*`,
+                            //       options: "i",
+                            //     },
+                            //   },
+                            // ],
+                          },
+                        ],
+                      },
+                    },
+                  },
+                ],
+                as: "schedule",
+              },
+        },
+        {
+          $unwind: {
+            path: "$schedule",
+            preserveNullAndEmptyArrays: false,
+          },
+        },
+      ];
+
+      const countCriteria = [
+        ...aggregation,
+        {
+          $count: "type",
+        },
+      ];
+
+      console.log({
+        page,
+        resultsPerPage,
       });
+
+      const result = await ScheduleService.paginateModelData({
+        model: transactionModel,
+        page,
+        resultsPerPage,
+        aggregation,
+        countCriteria,
+      });
+      return res.status(200).json(result);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -222,7 +327,8 @@ class ScheduleService {
       end,
       completionStatus = { $ne: "" },
       key,
-    }
+    },
+    type = "pickup"
   ) {
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
@@ -288,6 +394,86 @@ class ScheduleService {
       console.log(error);
       throw error;
     }
+  }
+
+  static async paginateModelData({
+    model,
+    page = 1,
+    resultsPerPage = 20,
+    criteria,
+    aggregation,
+    countCriteria,
+  }) {
+    try {
+      // get length of schedules with criteria
+      let totalResult = countCriteria
+        ? await model.aggregate(countCriteria)
+        : await model.countDocuments(criteria);
+      console.log({
+        totalResult,
+      });
+
+      countCriteria && totalResult.length > 0
+        ? (totalResult = Object.values(totalResult[0])[0])
+        : (totalResult = 0);
+
+      const data = aggregation
+        ? await model
+            .aggregate(aggregation)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * resultsPerPage)
+            .limit(resultsPerPage)
+        : await model
+            .find(criteria)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * resultsPerPage)
+            .limit(resultsPerPage);
+
+      console.log({ aggregation: JSON.stringify(aggregation) });
+
+      return {
+        data,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static extractPaginationCriteria(req, conditions, searchFields = []) {
+    let { page = 1, key, resultsPerPage = 20, start, end } = req.query;
+
+    // return error if neither date range nor search key is provided
+    const [startDate, endDate] = [new Date(start), new Date(end)];
+
+    const criteria =
+      key && searchFields.length > 0
+        ? {
+            $or: searchFields.map((field) => ({
+              [field]: { $regex: `.*${key}.*`, $options: "i" },
+            })),
+            // [
+            //   { Category: { $regex: `.*${key}.*`, $options: "i" } },
+            //   { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+            //   { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
+            //   { client: { $regex: `.*${key}.*`, $options: "i" } },
+            //   { phone: { $regex: `.*${key}.*`, $options: "i" } },
+            //   { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+            // ],
+            ...conditions,
+          }
+        : {
+            createdAt: {
+              $gte: startDate,
+              $lt: endDate,
+            },
+            ...conditions,
+          };
+
+    return { criteria, page, resultsPerPage };
   }
 
   static async rewardSystem(req, res) {
