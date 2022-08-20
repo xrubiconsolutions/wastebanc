@@ -848,7 +848,7 @@ class UserService {
           lcd: user.lcd,
           last_logged_in: user.last_logged_in,
           firstLogin: user.last_logged_in ? false : true,
-          terms_condition: user.terms_condition,
+          terms_condition: true,
           token,
         },
       });

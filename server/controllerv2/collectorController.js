@@ -2008,7 +2008,7 @@ class CollectorService {
           organisation: collector.organisation,
           profile_picture: collector.profile_picture,
           aggregatorId: collector.aggregatorId || "",
-          terms_condition: collector.terms_condition,
+          terms_condition: true,
           firstLogin: collector.firstLogin,
           token,
         },
