@@ -88,7 +88,7 @@ const transaction_Schema = {
     type: String,
   },
   ref_id: {
-    type: Number,
+    type: String,
   },
   organisationPaid: {
     type: Boolean,
