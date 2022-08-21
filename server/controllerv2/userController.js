@@ -579,7 +579,7 @@ class UserService {
       if (!user.terms_condition || user.terms_condition == false) {
         console.log("here");
         return res.status(400).json({
-          error: false,
+          error: true,
           message: "Please accept terms and condition",
           data: { userId: user._id },
           statusCode: 402,
