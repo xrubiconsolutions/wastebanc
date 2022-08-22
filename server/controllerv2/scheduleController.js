@@ -862,6 +862,13 @@ class ScheduleService {
       data.clientId = user._id.toString();
       data.state = user.state;
 
+      if (data.reminder === true) {
+        data.reminderDate = moment(data.pickUpDate, "YYYY-MM-DD").add(
+          6,
+          "days"
+        );
+      }
+
       console.log("data", data);
 
       const schedule = await scheduleModel.create(data);

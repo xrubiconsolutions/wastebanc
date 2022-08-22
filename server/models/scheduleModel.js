@@ -56,6 +56,10 @@ const schedulePick = new Schema({
     required: true,
     default: false,
   },
+  reminderDate:{
+    type: Date,
+    default:null,
+  },
   callOnArrival: {
     type: Boolean,
     default: false,
