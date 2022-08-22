@@ -49,6 +49,7 @@ class ScheduleService {
           $or: [
             { Category: { $regex: `.*${key}.*`, $options: "i" } },
             { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
+            { categories: { $regex: `.*${key}.*`, $options: "i" } },
             { organisation: { $regex: `.*${key}.*`, $options: "i" } },
             { schuduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
             { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
@@ -78,6 +79,10 @@ class ScheduleService {
       } else {
         criteria = {};
       }
+
+      console.log({
+        criteria: JSON.stringify(criteria),
+      });
 
       if (!currentScope) {
         return res.status(400).json({
@@ -140,6 +145,7 @@ class ScheduleService {
       $or: [
         { Category: { $regex: `.*${key}.*`, $options: "i" } },
         { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
+        { categories: { $regex: `.*${key}.*`, $options: "i" } },
         { organisation: { $regex: `.*${key}.*`, $options: "i" } },
         { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
         { client: { $regex: `.*${key}.*`, $options: "i" } },
@@ -284,6 +290,7 @@ class ScheduleService {
           $or: [
             { Category: { $regex: `.*${key}.*`, $options: "i" } },
             { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
+            { categories: { $regex: `.*${key}.*`, $options: "i" } },
             { organisation: { $regex: `.*${key}.*`, $options: "i" } },
             { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
             { client: { $regex: `.*${key}.*`, $options: "i" } },
