@@ -80,10 +80,6 @@ class ScheduleService {
         criteria = {};
       }
 
-      console.log({
-        criteria: JSON.stringify(criteria),
-      });
-
       if (!currentScope) {
         return res.status(400).json({
           error: true,
@@ -367,8 +363,6 @@ class ScheduleService {
             .sort({ createdAt: -1 })
             .skip((page - 1) * resultsPerPage)
             .limit(resultsPerPage);
-
-      console.log({ criteria: JSON.stringify(criteria) });
 
       return {
         data,
