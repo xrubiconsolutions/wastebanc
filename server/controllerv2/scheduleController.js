@@ -48,6 +48,8 @@ class ScheduleService {
         criteria = {
           $or: [
             { Category: { $regex: `.*${key}.*`, $options: "i" } },
+            { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
+            { categories: { $regex: `.*${key}.*`, $options: "i" } },
             { organisation: { $regex: `.*${key}.*`, $options: "i" } },
             { schuduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
             { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
@@ -138,6 +140,8 @@ class ScheduleService {
     const criteria = {
       $or: [
         { Category: { $regex: `.*${key}.*`, $options: "i" } },
+        { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
+        { categories: { $regex: `.*${key}.*`, $options: "i" } },
         { organisation: { $regex: `.*${key}.*`, $options: "i" } },
         { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
         { client: { $regex: `.*${key}.*`, $options: "i" } },
@@ -200,11 +204,22 @@ class ScheduleService {
         message: "Supply a date range (start and end) or key to search",
       });
 
-    const searchFields = ["scheduleCreator", "address", "lcd"];
+    const searchFields = [
+      "ref_id",
+      "address",
+      "coin",
+      "fullname",
+      "weight",
+      "categories.name",
+    ];
     const { criteria, page, resultsPerPage } =
-      ScheduleService.extractPaginationCriteria(req, {
-        type: type === "pickup" ? "pickup schedule" : "dropoff",
-      });
+      ScheduleService.extractPaginationCriteria(
+        req,
+        {
+          type: type === "pickup" ? "pickup" : "dropoff",
+        },
+        searchFields
+      );
     try {
       const company = await organisationModel.findById(companyId);
       if (!company)
@@ -212,88 +227,6 @@ class ScheduleService {
           error: true,
           message: "Organisation with ID not found!",
         });
-
-      const { _id: organisation } = company;
-      const aggregation = [
-        {
-          $match: {
-            organisation: organisation.toString(),
-            ...criteria,
-          },
-        },
-        {
-          $project: {
-            schedule: {
-              $toObjectId: "$scheduleId",
-            },
-            ref_id: 1,
-            type: 1,
-          },
-        },
-        {
-          $lookup: !key
-            ? {
-                from: type === "pickup" ? "schedulepicks" : "scheduledrops",
-                localField: "schedule",
-                foreignField: "_id",
-                as: "schedule",
-              }
-            : {
-                from: type === "pickup" ? "schedulepicks" : "scheduledrops",
-                let: { schedule: "$schedule" },
-                pipeline: [
-                  {
-                    $match: {
-                      $expr: {
-                        $and: [
-                          { $eq: ["$_id", "$$schedule"] },
-                          {
-                            $or: searchFields.map((field) => ({
-                              $regexMatch: {
-                                input: `$${field}`,
-                                regex: `.*${key}.*`,
-                                options: "i",
-                              },
-                            })),
-                            // [
-                            //   {
-                            //     $regexMatch: {
-                            //       input: "$organisation",
-                            //       regex: `.*${key}.*`,
-                            //       options: "i",
-                            //     },
-                            //   },
-                            //   {
-                            //     $regexMatch: {
-                            //       input: "$scheduleCreator",
-                            //       regex: `.*${key}.*`,
-                            //       options: "i",
-                            //     },
-                            //   },
-                            // ],
-                          },
-                        ],
-                      },
-                    },
-                  },
-                ],
-                as: "schedule",
-              },
-        },
-        {
-          $unwind: {
-            path: "$schedule",
-            preserveNullAndEmptyArrays: false,
-          },
-        },
-      ];
-
-      const countCriteria = [
-        ...aggregation,
-        {
-          $count: "type",
-        },
-      ];
 
       console.log({
         page,
@@ -304,8 +237,7 @@ class ScheduleService {
         model: transactionModel,
         page,
         resultsPerPage,
-        aggregation,
-        countCriteria,
+        criteria,
       });
       return res.status(200).json(result);
     } catch (error) {
@@ -353,6 +285,8 @@ class ScheduleService {
       ? {
           $or: [
             { Category: { $regex: `.*${key}.*`, $options: "i" } },
+            { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
+            { categories: { $regex: `.*${key}.*`, $options: "i" } },
             { organisation: { $regex: `.*${key}.*`, $options: "i" } },
             { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
             { client: { $regex: `.*${key}.*`, $options: "i" } },
@@ -413,9 +347,10 @@ class ScheduleService {
         totalResult,
       });
 
-      countCriteria && totalResult.length > 0
-        ? (totalResult = Object.values(totalResult[0])[0])
-        : (totalResult = 0);
+      if (countCriteria)
+        totalResult.length > 0
+          ? (totalResult = Object.values(totalResult[0])[0])
+          : (totalResult = 0);
 
       const data = aggregation
         ? await model
@@ -429,8 +364,6 @@ class ScheduleService {
             .skip((page - 1) * resultsPerPage)
             .limit(resultsPerPage);
 
-      console.log({ aggregation: JSON.stringify(aggregation) });
-
       return {
         data,
         totalResult,
@@ -443,26 +376,38 @@ class ScheduleService {
     }
   }
 
-  static extractPaginationCriteria(req, conditions, searchFields = []) {
+  static extractPaginationCriteria(
+    req,
+    conditions,
+    searchFields = [],
+    numFields = ["weight", "coin"]
+  ) {
     let { page = 1, key, resultsPerPage = 20, start, end } = req.query;
 
     // return error if neither date range nor search key is provided
     const [startDate, endDate] = [new Date(start), new Date(end)];
 
+    // seperate string from int fields for search
+    const stringSearchFields = searchFields.filter(
+      (field) => !numFields.includes(field)
+    );
+
+    let searchConditions = stringSearchFields.map((field) => ({
+      [field]: { $regex: `.*${key}.*`, $options: "i" },
+    }));
+
+    // add equality check to search conditions if key is a number
+    if (key && parseFloat(key)) {
+      const equalityChecks = numFields.map((field) => ({
+        [field]: { $eq: parseFloat(key) },
+      }));
+      searchConditions = searchConditions.concat(equalityChecks);
+    }
+
     const criteria =
       key && searchFields.length > 0
         ? {
-            $or: searchFields.map((field) => ({
-              [field]: { $regex: `.*${key}.*`, $options: "i" },
-            })),
-            // [
-            //   { Category: { $regex: `.*${key}.*`, $options: "i" } },
-            //   { organisation: { $regex: `.*${key}.*`, $options: "i" } },
-            //   { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
-            //   { client: { $regex: `.*${key}.*`, $options: "i" } },
-            //   { phone: { $regex: `.*${key}.*`, $options: "i" } },
-            //   { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
-            // ],
+            $or: searchConditions,
             ...conditions,
           }
         : {
@@ -634,6 +579,7 @@ class ScheduleService {
         state: scheduler.state || "",
         ref_id: ref,
         percentage: pakamPercentage,
+        address: schedule.address,
       });
 
       //  send push notification to household user

@@ -97,6 +97,9 @@ const transaction_Schema = {
   percentage: {
     type: Number,
   },
+  address: {
+    type: String,
+  },
 };
 
 module.exports = MONGOOSE.model("transaction", transaction_Schema);
