@@ -406,6 +406,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       state: scheduler.state || "",
       ref_id: ref,
       percentage: pakamPercentage,
+      address: dropoffs.address,
     });
 
     const message = {
