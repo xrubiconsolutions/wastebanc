@@ -141,6 +141,7 @@ areasController.getLcd = async (req, res) => {
       };
     } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,

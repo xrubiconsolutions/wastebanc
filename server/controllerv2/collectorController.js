@@ -77,6 +77,7 @@ class CollectorService {
           });
         }
         const [startDate, endDate] = [new Date(start), new Date(end)];
+        endDate.setDate(endDate.getDate() + 1);
         criteria = {
           createdAt: {
             $gte: startDate,
@@ -230,6 +231,7 @@ class CollectorService {
           });
         }
         const [startDate, endDate] = [new Date(start), new Date(end)];
+        endDate.setDate(endDate.getDate() + 1);
         criteria = {
           createdAt: {
             $gte: startDate,
@@ -879,6 +881,7 @@ class CollectorService {
       };
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,
@@ -1083,6 +1086,7 @@ class CollectorService {
       };
     } else if (start && end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,

@@ -68,6 +68,7 @@ class ScheduleService {
           });
         }
         const [startDate, endDate] = [new Date(start), new Date(end)];
+        endDate.setDate(endDate.getDate() + 1);
         criteria = {
           createdAt: {
             $gte: startDate,
@@ -274,6 +275,7 @@ class ScheduleService {
       });
 
     const [startDate, endDate] = [new Date(start), new Date(end)];
+    endDate.setDate(endDate.getDate() + 1);
     let statusCriteria = {};
     let collectorStatus = { $ne: "" };
     if (completionStatus === "accepted") {
@@ -386,6 +388,7 @@ class ScheduleService {
 
     // return error if neither date range nor search key is provided
     const [startDate, endDate] = [new Date(start), new Date(end)];
+    endDate.setDate(endDate.getDate() + 1);
 
     // seperate string from int fields for search
     const stringSearchFields = searchFields.filter(

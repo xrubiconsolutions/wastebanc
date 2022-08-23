@@ -56,6 +56,7 @@ dashboardController.cardMapData = async (req, res) => {
     }
 
     const [startDate, endDate] = [new Date(start), new Date(end)];
+    endDate.setDate(endDate.getDate() + 1);
     let criteria = {
       createdAt: {
         $gte: startDate,
@@ -141,6 +142,7 @@ dashboardController.companyCardMapData = async (req, res) => {
       }
     }
     const [startDate, endDate] = [new Date(start), new Date(end)];
+    endDate.setDate(endDate.getDate() + 1);
     const { companyName: organisation } = req.user;
 
     let criteria = {
@@ -231,6 +233,7 @@ dashboardController.recentPickups = async (req, res) => {
       };
     } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,
@@ -332,6 +335,7 @@ dashboardController.newUsers = async (req, res) => {
       };
     } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createAt: {
           $gte: startDate,
@@ -438,6 +442,7 @@ dashboardController.newAggregators = async (req, res) => {
       };
     } else if (start || end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,
@@ -509,6 +514,7 @@ dashboardController.collectormapData = async (req, res) => {
 
     const { start, end, collectorType = { $ne: "" } } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
+    endDate.setDate(endDate.getDate() + 1);
 
     if (start || end) {
       if (new Date(start) > new Date(end)) {

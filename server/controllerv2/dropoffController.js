@@ -65,6 +65,7 @@ dropoffController.dropOffs = async (req, res) => {
         });
       }
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,
@@ -169,6 +170,7 @@ dropoffController.companydropOffs = async (req, res) => {
         });
       }
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,
