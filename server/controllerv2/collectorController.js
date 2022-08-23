@@ -591,8 +591,8 @@ class CollectorService {
         return res.status(400).json({
           error: true,
           message: "Please accept terms and condition",
-          data: { collectorId: collector._id },
-          statusCode: 402,
+          data: null,
+          statusCode: 400,
         });
       }
       // handle the collector already register so a verification token can be resent
