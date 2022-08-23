@@ -587,14 +587,14 @@ class CollectorService {
         phone: body.phone,
       });
 
-      // if (!body.terms_condition || body.terms_condition == false) {
-      //   return res.status(400).json({
-      //     error: true,
-      //     message: "Please accept terms and condition",
-      //     data: null,
-      //     statusCode: 400,
-      //   });
-      // }
+      if (!body.terms_condition || body.terms_condition == false) {
+        return res.status(400).json({
+          error: true,
+          message: "Please accept terms and condition",
+          data: null,
+          statusCode: 400,
+        });
+      }
       // handle the collector already register so a verification token can be resent
       if (checkPhone) {
         if (checkPhone.verified) {
