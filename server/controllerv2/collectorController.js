@@ -77,6 +77,7 @@ class CollectorService {
           });
         }
         const [startDate, endDate] = [new Date(start), new Date(end)];
+        endDate.setDate(endDate.getDate() + 1);
         criteria = {
           createdAt: {
             $gte: startDate,
@@ -221,6 +222,7 @@ class CollectorService {
           ],
           organisation,
           companyVerified,
+          approvalStatus: { $ne: "DECLINED" },
         };
       } else if (start && end) {
         if (!start || !end) {
@@ -230,6 +232,7 @@ class CollectorService {
           });
         }
         const [startDate, endDate] = [new Date(start), new Date(end)];
+        endDate.setDate(endDate.getDate() + 1);
         criteria = {
           createdAt: {
             $gte: startDate,
@@ -237,8 +240,14 @@ class CollectorService {
           },
           organisation,
           companyVerified,
+          approvalStatus: { $ne: "DECLINED" },
         };
-      } else criteria = { organisation, companyVerified };
+      } else
+        criteria = {
+          organisation,
+          companyVerified,
+          approvalStatus: { $ne: "DECLINED" },
+        };
       if (state) criteria.state = state;
 
       criteria.collectorType = collectorType;
@@ -533,6 +542,7 @@ class CollectorService {
           //status: "active",
           organisation: organisation,
           areaOfAccess: accessArea,
+          approvalStatus: "APPROVED",
         },
         projection
       );
@@ -565,6 +575,7 @@ class CollectorService {
           companyVerified: false,
           approvedBy: "",
           areaOfAccess: [],
+          approvalStatus: "DECLINED",
         },
         projection
       );
@@ -879,6 +890,7 @@ class CollectorService {
       };
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,
@@ -1083,6 +1095,7 @@ class CollectorService {
       };
     } else if (start && end) {
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,

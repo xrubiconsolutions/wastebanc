@@ -51,6 +51,7 @@ class UserService {
             message: "Please pass a start and end date",
           });
         }
+        endDate.setDate(endDate.getDate() + 1);
         criteria = {
           createAt: {
             $gte: startDate,
@@ -116,6 +117,7 @@ class UserService {
     //     $lt: endDate,
     //   },
     //   roles: "client",
+    endDate.setDate(endDate.getDate() + 1);
     //   verified: true,
     // };
     // if (state) criteria.state = state;

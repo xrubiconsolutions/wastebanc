@@ -16,6 +16,7 @@ class invoiceService {
 
     if (!organisation) throw new Error("Invalid companyId passed");
     const [startDate, endDate] = [new Date(start), new Date(end)];
+    endDate.setDate(endDate.getDate() + 1);
     let criteria = {
       createdAt: {
         $gte: startDate,
@@ -247,6 +248,7 @@ class invoiceService {
         };
       }
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,
@@ -369,6 +371,7 @@ class invoiceService {
         };
       }
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,
@@ -477,6 +480,7 @@ class invoiceService {
         };
       }
       const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
       criteria = {
         createdAt: {
           $gte: startDate,
