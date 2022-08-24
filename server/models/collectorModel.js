@@ -165,6 +165,11 @@ const collector_Schema = new Schema({
   percentageAcc: {
     type: Number,
   },
+  approvalStatus: {
+    type: String,
+    default: "PENDING",
+    enum: ["PENDING", "APPROVED", "DECLINED"],
+  },
 });
 
 module.exports = MONGOOSE.model("Collector", collector_Schema);
