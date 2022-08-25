@@ -15,6 +15,98 @@ const randomstring = require("randomstring");
 const rewardService = require("../services/rewardService");
 moment().tz("Africa/Lagos", false);
 
+dropoffController.aggregateQuery = async ({
+  criteria,
+  page = 1,
+  resultsPerPage = 20,
+}) => {
+  try {
+    const pipeline = [
+      {
+        $match: criteria,
+      },
+      {
+        $skip: (page - 1) * resultsPerPage,
+      },
+      {
+        $limit: resultsPerPage,
+      },
+      {
+        $sort: {
+          createAt: -1,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: {
+            email: "$scheduleCreator",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$email", "$$email"],
+                },
+              },
+            },
+            {
+              $project: {
+                fullname: 1,
+                userId: "$_id",
+                _id: 0,
+              },
+            },
+          ],
+          as: "customer",
+        },
+      },
+      {
+        $unwind: {
+          path: "$customer",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          fullname: {
+            $ifNull: ["$customer.fullname", "$fullname"],
+          },
+          clientId: {
+            $ifNull: ["$customer.userId", "$clientId"],
+          },
+          scheduleCreator: 1,
+          categories: 1,
+          quantity: 1,
+          completionStatus: 1,
+          organisation: 1,
+          createdAt: 1,
+          organisationCollection: 1,
+          organisationPhone: 1,
+          dropOffDate: 1,
+          expiryDuration: 1,
+          state: 1,
+          collectedBy: 1,
+        },
+      },
+    ];
+
+    const countCriteria = [
+      ...pipeline,
+      {
+        $count: "scheduleCreator",
+      },
+    ];
+    let totalResult = await scheduleDropModel.aggregate(countCriteria);
+
+    const dropoffs = await scheduleDropModel.aggregate(pipeline);
+
+    return { dropoffs, totalResult: Object.values(totalResult[0])[0] };
+  } catch (error) {
+    throw error;
+  }
+};
+
 dropoffController.dropOffs = async (req, res) => {
   try {
     const { user } = req;
@@ -93,13 +185,13 @@ dropoffController.dropOffs = async (req, res) => {
 
     console.log("criteria", criteria);
 
-    const totalResult = await scheduleDropModel.countDocuments(criteria);
+    // const totalResult = await scheduleDropModel.countDocuments(criteria);
 
-    const dropoffs = await scheduleDropModel
-      .find(criteria)
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * resultsPerPage)
-      .limit(resultsPerPage);
+    const { dropoffs, totalResult } = await dropoffController.aggregateQuery({
+      criteria,
+      page,
+      resultsPerPage,
+    });
 
     return res.status(200).json({
       error: false,
@@ -179,19 +271,19 @@ dropoffController.companydropOffs = async (req, res) => {
         organisation,
       };
     } else {
-      criteria = {};
+      criteria = {
+        organisation,
+      };
     }
 
     console.log("c", criteria);
     if (state) criteria.state = state;
 
-    const totalResult = await scheduleDropModel.countDocuments(criteria);
-
-    const dropoffs = await scheduleDropModel
-      .find(criteria)
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * resultsPerPage)
-      .limit(resultsPerPage);
+    const { dropoffs, totalResult } = await dropoffController.aggregateQuery({
+      criteria,
+      page,
+      resultsPerPage,
+    });
 
     return res.status(200).json({
       error: false,
