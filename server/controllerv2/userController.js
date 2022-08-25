@@ -201,8 +201,8 @@ class UserService {
         return res.status(400).json({
           error: true,
           message: "Please accept terms and condition",
-          data: { userId: user._id },
-          statusCode: 402,
+          data: null,
+          statusCode: 400,
         });
       }
       if (checkPhone) {
@@ -317,7 +317,7 @@ class UserService {
         //onesignal_id: body.onesignal_id,
         address: body.address,
         onesignal_id,
-        terms_condition: body.terms_condition,
+        terms_condition: body.terms_condition || false,
       });
 
       //fine
@@ -580,8 +580,8 @@ class UserService {
 
       if (!user.terms_condition || user.terms_condition == false) {
         console.log("here");
-        return res.status(400).json({
-          error: false,
+        return res.status(200).json({
+          error: true,
           message: "Please accept terms and condition",
           data: { userId: user._id },
           statusCode: 402,
@@ -850,7 +850,7 @@ class UserService {
           lcd: user.lcd,
           last_logged_in: user.last_logged_in,
           firstLogin: user.last_logged_in ? false : true,
-          terms_condition: user.terms_condition,
+          terms_condition: true,
           token,
         },
       });

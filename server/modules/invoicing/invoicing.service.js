@@ -164,6 +164,7 @@ class invoiceService {
       totalMaintanceFee = totalMaintanceFee + Number(value.serviceCharge);
     });
 
+    totalPayment = totalOutStanding + totalCompleted + totalMaintanceFee;
     // const totalMaintanceFee = invoices.reduce((a, b) => {
     //   return Number(a.serviceCharge) + Number(b.serviceCharge);
     // });

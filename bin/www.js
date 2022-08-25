@@ -196,7 +196,7 @@ var transporter = nodemailer.createTransport({
 // )
 
 // start all cron jobs
-cronJobs();
+//cronJobs();
 
 const cors = require("cors");
 

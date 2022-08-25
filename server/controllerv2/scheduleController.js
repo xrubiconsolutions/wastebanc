@@ -772,7 +772,6 @@ class ScheduleService {
   static async pickup(req, res) {
     try {
       let data = req.body;
-      console.log("data", data);
 
       if (moment(data.pickUpDate) < moment()) {
         return res.status(400).json({
@@ -810,6 +809,13 @@ class ScheduleService {
       data.expiryDuration = expireDate;
       data.clientId = user._id.toString();
       data.state = user.state;
+
+      if (data.reminder === true) {
+        data.reminderDate = moment(data.pickUpDate, "YYYY-MM-DD").add(
+          6,
+          "days"
+        );
+      }
 
       console.log("data", data);
 
@@ -853,7 +859,7 @@ class ScheduleService {
         sendNotification({
           app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
           contents: {
-            en: `Your pickup schedule has been made successfully`,
+            en: `Your ${data.categories} schedule has been made successfully`,
           },
           channel_for_external_user_ids: "push",
           include_external_user_ids: playerIds,
@@ -861,7 +867,7 @@ class ScheduleService {
         await notificationModel.create({
           title: "Pickup Schedule made",
           lcd: schedule.lcd,
-          message: `Your schedule has been made successfully`,
+          message: `Your ${data.categories} schedule has been made successfully`,
           schedulerId: user._id,
         });
       }

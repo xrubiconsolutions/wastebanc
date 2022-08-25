@@ -11,6 +11,7 @@ module.exports = (APP) => {
 
   // account number resolver
   APP.route("/api/resolve/account").get(
+    auth.userValidation,
     CONTROLLER.payController.resolveAccount
   );
 

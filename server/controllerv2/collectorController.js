@@ -602,8 +602,8 @@ class CollectorService {
         return res.status(400).json({
           error: true,
           message: "Please accept terms and condition",
-          data: { collectorId: collector._id },
-          statusCode: 402,
+          data: null,
+          statusCode: 400,
         });
       }
       // handle the collector already register so a verification token can be resent
@@ -724,7 +724,7 @@ class CollectorService {
         areaOfAccess,
         onesignal_id,
         dateOfBirth: body.dateOfBirth || "",
-        terms_condition: body.terms_condition,
+        terms_condition: body.terms_condition || false,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -1233,7 +1233,7 @@ class CollectorService {
 
       // res
       if (!collector.terms_condition || collector.terms_condition == false) {
-        return res.status(400).json({
+        return res.status(200).json({
           error: true,
           message: "Please accept terms and condition",
           data: { collectorId: collector._id },
@@ -2021,7 +2021,7 @@ class CollectorService {
           organisation: collector.organisation,
           profile_picture: collector.profile_picture,
           aggregatorId: collector.aggregatorId || "",
-          terms_condition: collector.terms_condition,
+          terms_condition: true,
           firstLogin: collector.firstLogin,
           token,
         },

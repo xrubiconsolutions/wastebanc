@@ -46,10 +46,10 @@ payController.getBanks = (req, res) => {
 payController.resolveAccount = (req, res) => {
   const account_number = req.query.account_number;
   const bank_code = req.query.bank_code;
-
+  const { user } = req;
   request(
     {
-      url: `https://apiv2.pakam.ng/api/resolve/account?account_number=${account_number}&bank_code=${bank_code}`,
+      url: `https://apiv2.pakam.ng/api/resolve/account?account_number=${account_number}&bank_code=${bank_code}&userId=${user._id}`,
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -72,7 +72,7 @@ payController.saveR = async (req, res) => {
   try {
     const receipt = { ...req.body };
     let cardID = req.body.cardID;
-    let amount = req.body.amount;
+    let amount = Number(user.availablePoints);
     let balance;
 
     const user = await MODEL.userModel.findOne({ cardID });
