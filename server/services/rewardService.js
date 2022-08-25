@@ -5,10 +5,13 @@ class rewardService {
       let pricing = [];
       //let cat;
 
+      console.log("org", organisation);
       for (let category of categories) {
         if (organisation.categories.length !== 0) {
           const c = organisation.categories.find(
-            (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
+            (cc) =>
+              cc.name.toLowerCase().trim() ===
+              category.name.toLowerCase().trim()
           );
           if (c) {
             const p = parseFloat(category.quantity) * Number(c.price);

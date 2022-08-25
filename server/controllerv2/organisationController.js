@@ -30,6 +30,7 @@ const collectorModel = require("../models/collectorModel");
 const rewardService = require("../services/rewardService");
 const sterlingService = require("../modules/partners/sterling/sterlingService");
 const ObjectId = require("mongoose").Types.ObjectId;
+const categoriesModel = require("../models/categoryModel");
 
 organisationController.types = async (req, res) => {
   try {
@@ -303,6 +304,18 @@ organisationController.create = async (req, res) => {
   try {
     const body = req.body;
     const email = body.email.trim();
+
+    let categories = [];
+
+    // Promise.all(
+    //   body.categories.map(async (category) => {
+    //     const catDetail = await categoriesModel.findOne({
+    //       $or: [{ name: category.name }, { value: category.name }],
+    //     });
+
+    //   })
+    // );
+
     const check = await organisationModel.findOne({
       $or: [
         { companyName: body.companyName },

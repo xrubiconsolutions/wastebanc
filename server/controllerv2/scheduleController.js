@@ -469,9 +469,11 @@ class ScheduleService {
         });
       }
 
-      const organisation = await organisationModel.findById(
-        collector.approvedBy
-      );
+      const orgId = collector.approvedBy
+        ? collector.approvedBy
+        : collector.organisationId;
+
+      const organisation = await organisationModel.findById(orgId);
       if (!organisation) {
         return res.status(400).json({
           error: true,
@@ -536,6 +538,8 @@ class ScheduleService {
         categories,
         organisation
       );
+
+      console.log("household reward", householdReward);
       if (householdReward.error) {
         return res.status(400).json(householdReward);
       }
@@ -665,6 +669,7 @@ class ScheduleService {
         da: householdReward.totalWeight,
       });
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
         error: true,
         message: "An error occurred",
