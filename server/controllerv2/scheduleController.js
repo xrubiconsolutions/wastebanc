@@ -680,13 +680,14 @@ class ScheduleService {
         const organisation = await organisationModel.findById(
           user.organisationId
         );
-        //console.log("user organisation", organisation);
         if (organisation) {
           areaOfAccess = organisation.streetOfAccess;
         }
       } else {
         areaOfAccess = user.areaOfAccess;
       }
+
+      console.log("aces", areaOfAccess);
 
       const collectorAccessArea = areaOfAccess;
       let geofencedSchedules = [];
@@ -696,7 +697,7 @@ class ScheduleService {
       let tomorrow = new Date();
       tomorrow.setDate(new Date().getDate() + 7);
       console.log("tomorrow", tomorrow);
-      // console.log("user", user);
+      //console.log("user", user);
 
       const active_schedules = await scheduleModel.aggregate([
         {

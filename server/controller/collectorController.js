@@ -190,6 +190,7 @@ collectorController.checkAccepted = (REQUEST, RESPONSE) => {
       completionStatus: "pending",
       collectedBy: collectorID,
     })
+    .sort({ pickUpDate: 1 })
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
