@@ -566,7 +566,7 @@ class ScheduleService {
       const message = {
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
-          en: `You have just been credited ${householdReward.totalpointGained} for the ${items} pickup`,
+          en: `You have just been credited ${householdReward.totalpointGained} for your ${items} pickup`,
         },
         channel_for_external_user_ids: "push",
         include_external_user_ids: [scheduler.onesignal_id],

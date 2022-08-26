@@ -376,7 +376,7 @@ dropoffController.removeDropLocation = async (req, res) => {
 };
 
 dropoffController.rewardDropSystem = async (req, res) => {
-  const collectorId = req.body.collectorId;
+  const collectorId = req.user._id;
   const categories = req.body.categories;
   const scheduleId = req.body.scheduleId;
   try {
@@ -418,11 +418,11 @@ dropoffController.rewardDropSystem = async (req, res) => {
     }
 
     const orgId = collector.approvedBy
-    ? collector.approvedBy
-    : collector.organisationId;
+      ? collector.approvedBy
+      : collector.organisationId;
 
-
-    const organisation = await organisationModel.findById(collector.orgId);
+    console.log("org", orgId);
+    const organisation = await organisationModel.findById(orgId);
     if (!organisation) {
       return res.status(400).json({
         error: true,
@@ -513,6 +513,11 @@ dropoffController.rewardDropSystem = async (req, res) => {
 
     const householdReward = await rewardService.houseHold(cat, organisation);
 
+    console.log("household reward", householdReward);
+    if (householdReward.error) {
+      return res.status(400).json(householdReward);
+    }
+
     const pakamPercentage = rewardService.calPercentage(
       householdReward.totalpointGained,
       10
@@ -522,8 +527,9 @@ dropoffController.rewardDropSystem = async (req, res) => {
       charset: "numeric",
     });
     const t = await transactionModel.create({
-      weight: totalWeight,
-      coin: Number(totalpointGained) - Number(pakamPercentage),
+      weight: householdReward.totalWeight,
+      wastePickerCoin: 0,
+      coin: Number(householdReward.totalpointGained) - Number(pakamPercentage),
       cardID: scheduler._id,
       completedBy: collectorId,
       categories,
@@ -540,10 +546,12 @@ dropoffController.rewardDropSystem = async (req, res) => {
       address: dropoffs.address,
     });
 
+    const items = categories.map((category) => category.name);
+
     const message = {
       app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
       contents: {
-        en: `You have just been credited ${t.coin} for your drop off`,
+        en: `You have just been credited ${t.coin} for your ${items} drop off`,
       },
       channel_for_external_user_ids: "push",
       include_external_user_ids: [scheduler.onesignal_id],
@@ -553,7 +561,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
     await notificationModel.create({
       title: "Dropoff Schedule completed",
       lcd: scheduler.lcd,
-      message: `You have just been credited ${t.coin} for your drop off`,
+      message: `You have just been credited ${t.coin} for your ${items} drop off`,
       schedulerId: scheduler._id,
     });
 
@@ -565,7 +573,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
         $set: {
           completionStatus: "completed",
           collectedBy: collectorId,
-          quantity: totalWeight,
+          quantity: householdReward.totalWeight,
           completionDate: new Date(),
         },
       }
@@ -585,7 +593,8 @@ dropoffController.rewardDropSystem = async (req, res) => {
       { _id: collector._id },
       {
         $set: {
-          totalCollected: collector.totalCollected + totalWeight,
+          totalCollected:
+            collector.totalCollected + householdReward.totalWeight,
           numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
           busy: false,
           last_logged_in: new Date(),
@@ -611,8 +620,8 @@ dropoffController.rewardDropSystem = async (req, res) => {
     return res.status(200).json({
       error: false,
       message: "Dropoff completed successfully",
-      data: totalpointGained,
-      dd: totalWeight,
+      data: householdReward.totalpointGained,
+      dd: householdReward.totalWeight,
     });
   } catch (error) {
     console.log(error);
@@ -678,7 +687,6 @@ dropoffController.scheduledropOffs = async (req, res) => {
     data.clientId = user._id.toString();
     data.state = user.state || "Lagos";
     data.categories = categories;
-
 
     const schedule = await scheduleDropModel.create(data);
     const items = categories.map((category) => category.name);
