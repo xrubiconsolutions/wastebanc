@@ -14,6 +14,7 @@ const { sendNotification } = require("../util/commonFunction");
 const randomstring = require("randomstring");
 const rewardService = require("../services/rewardService");
 moment().tz("Africa/Lagos", false);
+const mongoose = require("mongoose");
 
 dropoffController.aggregateQuery = async ({
   criteria,
@@ -146,6 +147,7 @@ dropoffController.dropOffs = async (req, res) => {
           { organisationPhone: { $regex: `.*${key}.*`, $options: "i" } },
           //{ quantity: key },
           { categories: { $in: [key] } },
+          { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
           { Category: { $regex: `.*${key}.*`, $options: "i" } },
         ],
       };
@@ -250,6 +252,7 @@ dropoffController.companydropOffs = async (req, res) => {
           { organisationPhone: { $regex: `.*${key}.*`, $options: "i" } },
           // { quantity: key },
           { categories: { $in: [key] } },
+          { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
           { Category: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         organisation,
@@ -413,7 +416,12 @@ dropoffController.rewardDropSystem = async (req, res) => {
       });
     }
 
-    const organisation = await organisationModel.findById(collector.approvedBy);
+    const orgId = collector.approvedBy
+    ? collector.approvedBy
+    : collector.organisationId;
+
+
+    const organisation = await organisationModel.findById(collector.orgId);
     if (!organisation) {
       return res.status(400).json({
         error: true,
@@ -422,59 +430,87 @@ dropoffController.rewardDropSystem = async (req, res) => {
       });
     }
 
-    let pricing = [];
-    let cat;
+    // let pricing = [];
+    // let cat;
 
-    console.log("organisation", organisation);
-    console.log("categories", categories);
-    for (let category of categories) {
-      console.log("category", category.name.toLowerCase());
-      console.log("org cat", organisation.categories);
-      if (organisation.categories.length !== 0) {
-        const c = organisation.categories.find(
-          (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
-        );
+    // console.log("organisation", organisation);
+    // console.log("categories", categories);
+    // for (let category of categories) {
+    //   console.log("category", category.name.toLowerCase());
+    //   console.log("org cat", organisation.categories);
+    //   if (organisation.categories.length !== 0) {
+    //     const c = organisation.categories.find(
+    //       (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
+    //     );
 
-        if (c) {
-          console.log("cat", cc);
-          const p = parseFloat(category.quantity) * Number(c.price);
-          console.log("quantity", parseFloat(category.quantity));
-          pricing.push(p);
+    //     if (c) {
+    //       console.log("cat", cc);
+    //       const p = parseFloat(category.quantity) * Number(c.price);
+    //       console.log("quantity", parseFloat(category.quantity));
+    //       pricing.push(p);
+    //     }
+    //   } else {
+    //     var cc =
+    //       category.name === "nylonSachet"
+    //         ? "nylon"
+    //         : category.name === "glassBottle"
+    //         ? "glass"
+    //         : category.name.length < 4
+    //         ? category.name.substring(0, category.name.length)
+    //         : category.name.substring(0, category.name.length - 1);
+
+    //     var organisationCheck = JSON.parse(JSON.stringify(organisation));
+    //     console.log("organisation check here", organisationCheck);
+    //     for (let val in organisationCheck) {
+    //       console.log("category check here", cc);
+    //       if (val.includes(cc)) {
+    //         const equivalent = !!organisationCheck[val]
+    //           ? organisationCheck[val]
+    //           : 1;
+    //         console.log("equivalent here", equivalent);
+    //         const p = parseFloat(category.quantity) * equivalent;
+    //         pricing.push(p);
+    //       }
+    //     }
+    //   }
+    // }
+
+    // const totalpointGained = pricing.reduce((a, b) => {
+    //   return parseFloat(a) + parseFloat(b);
+    // }, 0);
+
+    // const totalWeight = categories.reduce((a, b) => {
+    //   return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
+    // }, 0);
+    // console.log("pricing", pricing);
+
+    let cat = [];
+
+    await Promise.all(
+      categories.map(async (category) => {
+        console.log("c", category);
+        const catDetail = await categoryModel.findOne({
+          $or: [{ name: category.name }, { value: category.name }],
+        });
+        if (catDetail) {
+          const value = {
+            name: catDetail.name,
+            catId: catDetail._id,
+            quantity: category.quantity,
+          };
+          cat.push(value);
         }
-      } else {
-        var cc =
-          category.name === "nylonSachet"
-            ? "nylon"
-            : category.name === "glassBottle"
-            ? "glass"
-            : category.name.length < 4
-            ? category.name.substring(0, category.name.length)
-            : category.name.substring(0, category.name.length - 1);
+      })
+    );
 
-        var organisationCheck = JSON.parse(JSON.stringify(organisation));
-        console.log("organisation check here", organisationCheck);
-        for (let val in organisationCheck) {
-          console.log("category check here", cc);
-          if (val.includes(cc)) {
-            const equivalent = !!organisationCheck[val]
-              ? organisationCheck[val]
-              : 1;
-            console.log("equivalent here", equivalent);
-            const p = parseFloat(category.quantity) * equivalent;
-            pricing.push(p);
-          }
-        }
-      }
+    if (cat.length == 0) {
+      return res.status(400).json({
+        message: "Invaild category passed",
+        error: true,
+      });
     }
 
-    const totalpointGained = pricing.reduce((a, b) => {
-      return parseFloat(a) + parseFloat(b);
-    }, 0);
-
-    const totalWeight = categories.reduce((a, b) => {
-      return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
-    }, 0);
-    console.log("pricing", pricing);
+    const householdReward = await rewardService.houseHold(cat, organisation);
 
     const pakamPercentage = rewardService.calPercentage(
       householdReward.totalpointGained,
@@ -590,7 +626,7 @@ dropoffController.scheduledropOffs = async (req, res) => {
   try {
     let data = req.body;
     if (moment(data.dropOffDate) < moment()) {
-      return RESPONSE.status(400).json({
+      return res.status(400).json({
         statusCode: 400,
         customMessage: "Invalid date",
       });
@@ -610,19 +646,48 @@ dropoffController.scheduledropOffs = async (req, res) => {
       });
     }
 
+    let categories = [];
+
+    await Promise.all(
+      data.categories.map(async (category) => {
+        console.log("c", category);
+        const catDetail = await categoryModel.findOne({
+          $or: [{ name: category }, { value: category }],
+        });
+        if (catDetail) {
+          const value = {
+            name: catDetail.name,
+            catId: catDetail._id,
+          };
+          categories.push(value);
+        }
+      })
+    );
+
+    if (categories.length == 0) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid Categories values passed",
+        data: req.body.categories,
+      });
+    }
+
     const expireDate = moment(data.dropOffDate, "YYYY-MM-DD").add(7, "days");
     data.expiryDuration = expireDate;
     data.clientId = user._id.toString();
     data.state = user.state || "Lagos";
+    data.categories = categories;
+
 
     const schedule = await scheduleDropModel.create(data);
+    const items = categories.map((category) => category.name);
 
     if (user.onesignal_id !== "") {
       console.log("user", user.onesignal_id);
       sendNotification({
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
-          en: `Your dropoff schedule has been made successfully`,
+          en: `Your ${items} dropoff schedule has been made successfully`,
         },
         channel_for_external_user_ids: "push",
         include_external_user_ids: [user.onesignal_id],
@@ -630,7 +695,7 @@ dropoffController.scheduledropOffs = async (req, res) => {
       await notificationModel.create({
         title: "Dropoff Schedule made",
         lcd: schedule.lcd,
-        message: `Your dropoff schedule has been made successfully`,
+        message: `Your ${items} waste has been schedule for  dropoff to ${schedule.organisation}`,
         schedulerId: user._id,
       });
     }
@@ -647,7 +712,7 @@ dropoffController.scheduledropOffs = async (req, res) => {
     await activitesModel.create({
       userType: "client",
       userId: user._id,
-      message: `Dropoff scheduled to ${schedule.organisation}`,
+      message: `Your ${items} waste has been schedule for  dropoff to ${schedule.organisation}`,
       activity_type: "dropoff",
     });
 

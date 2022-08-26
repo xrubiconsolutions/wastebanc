@@ -7,6 +7,7 @@ const {
   notificationModel,
   activitesModel,
   centralAccountModel,
+  categoryModel,
 } = require("../models");
 const { sendResponse, bodyValidate } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
@@ -15,7 +16,7 @@ const { sendNotification } = require("../util/commonFunction");
 const randomstring = require("randomstring");
 const rewardService = require("../services/rewardService");
 const { logger } = require("../config/logger");
-moment().tz("Africa/Lagos", false);
+const mongoose = require("mongoose");
 
 class ScheduleService {
   static async getSchedulesWithFilter(req, res) {
@@ -449,6 +450,20 @@ class ScheduleService {
         });
       }
 
+      if (schedule.collectorStatus != "accept") {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule has not been accepted",
+        });
+      }
+
+      if (schedule.collectedBy != collectorId.toString()) {
+        return res.status(400).json({
+          error: true,
+          message: "You do not have permission to completed schedule",
+        });
+      }
+
       const scheduler = await userModel.findOne({
         email: schedule.client,
       });
@@ -461,7 +476,6 @@ class ScheduleService {
       }
 
       const collector = await collectorModel.findById(collectorId);
-      console.log("collector", collector);
       if (!collector || collector.companyVerified === false) {
         return res.status(400).json({
           error: true,
@@ -482,62 +496,33 @@ class ScheduleService {
         });
       }
 
-      let pricing = [];
-      let cat;
-      //moved the loop to a service
+      let cat = [];
 
-      //console.log("organisation", organisation);
-      // for (let category of categories) {
-      //   if (organisation.categories.length !== 0) {
-      //     const c = organisation.categories.find(
-      //       (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
-      //     );
-      //     if (c) {
-      //       console.log("cat", cc);
-      //       const p = parseFloat(category.quantity) * Number(c.price);
-      //       console.log("quantity", parseFloat(category.quantity));
-      //       pricing.push(p);
-      //     }
-      //   } else {
-      //     console.log("here2");
-      //     var cc =
-      //       category.name === "nylonSachet"
-      //         ? "nylon"
-      //         : category.name === "glassBottle"
-      //         ? "glass"
-      //         : category.name.length < 4
-      //         ? category.name.substring(0, category.name.length)
-      //         : category.name.substring(0, category.name.length - 1);
-
-      //     var organisationCheck = JSON.parse(JSON.stringify(organisation));
-      //     //console.log("organisation check here", organisationCheck);
-      //     for (let val in organisationCheck) {
-      //       //console.log("category check here", cc);
-      //       if (val.includes(cc)) {
-      //         const equivalent = !!organisationCheck[val]
-      //           ? organisationCheck[val]
-      //           : 1;
-      //         console.log("equivalent here", equivalent);
-      //         const p = parseFloat(category.quantity) * equivalent;
-      //         pricing.push(p);
-      //       }
-      //     }
-      //   }
-      // }
-
-      // const totalpointGained = pricing.reduce((a, b) => {
-      //   return parseFloat(a) + parseFloat(b);
-      // }, 0);
-
-      // const totalWeight = categories.reduce((a, b) => {
-      //   return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
-      // }, 0);
-      // console.log("pricing", pricing);
-
-      const householdReward = await rewardService.houseHold(
-        categories,
-        organisation
+      await Promise.all(
+        categories.map(async (category) => {
+          console.log("c", category);
+          const catDetail = await categoryModel.findOne({
+            $or: [{ name: category.name }, { value: category.name }],
+          });
+          if (catDetail) {
+            const value = {
+              name: catDetail.name,
+              catId: catDetail._id,
+              quantity: category.quantity,
+            };
+            cat.push(value);
+          }
+        })
       );
+
+      if (cat.length == 0) {
+        return res.status(400).json({
+          message: "Invaild category passed",
+          error: true,
+        });
+      }
+
+      const householdReward = await rewardService.houseHold(cat, organisation);
 
       console.log("household reward", householdReward);
       if (householdReward.error) {
@@ -548,20 +533,6 @@ class ScheduleService {
         householdReward.totalpointGained,
         10
       );
-
-      // let pickerGain = 0;
-      // let percentageGain = 0;
-      // if (user.collectorType == "waste-picker") {
-      //   const pickerReward = await rewardService.picker(
-      //     categories,
-      //     organisation
-      //   );
-      //   if (pickerReward.error) {
-      //     return res.status(400).json(pickerReward);
-      //   }
-
-      //   pickerGain = pickerReward.totalpointGained;
-      // }
 
       const ref = randomstring.generate({
         length: 7,
@@ -589,11 +560,13 @@ class ScheduleService {
         address: schedule.address,
       });
 
+      const items = categories.map((category) => category.name);
+
       //  send push notification to household user
       const message = {
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
-          en: `You have just been credited ${householdReward.totalpointGained} for the pickup`,
+          en: `You have just been credited ${householdReward.totalpointGained} for the ${items} pickup`,
         },
         channel_for_external_user_ids: "push",
         include_external_user_ids: [scheduler.onesignal_id],
@@ -602,7 +575,7 @@ class ScheduleService {
       await notificationModel.create({
         title: "Pickup Schedule completed",
         lcd: scheduler.lcd,
-        message: `You have just been credited ${householdReward.totalpointGained} for your schedule`,
+        message: `You have just been credited ${householdReward.totalpointGained} for the ${items} pickup`,
         schedulerId: scheduler._id,
       });
 
@@ -647,11 +620,13 @@ class ScheduleService {
         }
       );
 
+     
+
       // store the user activity for both scheduler and collector
       // collector
       await activitesModel.create({
         userId: collector._id,
-        message: `Pickup completed. Reference ID: ${t.ref_id}`,
+        message: `${items} pickup completed. Reference ID: ${t.ref_id}`,
         activity_type: "pickup",
       });
 
@@ -659,7 +634,7 @@ class ScheduleService {
       await activitesModel.create({
         userType: "client",
         userId: scheduler._id,
-        message: `Pickup completed. Reference ID: ${t.ref_id}`,
+        message: `${items} pickup completed. Reference ID: ${t.ref_id}`,
         activity_type: "pickup",
       });
       return res.status(200).json({
@@ -692,8 +667,6 @@ class ScheduleService {
         areaOfAccess = user.areaOfAccess;
       }
 
-      console.log("aces", areaOfAccess);
-
       const collectorAccessArea = areaOfAccess;
       let geofencedSchedules = [];
       let active_today = new Date();
@@ -701,8 +674,6 @@ class ScheduleService {
       active_today.setMinutes(0);
       let tomorrow = new Date();
       tomorrow.setDate(new Date().getDate() + 7);
-      console.log("tomorrow", tomorrow);
-      //console.log("user", user);
 
       const active_schedules = await scheduleModel.aggregate([
         {
@@ -804,17 +775,37 @@ class ScheduleService {
         });
       }
 
-      // if (user.cardID == null) {
-      //   return res.status(400).json({
-      //     error: true,
-      //     message: "You don't have a valid card ID, contact support for help",
-      //   });
-      // }
+      let categories = [];
+
+      await Promise.all(
+        data.categories.map(async (category) => {
+          console.log("c", category);
+          const catDetail = await categoryModel.findOne({
+            $or: [{ name: category }, { value: category }],
+          });
+          if (catDetail) {
+            const value = {
+              name: catDetail.name,
+              catId: catDetail._id,
+            };
+            categories.push(value);
+          }
+        })
+      );
+
+      if (categories.length == 0) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid Categories values passed",
+          data: req.body.categories,
+        });
+      }
 
       const expireDate = moment(data.pickUpDate, "YYYY-MM-DD").add(7, "days");
       data.expiryDuration = expireDate;
       data.clientId = user._id.toString();
-      data.state = user.state;
+      data.state = user.state || "Lagos";
+      data.categories = categories;
 
       if (data.reminder === true) {
         data.reminderDate = moment(data.pickUpDate, "YYYY-MM-DD").add(
@@ -823,37 +814,65 @@ class ScheduleService {
         );
       }
 
-      console.log("data", data);
+      const catIds = categories.map((category) => category.catId);
 
+      console.log("catids", catIds);
       const schedule = await scheduleModel.create(data);
-      const collectors = await collectorModel.aggregate([
+      const organisations = await organisationModel.aggregate([
         {
           $match: {
-            areaOfAccess: { $in: [schedule.lcd] },
+            streetOfAccess: { $in: [schedule.lcd] },
+            "categories.catId": { $in: catIds },
+          },
+        },
+        {
+          $addFields: {
+            _id: {
+              $toString: "$_id",
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "collectors",
+            localField: "_id",
+            foreignField: "organisationId",
+            as: "collectors",
           },
         },
       ]);
+      // console.log("organisations", organisations);
+      // const collectors = await collectorModel.aggregate([
+      //   {
+      //     $match: {
+      //       areaOfAccess: { $in: [schedule.lcd] },
+      //     },
+      //   },
+      // ]);
       //send out notification to collectors
+      const items = categories.map((category) => category.name);
       await Promise.all(
-        collectors.map(async (collector) => {
-          if (!collector.onesignal_id || collector.onesignal_id !== "") {
-            const message = {
-              app_id: "565970dc-d44a-456f-aab7-3f57e0504ff4",
-              contents: {
-                en: `A user in ${schedule.lcd} just created a schedule`,
-              },
-              channel_for_external_user_ids: "push",
-              include_external_user_ids: [collector.onesignal_id],
-              //include_player_ids: [`${collector.onesignal_id} || ' '`],
-            };
-            sendNotification(message);
-            await notificationModel.create({
-              title: "Schedule made",
-              lcd: schedule.lcd,
-              message: `A user in ${schedule.lcd} just created a schedule`,
-              recycler_id: collector._id,
-            });
-          }
+        organisations.map(async (organisation) => {
+          organisation.collectors.map(async (collector) => {
+            if (!collector.onesignal_id || collector.onesignal_id !== "") {
+              const message = {
+                app_id: "565970dc-d44a-456f-aab7-3f57e0504ff4",
+                contents: {
+                  en: `A user in ${schedule.lcd} just created a ${items} schedule`,
+                },
+                channel_for_external_user_ids: "push",
+                include_external_user_ids: [collector.onesignal_id],
+                //include_player_ids: [`${collector.onesignal_id} || ' '`],
+              };
+              sendNotification(message);
+              await notificationModel.create({
+                title: "Schedule made",
+                lcd: schedule.lcd,
+                message: `A user in ${schedule.lcd} just created a ${items} schedule`,
+                recycler_id: collector._id,
+              });
+            }
+          });
         })
       );
 
@@ -861,11 +880,11 @@ class ScheduleService {
       if (user.onesignal_id !== "" || !user.onesignal_id) {
         console.log(user.onesignal_id);
         const playerIds = [user.onesignal_id];
-        console.log("playerids", playerIds);
+
         sendNotification({
           app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
           contents: {
-            en: `Your ${data.categories} schedule has been made successfully`,
+            en: `Your ${items} schedule has been made successfully`,
           },
           channel_for_external_user_ids: "push",
           include_external_user_ids: playerIds,
@@ -873,7 +892,7 @@ class ScheduleService {
         await notificationModel.create({
           title: "Pickup Schedule made",
           lcd: schedule.lcd,
-          message: `Your ${data.categories} schedule has been made successfully`,
+          message: `Your ${items} schedule has been made successfully`,
           schedulerId: user._id,
         });
       }

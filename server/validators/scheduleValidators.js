@@ -3,6 +3,7 @@ const { body } = require("express-validator");
 module.exports = {
   bookPickUp: [
     body("client")
+      .trim()
       .notEmpty()
       .withMessage("client is required")
       .isString()
@@ -13,10 +14,12 @@ module.exports = {
       .isInt()
       .withMessage("quantity should be number"),
     body("details")
+      .trim()
       .optional()
       .isString()
       .withMessage("details should be string"),
     body("address")
+      .trim()
       .notEmpty()
       .withMessage("address is required")
       .isString()
@@ -43,6 +46,7 @@ module.exports = {
       .isBoolean()
       .withMessage("callOnArrival should be either true or false"),
     body("phone")
+      .trim()
       .notEmpty()
       .withMessage("phone is required")
       .isString()

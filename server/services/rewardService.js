@@ -1,6 +1,6 @@
 const { categoryModel } = require("../models");
 class rewardService {
-  static async houseHold(categories, organisation) {
+  static async houseHoldBack(categories, organisation) {
     try {
       let pricing = [];
       //let cat;
@@ -67,6 +67,47 @@ class rewardService {
         message: "An error occurred,Please contact support team",
       };
     }
+  }
+
+  static async houseHold(categories, organisation) {
+    let pricing = [];
+    console.log("org", organisation);
+    categories.map((cat) => {
+      const organisationcategory = organisation.categories.find(
+        (category) => category.catId.toString() == cat.catId.toString()
+      );
+
+      console.log("cat", cat);
+      console.log("orgcat", organisationcategory);
+      if (organisationcategory) {
+        const p = parseFloat(cat.quantity) * parseFloat(organisationcategory.price);
+        pricing.push(p);
+      } else {
+        const p = parseFloat(cat.quantity) * 0;
+        pricing.push(p);
+      }
+    });
+
+    const totalpointGained = pricing.reduce((a, b) => {
+      return parseFloat(a) + parseFloat(b);
+    }, 0);
+
+    const totalWeight = categories.reduce((a, b) => {
+      return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
+    }, 0);
+
+    if (totalpointGained == 0) {
+      return {
+        error: true,
+        message: "Your company do not collect any of the waste category passed",
+      };
+    }
+
+    return {
+      error: false,
+      totalpointGained,
+      totalWeight,
+    };
   }
 
   static async picker(categories, organisation) {
