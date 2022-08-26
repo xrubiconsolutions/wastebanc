@@ -547,7 +547,7 @@ class ScheduleService {
         cardID: scheduler._id,
         completedBy: collectorId,
         categories,
-        fullname: `${scheduler.firstname} ${scheduler.lastname}`,
+        fullname: `${scheduler.fullname}`,
         recycler: collector.fullname,
         aggregatorId: collector.aggregatorId,
         organisation: collector.organisation,
