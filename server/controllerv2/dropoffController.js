@@ -7,6 +7,7 @@ const {
   organisationModel,
   notificationModel,
   activitesModel,
+  categoryModel,
 } = require("../models");
 let dropoffController = {};
 const moment = require("moment-timezone");
