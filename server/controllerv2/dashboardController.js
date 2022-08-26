@@ -6,6 +6,7 @@ const {
   collectorModel,
   categoryModel,
   organisationModel,
+  payModel,
 } = require("../models");
 
 const { sendResponse } = require("../util/commonFunction");
@@ -764,25 +765,28 @@ const totalWaste = async (criteria) => {
 };
 
 const totalpayout = async (criteria) => {
-  const transactions = await transactionModel.find({
+  const condition = {
     ...criteria,
     paid: true,
-    requestedForPayment: true,
-  });
+  };
+
+  const transactions = await payModel.find(condition);
   const totalpayouts = transactions
-    .map((x) => x.coin)
+    .map((x) => x.amount)
     .reduce((acc, curr) => acc + curr, 0);
   return totalpayouts;
 };
 
 const totaloutstanding = async (criteria) => {
-  const transactions = await transactionModel.find({
+  const condition = {
     ...criteria,
     paid: false,
-    requestedForPayment: true,
-  });
+  };
+
+  const transactions = await payModel.find(condition);
+
   const totalpayouts = transactions
-    .map((x) => x.coin)
+    .map((x) => x.amount)
     .reduce((acc, curr) => acc + curr, 0);
   return totalpayouts;
 };

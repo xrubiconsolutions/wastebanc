@@ -30,6 +30,7 @@ const collectorModel = require("../models/collectorModel");
 const rewardService = require("../services/rewardService");
 const sterlingService = require("../modules/partners/sterling/sterlingService");
 const ObjectId = require("mongoose").Types.ObjectId;
+const categoriesModel = require("../models/categoryModel");
 
 organisationController.types = async (req, res) => {
   try {
@@ -222,6 +223,7 @@ organisationController.listOrganisation = async (req, res) => {
           {
             streetOfAccess: { $regex: `.*${key}.*`, $options: "i" },
           },
+          { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
         ],
       };
     } else if (start || end) {
@@ -266,23 +268,26 @@ organisationController.listOrganisation = async (req, res) => {
 
     const organisations =
       !key && !(start || end)
-        ? await organisationModel.find(pickerCriteria, { password: 0 })
+        ? await organisationModel
+            .find(pickerCriteria, { password: 0 })
+            .populate("categories.catId")
+            .sort({ createAt: -1 })
+            .skip((page - 1) * resultsPerPage)
+            .limit(resultsPerPage)
         : await organisationModel
             .find(criteria, { password: 0 })
+            .populate("categories.catId")
             .sort({ createAt: -1 })
             .skip((page - 1) * resultsPerPage)
             .limit(resultsPerPage);
 
-    const data =
-      !key && !(start || end)
-        ? { organisations }
-        : {
-            organisations,
-            totalResult,
-            page,
-            resultsPerPage,
-            totalPages: Math.ceil(totalResult / resultsPerPage),
-          };
+    const data = {
+      organisations,
+      totalResult,
+      page,
+      resultsPerPage,
+      totalPages: Math.ceil(totalResult / resultsPerPage),
+    };
 
     return res.status(200).json({
       error: false,
@@ -299,17 +304,17 @@ organisationController.listOrganisation = async (req, res) => {
 };
 
 organisationController.create = async (req, res) => {
-  bodyValidate(req, res);
   try {
     const body = req.body;
     const email = body.email.trim();
+
     const check = await organisationModel.findOne({
       $or: [
         { companyName: body.companyName },
         { email: email },
         { rcNo: body.rcNo },
         { companyTag: body.companyTag },
-        { phone: Number(body.phone) },
+        { phone: body.phone },
       ],
     });
 
@@ -320,10 +325,38 @@ organisationController.create = async (req, res) => {
       });
     }
 
+    let categories = [];
+
+    await Promise.all(
+      body.categories.map(async (category) => {
+        const catDetail = await categoriesModel.findOne({
+          $or: [{ name: category.name }, { value: category.name }],
+        });
+
+        if (catDetail) {
+          const value = {
+            price: category.price,
+            name: category.name,
+            catId: catDetail._id,
+          };
+          categories.push(value);
+        }
+      })
+    );
+
+    if (categories.length == 0) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid Categories values passed",
+        data: req.body.categories,
+      });
+    }
+
     const password = generateRandomString();
     body.password = await encryptPassword(password);
     body.email = email.toLowerCase();
-    body.phone = Number(body.phone);
+    body.phone = body.phone;
+    body.categories = categories;
     const org = await organisationModel.create(body);
     sgMail.setApiKey(
       "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"
@@ -400,7 +433,6 @@ Pakam Team
               },
               function (error, response, body) {
                 const result = JSON.parse(body);
-                console.log("map result", result);
                 const LatLong = result.results.map((a) => ({
                   formatted_address: a.formatted_address,
                   geometry: a.geometry,
@@ -438,10 +470,9 @@ Pakam Team
 organisationController.findOrganisation = async (req, res) => {
   bodyValidate(req, res);
   try {
-    const organisation = await organisationModel.findById(
-      req.params.organisationId,
-      { password: 0 }
-    );
+    const organisation = await organisationModel
+      .findById(req.params.organisationId, { password: 0 })
+      .populate("categories.catId");
     if (!organisation) {
       return res.status(400).json({
         error: true,
@@ -464,7 +495,6 @@ organisationController.findOrganisation = async (req, res) => {
 };
 
 organisationController.update = async (req, res) => {
-  bodyValidate(req, res);
   try {
     const orgId = req.params.orgId;
     if (!ObjectId.isValid(orgId))
@@ -526,6 +556,35 @@ organisationController.update = async (req, res) => {
       }
     }
 
+    let categories = [];
+    if (req.body.categories) {
+      await Promise.all(
+        req.body.categories.map(async (category) => {
+          const catDetail = await categoriesModel.findOne({
+            $or: [{ name: category.name }, { value: category.name }],
+          });
+
+          if (catDetail) {
+            const value = {
+              price: category.price,
+              name: category.name,
+              catId: catDetail._id,
+            };
+            categories.push(value);
+          }
+        })
+      );
+
+      if (categories.length == 0) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid Categories values passed",
+          data: req.body.categories,
+        });
+      }
+    } else {
+      categories = organisation.categories;
+    }
     await organisationModel.updateOne(
       { _id: organisation._id },
       {
@@ -536,7 +595,7 @@ organisationController.update = async (req, res) => {
         companyTag: req.body.companyTag || organisation.companyTag,
         phone: req.body.phone || organisation.phone,
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
-        categories: req.body.categories || organisation.categories,
+        categories: categories,
         location: req.body.location || organisation.location,
         allowPickers: req.body.allowPickers || organisation.allowPickers,
       }
@@ -551,7 +610,7 @@ organisationController.update = async (req, res) => {
     organisation.phone = req.body.phone || organisation.phone;
     organisation.streetOfAccess =
       req.body.streetOfAccess || organisation.streetOfAccess;
-    organisation.categories = req.body.categories || organisation.categories;
+    organisation.categories = categories;
     organisation.location = req.body.location || organisation.location;
 
     // add action to log
@@ -814,6 +873,36 @@ organisationController.updateProfile = async (req, res) => {
           });
         }
       }
+    }
+
+    let categories = [];
+    if (req.body.categories) {
+      await Promise.all(
+        req.body.categories.map(async (category) => {
+          const catDetail = await categoriesModel.findOne({
+            $or: [{ name: category.name }, { value: category.name }],
+          });
+
+          if (catDetail) {
+            const value = {
+              price: category.price,
+              name: category.name,
+              catId: catDetail._id,
+            };
+            categories.push(value);
+          }
+        })
+      );
+
+      if (categories.length == 0) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid Categories values passed",
+          data: req.body.categories,
+        });
+      }
+    } else {
+      categories = organisation.categories;
     }
 
     await organisationModel.updateOne(

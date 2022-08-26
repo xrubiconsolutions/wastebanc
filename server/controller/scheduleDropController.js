@@ -337,21 +337,18 @@ scheduleDropController.rewardDropSystem = (REQUEST, RESPONSE) => {
   }
 };
 
-scheduleDropController.dropRequestRecycler = (req, res) => {
-  const organisationId = req.query.organisationId;
+scheduleDropController.dropRequestRecycler = async (req, res) => {
+  const organisationId = req.user.organisationId;
   try {
-    MODEL.scheduleDropModel
-      .find({
-        organisationCollection: organisationId,
-        completionStatus: "pending",
-      })
-
-      .then((drop) => {
-        return res
-          .status(200)
-          .json({ error: false, message: "success", data: drop });
-      });
+    const dropoffs = await MODEL.scheduleDropModel.find({
+      organisationCollection: organisationId,
+      completionStatus: "pending",
+    });
+    return res
+      .status(200)
+      .json({ error: false, message: "success", data: dropoffs });
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 };

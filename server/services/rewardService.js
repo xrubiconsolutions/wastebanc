@@ -1,14 +1,17 @@
 const { categoryModel } = require("../models");
 class rewardService {
-  static async houseHold(categories, organisation) {
+  static async houseHoldBack(categories, organisation) {
     try {
       let pricing = [];
       //let cat;
 
+      console.log("org", organisation);
       for (let category of categories) {
         if (organisation.categories.length !== 0) {
           const c = organisation.categories.find(
-            (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
+            (cc) =>
+              cc.name.toLowerCase().trim() ===
+              category.name.toLowerCase().trim()
           );
           if (c) {
             const p = parseFloat(category.quantity) * Number(c.price);
@@ -64,6 +67,50 @@ class rewardService {
         message: "An error occurred,Please contact support team",
       };
     }
+  }
+
+  static async houseHold(categories, organisation) {
+    let pricing = [];
+    console.log("org", organisation);
+    categories.map((cat) => {
+      const organisationcategory = organisation.categories.find(
+        (category) => category.catId.toString() == cat.catId.toString()
+      );
+
+      console.log("cat", cat);
+      console.log("orgcat", organisationcategory);
+      if (organisationcategory) {
+        const p =
+          parseFloat(cat.quantity) * parseFloat(organisationcategory.price);
+        pricing.push(p);
+      } else {
+        const p = parseFloat(cat.quantity) * 0;
+        pricing.push(p);
+      }
+    });
+
+    const totalpointGained = pricing.reduce((a, b) => {
+      return parseFloat(a) + parseFloat(b);
+    }, 0);
+
+    const totalWeight = categories.reduce((a, b) => {
+      return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
+    }, 0);
+
+    console.log("t", totalpointGained);
+
+    if (totalpointGained == 0) {
+      return {
+        error: true,
+        message: "Your company do not collect any of the waste category passed",
+      };
+    }
+
+    return {
+      error: false,
+      totalpointGained,
+      totalWeight,
+    };
   }
 
   static async picker(categories, organisation) {

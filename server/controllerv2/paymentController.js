@@ -20,6 +20,10 @@ paymentController.paymentHistory = async (req, res) => {
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
 
+    let paidStatus = true;
+    if (paid == "false") {
+      paidStatus = false;
+    }
     // if (!key) {
     //   if (!start || !end) {
     //     return res.status(400).json({
@@ -37,7 +41,7 @@ paymentController.paymentHistory = async (req, res) => {
           { userPhone: { $regex: `.*${key}.*`, $options: "i" } },
           { bankAcNo: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        paid,
+        paid: paidStatus,
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -52,10 +56,12 @@ paymentController.paymentHistory = async (req, res) => {
           $gte: startDate,
           $lt: endDate,
         },
-        paid,
+        paid: paidStatus,
       };
     } else {
-      criteria = {};
+      criteria = {
+        paid: paidStatus,
+      };
     }
     if (!currentScope) {
       return res.status(400).json({
@@ -65,6 +71,7 @@ paymentController.paymentHistory = async (req, res) => {
     }
 
     if (currentScope === "All") {
+      console.log("here");
       criteria.state = {
         $in: user.states,
       };

@@ -3,26 +3,31 @@ const { body, check, param, query } = require("express-validator");
 module.exports = {
   createOrganisation: [
     body("companyName")
+      .trim()
       .notEmpty()
       .withMessage("companyName is required")
       .isString()
       .withMessage("companyName should be string"),
     body("email")
+      .trim()
       .notEmpty()
       .withMessage("email is required")
       .isEmail()
       .withMessage("Enter a valid email"),
     body("rcNo")
+      .trim()
       .notEmpty()
       .withMessage("rcNo is required")
       .isString()
       .withMessage("rcNo should be string"),
     body("companyTag")
+      .trim()
       .notEmpty()
       .withMessage("companyTag is required")
       .isString()
       .withMessage("companyTag should be string"),
     body("phone")
+      .trim()
       .notEmpty()
       .withMessage("phone is required")
       .isNumeric()
@@ -58,10 +63,15 @@ module.exports = {
       .isString()
       .withMessage("location should be string"),
     body("country")
+      .trim()
       .optional()
       .isString()
       .withMessage("country should be string"),
-    body("state").optional().isString().withMessage("state should be string"),
+    body("state")
+      .trim()
+      .optional()
+      .isString()
+      .withMessage("state should be string"),
   ],
 
   organisationId: [
