@@ -18,6 +18,125 @@ const { logger } = require("../config/logger");
 moment().tz("Africa/Lagos", false);
 
 class ScheduleService {
+  static async aggregateQuery({ criteria, page = 1, resultsPerPage = 20 }) {
+    const paginationQuery = [
+      {
+        $skip: (page - 1) * resultsPerPage,
+      },
+      {
+        $limit: resultsPerPage,
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+    ];
+    try {
+      const pipeline = [
+        {
+          $match: criteria,
+        },
+        {
+          $lookup: {
+            from: "users",
+            let: {
+              email: "$client",
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$email", "$$email"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  fullname: 1,
+                  phone: 1,
+                  gender: 1,
+                  userId: "$_id",
+                  _id: 0,
+                },
+              },
+            ],
+            as: "customer",
+          },
+        },
+        {
+          $unwind: {
+            path: "$customer",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            fullname: {
+              $ifNull: ["$customer.fullname", "$fullname"],
+            },
+            clientId: {
+              $ifNull: ["$customer.userId", "$clientId"],
+            },
+            phone: {
+              $ifNull: ["$customer.phone", "$phone"],
+            },
+            gender: "$customer.gender",
+            scheduleCreator: 1,
+            categories: 1,
+            Category: 1,
+            quantity: 1,
+            completionStatus: 1,
+            organisation: 1,
+            createdAt: 1,
+            organisationCollection: 1,
+            organisationPhone: 1,
+            dropOffDate: 1,
+            expiryDuration: 1,
+            state: 1,
+            collectedBy: 1,
+            details: 1,
+            address: 1,
+            pickUpDate: 1,
+            expiryDuration: 1,
+            reminder: 1,
+            callOnArrival: 1,
+            completionStatus: 1,
+            acceptedBy: 1,
+            collectedBy: 1,
+            collectedPhone: 1,
+            rating: 1,
+            comment: 1,
+            organisationCollection: 1,
+            lcd: 1,
+            lat: 1,
+            long: 1,
+            recycler: 1,
+            completionDate: 1,
+            state: 1,
+          },
+        },
+      ];
+
+      const countCriteria = [
+        ...pipeline,
+        {
+          $count: "createdAt",
+        },
+      ];
+      let totalResult = await scheduleModel.aggregate(countCriteria);
+
+      const schedules = await scheduleModel.aggregate([
+        ...pipeline,
+        ...paginationQuery,
+      ]);
+
+      return { schedules, totalResult: Object.values(totalResult[0])[0] };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async getSchedulesWithFilter(req, res) {
     try {
       const { user } = req;
@@ -96,15 +215,11 @@ class ScheduleService {
         criteria.state = currentScope;
       }
 
-      const totalResult = await scheduleModel.countDocuments(criteria);
-
-      const skip = (page - 1) * resultsPerPage;
-      // get all schedules within range
-      const schedules = await scheduleModel
-        .find(criteria)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * resultsPerPage)
-        .limit(resultsPerPage);
+      const { schedules, totalResult } = await ScheduleService.aggregateQuery({
+        criteria,
+        page,
+        resultsPerPage,
+      });
 
       return res.status(200).json({
         error: false,
@@ -154,15 +269,21 @@ class ScheduleService {
     if (state) criteria.state = state;
 
     try {
-      // get length of schedules with completion status and provided field value
-      const totalResult = await scheduleModel.countDocuments(criteria);
+      // // get length of schedules with completion status and provided field value
+      // const totalResult = await scheduleModel.countDocuments(criteria);
 
-      // get schedules based on page
-      const schedules = await scheduleModel
-        .find(criteria)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * resultsPerPage)
-        .limit(resultsPerPage);
+      // // get schedules based on page
+      // const schedules = await scheduleModel
+      //   .find(criteria)
+      //   .sort({ createdAt: -1 })
+      //   .skip((page - 1) * resultsPerPage)
+      //   .limit(resultsPerPage);
+
+      const { schedules, totalResult } = await ScheduleService.aggregateQuery({
+        criteria,
+        page,
+        resultsPerPage,
+      });
 
       return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
         schedules,
@@ -228,11 +349,6 @@ class ScheduleService {
           error: true,
           message: "Organisation with ID not found!",
         });
-
-      console.log({
-        page,
-        resultsPerPage,
-      });
 
       const result = await ScheduleService.paginateModelData({
         model: transactionModel,
@@ -310,14 +426,13 @@ class ScheduleService {
         };
 
     try {
-      // get length of schedules with criteria
-      const totalResult = await scheduleModel.countDocuments(criteria);
-
-      const companySchedules = await scheduleModel
-        .find(criteria)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * resultsPerPage)
-        .limit(resultsPerPage);
+      // // get length of schedules with criteria
+      const { schedules: companySchedules, totalResult } =
+        await ScheduleService.aggregateQuery({
+          criteria,
+          page,
+          resultsPerPage,
+        });
 
       return res.status(200).json({
         companySchedules,

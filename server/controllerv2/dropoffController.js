@@ -21,10 +21,7 @@ dropoffController.aggregateQuery = async ({
   resultsPerPage = 20,
 }) => {
   try {
-    const pipeline = [
-      {
-        $match: criteria,
-      },
+    const paginationQuery = [
       {
         $skip: (page - 1) * resultsPerPage,
       },
@@ -33,8 +30,13 @@ dropoffController.aggregateQuery = async ({
       },
       {
         $sort: {
-          createAt: -1,
+          createdAt: -1,
         },
+      },
+    ];
+    const pipeline = [
+      {
+        $match: criteria,
       },
       {
         $lookup: {
@@ -99,7 +101,10 @@ dropoffController.aggregateQuery = async ({
     ];
     let totalResult = await scheduleDropModel.aggregate(countCriteria);
 
-    const dropoffs = await scheduleDropModel.aggregate(pipeline);
+    const dropoffs = await scheduleDropModel.aggregate([
+      ...pipeline,
+      ...paginationQuery,
+    ]);
 
     return { dropoffs, totalResult: Object.values(totalResult[0])[0] };
   } catch (error) {
