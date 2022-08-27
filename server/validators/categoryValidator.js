@@ -9,7 +9,6 @@ module.exports = {
       .withMessage("name should be string"),
     body("wastepicker")
       .optional()
-      .withMessage("wastepicker is required")
       .isInt()
       .withMessage("wastepicker should be number"),
   ],
