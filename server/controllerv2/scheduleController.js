@@ -20,6 +20,7 @@ const mongoose = require("mongoose");
 
 class ScheduleService {
   static async aggregateQuery({ criteria, page = 1, resultsPerPage = 20 }) {
+
     const paginationQuery = [
       {
         $skip: (page - 1) * resultsPerPage,
@@ -58,6 +59,7 @@ class ScheduleService {
                   phone: 1,
                   gender: 1,
                   userId: "$_id",
+                  email: 1,
                   _id: 0,
                 },
               },
@@ -83,6 +85,7 @@ class ScheduleService {
               $ifNull: ["$customer.phone", "$phone"],
             },
             gender: "$customer.gender",
+            email:"$customer.email",
             scheduleCreator: 1,
             categories: 1,
             Category: 1,
@@ -132,11 +135,13 @@ class ScheduleService {
         ...paginationQuery,
       ]);
 
-      let totalValue = Object.values(totalResult[0])[0];
+      let totalValue;
       if (totalResult.length == 0) {
         totalValue = 0;
+      } else {
+        totalValue = Object.values(totalResult[0])[0];
       }
-      console.log("totalResult", totalValue);
+     
       return { schedules, totalResult: totalValue };
     } catch (error) {
       throw error;
@@ -176,7 +181,7 @@ class ScheduleService {
             { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
             { categories: { $regex: `.*${key}.*`, $options: "i" } },
             { organisation: { $regex: `.*${key}.*`, $options: "i" } },
-            { schuduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+            { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
             { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
             { client: { $regex: `.*${key}.*`, $options: "i" } },
             { phone: { $regex: `.*${key}.*`, $options: "i" } },
