@@ -20,7 +20,6 @@ const mongoose = require("mongoose");
 
 class ScheduleService {
   static async aggregateQuery({ criteria, page = 1, resultsPerPage = 20 }) {
-
     const paginationQuery = [
       {
         $skip: (page - 1) * resultsPerPage,
@@ -85,7 +84,7 @@ class ScheduleService {
               $ifNull: ["$customer.phone", "$phone"],
             },
             gender: "$customer.gender",
-            email:"$customer.email",
+            email: "$customer.email",
             scheduleCreator: 1,
             categories: 1,
             Category: 1,
@@ -141,7 +140,7 @@ class ScheduleService {
       } else {
         totalValue = Object.values(totalResult[0])[0];
       }
-     
+
       return { schedules, totalResult: totalValue };
     } catch (error) {
       throw error;
@@ -186,6 +185,7 @@ class ScheduleService {
             { client: { $regex: `.*${key}.*`, $options: "i" } },
             { phone: { $regex: `.*${key}.*`, $options: "i" } },
             { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
+            { recycler: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           collectorStatus,
           completionStatus,
