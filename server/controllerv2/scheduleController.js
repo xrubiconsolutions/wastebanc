@@ -132,6 +132,7 @@ class ScheduleService {
         ...paginationQuery,
       ]);
 
+      console.log('totalResult', totalResult);
       return { schedules, totalResult: Object.values(totalResult[0])[0] };
     } catch (error) {
       throw error;
