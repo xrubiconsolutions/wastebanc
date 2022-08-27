@@ -208,7 +208,10 @@ class ScheduleService {
           completionStatus,
         };
       } else {
-        criteria = {};
+        criteria = {
+          collectorStatus,
+          completionStatus,
+        };
       }
 
       if (!currentScope) {
