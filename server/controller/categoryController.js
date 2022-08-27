@@ -65,7 +65,7 @@ categoryController.addCategory = async (req, res) => {
     const store = await MODEL.categoryModel.create({
       name,
       value,
-      wastepicker: req.body.wastepicker,
+      wastepicker: req.body.wastepicker || 0,
     });
 
     return res.status(200).json({
