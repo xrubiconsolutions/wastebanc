@@ -60,6 +60,7 @@ roleController.roles = async (req, res) => {
       .find({
         active: true,
       })
+      .sort({ _id: -1 })
       .populate("claims.claimId", "title");
 
     return res.status(200).json({
