@@ -132,8 +132,12 @@ class ScheduleService {
         ...paginationQuery,
       ]);
 
-      console.log('totalResult', totalResult);
-      return { schedules, totalResult: Object.values(totalResult[0])[0] };
+      let totalValue = Object.values(totalResult[0])[0];
+      if (totalResult.length == 0) {
+        totalValue = 0;
+      }
+      console.log("totalResult", totalValue);
+      return { schedules, totalResult: totalValue };
     } catch (error) {
       throw error;
     }
@@ -735,8 +739,6 @@ class ScheduleService {
           },
         }
       );
-
-     
 
       // store the user activity for both scheduler and collector
       // collector
