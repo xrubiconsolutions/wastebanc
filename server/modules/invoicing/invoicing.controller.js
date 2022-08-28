@@ -212,6 +212,17 @@ class invoiceController {
       });
     }
   }
+
+  static async invoicePDF(req, res) {
+    const { invoiceNumber } = req.params;
+    const generatePDF = await invoiceService.generateInvoicePDF(invoiceNumber);
+    if (generatePDF.error)
+      return res
+        .status(400)
+        .json({ error: false, message: "Invalid invoice number passed" });
+
+    return res.status(200).download(generatePDF.path);
+  }
 }
 
 module.exports = invoiceController;

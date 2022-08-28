@@ -10,6 +10,10 @@ moment().tz("Africa/Lagos", false);
 const { ObjectId } = require("mongodb");
 const invoiceTemplate = require("../../../email-templates/invoice.template");
 const sgMail = require("@sendgrid/mail");
+const puppeteer = require("puppeteer");
+const fs = require("fs");
+const FsExtra = require("fs-extra");
+
 class invoiceService {
   static async generateInvoice(start, end, companyId, authuser) {
     const organisation = await organisationModel.findById(companyId);
@@ -510,6 +514,38 @@ class invoiceService {
         totalPages: Math.ceil(totalResult / resultsPerPage),
       },
     };
+  }
+
+  static async generateInvoicePDF(invoiceNumber) {
+    const invoiceData = await invoiceModel
+      .findOne({
+        invoiceNumber,
+      })
+      .populate("company", "companyName email phone location")
+      .populate("transactions");
+    if (!invoiceData) return { error: true, path: "" };
+
+    console.log("invoiceData", invoiceData);
+    const template = invoiceTemplate(invoiceData);
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    const path = "invoice.pdf";
+
+    if (fs.existsSync(path)) {
+      FsExtra.remove(path);
+    }
+    // generate pdf
+    await page.setContent(template, { waitUntil: "domcontentloaded" });
+    await page.emulateMediaType("screen");
+    const pdf = await page.pdf({
+      path: "invoice.pdf",
+      margin: { top: "100px", right: "50px", bottom: "100px", left: "50px" },
+      printBackground: true,
+      format: "A4",
+    });
+    await browser.close();
+
+    return { error: false, path };
   }
 }
 

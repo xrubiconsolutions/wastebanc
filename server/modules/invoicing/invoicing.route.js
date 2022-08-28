@@ -26,6 +26,20 @@ module.exports = (APP) => {
     invoiceController.sendInvoice
   );
 
+  APP.route("/api/generate/invoicepdf/:invoiceNumber").get(
+    adminPakamValidation,
+    invoiceNumber,
+    checkRequestErrs,
+    invoiceController.invoicePDF
+  );
+
+  APP.route("/api/company/generate/invoicepdf/:invoiceNumber").get(
+    companyPakamDataValidation,
+    invoiceNumber,
+    checkRequestErrs,
+    invoiceController.invoicePDF
+  );
+
   APP.route("/api/invoice/summary").get(
     adminPakamValidation,
     invoiceController.cardData

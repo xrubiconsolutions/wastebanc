@@ -1,3 +1,4 @@
+const moment = require("moment");
 module.exports = (invoice) => {
   const {
     transactions,
@@ -11,9 +12,9 @@ module.exports = (invoice) => {
     invoiceNumber,
   } = invoice;
   const data = transactions.map(
-    ({ ref_id, fullname, categories, weight, coin }) => {
+    ({ ref_id, fullname, type, categories, weight, coin }) => {
       const catgs = categories.map((cat) => cat.name).join(", ");
-      return [ref_id, `Payment to ${fullname}`, catgs, weight, coin];
+      return [ref_id, `Payment to ${fullname}`, type, catgs, weight, coin];
     }
   );
   let bodyData = data
@@ -162,10 +163,10 @@ module.exports = (invoice) => {
       <tr>
         <td width="35">
           <a href="#" target="_blank">
-            <img
-              src="https://res.cloudinary.com/xrubicon/image/upload/v1647091610/pakam-logo_pddzwg.png"
-              alt="Pakam"
-            />
+          <img
+          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAkCAYAAADsHujfAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAURSURBVHgBtZhbbBRVGMf/s91CARUQkYpRKdaAUEQl4eIlUIP6ItEHJT4YE6NB0JQQNVWQkBLxglHjNSYl4cHIi8ZojIkvPiCaEB+MRmqKFGlRbCmWClaw1d0Zf+fM0N2ZOVu32/JtvjlnLuc7//N957uc9TTetFkz5Oly+boRnk+/Wjl9pVf1yUjDPI0HbdVtTPoUvRUKNA2Wgw8rr9v1urp03oAYatJE1Wi5qrSGSW+Flw6DMOTbfpcm6Hrt1OmRgexASJXuYcDH2qLPNBZ6VldoSHcg605mWQ2Q6RaMr+16Uy1uIDt1IR/sYdCaaBWdcAe9XvgU737l/nfak/AAo85w7UDNp1QuPaGbkPEI4xfoDTTnBPKS3uajx4vsuRe7N2qVsly/4f55C8jTTDbeVO7nwLXwDJ5Pgv9gggvsegP1ce2jf4y2n/YEz07Q9ukvFjJR3+sAYPYiKQbkRYTKaiC+ufKosoXJtzMkwFwtZa3eUzMe86/qMHE1MuqU4T7QFPqXWi8K0IZZyDs6Wjwwy9DF0UaKU0ZrubbyPGCDVak8CvQympDlNG1keh8gBqDiQDK8qC0So6Kdfm/09G8LZTzI18JI/qLkqwwaOZoySwhqNeYwMWFAZ8cFiAeQW6x8T/VpIFVsniSFgMxGXsv1T7sdx0rrtZJrVSR7YRpIs47z4oxTK75eg28GSl5jpYwaiuRfnXydjdoeOK6uEMwU2mtxuedw568BdYT7QbgH6D16i5BVLgUEAn8YyGytIwy0FiJsNvpoP1zvzBHina8vaGfBjbBZzWxNJgg22zhymvfdtN20Rrtn6R/AhQdoj+sSHWKvGQjLi+ROwOSX2bExINLPMZPEqYNwtkelaB3xYjpCh4gXgj2m9tkPng14s4jHq7QBWH600wpxahnXg0mNdKqgwiTnNBK1Mon0S8Rxeoxoa7wuYJ6k3OKwMQzEj5C5tVJ+PkmSj3YkyV0WzC/+NGOvk9QeExAfMKBKqQqTuUEYWpQG8rSdrFfuwOarUsrrqhIyZb0xBcSQrx9SgsIoeFKVkm+zdHJvnOtP1gPWcxJATKJyq7FHlZKnubZ1yQ31XJcG4us7p7BgTJv1mlhmj5vGmG5BGkjekfyCSFylFFBipE1SDGhJGkjAHnG5r0cZUAk9SNQNCHWhbDkBiWIpBaSGgBREyS2ulV5VQjV4hctbFAPVkAYS5oPDqcH9tt4cPeVi2bYU1+u+sPrLJIa3xe7Mx602iY2eAl1XBhAz/zwXkIOjyjMjA5lXBpAw1qiQfUPKkfzi0Pr1f/QotZenhxB4pUxdk9O72q1d9Oc4PNAFZjANRPoxMXBks2zgsBFQlZja3Zg1r4tptwCrAWBzHatPb9ysfjJNfP3Z6Hyj4Y8HS4JYb1e8jRJnB4F6BUevbThsLQm0iQnvKukpcRfepQ/1WxrIC9ZVjxVppK8kkAyTiWg809Ya+9FGPxOYXyOm+igxoQvQtyyzqSAuSZ492Z0LwdUlgQS6SOYoOaQPKI0W0z7MkbJN/3C+DewvqQGTx83B60uZo9ZUjhafF2rerAOIsbtZ7TT6y7SJP1gCak9TJuRYQ56yMjzPmnPuUq5LeH437W54K/0hvtknWW84BB+B2xnZqU9LB0f3/yNP8oeK9J4t53zF7eoP97vhNvrPsLqNTLSSZLAZ7ezT+6PP2KX/qNnEinzdT+8GhUcIE3W7WHE79Xu7XuFAkZYVqEL6D+KyYAEKG7FTAAAAAElFTkSuQmCC"
+          alt="logo"
+        />
           </a>
         </td>
         <td class="logo">
@@ -177,7 +178,9 @@ module.exports = (invoice) => {
       <tr>
         <td colspan="2">
           <p class="description">
-            Final invoice for the June 2022 billing period
+            Invoice for transactions done from ${moment(startDate).format(
+              "MMMM Do YYYY"
+            )} to ${moment(endDate).format("MMMM Do YYYY")}
           </p>
         </td>
       </tr>
@@ -231,20 +234,14 @@ module.exports = (invoice) => {
           <p>&#8358;${amount}</p>
         </td>
       </tr>
-      <tr>
-        <td colspan="3" class="brief-text">
-          <p class="font-light">
-            If you have a credit card on file, it will be automatically charged
-            within 24 hours
-          </p>
-        </td>
-      </tr>
+    
     </table>
     <table class="transactions" width="100%">
       <thead>
         <tr>
           <th>Ref No</th>
           <th>Description</th>
+          <th>Type</th>
           <th>Waste Category</th>
           <th>Weight (Kg)</th>
           <th>Amount (&#8358;)</th>
