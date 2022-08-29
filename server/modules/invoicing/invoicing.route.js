@@ -27,14 +27,14 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/generate/invoicepdf/:invoiceNumber").get(
-    adminPakamValidation,
+    // adminPakamValidation,
     invoiceNumber,
     checkRequestErrs,
     invoiceController.invoicePDF
   );
 
   APP.route("/api/company/generate/invoicepdf/:invoiceNumber").get(
-    companyPakamDataValidation,
+    // companyPakamDataValidation,
     invoiceNumber,
     checkRequestErrs,
     invoiceController.invoicePDF
