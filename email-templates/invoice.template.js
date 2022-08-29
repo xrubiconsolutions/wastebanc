@@ -23,8 +23,6 @@ module.exports = (invoice) => {
         `<tr>${current.map((val) => `<td>${val}</td>`).join("")}</tr>`
     )
     .join("");
-  console.log({ bodyData });
-
   return `<!DOCTYPE html>
   <html lang="en">
     <head>

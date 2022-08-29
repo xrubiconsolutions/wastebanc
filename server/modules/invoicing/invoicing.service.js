@@ -42,7 +42,7 @@ class invoiceService {
     }
 
     let householdTotal = 0,
-      // wastePickersTotal = 0,
+       wastePickersTotal = 0,
       totalValue = 0,
       sumPercentage = 0,
       transId = [];
@@ -54,9 +54,9 @@ class invoiceService {
         return a.coin + b.coin;
       });
 
-      // wastePickersTotal = totalResult.reduce((a, b) => {
-      //   return a.wastePickerCoin + b.wastePickerCoin;
-      // });
+      wastePickersTotal = totalResult.reduce((a, b) => {
+        return a.wastePickerCoin + b.wastePickerCoin;
+      });
 
       const charges = organisation.systemCharge || 10;
       totalValue = householdTotal + wastePickersTotal;
@@ -525,7 +525,6 @@ class invoiceService {
       .populate("transactions");
     if (!invoiceData) return { error: true, path: "" };
 
-    console.log("invoiceData", invoiceData);
     const template = invoiceTemplate(invoiceData);
     const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
     const page = await browser.newPage();

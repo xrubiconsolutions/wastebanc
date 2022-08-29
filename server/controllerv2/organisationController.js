@@ -1174,16 +1174,24 @@ organisationController.estimatedCost = async (req, res) => {
       organisationPaid: false,
     });
 
-    const household = sumData.reduce((pValue, cValue) => {
-      return pValue.coin + cValue.coin;
-    }, 0);
+    console.log("t", sumData);
 
-    const wastePickersTotal = sumData.reduce((pValue, cValue) => {
-      return pValue.wastePickerCoin + cValue.wastePickerCoin;
-    }, 0);
-    const sumTotal = household + wastePickersTotal;
+    let houseHoldTotalCoins = 0;
+    let wastePickerTotalCoins = 0;
+    sumData.forEach((e) => {
+      houseHoldTotalCoins += e.coin;
+    });
 
-    const sumPercentage = rewardService.calPercentage(sumTotal, 10);
+    sumData.forEach((e) => {
+      wastePickerTotalCoins += e.wastePickerCoin;
+    });
+    const sumTotal = houseHoldTotalCoins + wastePickerTotalCoins;
+
+    const sumPercentage = rewardService.calPercentage(
+      sumTotal,
+      user.systemCharge
+    );
+
     const sum = sumTotal + sumPercentage;
 
     return res.status(200).json({
@@ -1208,7 +1216,11 @@ organisationController.ongoingbilling = async (req, res) => {
       organisationPaid: false,
     });
 
-    let start, end, percentage, subtotal, total;
+    let start = "",
+      end = "",
+      percentage = 0,
+      subtotal = 0,
+      total = 0;
     if (transactions.length > 0) {
       // get the highest createdAt and lowest created At
       let arr = [];
@@ -1229,6 +1241,9 @@ organisationController.ongoingbilling = async (req, res) => {
 
       end = new Date(Math.max(...arr));
       start = new Date(Math.min(...arr));
+
+      start.toUTCString().split(" ").slice(0, 3).join(" ");
+      end.toUTCString().split(" ").slice(0, 4).join(" ");
     }
 
     // billing
@@ -1236,8 +1251,8 @@ organisationController.ongoingbilling = async (req, res) => {
       error: false,
       message: "Company Billing data",
       data: {
-        startMonth: start.toUTCString().split(" ").slice(0, 3).join(" "),
-        endMonth: end.toUTCString().split(" ").slice(0, 4).join(" "),
+        startMonth: start,
+        endMonth: end,
         transactions,
         subtotal,
         serviceCharge: percentage,
