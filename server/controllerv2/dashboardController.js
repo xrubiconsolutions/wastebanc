@@ -549,6 +549,8 @@ dashboardController.collectormapData = async (req, res) => {
       criteria.state = currentScope;
     }
 
+    criteria.collectorType = "collector";
+
     const collectors = await allCollector(criteria);
 
     const totalVerified = await verified(criteria);
