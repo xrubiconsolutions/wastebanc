@@ -531,6 +531,7 @@ class invoiceService {
     const page = await browser.newPage();
     const path = "invoice.pdf";
 
+    //here
     if (fs.existsSync(path)) {
       FsExtra.remove(path);
     }
