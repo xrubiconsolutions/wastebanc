@@ -794,7 +794,7 @@ const totaloutstanding = async (criteria) => {
 };
 
 const totalMale = async (criteria) => {
-  return await collectorModel.countDocuments({ ...criteria, gender: "male" });
+  return await collectorModel.countDocuments({ ...criteria, gender: "Male" });
 };
 
 const totalFemale = async (criteria) => {
