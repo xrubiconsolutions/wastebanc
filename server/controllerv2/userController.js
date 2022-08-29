@@ -309,7 +309,7 @@ class UserService {
         country: body.country,
         state: body.state,
         password: await encryptPassword(body.password),
-        gender: body.gender,
+        gender: body.gender.toLowerCase(),
         email: body.email,
         lcd: body.lga,
         uType: body.uType,

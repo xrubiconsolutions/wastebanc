@@ -1513,7 +1513,7 @@ class CollectorService {
           $set: {
             email,
             phone: user.phone,
-            gender: req.body.gender || user.gender,
+            gender: req.body.gender.toLowerCase() || user.gender,
             dateOfBirth: req.body.dateOfBirth || user.dateOfBirth,
             address: req.body.address || user.address,
             fullname,
