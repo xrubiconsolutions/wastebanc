@@ -42,7 +42,7 @@ class invoiceService {
     }
 
     let householdTotal = 0,
-       wastePickersTotal = 0,
+      wastePickersTotal = 0,
       totalValue = 0,
       sumPercentage = 0,
       transId = [];
@@ -50,13 +50,19 @@ class invoiceService {
     const totalResult = await transactionModel.find(criteria);
 
     if (totalResult.length > 0) {
-      householdTotal = totalResult.reduce((a, b) => {
-        return a.coin + b.coin;
+      totalResult.forEach((e) => {
+        householdTotal += e.coin;
       });
+      // householdTotal = totalResult.reduce((a, b) => {
+      //   return a.coin + b.coin;
+      // });
 
-      wastePickersTotal = totalResult.reduce((a, b) => {
-        return a.wastePickerCoin + b.wastePickerCoin;
+      totalResult.forEach((e) => {
+        wastePickersTotal += e.wastePickerCoin;
       });
+      // wastePickersTotal = totalResult.reduce((a, b) => {
+      //   return a.wastePickerCoin + b.wastePickerCoin;
+      // });
 
       const charges = organisation.systemCharge || 10;
       totalValue = householdTotal + wastePickersTotal;
