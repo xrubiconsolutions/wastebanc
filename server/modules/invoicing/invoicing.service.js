@@ -53,16 +53,10 @@ class invoiceService {
       totalResult.forEach((e) => {
         householdTotal += e.coin;
       });
-      // householdTotal = totalResult.reduce((a, b) => {
-      //   return a.coin + b.coin;
-      // });
 
       totalResult.forEach((e) => {
         wastePickersTotal += e.wastePickerCoin;
       });
-      // wastePickersTotal = totalResult.reduce((a, b) => {
-      //   return a.wastePickerCoin + b.wastePickerCoin;
-      // });
 
       const charges = organisation.systemCharge || 10;
       totalValue = householdTotal + wastePickersTotal;
@@ -71,28 +65,37 @@ class invoiceService {
       totalValue = totalValue + sumPercentage;
 
       transId = totalResult.map((value) => value._id);
+
+      const dd = Date.now();
+      const geneNo = generateRandomString(7) + `${dd}`;
+      const invoiceNumber = geneNo.substring(0, 9);
+      const expectedPaymentDate = moment().add(3, "days");
+
+      const invoiceData = await invoiceModel.create({
+        company: companyId,
+        organisationName: organisation.companyName,
+        invoiceNumber,
+        startDate,
+        endDate,
+        transactions: transId,
+        amount: totalValue,
+        serviceCharge: sumPercentage,
+        expectedPaymentDate,
+        state,
+      });
+
+      return {
+        invoiceNumber: invoiceData.invoiceData,
+        result: totalResult,
+        householdTotal,
+        // wastePickersTotal,
+        totalValue,
+        sumPercentage,
+      };
     }
 
-    const dd = Date.now();
-    const geneNo = generateRandomString(7) + `${dd}`;
-    const invoiceNumber = geneNo.substring(0, 9);
-    const expectedPaymentDate = moment().add(3, "days");
-
-    await invoiceModel.create({
-      company: companyId,
-      organisationName: organisation.companyName,
-      invoiceNumber,
-      startDate,
-      endDate,
-      transactions: transId,
-      amount: totalValue,
-      serviceCharge: sumPercentage,
-      expectedPaymentDate,
-      state,
-    });
-
     return {
-      invoiceNumber,
+      invoiceNumber: "",
       result: totalResult,
       householdTotal,
       // wastePickersTotal,
