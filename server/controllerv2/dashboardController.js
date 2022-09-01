@@ -511,7 +511,7 @@ dashboardController.collectormapData = async (req, res) => {
     const { user } = req;
     const currentScope = user.locationScope;
 
-    const { start, end, collectorType = { $ne: "" } } = req.query;
+    const { start, end, collectorType = "collector" } = req.query;
     const [startDate, endDate] = [new Date(start), new Date(end)];
     endDate.setDate(endDate.getDate() + 1);
 
