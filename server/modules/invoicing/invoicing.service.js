@@ -49,7 +49,6 @@ class invoiceService {
 
     const totalResult = await transactionModel.find(criteria);
 
-    console.log('res', totalResult);
     if (totalResult.length > 0) {
       totalResult.forEach((e) => {
         householdTotal += e.coin;

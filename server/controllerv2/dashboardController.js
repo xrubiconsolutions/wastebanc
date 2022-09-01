@@ -507,8 +507,6 @@ dashboardController.newAggregators = async (req, res) => {
 };
 
 dashboardController.collectormapData = async (req, res) => {
-  console.log("here");
-
   try {
     const { user } = req;
     const currentScope = user.locationScope;
@@ -548,8 +546,6 @@ dashboardController.collectormapData = async (req, res) => {
     } else {
       criteria.state = currentScope;
     }
-
-    criteria.collectorType = "collector";
 
     const collectors = await allCollector(criteria);
 
