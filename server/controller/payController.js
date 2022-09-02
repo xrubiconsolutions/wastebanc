@@ -47,6 +47,7 @@ payController.resolveAccount = (req, res) => {
   const account_number = req.query.account_number;
   const bank_code = req.query.bank_code;
   const { user } = req;
+  console.log({ user });
   request(
     {
       url: `https://apiv2.pakam.ng/api/resolve/account?account_number=${account_number}&bank_code=${bank_code}&userId=${user._id}`,
@@ -62,6 +63,16 @@ payController.resolveAccount = (req, res) => {
       if (err) return res.status(400).json(err);
       if (result.body.statusCode && result.body.statusCode >= 400)
         return res.status(result.body.statusCode).json(result.body);
+
+      // return only account number and account name if request is made by admin
+      if (user.roles === "admin") {
+        const { account_name, account_number } =
+          result.body.data.accountResult || {};
+        return res.status(200).json({
+          account_number,
+          account_name,
+        });
+      }
       return res.status(200).json(result.body.data || result.body);
     }
   );

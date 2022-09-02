@@ -15,6 +15,11 @@ module.exports = (APP) => {
     CONTROLLER.payController.resolveAccount
   );
 
+  APP.route("/api/admin/resolve/account").get(
+    auth.adminPakamValidation,
+    CONTROLLER.payController.resolveAccount
+  );
+
   APP.route("/api/payment/receipt").post(
     auth.userValidation,
     CONTROLLER.payController.saveR
