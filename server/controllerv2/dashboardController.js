@@ -507,13 +507,12 @@ dashboardController.newAggregators = async (req, res) => {
 };
 
 dashboardController.collectormapData = async (req, res) => {
-  console.log("here");
-
   try {
     const { user } = req;
     const currentScope = user.locationScope;
 
-    const { start, end, collectorType = { $ne: "" } } = req.query;
+    const { start, end } = req.query;
+    let collectorType = "collector";
     const [startDate, endDate] = [new Date(start), new Date(end)];
     endDate.setDate(endDate.getDate() + 1);
 
@@ -524,6 +523,10 @@ dashboardController.collectormapData = async (req, res) => {
           message: "Start date cannot be greater than end date",
         });
       }
+    }
+
+    if (req.query.collectoryType) {
+      collectorType = req.query.collectoryType;
     }
     let criteria = {
       createdAt: {
@@ -548,8 +551,6 @@ dashboardController.collectormapData = async (req, res) => {
     } else {
       criteria.state = currentScope;
     }
-
-    criteria.collectorType = "collector";
 
     const collectors = await allCollector(criteria);
 
