@@ -124,7 +124,7 @@ module.exports = {
       .notEmpty()
       .withMessage("requestId is required")
       .isString()
-      .withMesage("requestId should be string"),
+      .withMessage("requestId should be string"),
     body("otp")
       .trim()
       .notEmpty()
