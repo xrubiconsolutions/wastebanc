@@ -2034,6 +2034,97 @@ class CollectorService {
       });
     }
   }
+
+  // request summary page
+  // request otp
+  // confirm otp and initate payment
+
+  static async requestSummary(req, res) {
+    try {
+      const { user } = req;
+      const body = {
+        collectorId: user._id,
+      };
+
+      const result = await axios.post(
+        "https://apiv2.pakam.ng./api/wastepicker/withdrawal/summary",
+        body,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+          },
+        }
+      );
+
+      return res.status(200).json(result.data);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async requestOTP(req, res) {
+    try {
+      const { user } = req;
+      const body = {
+        collectorId: user._id,
+      };
+      const result = await axios.post(
+        "https://apiv2.pakam.ng./api/wastepicker/request/otp",
+        body,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+          },
+        }
+      );
+
+      console.log("here", result.data);
+      return res.status(200).json(result.data);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async initiatePayment(req, res) {
+    try {
+      const { user } = req;
+      const body = {
+        collectorId: user._id,
+        requestId: req.body.requestId,
+        otp: req.body.otp,
+      };
+
+      const result = await axios.post(
+        "https://apiv2.pakam.ng./api/disbursement/collector/initiate",
+        body,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+          },
+        }
+      );
+
+      console.log("here", result.data);
+      return res.status(200).json(result.data);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = CollectorService;

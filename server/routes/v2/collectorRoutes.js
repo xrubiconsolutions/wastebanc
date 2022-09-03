@@ -200,4 +200,9 @@ module.exports = (APP) => {
     checkRequestErrs,
     CollectorService.acceptTermsCondition
   );
+
+  APP.route("/api/collector/payment/summary").get(
+    recyclerValidation,
+    CollectorService.requestSummary
+  );
 };
