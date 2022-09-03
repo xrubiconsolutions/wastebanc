@@ -194,7 +194,6 @@ module.exports = (APP) => {
     CollectorService.removeCollector
   );
 
-  // accept terms and conditions
   APP.route("/api/collector/accept/termscondition").post(
     collectorValidator.termsCondition,
     checkRequestErrs,
