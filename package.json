@@ -9,6 +9,9 @@
     "gulpstart": "gulp start",
     "gulp-build": "NODE_ENV='production' gulp"
   },
+  "engines": {
+    "node": "14.x"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
