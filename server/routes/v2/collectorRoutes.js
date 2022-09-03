@@ -207,8 +207,6 @@ module.exports = (APP) => {
 
   APP.route("/api/collector/request/otp").post(
     recyclerValidation,
-    collectorValidator.otpRequest,
-    checkRequestErrs,
     CollectorService.requestOTP
   );
 
