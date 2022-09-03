@@ -2134,7 +2134,7 @@ class CollectorService {
       const { user } = req;
       const body = {
         collectorId: user._id,
-        type: req.body.type,
+        type: "gain",
       };
 
       const result = await axios.post(
