@@ -204,4 +204,18 @@ module.exports = (APP) => {
     recyclerValidation,
     CollectorService.requestSummary
   );
+
+  APP.route("/api/collector/request/otp").post(
+    recyclerValidation,
+    collectorValidator.otpRequest,
+    checkRequestErrs,
+    CollectorService.requestOTP
+  );
+
+  APP.route("/api/collector/initiate/payment").post(
+    recyclerValidation,
+    collectorValidtor.initiatePayment,
+    checkRequestErrs,
+    CollectorService.initiatePayment
+  );
 };

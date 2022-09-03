@@ -109,4 +109,27 @@ module.exports = {
       .isString()
       .withMessage("collectorId should be string"),
   ],
+
+  otpRequest: [
+    body("type")
+      .trim()
+      .notEmpty()
+      .withMessage("type is required")
+      .isIn(["gain", "charity"]),
+  ],
+
+  initiatePayment: [
+    body("requestId")
+      .trim()
+      .notEmpty()
+      .withMessage("requestId is required")
+      .isString()
+      .withMesage("requestId should be string"),
+    body("otp")
+      .trim()
+      .notEmpty()
+      .withMessage("otp is required")
+      .isString()
+      .withMessage("otp should be string"),
+  ],
 };

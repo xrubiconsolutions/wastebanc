@@ -2067,7 +2067,7 @@ class CollectorService {
     }
   }
 
-  static async requestOTP(req, res) {
+  static async b(req, res) {
     try {
       const { user } = req;
       const body = {
