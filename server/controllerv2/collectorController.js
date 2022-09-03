@@ -2125,6 +2125,35 @@ class CollectorService {
       });
     }
   }
+
+  static async requestOTP(req, res) {
+    try {
+      const { user } = req;
+      const body = {
+        collectorId: user._id,
+        type: req.body.type,
+      };
+
+      const result = await axios.post(
+        "https://apiv2.pakam.ng./api/wastepicker/request/otp",
+        body,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+          },
+        }
+      );
+
+      return res.status(200).json(result.data);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = CollectorService;

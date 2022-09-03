@@ -214,7 +214,7 @@ module.exports = (APP) => {
 
   APP.route("/api/collector/initiate/payment").post(
     recyclerValidation,
-    collectorValidtor.initiatePayment,
+    collectorValidator.initiatePayment,
     checkRequestErrs,
     CollectorService.initiatePayment
   );
