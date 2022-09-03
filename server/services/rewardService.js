@@ -89,17 +89,20 @@ class rewardService {
       }
     });
 
-    const totalpointGained = pricing.reduce((a, b) => {
-      return parseFloat(a) + parseFloat(b);
-    }, 0);
+    let totalpointGained = 0,
+      totalWeight = 0;
 
-    const totalWeight = categories.reduce((a, b) => {
-      return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
-    }, 0);
+    pricing.forEach((a) => {
+      totalpointGained += parseFloat(b);
+    });
+
+    categories.forEach((a) => {
+      totalWeight += parseFloat(b["quantity"] || 0);
+    });
 
     console.log("t", totalpointGained);
 
-    if (totalpointGained == 0) {
+    if (totalpointGained <= 0) {
       return {
         error: true,
         message: "Your company do not collect any of the waste category passed",
