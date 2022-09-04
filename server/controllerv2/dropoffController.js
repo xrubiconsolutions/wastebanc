@@ -436,60 +436,6 @@ dropoffController.rewardDropSystem = async (req, res) => {
       });
     }
 
-    // let pricing = [];
-    // let cat;
-
-    // console.log("organisation", organisation);
-    // console.log("categories", categories);
-    // for (let category of categories) {
-    //   console.log("category", category.name.toLowerCase());
-    //   console.log("org cat", organisation.categories);
-    //   if (organisation.categories.length !== 0) {
-    //     const c = organisation.categories.find(
-    //       (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
-    //     );
-
-    //     if (c) {
-    //       console.log("cat", cc);
-    //       const p = parseFloat(category.quantity) * Number(c.price);
-    //       console.log("quantity", parseFloat(category.quantity));
-    //       pricing.push(p);
-    //     }
-    //   } else {
-    //     var cc =
-    //       category.name === "nylonSachet"
-    //         ? "nylon"
-    //         : category.name === "glassBottle"
-    //         ? "glass"
-    //         : category.name.length < 4
-    //         ? category.name.substring(0, category.name.length)
-    //         : category.name.substring(0, category.name.length - 1);
-
-    //     var organisationCheck = JSON.parse(JSON.stringify(organisation));
-    //     console.log("organisation check here", organisationCheck);
-    //     for (let val in organisationCheck) {
-    //       console.log("category check here", cc);
-    //       if (val.includes(cc)) {
-    //         const equivalent = !!organisationCheck[val]
-    //           ? organisationCheck[val]
-    //           : 1;
-    //         console.log("equivalent here", equivalent);
-    //         const p = parseFloat(category.quantity) * equivalent;
-    //         pricing.push(p);
-    //       }
-    //     }
-    //   }
-    // }
-
-    // const totalpointGained = pricing.reduce((a, b) => {
-    //   return parseFloat(a) + parseFloat(b);
-    // }, 0);
-
-    // const totalWeight = categories.reduce((a, b) => {
-    //   return parseFloat(a) + (parseFloat(b["quantity"]) || 0);
-    // }, 0);
-    // console.log("pricing", pricing);
-
     let cat = [];
 
     await Promise.all(
@@ -521,6 +467,19 @@ dropoffController.rewardDropSystem = async (req, res) => {
     console.log("household reward", householdReward);
     if (householdReward.error) {
       return res.status(400).json(householdReward);
+    }
+
+    let wastePickerCoin = 0;
+    let wastePickerPercentage = 0;
+    if (collector.collectorType == "waste-picker") {
+      const wastepickerReward = await rewardService.picker(cat, organisation);
+      if (!wastepickerReward.error) {
+        wastePickerCoin = wastepickerReward.totalpointGained;
+        wastePickerPercentage = rewardService.calPercentage(
+          wastepickerReward.totalpointGained,
+          10
+        );
+      }
     }
 
     const pakamPercentage = rewardService.calPercentage(

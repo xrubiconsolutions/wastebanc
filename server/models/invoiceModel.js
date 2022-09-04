@@ -11,6 +11,8 @@ const invoiceSchema = new Schema(
     startDate: { type: Date },
     endDate: { type: Date },
     transactions: [{ type: Schema.Types.ObjectId, ref: "transaction" }],
+    householdTotal: { type: Number },
+    wastePickersTotal: { type: Number },
     amount: { type: String },
     serviceCharge: { type: String },
     paidStatus: { type: String, default: "pending" },

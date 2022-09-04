@@ -79,6 +79,8 @@ class invoiceService {
         endDate,
         transactions: transId,
         amount: totalValue,
+        householdTotal,
+        wastePickersTotal,
         serviceCharge: sumPercentage,
         expectedPaymentDate,
         state,
@@ -88,7 +90,7 @@ class invoiceService {
         invoiceNumber: invoiceData.invoiceData,
         result: totalResult,
         householdTotal,
-        // wastePickersTotal,
+        wastePickersTotal,
         totalValue,
         sumPercentage,
       };
@@ -98,7 +100,7 @@ class invoiceService {
       invoiceNumber: "",
       result: totalResult,
       householdTotal,
-      // wastePickersTotal,
+      wastePickersTotal,
       totalValue,
       sumPercentage,
     };

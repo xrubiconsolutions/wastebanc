@@ -97,6 +97,9 @@ const transaction_Schema = {
   percentage: {
     type: Number,
   },
+  wastePickerPercentage: {
+    type: Number,
+  },
   address: {
     type: String,
   },

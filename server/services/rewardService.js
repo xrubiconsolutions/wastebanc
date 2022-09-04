@@ -89,8 +89,8 @@ class rewardService {
       }
     });
 
-    let totalpointGained = 0,
-      totalWeight = 0;
+    let totalpointGained = 0;
+    let totalWeight = 0;
 
     pricing.forEach((a) => {
       totalpointGained += parseFloat(b);
@@ -116,7 +116,7 @@ class rewardService {
     };
   }
 
-  static async picker(categories, organisation) {
+  static async pickerBackUp(categories, organisation) {
     try {
       let pricing = [];
 
@@ -152,26 +152,6 @@ class rewardService {
         })
       );
 
-      //   for (let category of categories) {
-      //     const c = organisation.categories.find(
-      //       (cc) => cc.name.toLowerCase() === category.name.toLowerCase()
-      //     );
-      //     if (c) {
-      //       // get waste picker price on that category
-      //       const systemPricing = await categoryModel.findOne({
-      //         name: c.name.toLowerCase(),
-      //       });
-      //       if (systemPricing) {
-      //         const p =
-      //           parseFloat(category.quantity) * Number(systemPricing.wastepicker);
-      //         pricing.push(p);
-      //       }
-      //     } else {
-      //       const p = parseFloat(category.quantity) * 0;
-      //       pricing.push(p);
-      //     }
-      //   }
-
       const totalpointGained = pricing.reduce((a, b) => {
         return parseFloat(a) + parseFloat(b);
       }, 0);
@@ -192,6 +172,54 @@ class rewardService {
         message: "An error occurred,Please contact support team",
       };
     }
+  }
+
+  static async picker(categories, organisation) {
+    let pricing = [];
+
+    await Promise.all(
+      categories.map(async (cat) => {
+        const organisationcategory = organisation.categories.find(
+          (category) => category.catId.toString() == cat.catId.toString()
+        );
+
+        if (organisationcategory) {
+          const systemPricing = await categoryModel.findById(cat.catId);
+          if (systemPricing) {
+            const p =
+              parseFloat(cat.quantity) * Number(systemPricing.wastepicker);
+            pricing.push(p);
+          }
+        } else {
+          const p = parseFloat(cat.quantity) * 0;
+          pricing.push(p);
+        }
+      })
+    );
+
+    let totalpointGained = 0;
+    let totalWeight = 0;
+
+    pricing.forEach((a) => {
+      totalpointGained += parseFloat(b);
+    });
+
+    categories.forEach((a) => {
+      totalWeight += parseFloat(b["quantity"] || 0);
+    });
+
+    if (totalpointGained <= 0) {
+      return {
+        error: true,
+        message: "Your company do not collect any of the waste category passed",
+      };
+    }
+
+    return {
+      error: false,
+      totalpointGained,
+      totalWeight,
+    };
   }
 
   static calPercentage(point, percentage) {

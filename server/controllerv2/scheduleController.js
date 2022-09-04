@@ -657,6 +657,19 @@ class ScheduleService {
         return res.status(400).json(householdReward);
       }
 
+      let wastePickerCoin = 0;
+      let wastePickerPercentage = 0;
+      if (collector.collectorType == "waste-picker") {
+        const wastepickerReward = await rewardService.picker(cat, organisation);
+        if (!wastepickerReward.error) {
+          wastePickerCoin = wastepickerReward.totalpointGained;
+          wastePickerPercentage = rewardService.calPercentage(
+            wastepickerReward.totalpointGained,
+            10
+          );
+        }
+      }
+
       const pakamPercentage = rewardService.calPercentage(
         householdReward.totalpointGained,
         10
@@ -671,7 +684,8 @@ class ScheduleService {
         weight: householdReward.totalWeight,
         coin:
           Number(householdReward.totalpointGained) - Number(pakamPercentage),
-        wastePickerCoin: 0,
+        wastePickerCoin,
+        wastePickerPercentage,
         cardID: scheduler._id,
         completedBy: collectorId,
         categories,

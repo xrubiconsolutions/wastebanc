@@ -1258,6 +1258,8 @@ organisationController.ongoingbilling = async (req, res) => {
         startMonth: start,
         endMonth: end,
         transactions,
+        household,
+        wastePickersTotal,
         subtotal,
         serviceCharge: percentage,
         total,
