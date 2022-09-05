@@ -41,6 +41,12 @@ class invoiceService {
       state.push(authuser.locationScope);
     }
 
+    const from = {
+      name: "xrubicon solution",
+      address: "127 Ogunlana drive, Surulere",
+      country: "Nigeria",
+    };
+
     let householdTotal = 0,
       wastePickersTotal = 0,
       totalValue = 0,
@@ -86,23 +92,37 @@ class invoiceService {
         state,
       });
 
+      const invoiceResult = await invoiceModel
+        .findOne({
+          invoiceNumber: invoiceData.invoiceNumber,
+        })
+        .populate("company", "companyName email phone location country");
+
       return {
-        invoiceNumber: invoiceData.invoiceData,
+        invoiceNumber: invoiceData.invoiceNumber,
+        company: invoiceResult.company,
+        start: invoiceResult.startDate,
+        end: invoiceResult.endDate,
         result: totalResult,
         householdTotal,
         wastePickersTotal,
         totalValue,
         sumPercentage,
+        from,
       };
     }
 
     return {
       invoiceNumber: "",
+      company: "",
+      start: startDate,
+      end: endDate,
       result: totalResult,
       householdTotal,
       wastePickersTotal,
       totalValue,
       sumPercentage,
+      from,
     };
   }
 
@@ -111,7 +131,7 @@ class invoiceService {
       .findOne({
         invoiceNumber,
       })
-      .populate("company", "companyName email phone location")
+      .populate("company", "companyName email phone location country")
       .populate("transactions");
     if (!invoiceData) return false;
 
@@ -289,7 +309,7 @@ class invoiceService {
     const totalResult = await invoiceModel.countDocuments(criteria);
     const invoices = await invoiceModel
       .find(criteria)
-      .populate("company", ["companyName", "email", "phone", "companyTag"])
+      .populate("company", "companyName email phone location country")
       .select([
         "_id",
         "invoiceNumber",
@@ -319,17 +339,17 @@ class invoiceService {
   static async getinvoiceById(invoiceId) {
     const invoice = await invoiceModel
       .findOne({ _id: invoiceId })
-      .populate("company", ["companyName", "email", "phone", "companyTag"])
-      .populate("transactions", [
-        "categories",
-        "category",
-        "type",
-        "weight",
-        "coin",
-        "wastePickerCoin",
-        "type",
-      ]);
+      .populate("company", "companyName email phone location country")
+      .populate(
+        "transactions",
+        "categories category type weight coin wastePickerCoin type"
+      );
 
+    const from = {
+      name: "xrubicon solution",
+      address: "127 Ogunlana drive, Surulere",
+      country: "Nigeria",
+    };
     if (!invoice)
       return {
         error: true,
@@ -339,7 +359,7 @@ class invoiceService {
     return {
       error: false,
       message: "success",
-      data: invoice,
+      data: { invoice, from },
     };
   }
 
