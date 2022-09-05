@@ -93,11 +93,11 @@ class rewardService {
     let totalWeight = 0;
 
     pricing.forEach((a) => {
-      totalpointGained += parseFloat(b);
+      totalpointGained += parseFloat(a);
     });
 
     categories.forEach((a) => {
-      totalWeight += parseFloat(b["quantity"] || 0);
+      totalWeight += parseFloat(a["quantity"] || 0);
     });
 
     console.log("t", totalpointGained);
@@ -201,11 +201,11 @@ class rewardService {
     let totalWeight = 0;
 
     pricing.forEach((a) => {
-      totalpointGained += parseFloat(b);
+      totalpointGained += parseFloat(a);
     });
 
     categories.forEach((a) => {
-      totalWeight += parseFloat(b["quantity"] || 0);
+      totalWeight += parseFloat(a["quantity"] || 0);
     });
 
     if (totalpointGained <= 0) {
