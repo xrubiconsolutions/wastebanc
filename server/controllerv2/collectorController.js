@@ -573,7 +573,7 @@ class CollectorService {
         { _id: collectorId, organisation },
         {
           companyVerified: false,
-          approvedBy: "",
+          approvedBy: null,
           areaOfAccess: [],
           approvalStatus: "DECLINED",
         },
