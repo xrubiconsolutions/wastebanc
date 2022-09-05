@@ -41,6 +41,7 @@ class invoiceService {
       state.push(authuser.locationScope);
     }
 
+    //from
     const from = {
       name: "xrubicon solution",
       address: "127 Ogunlana drive, Surulere",
