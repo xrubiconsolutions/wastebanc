@@ -45,4 +45,5 @@ module.exports = {
   systemChargesModel: require("./systemCharges"),
   invoiceModel: require("./invoiceModel"),
   organisationLogModel: require("./organisationLogModel"),
+  companyInfoModel: require("./companyInfoModel"),
 };

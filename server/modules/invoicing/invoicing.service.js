@@ -2,6 +2,7 @@ const {
   transactionModel,
   invoiceModel,
   organisationModel,
+  companyInfoModel,
 } = require("../../models");
 const rewardService = require("../../services/rewardService");
 const { generateRandomString } = require("../../util/commonFunction");
@@ -41,10 +42,13 @@ class invoiceService {
       state.push(authuser.locationScope);
     }
 
+    const company = await companyInfoModel.findOne();
     const from = {
-      name: "xrubicon solution",
-      address: "127 Ogunlana drive, Surulere",
-      country: "Nigeria",
+      name: company.name,
+      address: company?.address || "",
+      email: company.email,
+      phone: company?.phoneNumber || "",
+      country: company?.country || "",
     };
 
     let householdTotal = 0,
@@ -141,9 +145,11 @@ class invoiceService {
       "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"
     );
 
+    const companyInfo = await companyInfoModel.findOne();
+
     const msg = {
       to: `${invoiceData.company.email}`,
-      from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+      from: companyInfo.email, // Use the email address or domain you verified above
       subject: "INVOICE",
       html: template,
     };
@@ -356,11 +362,15 @@ class invoiceService {
         message: "Invoice Not found",
       };
 
+    const company = await companyInfoModel.findOne();
     const from = {
-      name: "xrubicon solution",
-      address: "127 Ogunlana drive, Surulere",
-      country: "Nigeria",
+      name: company.name,
+      address: company?.address || "",
+      email: company.email,
+      phone: company?.phoneNumber || "",
+      country: company?.country || "",
     };
+
     return {
       error: false,
       message: "success",
@@ -380,14 +390,6 @@ class invoiceService {
     },
     populate = [],
   }) {
-    console.log({
-      companyId,
-      page,
-      resultsPerPage,
-      key,
-      start,
-      end,
-    });
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
