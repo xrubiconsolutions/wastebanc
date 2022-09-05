@@ -1803,9 +1803,9 @@ class CollectorService {
         {
           organisation: organisation.companyName,
           organisationId: organisation._id.toString(),
-          approvedBy: organisation._id.toString(),
-          approvalStatus: "APPROVED",
-          companyVerified: true,
+          //approvedBy: organisation._id.toString(),
+          approvalStatus: "PENDING",
+          companyVerified: false,
         }
       );
 
