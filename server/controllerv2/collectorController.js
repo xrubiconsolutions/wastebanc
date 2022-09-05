@@ -1396,7 +1396,7 @@ class CollectorService {
 
   static async recentTransaction(req, res) {
     try {
-      let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+      let { page = 1, resultsPerPage = 10, start, end, state, key } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
@@ -1459,6 +1459,7 @@ class CollectorService {
         message: "success",
         data: {
           totalWaste: Math.ceil(totalWaste),
+          totalAmount: req.user.pointGained,
           transactions,
           totalResult,
           page,
