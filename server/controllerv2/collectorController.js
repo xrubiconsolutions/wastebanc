@@ -576,6 +576,8 @@ class CollectorService {
           approvedBy: null,
           areaOfAccess: [],
           approvalStatus: "DECLINED",
+          organisation: "",
+          organisationId: "",
         },
         projection
       );
