@@ -118,7 +118,7 @@ class CollectorService {
         password: 0,
       };
       // get collectors based on page
-      const collectors = await collectorModel
+      let collectors = await collectorModel
         .find(criteria, projection, { lean: true })
         .sort({ createdAt: -1 })
         .skip((page - 1) * resultsPerPage)
@@ -810,7 +810,7 @@ class CollectorService {
       const maleCount = await collectorModel.countDocuments({
         gender: "male",
         organisationId: req.user._id.toString(),
-        verified: true,
+        //verified: true,
         //companyVerified: true,
         collectorType,
       });
@@ -819,7 +819,7 @@ class CollectorService {
       const femaleCount = await collectorModel.countDocuments({
         gender: "female",
         organisationId: req.user._id.toString(),
-        verified: true,
+        //verified: true,
         //companyVerified: true,
         collectorType,
       });
