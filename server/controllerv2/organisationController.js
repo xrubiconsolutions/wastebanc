@@ -1533,4 +1533,26 @@ organisationController.addLog = async (
   }
 };
 
+organisationController.profile = async (req, res) => {
+  try {
+    const { user } = req;
+
+    const companyDetail = await organisationModel
+      .findById(user._id,  { password: 0, roles:0, role:0, totalAvailable:0, totalSpent:0, resetToken: 0, })
+      .populate("categories.catId");
+
+    return res.status(200).json({
+      error: false,
+      message: "Company Details",
+      data: companyDetail,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      error: true,
+      message: "An error occured!",
+    });
+  }
+};
+
 module.exports = organisationController;

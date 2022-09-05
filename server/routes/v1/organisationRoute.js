@@ -256,7 +256,7 @@ module.exports = (APP) => {
     auth.companyValidation,
     CONTROLLER.organisationController.payPortal
   );
-  APP.route("/api/organisation/profile").get(
+  APP.route("/api/organisation/profile/backup").get(
     auth.companyPakamDataValidation,
     CONTROLLER.organisationController.checkProfile
   );

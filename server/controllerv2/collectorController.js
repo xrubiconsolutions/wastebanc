@@ -1803,6 +1803,8 @@ class CollectorService {
           organisation: organisation.companyName,
           organisationId: organisation._id.toString(),
           approvedBy: organisation._id.toString(),
+          approvalStatus: "APPROVED",
+          companyVerified: true,
         }
       );
 
@@ -1861,6 +1863,7 @@ class CollectorService {
           organisation: "",
           organisationId: "",
           approvedBy: "",
+          approvalStatus: "PENDING",
           companyVerified: false,
         }
       );

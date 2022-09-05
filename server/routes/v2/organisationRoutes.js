@@ -121,4 +121,9 @@ module.exports = (APP) => {
     companyPakamDataValidation,
     organisationController.accountDetails
   );
+
+  APP.route("/api/organisation/profile").get(
+    companyPakamDataValidation,
+    organisationController.profile
+  );
 };

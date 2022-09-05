@@ -194,7 +194,7 @@ validateUser.companyPakamDataValidation = async (req, res, NEXT) => {
     }
 
     const user = await MODEL.organisationModel.findById(validated.userId);
-   // console.log("user", user);
+    // console.log("user", user);
     if (!user) {
       return res.status(401).json({
         error: true,
