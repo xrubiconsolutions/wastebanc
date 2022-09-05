@@ -340,26 +340,31 @@ class invoiceService {
     const invoice = await invoiceModel
       .findOne({ _id: invoiceId })
       .populate("company", "companyName email phone location country")
-      .populate(
-        "transactions",
-        "categories category type weight coin wastePickerCoin type"
-      );
+      .populate("transactions", [
+        "categories",
+        "category",
+        "type",
+        "weight",
+        "coin",
+        "wastePickerCoin",
+        "type",
+      ]);
 
-    const from = {
-      name: "xrubicon solution",
-      address: "127 Ogunlana drive, Surulere",
-      country: "Nigeria",
-    };
     if (!invoice)
       return {
         error: true,
         message: "Invoice Not found",
       };
 
+    const from = {
+      name: "xrubicon solution",
+      address: "127 Ogunlana drive, Surulere",
+      country: "Nigeria",
+    };
     return {
       error: false,
       message: "success",
-      data: { invoice, from },
+      data: { ...invoice.toJSON(), from },
     };
   }
 
