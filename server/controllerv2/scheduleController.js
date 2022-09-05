@@ -660,7 +660,9 @@ class ScheduleService {
       let wastePickerCoin = 0;
       let wastePickerPercentage = 0;
       if (collector.collectorType == "waste-picker") {
+        console.log("happened");
         const wastepickerReward = await rewardService.picker(cat, organisation);
+        console.log("wap", wastepickerReward);
         if (!wastepickerReward.error) {
           wastePickerCoin = wastepickerReward.totalpointGained;
           wastePickerPercentage = rewardService.calPercentage(
@@ -756,6 +758,7 @@ class ScheduleService {
             totalCollected:
               collector.totalCollected + householdReward.totalWeight,
             numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
+            pointGained: collector.pointGained + wastePickerCoin,
             busy: false,
             last_logged_in: new Date(),
           },
