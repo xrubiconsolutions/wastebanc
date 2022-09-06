@@ -273,7 +273,7 @@ class CollectorService {
     }
   }
   static async getCompanyCollectors(req, res) {
-    const { companyName: organisation } = req.user;
+    const { _id: organisationId } = req.user;
     // log
 
     try {
@@ -307,7 +307,7 @@ class CollectorService {
             { localGovernment: { $regex: `.*${key}.*`, $options: "i" } },
             { organisation: { $regex: `.*${key}.*`, $options: "i" } },
           ],
-          organisation,
+          organisationId:organisationId.toString(),
           companyVerified,
           collectorType,
           approvalStatus: { $ne: "DECLINED" },
@@ -326,14 +326,14 @@ class CollectorService {
             $gte: startDate,
             $lt: endDate,
           },
-          organisation,
+          organisationId:organisationId.toString(),
           companyVerified,
           collectorType,
           approvalStatus: { $ne: "DECLINED" },
         };
       } else
         criteria = {
-          organisation,
+          organisationId:organisationId.toString(),
           companyVerified,
           collectorType,
           approvalStatus: { $ne: "DECLINED" },
@@ -935,7 +935,7 @@ class CollectorService {
           $gte: ONE_MONTH_AGO,
         },
         organisationId: req.user._id.toString(),
-        //companyVerified: true,
+        //companyVerified: t,
         collectorType,
       });
 
