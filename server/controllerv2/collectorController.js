@@ -56,14 +56,14 @@ class CollectorService {
               {
                 $group: {
                   _id: "$completionStatus",
-                  status: {
+                  totalCount: {
                     $sum: 1,
                   },
                 },
               },
               {
                 $unwind: {
-                  path: "$status",
+                  path: "$totalCount",
                   preserveNullAndEmptyArrays: true,
                 },
               },
