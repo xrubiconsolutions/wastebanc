@@ -1,5 +1,7 @@
 const moment = require("moment");
-module.exports = (invoice) => {
+const { companyInfoModel } = require("../server/models");
+
+module.exports = async (invoice) => {
   const {
     transactions,
     company: { companyName, email, phone, location },
@@ -11,6 +13,9 @@ module.exports = (invoice) => {
     balance,
     invoiceNumber,
   } = invoice;
+
+  const companyInfo = await companyInfoModel.findOne();
+
   const data = transactions.map(
     ({ ref_id, fullname, type, categories, weight, coin }) => {
       const catgs = categories.map((cat) => cat.name).join(", ");
@@ -188,9 +193,9 @@ module.exports = (invoice) => {
         <td>
           <p class="title">From</p>
           <div class="info-text">
-            <p>Xrubicon solutions</p>
-            <p>127 Ogunlana Drive, Surulere,</p>
-            <p>Nigeria</p>
+            <p>${companyInfo?.name}</p>
+            <p>${companyInfo?.address}</p>
+            <p>${companyInfo.country}</p>
           </div>
         </td>
         <td>

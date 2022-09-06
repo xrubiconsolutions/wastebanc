@@ -140,7 +140,7 @@ class invoiceService {
     if (!invoiceData) return false;
 
     // prepare invoice template and send invoice
-    const template = invoiceTemplate(invoiceData);
+    const template = await invoiceTemplate(invoiceData);
     sgMail.setApiKey(
       "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"
     );
