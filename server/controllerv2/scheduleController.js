@@ -119,6 +119,75 @@ class ScheduleService {
             state: 1,
           },
         },
+        {
+          $lookup: {
+            from: "transactions",
+            let: {
+              schedule: {
+                $toString: "$_id",
+              },
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$scheduleId", "$$schedule"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  categories: 1,
+                },
+              },
+            ],
+            as: "cats",
+          },
+        },
+        {
+          $project: {
+            categoriesQuantity: {
+              $arrayElemAt: ["$cats.categories", 0],
+            },
+            fullname: 1,
+            clientId: 1,
+            phone: 1,
+            gender: 1,
+            email: 1,
+            scheduleCreator: 1,
+            categories: 1,
+            Category: 1,
+            quantity: 1,
+            completionStatus: 1,
+            organisation: 1,
+            createdAt: 1,
+            organisationCollection: 1,
+            organisationPhone: 1,
+            dropOffDate: 1,
+            expiryDuration: 1,
+            state: 1,
+            collectedBy: 1,
+            details: 1,
+            address: 1,
+            pickUpDate: 1,
+            expiryDuration: 1,
+            reminder: 1,
+            callOnArrival: 1,
+            completionStatus: 1,
+            acceptedBy: 1,
+            collectedBy: 1,
+            collectedPhone: 1,
+            rating: 1,
+            comment: 1,
+            organisationCollection: 1,
+            lcd: 1,
+            lat: 1,
+            long: 1,
+            recycler: 1,
+            completionDate: 1,
+            state: 1,
+          },
+        },
       ];
 
       const countCriteria = [

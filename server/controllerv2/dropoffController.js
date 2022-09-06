@@ -93,6 +93,52 @@ dropoffController.aggregateQuery = async ({
           collectedBy: 1,
         },
       },
+      {
+        $lookup: {
+          from: "transactions",
+          let: {
+            schedule: {
+              $toString: "$_id",
+            },
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$scheduleId", "$$schedule"],
+                },
+              },
+            },
+            {
+              $project: {
+                categories: 1,
+              },
+            },
+          ],
+          as: "cats",
+        },
+      },
+      {
+        $project: {
+          categoriesQuantity: {
+            $arrayElemAt: ["$cats.categories", 0],
+          },
+          fullname: 1,
+          clientId: 1,
+          scheduleCreator: 1,
+          categories: 1,
+          quantity: 1,
+          completionStatus: 1,
+          organisation: 1,
+          createdAt: 1,
+          organisationCollection: 1,
+          organisationPhone: 1,
+          dropOffDate: 1,
+          expiryDuration: 1,
+          state: 1,
+          collectedBy: 1,
+        },
+      },
     ];
 
     const countCriteria = [
