@@ -15,6 +15,7 @@ module.exports = async (invoice) => {
   } = invoice;
 
   const companyInfo = await companyInfoModel.findOne();
+ 
 
   const data = transactions.map(
     ({ ref_id, fullname, type, categories, weight, coin }) => {
