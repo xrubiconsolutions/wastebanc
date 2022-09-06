@@ -21,7 +21,7 @@ class invoiceService {
 
     if (!organisation) throw new Error("Invalid companyId passed");
     const [startDate, endDate] = [new Date(start), new Date(end)];
-    endDate.setDate(endDate.getDate() + 1);
+    // endDate.setDate(endDate.getDate() + 1);
     let criteria = {
       createdAt: {
         $gte: startDate,
@@ -88,10 +88,10 @@ class invoiceService {
         startDate,
         endDate,
         transactions: transId,
-        amount: totalValue,
+        amount: totalValue.toFixed(2),
         householdTotal,
         wastePickersTotal,
-        serviceCharge: sumPercentage,
+        serviceCharge: sumPercentage.toFixed(2),
         expectedPaymentDate,
         state,
       });
@@ -100,7 +100,10 @@ class invoiceService {
         .findOne({
           invoiceNumber: invoiceData.invoiceNumber,
         })
-        .populate("company", "companyName email phone location country");
+        .populate(
+          "company",
+          "companyName email phone location country companyTag"
+        );
 
       return {
         invoiceNumber: invoiceData.invoiceNumber,
@@ -110,8 +113,8 @@ class invoiceService {
         result: totalResult,
         householdTotal,
         wastePickersTotal,
-        totalValue,
-        sumPercentage,
+        totalValue: totalValue.toFixed(2),
+        sumPercentage: sumPercentage.toFixed(2),
         from,
       };
     }
