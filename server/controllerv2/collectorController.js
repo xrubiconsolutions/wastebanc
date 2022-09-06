@@ -598,6 +598,7 @@ class CollectorService {
       const body = req.body;
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
+        collectorType: "collector",
       });
 
       if (!body.terms_condition || body.terms_condition == false) {
@@ -1631,6 +1632,7 @@ class CollectorService {
       const body = req.body;
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
+        collectorType: "waste-picker",
       });
       if (checkPhone) {
         return res.status(400).json({
