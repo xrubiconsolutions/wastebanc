@@ -20,6 +20,90 @@ const request = require("request");
 const uuid = require("uuid");
 
 class CollectorService {
+  static async aggregateQuery({ criteria, page = 1, resultsPerPage = 20 }) {
+    const paginationQuery = [
+      {
+        $skip: (page - 1) * resultsPerPage,
+      },
+      {
+        $limit: resultsPerPage,
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+    ];
+
+    try {
+      const pipeline = [
+        {
+          $lookup: {
+            from: "schedulepicks",
+            let: {
+              collector: {
+                $toString: "$_id",
+              },
+            },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$collectedBy", "$$collector"],
+                  },
+                },
+              },
+              {
+                $group: {
+                  _id: "$completionStatus",
+                  status: {
+                    $sum: 1,
+                  },
+                },
+              },
+              {
+                $unwind: {
+                  path: "$status",
+                  preserveNullAndEmptyArrays: true,
+                },
+              },
+            ],
+            as: "schedules",
+          },
+        },
+        {
+          $project: {
+            password: 0,
+          },
+        },
+      ];
+
+      const countCriteria = [
+        ...pipeline,
+        {
+          $count: "createdAt",
+        },
+      ];
+      let totalResult = await collectorModel.aggregate(countCriteria);
+
+      const collectors = await collectorModel.aggregate([
+        ...pipeline,
+        ...paginationQuery,
+      ]);
+
+      let totalValue;
+      if (totalResult.length == 0) {
+        totalValue = 0;
+      } else {
+        totalValue = Object.values(totalResult[0])[0];
+      }
+
+      return { collectors, totalResult: totalValue };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async getCollectors(req, res) {
     try {
       const { user } = req;
@@ -112,17 +196,13 @@ class CollectorService {
       console.log(criteria);
       //if (state) criteria.state = state;
 
-      const totalResult = await collectorModel.countDocuments(criteria);
-      const projection = {
-        roles: 0,
-        password: 0,
-      };
-      // get collectors based on page
-      let collectors = await collectorModel
-        .find(criteria, projection, { lean: true })
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * resultsPerPage)
-        .limit(resultsPerPage);
+      const { collectors, totalResult } = await CollectorService.aggregateQuery(
+        {
+          criteria,
+          page,
+          resultsPerPage,
+        }
+      );
 
       return res.status(200).json({
         error: false,
@@ -165,14 +245,14 @@ class CollectorService {
 
     try {
       // get length of collectors with completion status and provided field value
-      const totalResult = await collectorModel.countDocuments(criteria);
-
       // get collectors based on page
-      const collectors = await collectorModel
-        .find(criteria)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * resultsPerPage)
-        .limit(resultsPerPage);
+      const { collectors, totalResult } = await CollectorService.aggregateQuery(
+        {
+          criteria,
+          page,
+          resultsPerPage,
+        }
+      );
 
       return sendResponse(res, STATUS_MSG.SUCCESS.DEFAULT, {
         collectors,
@@ -252,17 +332,25 @@ class CollectorService {
 
       criteria.collectorType = collectorType;
 
-      const totalResult = await collectorModel.countDocuments(criteria);
-      const projection = {
-        roles: 0,
-        password: 0,
-      };
-      // get collectors based on page
-      const collectors = await collectorModel
-        .find(criteria, projection, { lean: true })
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * resultsPerPage)
-        .limit(resultsPerPage);
+      // const totalResult = await collectorModel.countDocuments(criteria);
+      // const projection = {
+      //   roles: 0,
+      //   password: 0,
+      // };
+      // // get collectors based on page
+      // const collectors = await collectorModel
+      //   .find(criteria, projection, { lean: true })
+      //   .sort({ createdAt: -1 })
+      //   .skip((page - 1) * resultsPerPage)
+      //   .limit(resultsPerPage);
+
+      const { collectors, totalResult } = await CollectorService.aggregateQuery(
+        {
+          criteria,
+          page,
+          resultsPerPage,
+        }
+      );
 
       return res.status(200).json({
         error: false,
