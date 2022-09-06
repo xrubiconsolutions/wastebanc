@@ -117,6 +117,7 @@ class ScheduleService {
             recycler: 1,
             completionDate: 1,
             state: 1,
+            cancelReason: 1,
           },
         },
       ];
