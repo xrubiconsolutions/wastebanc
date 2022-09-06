@@ -116,6 +116,9 @@ const schedulePick = new Schema({
   recycler: {
     type: String,
   },
+  acceptedDate:{
+    type:Date,
+  },
   completionDate: {
     type: Date,
   },

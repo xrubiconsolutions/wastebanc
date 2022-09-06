@@ -1089,6 +1089,7 @@ class ScheduleService {
             organisation: user.organisation,
             organisationCollection: user.approvedBy,
             recycler: user.fullname,
+            acceptedDate: new Date(),
           },
         }
       );
