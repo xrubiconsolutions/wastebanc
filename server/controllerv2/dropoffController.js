@@ -108,14 +108,11 @@ dropoffController.aggregateQuery = async ({
       ...paginationQuery,
     ]);
 
-    let totalValue;
-    if (totalResult.length == 0) {
-      totalValue = 0;
-    } else {
-      totalValue = Object.values(totalResult[0])[0];
-    }
-
-    return { dropoffs, totalResult: totalValue };
+    return {
+      dropoffs,
+      totalResult:
+        totalResult.length > 0 ? Object.values(totalResult[0])[0] : 0,
+    };
   } catch (error) {
     throw error;
   }
