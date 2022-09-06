@@ -23,7 +23,7 @@ class CollectorService {
   static async aggregateQuery({ criteria, page = 1, resultsPerPage = 20 }) {
     const paginationQuery = [
       {
-        $match:criteria,
+        $match: criteria,
       },
       {
         $skip: (page - 1) * resultsPerPage,
@@ -82,6 +82,9 @@ class CollectorService {
       ];
 
       const countCriteria = [
+        {
+          $match: criteria,
+        },
         ...pipeline,
         {
           $count: "createdAt",
