@@ -433,10 +433,13 @@ Pakam Team
               },
               function (error, response, body) {
                 const result = JSON.parse(body);
-                const LatLong = result.results.map((a) => ({
-                  formatted_address: a.formatted_address,
-                  geometry: a.geometry,
-                }));
+                console.log(result);
+                const LatLong = Promise.all(
+                  result.results.map((a) => ({
+                    formatted_address: a.formatted_address,
+                    geometry: a.geometry,
+                  }))
+                );
                 geofenceModel.create({
                   organisationId: org._id,
                   data: LatLong,
@@ -600,6 +603,39 @@ organisationController.update = async (req, res) => {
         allowPickers: req.body.allowPickers || organisation.allowPickers,
       }
     );
+
+    if (req.body.areaOfAccess) {
+      await geofenceModel.deleteMany({ organisationId: organisation._id });
+      await Promise.all(
+        req.body.areaOfAccess.map(async (area) => {
+          const lcd = await localGovernmentModel.findOne({
+            slug: area,
+          });
+
+          if (lcd) {
+            request.get(
+              {
+                url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
+              },
+              function (error, response, body) {
+                const result = JSON.parse(body);
+                console.log(result);
+                const LatLong = Promise.all(
+                  result.results.map((a) => ({
+                    formatted_address: a.formatted_address,
+                    geometry: a.geometry,
+                  }))
+                );
+                geofenceModel.create({
+                  organisationId: organisation._id,
+                  data: LatLong,
+                });
+              }
+            );
+          }
+        })
+      );
+    }
 
     organisation.email = req.body.email || organisation.email;
     organisation.areaOfAccess =
@@ -919,6 +955,39 @@ organisationController.updateProfile = async (req, res) => {
         location: req.body.location || organisation.location,
       }
     );
+
+    if (req.body.areaOfAccess) {
+      await geofenceModel.deleteMany({ organisationId: organisation._id });
+      await Promise.all(
+        req.body.areaOfAccess.map(async (area) => {
+          const lcd = await localGovernmentModel.findOne({
+            slug: area,
+          });
+
+          if (lcd) {
+            request.get(
+              {
+                url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
+              },
+              function (error, response, body) {
+                const result = JSON.parse(body);
+                console.log(result);
+                const LatLong = Promise.all(
+                  result.results.map((a) => ({
+                    formatted_address: a.formatted_address,
+                    geometry: a.geometry,
+                  }))
+                );
+                geofenceModel.create({
+                  organisationId: organisation._id,
+                  data: LatLong,
+                });
+              }
+            );
+          }
+        })
+      );
+    }
 
     organisation.email = req.body.email || organisation.email;
     organisation.areaOfAccess =
@@ -1538,7 +1607,14 @@ organisationController.profile = async (req, res) => {
     const { user } = req;
 
     const companyDetail = await organisationModel
-      .findById(user._id,  { password: 0, roles:0, role:0, totalAvailable:0, totalSpent:0, resetToken: 0, })
+      .findById(user._id, {
+        password: 0,
+        roles: 0,
+        role: 0,
+        totalAvailable: 0,
+        totalSpent: 0,
+        resetToken: 0,
+      })
       .populate("categories.catId");
 
     return res.status(200).json({
