@@ -513,9 +513,13 @@ dashboardController.collectormapData = async (req, res) => {
 
     const { start, end } = req.query;
     let collectorType = "collector";
-    const [startDate, endDate] = [new Date(start), new Date(end)];
-    endDate.setDate(endDate.getDate() + 1);
 
+    if (!start || !end) {
+      return res.status(400).json({
+        error: true,
+        message: "Date range is required",
+      });
+    }
     if (start || end) {
       if (new Date(start) > new Date(end)) {
         return res.status(400).json({
@@ -524,6 +528,9 @@ dashboardController.collectormapData = async (req, res) => {
         });
       }
     }
+
+    const [startDate, endDate] = [new Date(start), new Date(end)];
+    endDate.setDate(endDate.getDate() + 1);
 
     if (req.query.collectoryType) {
       collectorType = req.query.collectoryType;

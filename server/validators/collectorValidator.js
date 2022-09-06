@@ -66,6 +66,26 @@ module.exports = {
       .optional()
       .isString()
       .withMessage("organisation should be string"),
+    body("accountName")
+      .notEmpty()
+      .withMessage("account name is required")
+      .isString()
+      .withMessage("account name should be string"),
+    body("accountNo")
+      .notEmpty()
+      .withMessage("account number is required")
+      .isString()
+      .withMessage("account number should be string"),
+    body("bankName")
+      .notEmpty()
+      .withMessage("bank name is required")
+      .isString()
+      .withMessage("bank name should be string"),
+    body("bankSortCode")
+      .notEmpty()
+      .withMessage("bank sort code is required")
+      .isString()
+      .withMessage("bank sort code should be string"),
   ],
 
   assignPicker: [
