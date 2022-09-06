@@ -307,7 +307,7 @@ class CollectorService {
             { localGovernment: { $regex: `.*${key}.*`, $options: "i" } },
             { organisation: { $regex: `.*${key}.*`, $options: "i" } },
           ],
-          organisationId:organisationId.toString(),
+          organisationId: organisationId.toString(),
           companyVerified,
           collectorType,
           approvalStatus: { $ne: "DECLINED" },
@@ -326,14 +326,14 @@ class CollectorService {
             $gte: startDate,
             $lt: endDate,
           },
-          organisationId:organisationId.toString(),
+          organisationId: organisationId.toString(),
           companyVerified,
           collectorType,
           approvalStatus: { $ne: "DECLINED" },
         };
       } else
         criteria = {
-          organisationId:organisationId.toString(),
+          organisationId: organisationId.toString(),
           companyVerified,
           collectorType,
           approvalStatus: { $ne: "DECLINED" },
@@ -394,10 +394,11 @@ class CollectorService {
       resultsPerPage = parseInt(resultsPerPage);
     if (paginated) paginated = paginated === "true" ? true : false;
 
+    console.log("organisationId", organisationId.toString());
     try {
       // check existence of geofence data in db
       const coordinateData = await geofenceModel.findOne({
-        organisationId,
+        organisationId: organisationId.toString(),
       });
       // return error if data doesn't exist for company
       if (!coordinateData)
@@ -415,8 +416,7 @@ class CollectorService {
         // paginated result
         const coordinateData = await geofenceModel
           .find({
-            organisationId,
-            collectorType,
+            organisationId: organisationId.toString(),
           })
           .sort({ createdAt: -1 })
           .skip((page - 1) * resultsPerPage)
@@ -437,8 +437,7 @@ class CollectorService {
       } else {
         //send all coordinates
         const coordinateData = await geofenceModel.find({
-          organisationId,
-          collectorType,
+          organisationId: organisationId.toString(),
         });
 
         // send all data
