@@ -81,7 +81,7 @@ module.exports = {
       .withMessage("bank name is required")
       .isString()
       .withMessage("bank name should be string"),
-    body("bankSortCode")
+    body("sortCode")
       .notEmpty()
       .withMessage("bank sort code is required")
       .isString()
