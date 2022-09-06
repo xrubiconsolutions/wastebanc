@@ -118,6 +118,7 @@ class ScheduleService {
             completionDate: 1,
             state: 1,
             cancelReason: 1,
+            collectorStatus: 1,
           },
         },
       ];
