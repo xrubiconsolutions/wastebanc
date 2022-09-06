@@ -23,6 +23,9 @@ class CollectorService {
   static async aggregateQuery({ criteria, page = 1, resultsPerPage = 20 }) {
     const paginationQuery = [
       {
+        $match:criteria,
+      },
+      {
         $skip: (page - 1) * resultsPerPage,
       },
       {
@@ -269,7 +272,7 @@ class CollectorService {
   static async getCompanyCollectors(req, res) {
     const { companyName: organisation } = req.user;
     // log
-    const { collectorType = "collector" } = req.query;
+
     try {
       let {
         page = 1,
@@ -278,6 +281,7 @@ class CollectorService {
         end,
         state,
         key,
+        collectorType = "collector",
         companyVerified,
       } = req.query;
       if (typeof page === "string") page = parseInt(page);
@@ -302,6 +306,7 @@ class CollectorService {
           ],
           organisation,
           companyVerified,
+          collectorType,
           approvalStatus: { $ne: "DECLINED" },
         };
       } else if (start && end) {
@@ -320,17 +325,21 @@ class CollectorService {
           },
           organisation,
           companyVerified,
+          collectorType,
           approvalStatus: { $ne: "DECLINED" },
         };
       } else
         criteria = {
           organisation,
           companyVerified,
+          collectorType,
           approvalStatus: { $ne: "DECLINED" },
         };
       if (state) criteria.state = state;
 
-      criteria.collectorType = collectorType;
+      console.log("criteria", criteria);
+
+      //criteria.collectorType = collectorType;
 
       // const totalResult = await collectorModel.countDocuments(criteria);
       // const projection = {
