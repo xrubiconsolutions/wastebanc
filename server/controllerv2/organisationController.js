@@ -31,7 +31,7 @@ const rewardService = require("../services/rewardService");
 const sterlingService = require("../modules/partners/sterling/sterlingService");
 const ObjectId = require("mongoose").Types.ObjectId;
 const categoriesModel = require("../models/categoryModel");
-
+const axios = require("axios");
 organisationController.types = async (req, res) => {
   try {
     const types = await organisationTypeModel
@@ -613,25 +613,36 @@ organisationController.update = async (req, res) => {
           });
 
           if (lcd) {
-            request.get(
-              {
-                url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
-              },
-              function (error, response, body) {
-                const result = JSON.parse(body);
-                console.log(result);
-                const LatLong = Promise.all(
-                  result.results.map((a) => ({
-                    formatted_address: a.formatted_address,
-                    geometry: a.geometry,
-                  }))
-                );
-                geofenceModel.create({
-                  organisationId: organisation._id,
-                  data: LatLong,
-                });
-              }
+            const result = await axios.get(
+              `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`
             );
+            const data = result.data.results;
+
+            console.log("result", data);
+
+            await geofenceModel.create({
+              organisationId: organisation._id,
+              data: result.data.results,
+            });
+
+            //   {
+            //     url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
+            //   },
+            //   function (error, response, body) {
+            //     const result = JSON.parse(body);
+            //     console.log(result);
+            //     const LatLong = Promise.all(
+            //       result.results.map((a) => ({
+            //         formatted_address: a.formatted_address,
+            //         geometry: a.geometry,
+            //       }))
+            //     );
+            //     geofenceModel.create({
+            //       organisationId: organisation._id,
+            //       data: LatLong,
+            //     });
+            //   }
+            // );
           }
         })
       );
@@ -965,25 +976,17 @@ organisationController.updateProfile = async (req, res) => {
           });
 
           if (lcd) {
-            request.get(
-              {
-                url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`,
-              },
-              function (error, response, body) {
-                const result = JSON.parse(body);
-                console.log(result);
-                const LatLong = Promise.all(
-                  result.results.map((a) => ({
-                    formatted_address: a.formatted_address,
-                    geometry: a.geometry,
-                  }))
-                );
-                geofenceModel.create({
-                  organisationId: organisation._id,
-                  data: LatLong,
-                });
-              }
+            const result = await axios.get(
+              `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`
             );
+            const data = result.data.results;
+
+            console.log("result", data);
+
+            await geofenceModel.create({
+              organisationId: organisation._id,
+              data: result.data.results,
+            });
           }
         })
       );

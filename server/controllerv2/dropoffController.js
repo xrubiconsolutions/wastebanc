@@ -58,6 +58,7 @@ dropoffController.aggregateQuery = async ({
               $project: {
                 fullname: 1,
                 userId: "$_id",
+                phone: 1,
                 _id: 0,
               },
             },

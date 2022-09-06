@@ -117,6 +117,8 @@ class ScheduleService {
             recycler: 1,
             completionDate: 1,
             state: 1,
+            cancelReason: 1,
+            collectorStatus: 1,
           },
         },
         {
@@ -1158,6 +1160,7 @@ class ScheduleService {
             organisation: user.organisation,
             organisationCollection: user.approvedBy,
             recycler: user.fullname,
+            acceptedDate: new Date(),
           },
         }
       );

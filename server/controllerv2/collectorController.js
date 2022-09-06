@@ -23,6 +23,9 @@ class CollectorService {
   static async aggregateQuery({ criteria, page = 1, resultsPerPage = 20 }) {
     const paginationQuery = [
       {
+        $match: criteria,
+      },
+      {
         $skip: (page - 1) * resultsPerPage,
       },
       {
@@ -79,6 +82,9 @@ class CollectorService {
       ];
 
       const countCriteria = [
+        {
+          $match: criteria,
+        },
         ...pipeline,
         {
           $count: "createdAt",
@@ -267,9 +273,9 @@ class CollectorService {
     }
   }
   static async getCompanyCollectors(req, res) {
-    const { companyName: organisation } = req.user;
+    const { _id: organisationId } = req.user;
     // log
-    const { collectorType = "collector" } = req.query;
+
     try {
       let {
         page = 1,
@@ -278,6 +284,7 @@ class CollectorService {
         end,
         state,
         key,
+        collectorType = "collector",
         companyVerified,
       } = req.query;
       if (typeof page === "string") page = parseInt(page);
@@ -300,8 +307,9 @@ class CollectorService {
             { localGovernment: { $regex: `.*${key}.*`, $options: "i" } },
             { organisation: { $regex: `.*${key}.*`, $options: "i" } },
           ],
-          organisation,
+          organisationId: organisationId.toString(),
           companyVerified,
+          collectorType,
           approvalStatus: { $ne: "DECLINED" },
         };
       } else if (start && end) {
@@ -318,19 +326,23 @@ class CollectorService {
             $gte: startDate,
             $lt: endDate,
           },
-          organisation,
+          organisationId: organisationId.toString(),
           companyVerified,
+          collectorType,
           approvalStatus: { $ne: "DECLINED" },
         };
       } else
         criteria = {
-          organisation,
+          organisationId: organisationId.toString(),
           companyVerified,
+          collectorType,
           approvalStatus: { $ne: "DECLINED" },
         };
       if (state) criteria.state = state;
 
-      criteria.collectorType = collectorType;
+      console.log("criteria", criteria);
+
+      //criteria.collectorType = collectorType;
 
       // const totalResult = await collectorModel.countDocuments(criteria);
       // const projection = {
@@ -382,10 +394,11 @@ class CollectorService {
       resultsPerPage = parseInt(resultsPerPage);
     if (paginated) paginated = paginated === "true" ? true : false;
 
+    console.log("organisationId", organisationId.toString());
     try {
       // check existence of geofence data in db
       const coordinateData = await geofenceModel.findOne({
-        organisationId,
+        organisationId: organisationId.toString(),
       });
       // return error if data doesn't exist for company
       if (!coordinateData)
@@ -403,8 +416,7 @@ class CollectorService {
         // paginated result
         const coordinateData = await geofenceModel
           .find({
-            organisationId,
-            collectorType,
+            organisationId: organisationId.toString(),
           })
           .sort({ createdAt: -1 })
           .skip((page - 1) * resultsPerPage)
@@ -425,8 +437,7 @@ class CollectorService {
       } else {
         //send all coordinates
         const coordinateData = await geofenceModel.find({
-          organisationId,
-          collectorType,
+          organisationId: organisationId.toString(),
         });
 
         // send all data
@@ -686,7 +697,6 @@ class CollectorService {
       const body = req.body;
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
-        collectorType: "collector",
       });
 
       if (!body.terms_condition || body.terms_condition == false) {
@@ -923,7 +933,7 @@ class CollectorService {
           $gte: ONE_MONTH_AGO,
         },
         organisationId: req.user._id.toString(),
-        //companyVerified: true,
+        //companyVerified: t,
         collectorType,
       });
 
@@ -1720,7 +1730,6 @@ class CollectorService {
       const body = req.body;
       const checkPhone = await collectorModel.findOne({
         phone: body.phone,
-        collectorType: "waste-picker",
       });
       if (checkPhone) {
         return res.status(400).json({
