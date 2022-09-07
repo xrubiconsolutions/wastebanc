@@ -7836,7 +7836,7 @@ organisationController.getCompletedSchedulesDrop = (req, res) => {
   }
 };
 
-organisationController.getDropOffUser = (req, res) => {
+organisationController.getDropOffUser = async (req, res) => {
   const lat = req.query.lat;
   const long = req.query.long;
   function rad(x) {
@@ -7864,6 +7864,39 @@ organisationController.getDropOffUser = (req, res) => {
     var nearestDistances = [];
     var addresses = [];
     var datum = [];
+
+    const d = await MODEL.dropOffModel.find({});
+    for (let i = 0; i < d.length; i++) {
+      getDistance(d[i].location, { lat, long });
+
+      nearestLocation.push(d[i].location);
+      nearestDistances.push(getDistance(d[i].location, { lat, long }));
+      datum.push(d[i]);
+    }
+
+    // await Promise.all(
+    //   datum
+    //     .map(async (address) => {
+    //       const categories = await MODEL.organisationModel
+    //         .findById(address.organisationId)
+    //         .select("categories");
+    //       let r = {
+    //         Organisation: address.organisation,
+    //         phone: address.phone,
+
+    //         OrganisationId: address.organisationId,
+    //         distance: getDistance(address.location, { lat, long }),
+
+    //         location: address.location,
+    //         categories,
+    //       };
+    //       addresses.push(r);
+    //     })
+    //     .sort((a, b) => a.distance - b.distance)
+    // );
+
+    // return res.status(200).json(addresses);
+
     MODEL.dropOffModel.find({}).then((drop) => {
       for (let i = 0; i < drop.length; i++) {
         getDistance(drop[i].location, { lat, long });
@@ -7876,6 +7909,7 @@ organisationController.getDropOffUser = (req, res) => {
         .map((address) => ({
           Organisation: address.organisation,
           phone: address.phone,
+
           OrganisationId: address.organisationId,
           distance: getDistance(address.location, { lat, long }),
 

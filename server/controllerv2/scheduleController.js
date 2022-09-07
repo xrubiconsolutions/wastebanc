@@ -104,7 +104,6 @@ class ScheduleService {
             expiryDuration: 1,
             reminder: 1,
             callOnArrival: 1,
-            completionStatus: 1,
             acceptedBy: 1,
             collectedBy: 1,
             collectedPhone: 1,
