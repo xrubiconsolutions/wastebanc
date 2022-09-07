@@ -640,7 +640,7 @@ class CollectorService {
           approvedBy: companyId,
           //status: "active",
           //organisationId,
-          areaOfAccess: req.user.accessArea,
+          areaOfAccess: req.user.streetOfAccess,
           approvalStatus: "APPROVED",
         },
         projection
