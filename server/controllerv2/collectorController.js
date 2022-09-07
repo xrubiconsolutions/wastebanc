@@ -634,13 +634,13 @@ class CollectorService {
         });
 
       await collectorModel.updateOne(
-        { _id: collectorId, organisationId },
+        { _id: collectorId, organisationId: req.user._id.toString() },
         {
           companyVerified: true,
           approvedBy: companyId,
           //status: "active",
-          organisationId,
-          areaOfAccess: accessArea,
+          //organisationId,
+          areaOfAccess: req.user.accessArea,
           approvalStatus: "APPROVED",
         },
         projection
