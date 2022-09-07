@@ -566,7 +566,8 @@ class invoiceService {
       .populate("transactions");
     if (!invoiceData) return { error: true, path: "" };
 
-    const template = invoiceTemplate(invoiceData);
+    const template = await invoiceTemplate(invoiceData);
+
     const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
     const page = await browser.newPage();
     const path = "invoice.pdf";

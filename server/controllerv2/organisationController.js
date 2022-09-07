@@ -1332,9 +1332,9 @@ organisationController.ongoingbilling = async (req, res) => {
         transactions,
         household,
         wastePickersTotal,
-        subtotal,
-        serviceCharge: percentage,
-        total,
+        subtotal: subtotal.toFixed(2),
+        serviceCharge: percentage.toFixed(2),
+        total: total.toFixed(2),
       },
     });
   } catch (error) {
