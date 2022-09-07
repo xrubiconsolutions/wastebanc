@@ -639,7 +639,7 @@ class CollectorService {
           companyVerified: true,
           approvedBy: companyId,
           //status: "active",
-          organisationId
+          organisationId,
           areaOfAccess: accessArea,
           approvalStatus: "APPROVED",
         },
