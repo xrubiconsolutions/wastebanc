@@ -491,8 +491,8 @@ class CollectorService {
       accessArea.forEach((area) => {
         const matchSchedules = initSchedules.filter(
           (schedule) =>
-            schedule.address.toLowerCase().indexOf(area.toLowerCase()) > -1 ||
-            schedule.lcd === area
+            schedule?.address?.toLowerCase().indexOf(area?.toLowerCase()) >
+              -1 || schedule?.lcd === area
         );
         schedules = schedules.concat(matchSchedules);
       });
