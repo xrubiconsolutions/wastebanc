@@ -910,6 +910,7 @@ organisationController.updateProfile = async (req, res) => {
               catId: catDetail._id,
             };
             categories.push(value);
+            console.log("categories", categories);
           }
         })
       );
