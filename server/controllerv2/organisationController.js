@@ -423,9 +423,8 @@ Pakam Team
       await Promise.all(
         areas.map(async (area) => {
           const lcd = await localGovernmentModel.findOne({
-            slug: area,
+            $or: [{ slug: area }, { lcd: area }],
           });
-
           if (lcd) {
             const result = await axios.get(
               `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`
@@ -601,8 +600,9 @@ organisationController.update = async (req, res) => {
       await Promise.all(
         req.body.areaOfAccess.map(async (area) => {
           const lcd = await localGovernmentModel.findOne({
-            slug: area,
+            $or: [{ slug: area }, { lcd: area }],
           });
+          console.log("lcd", area);
 
           if (lcd) {
             const result = await axios.get(
@@ -945,7 +945,7 @@ organisationController.updateProfile = async (req, res) => {
       await Promise.all(
         req.body.areaOfAccess.map(async (area) => {
           const lcd = await localGovernmentModel.findOne({
-            slug: area,
+            $or: [{ slug: area }, { lcd: area }],
           });
 
           if (lcd) {
