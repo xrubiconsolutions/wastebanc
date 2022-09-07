@@ -620,7 +620,7 @@ class CollectorService {
     const { collectorId } = req.body;
     const {
       _id: companyId,
-      companyName: organisation,
+      organsationId: organisationId,
       streetOfAccess: accessArea,
     } = req.user;
     const projection = { password: 0, _v: 0 };
@@ -634,7 +634,7 @@ class CollectorService {
         });
 
       await collectorModel.updateOne(
-        { _id: collectorId, organisation },
+        { _id: collectorId, organisationId },
         {
           companyVerified: true,
           approvedBy: companyId,
