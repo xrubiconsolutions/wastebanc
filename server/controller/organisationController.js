@@ -7836,7 +7836,7 @@ organisationController.getCompletedSchedulesDrop = (req, res) => {
   }
 };
 
-organisationController.getDropOffUser = (req, res) => {
+organisationController.getDropOffUser = async(req, res) => {
   const lat = req.query.lat;
   const long = req.query.long;
   function rad(x) {
@@ -7864,6 +7864,16 @@ organisationController.getDropOffUser = (req, res) => {
     var nearestDistances = [];
     var addresses = [];
     var datum = [];
+
+    // const addresses = await MODEL.dropOffModel.find({});
+    // addresses.map((address)=>{
+    //   getDistance(address.location, {lat, long});
+    //   nearestLocation.push(address.location);
+    //   nearestDistances.push(getDistance(address.location, {lat, long}))
+    //   datum.push()
+    // })
+
+
     MODEL.dropOffModel.find({}).then((drop) => {
       for (let i = 0; i < drop.length; i++) {
         getDistance(drop[i].location, { lat, long });
@@ -7876,6 +7886,7 @@ organisationController.getDropOffUser = (req, res) => {
         .map((address) => ({
           Organisation: address.organisation,
           phone: address.phone,
+
           OrganisationId: address.organisationId,
           distance: getDistance(address.location, { lat, long }),
 
