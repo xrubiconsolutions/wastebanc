@@ -909,8 +909,7 @@ organisationController.updateProfile = async (req, res) => {
               name: category.name,
               catId: catDetail._id,
             };
-
-            console.log("categories", categories);
+            categories.push(value);
           }
         })
       );
@@ -974,7 +973,7 @@ organisationController.updateProfile = async (req, res) => {
     organisation.phone = req.body.phone || organisation.phone;
     organisation.streetOfAccess =
       req.body.streetOfAccess || organisation.streetOfAccess;
-    organisation.categories = req.body.categories || organisation.categories;
+    organisation.categories = categories;
     organisation.location = req.body.location || organisation.location;
     organisation.allowPickers =
       req.body.allowPickers || organisation.allowPickers;
