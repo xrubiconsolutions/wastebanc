@@ -938,6 +938,7 @@ organisationController.updateProfile = async (req, res) => {
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
         categories: req.body.categories || organisation.categories,
         location: req.body.location || organisation.location,
+        allowPickers: req.body.allowPickers || organisation.allowPickers,
       }
     );
 
@@ -977,6 +978,7 @@ organisationController.updateProfile = async (req, res) => {
       req.body.streetOfAccess || organisation.streetOfAccess;
     organisation.categories = req.body.categories || organisation.categories;
     organisation.location = req.body.location || organisation.location;
+    organisation.allowPickers = req.body.allowPickers || organisation.allowPickers
 
     // add action to log
     organisationController.addLog(
