@@ -909,7 +909,7 @@ organisationController.updateProfile = async (req, res) => {
               name: category.name,
               catId: catDetail._id,
             };
-            categories.push(value);
+
             console.log("categories", categories);
           }
         })
@@ -936,7 +936,7 @@ organisationController.updateProfile = async (req, res) => {
         companyTag: req.body.companyTag || organisation.companyTag,
         phone: req.body.phone || organisation.phone,
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
-        categories: req.body.categories || organisation.categories,
+        categories,
         location: req.body.location || organisation.location,
         allowPickers: req.body.allowPickers || organisation.allowPickers,
       }
@@ -955,8 +955,6 @@ organisationController.updateProfile = async (req, res) => {
               `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`
             );
             const data = result.data.results;
-
-            console.log("result", data);
 
             await geofenceModel.create({
               organisationId: organisation._id,
@@ -978,7 +976,8 @@ organisationController.updateProfile = async (req, res) => {
       req.body.streetOfAccess || organisation.streetOfAccess;
     organisation.categories = req.body.categories || organisation.categories;
     organisation.location = req.body.location || organisation.location;
-    organisation.allowPickers = req.body.allowPickers || organisation.allowPickers
+    organisation.allowPickers =
+      req.body.allowPickers || organisation.allowPickers;
 
     // add action to log
     organisationController.addLog(
@@ -987,11 +986,13 @@ organisationController.updateProfile = async (req, res) => {
       organisation._id,
       req.user._id
     );
+    const resultData = { ...organisation.toJSON() };
+    delete resultData.password;
 
     return res.status(200).json({
       error: false,
       message: "organisation updated successfully",
-      data: organisation,
+      data: resultData,
     });
   } catch (error) {
     console.log(error);
