@@ -550,6 +550,11 @@ organisationController.update = async (req, res) => {
       }
     }
 
+    let allowPickers = organisation.allowPickers;
+    if (typeof req.body.allowPickers) {
+      allowPickers = req.body.allowPickers;
+    }
+
     let categories = [];
     if (req.body.categories) {
       await Promise.all(
@@ -579,6 +584,7 @@ organisationController.update = async (req, res) => {
     } else {
       categories = organisation.categories;
     }
+
     await organisationModel.updateOne(
       { _id: organisation._id },
       {
@@ -591,7 +597,7 @@ organisationController.update = async (req, res) => {
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
         categories: categories,
         location: req.body.location || organisation.location,
-        allowPickers: req.body.allowPickers || organisation.allowPickers,
+        allowPickers,
       }
     );
 
@@ -632,6 +638,7 @@ organisationController.update = async (req, res) => {
       req.body.streetOfAccess || organisation.streetOfAccess;
     organisation.categories = categories;
     organisation.location = req.body.location || organisation.location;
+    organisation.allowPickers = allowPickers;
 
     // add action to log
     organisationController.addLog(
@@ -925,6 +932,11 @@ organisationController.updateProfile = async (req, res) => {
       categories = organisation.categories;
     }
 
+    let allowPickers = organisation.allowPickers;
+    if (typeof req.body.allowPickers) {
+      allowPickers = req.body.allowPickers;
+    }
+   
     await organisationModel.updateOne(
       { _id: organisation._id },
       {
@@ -937,7 +949,7 @@ organisationController.updateProfile = async (req, res) => {
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
         categories,
         location: req.body.location || organisation.location,
-        allowPickers: req.body.allowPickers || organisation.allowPickers,
+        allowPickers,
       }
     );
 
@@ -975,8 +987,7 @@ organisationController.updateProfile = async (req, res) => {
       req.body.streetOfAccess || organisation.streetOfAccess;
     organisation.categories = categories;
     organisation.location = req.body.location || organisation.location;
-    organisation.allowPickers =
-      req.body.allowPickers || organisation.allowPickers;
+    organisation.allowPickers = allowPickers;
 
     // add action to log
     organisationController.addLog(
