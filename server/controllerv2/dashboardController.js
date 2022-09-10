@@ -144,25 +144,27 @@ dashboardController.companyCardMapData = async (req, res) => {
     }
     const [startDate, endDate] = [new Date(start), new Date(end)];
     endDate.setDate(endDate.getDate() + 1);
-    const { companyName: organisation } = req.user;
+    const { _id: organisationId } = req.user;
 
     let criteria = {
       createdAt: {
         $gte: startDate,
         $lt: endDate,
       },
-      organisation,
     };
 
-    const schedules = await allSchedules(criteria);
-    const totalWastes = await totalWaste(criteria);
-    const totalPayment = await totalpayout(criteria);
-    const totalOutstanding = await totaloutstanding(criteria);
-    const totalDropOff = await dropOffs(criteria);
-    const totalMissed = await missed(criteria);
-    const totalCompleted = await completed(criteria);
-    const totalPending = await pending(criteria);
-    const totalCancelled = await cancelled(criteria);
+    const schedules = await companyAllSchedules(criteria, organisationId);
+    const totalWastes = await companyTotalWaste(criteria, organisationId);
+    const totalPayment = await companyTotalpayout(criteria, organisationId);
+    const totalOutstanding = await companyTotaloutstanding(
+      criteria,
+      organisationId
+    );
+    const totalDropOff = await companyDropOffs(criteria, organisationId);
+    const totalMissed = await companyMissed(criteria, organisationId);
+    const totalCompleted = await companyCompleted(criteria, organisationId);
+    const totalPending = await companyPending(criteria, organisationId);
+    const totalCancelled = await companyCancelled(criteria, organisationId);
 
     return res.status(200).json({
       error: false,
@@ -704,9 +706,29 @@ const allSchedules = async (criteria) => {
   return schedules;
 };
 
+const companyAllSchedules = async (criteria, organisationId) => {
+  // get length of schedules within given date range
+
+  const schedules = await scheduleModel
+    .find({ ...criteria, organisationCollection: organisationId })
+    .sort({ createdAt: -1 });
+  return schedules;
+};
+
 const completed = async (criteria) => {
   const totalCompleted = await scheduleModel.countDocuments({
     ...criteria,
+    completionStatus: "completed",
+    collectorStatus: "accept",
+  });
+  return totalCompleted;
+};
+
+const companyCompleted = async (criteria, organisationId) => {
+  console.log("total completed", criteria);
+  const totalCompleted = await scheduleModel.countDocuments({
+    ...criteria,
+    organisationCollection: organisationId,
     completionStatus: "completed",
     collectorStatus: "accept",
   });
@@ -732,6 +754,18 @@ const wastePickers = async (criteria) => {
   return totalwastePicker;
 };
 
+const companyWastePickers = async (criteria, organisationId) => {
+  console.log("total wasp", criteria);
+
+  const totalwastePicker = await collectorModel.countDocuments({
+    ...criteria,
+    approvedBy: organisationId,
+    collectorType: "waste-picker",
+  });
+
+  return totalwastePicker;
+};
+
 const missed = async (criteria) => {
   const totalMissed = await scheduleModel.countDocuments({
     ...criteria,
@@ -740,10 +774,28 @@ const missed = async (criteria) => {
   return totalMissed;
 };
 
+const companyMissed = async (criteria, organisationId) => {
+  const totalMissed = await scheduleModel.countDocuments({
+    ...criteria,
+    organisationCollection: organisationId,
+    completionStatus: "missed",
+  });
+  return totalMissed;
+};
+
 const pending = async (criteria) => {
-  console.log("criteria", criteria);
   const totalPending = await scheduleModel.countDocuments({
     ...criteria,
+    completionStatus: "pending",
+    collectorStatus: "decline",
+  });
+  return totalPending;
+};
+
+const companyPending = async (criteria, organisationId) => {
+  const totalPending = await scheduleModel.countDocuments({
+    ...criteria,
+    organisationCollection: organisationId,
     completionStatus: "pending",
     collectorStatus: "decline",
   });
@@ -758,13 +810,32 @@ const cancelled = async (criteria) => {
   return totalCancelled;
 };
 
+const companyCancelled = async (criteria, organisationId) => {
+  console.log("total cancelled", criteria);
+  const totalCancelled = await scheduleModel.countDocuments({
+    ...criteria,
+    organisationCollection: organisationId,
+    completionStatus: "cancelled",
+  });
+  return totalCancelled;
+};
+
 const dropOffs = async (criteria) => {
   const totalResult = await scheduleDropModel.countDocuments(criteria);
   return totalResult;
 };
 
+const companyDropOffs = async (criteria, organisationId) => {
+  criteria.organisationCollection = organisationId;
+  console.log("total dropoffs", criteria);
+  const totalResult = await scheduleDropModel.countDocuments({
+    ...criteria,
+    organisationCollection: organisationId,
+  });
+  return totalResult;
+};
+
 const totalWaste = async (criteria) => {
-  console.log("totalWaste", criteria);
   const transactions = await transactionModel.find(criteria);
 
   const totalWastes = transactions
@@ -774,9 +845,39 @@ const totalWaste = async (criteria) => {
   return totalWastes;
 };
 
+const companyTotalWaste = async (criteria, organisationId) => {
+  console.log("totalwaste", criteria);
+  const transactions = await transactionModel.find({
+    ...criteria,
+    organisationID: organisationId,
+  });
+
+  const totalWastes = transactions
+    .map((x) => x.weight)
+    .reduce((acc, curr) => acc + curr, 0);
+
+  return totalWastes;
+};
+
 const totalpayout = async (criteria) => {
+  console.log("totalPayout", criteria);
   const condition = {
     ...criteria,
+    paid: true,
+  };
+
+  const transactions = await payModel.find(condition);
+  const totalpayouts = transactions
+    .map((x) => x.amount)
+    .reduce((acc, curr) => acc + curr, 0);
+  return totalpayouts;
+};
+
+const companyTotalpayout = async (criteria, organisationId) => {
+  console.log("totalPayout", criteria);
+  const condition = {
+    ...criteria,
+    organisationID: organisationId,
     paid: true,
   };
 
@@ -801,12 +902,35 @@ const totaloutstanding = async (criteria) => {
   return totalpayouts;
 };
 
+const companyTotaloutstanding = async (criteria, organisationId) => {
+  const condition = {
+    ...criteria,
+    organisationID: organisationId,
+    paid: false,
+  };
+
+  const transactions = await payModel.find(condition);
+
+  const totalpayouts = transactions
+    .map((x) => x.amount)
+    .reduce((acc, curr) => acc + curr, 0);
+  return totalpayouts;
+};
+
 const totalMale = async (criteria) => {
-  return await collectorModel.countDocuments({ ...criteria, gender: "male" });
+  return await collectorModel.countDocuments({
+    ...criteria,
+    gender: "male",
+    // collectorType: "collector",
+  });
 };
 
 const totalFemale = async (criteria) => {
-  return await collectorModel.countDocuments({ ...criteria, gender: "female" });
+  return await collectorModel.countDocuments({
+    ...criteria,
+    gender: "female",
+    // collectorType: "collector",
+  });
 };
 
 const verified = async (criteria) => {
