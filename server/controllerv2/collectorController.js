@@ -986,6 +986,7 @@ class CollectorService {
           { fullname: { $regex: `.*${key}.*`, $options: "i" } },
           { aggregatorId: { $regex: `.*${key}.*`, $options: "i" } },
           { recycler: { $regex: `.*${key}.*`, $options: "i" } },
+          { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
         ],
         organisationID: organisation,
       };
