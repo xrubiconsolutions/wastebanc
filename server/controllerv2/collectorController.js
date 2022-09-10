@@ -976,7 +976,7 @@ class CollectorService {
         message: "Please pass a start and end date or a search key",
       });
 
-    let { companyName: organisation } = req.user;
+    let { _id: organisation } = req.user;
     organisation = organisation.toString();
     let criteria;
 
@@ -987,7 +987,7 @@ class CollectorService {
           { aggregatorId: { $regex: `.*${key}.*`, $options: "i" } },
           { recycler: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        organisation,
+        organisationID:organisation,
       };
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -997,7 +997,7 @@ class CollectorService {
           $gte: startDate,
           $lt: endDate,
         },
-        organisation,
+        organisationID:organisation,
       };
     }
 
