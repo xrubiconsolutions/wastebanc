@@ -496,6 +496,7 @@ class ScheduleService {
             { client: { $regex: `.*${key}.*`, $options: "i" } },
             { phone: { $regex: `.*${key}.*`, $options: "i" } },
             { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+            { recycler: { $regex: `.*${key}.*`, $options: "i" }}
           ],
           collectorStatus,
           completionStatus,
