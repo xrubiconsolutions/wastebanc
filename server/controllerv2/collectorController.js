@@ -1033,7 +1033,7 @@ class CollectorService {
 
   static async getCompanyWasteStats(req, res) {
     let { start, end, state } = req.query;
-    let { companyName: organisation } = req.user;
+    let { _id: organisation } = req.user;
     organisation = organisation.toString();
     if (!start || !end) {
       return res.status(400).json({
@@ -1047,7 +1047,7 @@ class CollectorService {
         $gte: new Date(start),
         $lt: new Date(end),
       },
-      organisation,
+      organisationID: organisation,
     };
     const pipelines = [
       {
