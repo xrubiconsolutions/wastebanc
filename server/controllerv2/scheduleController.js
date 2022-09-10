@@ -385,10 +385,10 @@ class ScheduleService {
   }
 
   static async getCompanySchedules(req, res) {
-    const { companyName: organisation } = req.user;
+    const { _id: organisationId } = req.user;
     try {
       return ScheduleService.getOrgSchedules(res, {
-        organisation,
+        organisationCollection: organisationId,
         ...req.query,
       });
     } catch (error) {
