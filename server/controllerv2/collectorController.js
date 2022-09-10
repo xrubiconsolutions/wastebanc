@@ -987,7 +987,7 @@ class CollectorService {
           { aggregatorId: { $regex: `.*${key}.*`, $options: "i" } },
           { recycler: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        organisationID:organisation,
+        organisationID: organisation,
       };
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -997,12 +997,11 @@ class CollectorService {
           $gte: startDate,
           $lt: endDate,
         },
-        organisationID:organisation,
+        organisationID: organisation,
       };
     }
 
     try {
-      // totalResult count
       const totalResult = await transactionModel.countDocuments(criteria);
 
       // paginated outstanding payment
