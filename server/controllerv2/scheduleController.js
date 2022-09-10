@@ -388,7 +388,7 @@ class ScheduleService {
     const { _id: organisationId } = req.user;
     try {
       return ScheduleService.getOrgSchedules(res, {
-        organisationCollection: organisationId,
+        organisationCollection: organisationId.toString(),
         ...req.query,
       });
     } catch (error) {
@@ -455,7 +455,7 @@ class ScheduleService {
   static async getOrgSchedules(
     res,
     {
-      organisation,
+      organisationCollection,
       page = 1,
       resultsPerPage = 20,
       start,
@@ -499,19 +499,20 @@ class ScheduleService {
           ],
           collectorStatus,
           completionStatus,
-          organisation,
+          organisationCollection,
         }
       : {
           createdAt: {
             $gte: startDate,
             $lt: endDate,
           },
-          organisation,
+          organisationCollection,
           completionStatus,
           collectorStatus,
         };
 
     try {
+      console.log("criteria", criteria);
       // // get length of schedules with criteria
       const { schedules: companySchedules, totalResult } =
         await ScheduleService.aggregateQuery({
