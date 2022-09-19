@@ -385,10 +385,10 @@ class ScheduleService {
   }
 
   static async getCompanySchedules(req, res) {
-    const { companyName: organisation } = req.user;
+    const { _id: organisationId } = req.user;
     try {
       return ScheduleService.getOrgSchedules(res, {
-        organisation,
+        organisationCollection: organisationId.toString(),
         ...req.query,
       });
     } catch (error) {
@@ -455,7 +455,7 @@ class ScheduleService {
   static async getOrgSchedules(
     res,
     {
-      organisation,
+      organisationCollection,
       page = 1,
       resultsPerPage = 20,
       start,
@@ -496,22 +496,24 @@ class ScheduleService {
             { client: { $regex: `.*${key}.*`, $options: "i" } },
             { phone: { $regex: `.*${key}.*`, $options: "i" } },
             { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+            { recycler: { $regex: `.*${key}.*`, $options: "i" }}
           ],
           collectorStatus,
           completionStatus,
-          organisation,
+          organisationCollection,
         }
       : {
           createdAt: {
             $gte: startDate,
             $lt: endDate,
           },
-          organisation,
+          organisationCollection,
           completionStatus,
           collectorStatus,
         };
 
     try {
+      console.log("criteria", criteria);
       // // get length of schedules with criteria
       const { schedules: companySchedules, totalResult } =
         await ScheduleService.aggregateQuery({

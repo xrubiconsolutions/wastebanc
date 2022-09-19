@@ -620,7 +620,7 @@ class CollectorService {
     const { collectorId } = req.body;
     const {
       _id: companyId,
-      companyName: organisation,
+      organsationId: organisationId,
       streetOfAccess: accessArea,
     } = req.user;
     const projection = { password: 0, _v: 0 };
@@ -634,13 +634,13 @@ class CollectorService {
         });
 
       await collectorModel.updateOne(
-        { _id: collectorId, organisation },
+        { _id: collectorId, organisationId: req.user._id.toString() },
         {
           companyVerified: true,
           approvedBy: companyId,
           //status: "active",
-          organisation: organisation,
-          areaOfAccess: accessArea,
+          //organisationId,
+          areaOfAccess: req.user.streetOfAccess,
           approvalStatus: "APPROVED",
         },
         projection
@@ -976,7 +976,7 @@ class CollectorService {
         message: "Please pass a start and end date or a search key",
       });
 
-    let { companyName: organisation } = req.user;
+    let { _id: organisation } = req.user;
     organisation = organisation.toString();
     let criteria;
 
@@ -986,8 +986,9 @@ class CollectorService {
           { fullname: { $regex: `.*${key}.*`, $options: "i" } },
           { aggregatorId: { $regex: `.*${key}.*`, $options: "i" } },
           { recycler: { $regex: `.*${key}.*`, $options: "i" } },
+          { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        organisation,
+        organisationID: organisation,
       };
     } else {
       const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -997,12 +998,11 @@ class CollectorService {
           $gte: startDate,
           $lt: endDate,
         },
-        organisation,
+        organisationID: organisation,
       };
     }
 
     try {
-      // totalResult count
       const totalResult = await transactionModel.countDocuments(criteria);
 
       // paginated outstanding payment
@@ -1034,7 +1034,7 @@ class CollectorService {
 
   static async getCompanyWasteStats(req, res) {
     let { start, end, state } = req.query;
-    let { companyName: organisation } = req.user;
+    let { _id: organisation } = req.user;
     organisation = organisation.toString();
     if (!start || !end) {
       return res.status(400).json({
@@ -1048,7 +1048,7 @@ class CollectorService {
         $gte: new Date(start),
         $lt: new Date(end),
       },
-      organisation,
+      organisationID: organisation,
     };
     const pipelines = [
       {
@@ -2260,6 +2260,33 @@ class CollectorService {
       return res.status(500).json({
         error: true,
         message: "An error occurred",
+      });
+    }
+  }
+
+  static async removeUser(req, res) {
+    try {
+      const { user } = req;
+      const result = await await collectorModel.findByIdAndUpdate(user._id, {
+        status: "deleted",
+      });
+
+      if (!result) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+
+      return res.status(200).json({
+        error: true,
+        message: "User deleted successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error removing User",
       });
     }
   }

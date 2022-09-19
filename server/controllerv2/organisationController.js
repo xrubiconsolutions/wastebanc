@@ -550,6 +550,11 @@ organisationController.update = async (req, res) => {
       }
     }
 
+    let allowPickers = organisation.allowPickers;
+    if (typeof req.body.allowPickers) {
+      allowPickers = req.body.allowPickers;
+    }
+
     let categories = [];
     if (req.body.categories) {
       await Promise.all(
@@ -579,6 +584,7 @@ organisationController.update = async (req, res) => {
     } else {
       categories = organisation.categories;
     }
+
     await organisationModel.updateOne(
       { _id: organisation._id },
       {
@@ -591,7 +597,7 @@ organisationController.update = async (req, res) => {
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
         categories: categories,
         location: req.body.location || organisation.location,
-        allowPickers: req.body.allowPickers || organisation.allowPickers,
+        allowPickers,
       }
     );
 
@@ -632,6 +638,7 @@ organisationController.update = async (req, res) => {
       req.body.streetOfAccess || organisation.streetOfAccess;
     organisation.categories = categories;
     organisation.location = req.body.location || organisation.location;
+    organisation.allowPickers = allowPickers;
 
     // add action to log
     organisationController.addLog(
@@ -925,6 +932,11 @@ organisationController.updateProfile = async (req, res) => {
       categories = organisation.categories;
     }
 
+    let allowPickers = organisation.allowPickers;
+    if (typeof req.body.allowPickers) {
+      allowPickers = req.body.allowPickers;
+    }
+   
     await organisationModel.updateOne(
       { _id: organisation._id },
       {
@@ -935,8 +947,9 @@ organisationController.updateProfile = async (req, res) => {
         companyTag: req.body.companyTag || organisation.companyTag,
         phone: req.body.phone || organisation.phone,
         streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
-        categories: req.body.categories || organisation.categories,
+        categories,
         location: req.body.location || organisation.location,
+        allowPickers,
       }
     );
 
@@ -953,8 +966,6 @@ organisationController.updateProfile = async (req, res) => {
               `https://maps.googleapis.com/maps/api/geocode/json?address=${lcd.lcd}&key=AIzaSyBGv53NEoMm3uPyA9U45ibSl3pOlqkHWN8`
             );
             const data = result.data.results;
-
-            console.log("result", data);
 
             await geofenceModel.create({
               organisationId: organisation._id,
@@ -974,8 +985,9 @@ organisationController.updateProfile = async (req, res) => {
     organisation.phone = req.body.phone || organisation.phone;
     organisation.streetOfAccess =
       req.body.streetOfAccess || organisation.streetOfAccess;
-    organisation.categories = req.body.categories || organisation.categories;
+    organisation.categories = categories;
     organisation.location = req.body.location || organisation.location;
+    organisation.allowPickers = allowPickers;
 
     // add action to log
     organisationController.addLog(
@@ -984,11 +996,13 @@ organisationController.updateProfile = async (req, res) => {
       organisation._id,
       req.user._id
     );
+    const resultData = { ...organisation.toJSON() };
+    delete resultData.password;
 
     return res.status(200).json({
       error: false,
       message: "organisation updated successfully",
-      data: organisation,
+      data: resultData,
     });
   } catch (error) {
     console.log(error);
@@ -1081,7 +1095,7 @@ organisationController.disableCompany = async (req, res) => {
     // disable all collectors account within organisation
     await collectorModel.updateMany(
       {
-        organisation: company.companyName,
+        organisationID: company._id.toString(),
       },
       { status: "disabled" }
     );

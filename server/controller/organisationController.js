@@ -7874,50 +7874,50 @@ organisationController.getDropOffUser = async (req, res) => {
       datum.push(d[i]);
     }
 
-    // await Promise.all(
-    //   datum
-    //     .map(async (address) => {
-    //       const categories = await MODEL.organisationModel
-    //         .findById(address.organisationId)
-    //         .select("categories");
-    //       let r = {
-    //         Organisation: address.organisation,
-    //         phone: address.phone,
+    await Promise.all(
+      datum
+        .map(async (address) => {
+          const categories = await MODEL.organisationModel
+            .findById(address.organisationId)
+            .select("categories");
+          let r = {
+            Organisation: address.organisation,
+            phone: address.phone,
 
-    //         OrganisationId: address.organisationId,
-    //         distance: getDistance(address.location, { lat, long }),
+            OrganisationId: address.organisationId,
+            distance: getDistance(address.location, { lat, long }),
 
-    //         location: address.location,
-    //         categories,
-    //       };
-    //       addresses.push(r);
-    //     })
-    //     .sort((a, b) => a.distance - b.distance)
-    // );
+            location: address.location,
+            categories,
+          };
+          addresses.push(r);
+        })
+        .sort((a, b) => a.distance - b.distance)
+    );
 
-    // return res.status(200).json(addresses);
+    return res.status(200).json(addresses);
 
-    MODEL.dropOffModel.find({}).then((drop) => {
-      for (let i = 0; i < drop.length; i++) {
-        getDistance(drop[i].location, { lat, long });
+    // MODEL.dropOffModel.find({}).then((drop) => {
+    //   for (let i = 0; i < drop.length; i++) {
+    //     getDistance(drop[i].location, { lat, long });
 
-        nearestLocation.push(drop[i].location);
-        nearestDistances.push(getDistance(drop[i].location, { lat, long }));
-        datum.push(drop[i]);
-      }
-      addresses = datum
-        .map((address) => ({
-          Organisation: address.organisation,
-          phone: address.phone,
+    //     nearestLocation.push(drop[i].location);
+    //     nearestDistances.push(getDistance(drop[i].location, { lat, long }));
+    //     datum.push(drop[i]);
+    //   }
+    //   addresses = datum
+    //     .map((address) => ({
+    //       Organisation: address.organisation,
+    //       phone: address.phone,
 
-          OrganisationId: address.organisationId,
-          distance: getDistance(address.location, { lat, long }),
+    //       OrganisationId: address.organisationId,
+    //       distance: getDistance(address.location, { lat, long }),
 
-          location: address.location,
-        }))
-        .sort((a, b) => a.distance - b.distance);
-      return res.status(200).json(addresses);
-    });
+    //       location: address.location,
+    //     }))
+    //     .sort((a, b) => a.distance - b.distance);
+    //   return res.status(200).json(addresses);
+    // });
   } catch (err) {
     return res.status(500).json(err);
   }

@@ -216,4 +216,9 @@ module.exports = (APP) => {
     checkRequestErrs,
     CollectorService.initiatePayment
   );
+
+  APP.route("/api/collector/delete").post(
+    recyclerValidation,
+    CollectorService.removeCollector
+  );
 };

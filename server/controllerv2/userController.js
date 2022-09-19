@@ -862,6 +862,32 @@ class UserService {
       });
     }
   }
+
+  static async deleteUser(req, res) {
+    try {
+      const { user } = req;
+      const result = await userModel.findByIdAndUpdate(user._id, {
+        status: "deleted",
+      });
+      if (!result) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+
+      return res.status(200).json({
+        error: true,
+        message: "User deleted successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error deleting User",
+      });
+    }
+  }
 }
 
 module.exports = UserService;
