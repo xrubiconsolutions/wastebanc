@@ -865,8 +865,8 @@ class UserService {
 
   static async deleteUser(req, res) {
     try {
-      const { userId } = req.body;
-      const result = await userModel.findByIdAndUpdate(userId, {
+      const { user } = req;
+      const result = await userModel.findByIdAndUpdate(user._id, {
         status: "deleted",
       });
       if (!result) {

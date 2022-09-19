@@ -55,8 +55,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/user/delete").post(
-    userValidator.termsCondition,
-    checkRequestErrs,
+    userValidation,
     UserService.deleteUser
   );
 };
