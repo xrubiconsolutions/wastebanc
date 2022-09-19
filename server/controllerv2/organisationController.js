@@ -1095,7 +1095,7 @@ organisationController.disableCompany = async (req, res) => {
     // disable all collectors account within organisation
     await collectorModel.updateMany(
       {
-        organisation: company.companyName,
+        organisationID: company._id.toString(),
       },
       { status: "disabled" }
     );
