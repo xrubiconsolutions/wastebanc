@@ -2263,6 +2263,33 @@ class CollectorService {
       });
     }
   }
+
+  static async removeUser(req, res) {
+    try {
+      const { user } = req;
+      const result = await await collectorModel.findByIdAndUpdate(user._id, {
+        status: "deleted",
+      });
+
+      if (!result) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+
+      return res.status(200).json({
+        error: true,
+        message: "User deleted successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error removing User",
+      });
+    }
+  }
 }
 
 module.exports = CollectorService;
