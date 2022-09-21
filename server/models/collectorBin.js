@@ -17,12 +17,12 @@ const collectorbin_Schema = new Schema({
   },
   email: {
     type: String,
-    unique: true,
+    //unique: true,
   },
   phone: {
     type: String,
     required: true,
-    unique: true,
+    //unique: true,
   },
   roles: {
     type: String,
@@ -127,6 +127,10 @@ const collectorbin_Schema = new Schema({
   },
   country: {
     type: String,
+  },
+  deleteDate: {
+    type: Date,
+    default: Date.now,
   },
 });
 

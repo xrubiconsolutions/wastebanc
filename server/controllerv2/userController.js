@@ -4,6 +4,7 @@ const {
   recentVerificationModel,
   verificationLogModel,
   organisationTypeModel,
+  userBinModel,
 } = require("../models");
 const {
   sendResponse,
@@ -570,7 +571,7 @@ class UserService {
         });
       }
 
-      if(user.status == 'deleted'){
+      if (user.status == "deleted") {
         return res.status(400).json({
           error: true,
           message: "Invalid credentials",
@@ -874,14 +875,21 @@ class UserService {
   static async deleteUser(req, res) {
     try {
       const { user } = req;
-      const result = await userModel.findByIdAndUpdate(user._id, {
-        status: "deleted",
-      });
+      const result = await userModel.findById(user._id);
       if (!result) {
         return res.status(400).json({
           error: true,
           message: "User not found",
         });
+      }
+      const newResult = { ...result.toJSON() };
+
+      delete newResult._id;
+
+      const storeInBin = await userBinModel.create(newResult);
+      if (storeInBin) {
+        console.log("here");
+        result.deleteOne();
       }
 
       return res.status(200).json({

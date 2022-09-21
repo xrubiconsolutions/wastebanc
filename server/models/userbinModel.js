@@ -11,7 +11,7 @@ const Constants = require("../util/constants");
 var expiry = new Date();
 expiry.setDate(new Date().getDate() + 365);
 
-const user_Schema = new Schema({
+const userBin_Schema = new Schema({
   username: {
     type: String,
     required: true,
@@ -45,12 +45,12 @@ const user_Schema = new Schema({
   email: {
     type: String,
     // required: true,
-    unique: true,
+    //unique: true,
   },
   phone: {
     type: String,
     required: true,
-    unique: true,
+    //unique: true,
   },
   password: {
     type: String,
@@ -144,6 +144,10 @@ const user_Schema = new Schema({
     type: String,
     default: "active",
   },
+  deleteDate: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-module.exports = MONGOOSE.model("UserBin", user_Schema);
+module.exports = MONGOOSE.model("UserBin", userBin_Schema);

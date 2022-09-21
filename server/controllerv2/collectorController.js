@@ -1,4 +1,4 @@
-const { collectorModel } = require("../models");
+const { collectorModel, collectorBinModel } = require("../models");
 const geofenceModel = require("../models/geofenceModel");
 const organisationModel = require("../models/organisationModel");
 const scheduleModel = require("../models/scheduleModel");
@@ -1324,7 +1324,7 @@ class CollectorService {
         });
       }
 
-      if(collector.status == 'deleted'){
+      if (collector.status == "deleted") {
         return res.status(400).json({
           error: true,
           message: "Invalid credentials",
@@ -2274,7 +2274,7 @@ class CollectorService {
   static async removeUser(req, res) {
     try {
       const { user } = req;
-      const result = await await collectorModel.findByIdAndUpdate(user._id, {
+      const result = await await collectorModel.findById(user._id, {
         status: "deleted",
       });
 
@@ -2283,6 +2283,17 @@ class CollectorService {
           error: true,
           message: "User not found",
         });
+      }
+
+      const newResult = { ...result.toJSON() };
+
+      delete newResult._id;
+
+      collectorBinModel;
+      const storeInBin = await collectorBinModel.create(newResult);
+      if (storeInBin) {
+        console.log("here");
+        result.deleteOne();
       }
 
       return res.status(200).json({
