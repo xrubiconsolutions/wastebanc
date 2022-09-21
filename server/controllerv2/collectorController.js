@@ -1324,6 +1324,13 @@ class CollectorService {
         });
       }
 
+      if(collector.status == 'deleted'){
+        return res.status(400).json({
+          error: true,
+          message: "Invalid credentials",
+          statusCode: 400,
+        });
+      }
       if (!(await comparePassword(req.body.password, collector.password))) {
         return res.status(400).json({
           error: true,

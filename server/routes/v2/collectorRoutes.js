@@ -219,6 +219,6 @@ module.exports = (APP) => {
 
   APP.route("/api/collector/delete").post(
     recyclerValidation,
-    CollectorService.removeCollector
+    CollectorService.removeUser
   );
 };

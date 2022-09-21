@@ -570,6 +570,14 @@ class UserService {
         });
       }
 
+      if(user.status == 'deleted'){
+        return res.status(400).json({
+          error: true,
+          message: "Invalid credentials",
+          statusCode: 400,
+        });
+      }
+
       if (!(await comparePassword(req.body.password, user.password))) {
         return res.status(400).json({
           error: true,
