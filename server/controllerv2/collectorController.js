@@ -1608,7 +1608,7 @@ class CollectorService {
       if (req.body.email) {
         email = req.body.email.trim().toLowerCase();
       } else {
-        email = user.email;
+        email = user.email.trim().toLowerCase();
       }
 
       let fullname;
