@@ -1760,7 +1760,7 @@ class CollectorService {
       } else {
         console.log("here");
         email =
-          body.fullname.split("").join("") +
+          body.fullname.split(" ").join("") +
           Math.floor(Math.random() + 100) +
           "@xrubicon.com";
       }
@@ -1820,7 +1820,7 @@ class CollectorService {
         address: body.address,
         onesignal_id,
         aggregatorId: body.aggregatorId || "",
-        firstLogin: true
+        firstLogin: true,
       });
 
       const phoneNo = String(create.phone).substring(1, 11);
@@ -1861,7 +1861,7 @@ class CollectorService {
           address: create.address,
           organisation: create.organisation,
           aggregatorId: create.aggregatorId,
-          firstLogin: true
+          firstLogin: true,
         },
       });
     } catch (error) {
