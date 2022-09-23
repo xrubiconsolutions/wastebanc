@@ -1820,6 +1820,7 @@ class CollectorService {
         address: body.address,
         onesignal_id,
         aggregatorId: body.aggregatorId || "",
+        firstLogin: true
       });
 
       const phoneNo = String(create.phone).substring(1, 11);
@@ -1860,6 +1861,7 @@ class CollectorService {
           address: create.address,
           organisation: create.organisation,
           aggregatorId: create.aggregatorId,
+          firstLogin: true
         },
       });
     } catch (error) {
