@@ -934,7 +934,11 @@ const totalFemale = async (criteria) => {
 };
 
 const verified = async (criteria) => {
-  return await collectorModel.countDocuments({ ...criteria, verified: true });
+  return await collectorModel.countDocuments({
+    ...criteria,
+    verified: true,
+    companyVerified: false,
+  });
 };
 
 const allCollector = async (criteria) => {
