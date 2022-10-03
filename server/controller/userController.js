@@ -705,7 +705,7 @@ userController.resendVerification = async (REQUEST, RESPONSE) => {
   if (!user) {
     return RESPONSE.status(400).json({
       error: true,
-      message: "Phone does not exist",
+      message: "phone number does not exist",
     });
   }
   var phoneNo = String(phone).substring(1, 11);
