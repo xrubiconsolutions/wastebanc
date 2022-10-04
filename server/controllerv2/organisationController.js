@@ -434,7 +434,7 @@ Pakam Team
             console.log("result", data);
 
             await geofenceModel.create({
-              organisationId: organisation._id,
+              organisationId: org._id,
               data: result.data.results,
             });
           }
@@ -936,7 +936,7 @@ organisationController.updateProfile = async (req, res) => {
     if (typeof req.body.allowPickers) {
       allowPickers = req.body.allowPickers;
     }
-   
+
     await organisationModel.updateOne(
       { _id: organisation._id },
       {
