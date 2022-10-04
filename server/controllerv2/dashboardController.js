@@ -566,13 +566,14 @@ dashboardController.collectormapData = async (req, res) => {
     const totalVerified = await verified(criteria);
     const totalF = await totalFemale(criteria);
     const totalM = await totalMale(criteria);
+    const newCollectorUsers = await newCollectors(criteria);
 
     return res.status(200).json({
       error: false,
       message: "success",
       data: {
         collectors,
-        totalCollectors: collectors.length,
+        totalCollectors: newCollectorUsers,
         totalFemale: totalF,
         totalMale: totalM,
         totalVerified,
@@ -937,10 +938,20 @@ const verified = async (criteria) => {
   return await collectorModel.countDocuments({
     ...criteria,
     verified: true,
-    companyVerified: false,
   });
 };
 
+const newCollectors = async (criteria) => {
+  const ONE_MONTH_AGO = new Date() - 1000 * 60 * 60 * 24 * 30;
+  return await collectorModel.countDocuments({
+    ...criteria,
+    createdAt: {
+      $gte: ONE_MONTH_AGO,
+    },
+    verified: true,
+    companyVerified: false,
+  });
+};
 const allCollector = async (criteria) => {
   return await collectorModel.find(criteria);
 };
