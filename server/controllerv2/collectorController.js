@@ -932,6 +932,7 @@ class CollectorService {
         createdAt: {
           $gte: ONE_MONTH_AGO,
         },
+        companyVerified: false,
         organisationId: req.user._id.toString(),
         //companyVerified: t,
         collectorType,
