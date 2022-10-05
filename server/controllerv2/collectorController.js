@@ -2296,7 +2296,7 @@ class CollectorService {
       const storeInBin = await collectorBinModel.create(newResult);
       if (storeInBin) {
         console.log("here");
-        result.deleteOne();
+        await collectorModel.deleteOne({ phone: user.phone });
       }
 
       return res.status(200).json({
