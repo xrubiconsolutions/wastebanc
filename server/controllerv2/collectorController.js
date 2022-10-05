@@ -2277,21 +2277,21 @@ class CollectorService {
   static async removeUser(req, res) {
     try {
       const { user } = req;
-      const result = await await collectorModel.findById(user._id, {
-        status: "deleted",
-      });
+      // const result = await await collectorModel.findById(user._id, {
+      //   status: "deleted",
+      // });
 
-      if (!result) {
-        return res.status(400).json({
-          error: true,
-          message: "User not found",
-        });
-      }
+      // if (!result) {
+      //   return res.status(400).json({
+      //     error: true,
+      //     message: "User not found",
+      //   });
+      // }
 
-      const newResult = { ...result.toJSON() };
+      const newResult = { ...user.toJSON() };
 
       delete newResult._id;
-      console.log('newResult', newResult);
+      console.log("newResult", newResult);
 
       const storeInBin = await collectorBinModel.create(newResult);
       if (storeInBin) {
