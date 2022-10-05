@@ -2291,6 +2291,7 @@ class CollectorService {
       const newResult = { ...result.toJSON() };
 
       delete newResult._id;
+      console.log('newResult', newResult);
 
       const storeInBin = await collectorBinModel.create(newResult);
       if (storeInBin) {
