@@ -10,7 +10,7 @@ const Constants = require("../util/constants");
 const collectorbin_Schema = new Schema({
   fullname: {
     type: String,
-    required: true,
+    //required: true,
   },
   address: {
     type: String,
