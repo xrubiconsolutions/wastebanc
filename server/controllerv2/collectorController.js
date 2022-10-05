@@ -2292,7 +2292,6 @@ class CollectorService {
 
       delete newResult._id;
 
-      collectorBinModel;
       const storeInBin = await collectorBinModel.create(newResult);
       if (storeInBin) {
         console.log("here");
