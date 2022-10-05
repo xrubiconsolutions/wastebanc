@@ -381,7 +381,7 @@ Please note you can reset the password after logging into the App by clicking on
 *Attached below is a guide on how to use the Company Dashboard.
 
 How To Use The Dashboard
-Kindly Logon to https://dashboard.pakam.ng
+Kindly Logon to https://newdashboard.pakam.ng
 
 * Select Recycling Company
 * Input your Login Details
