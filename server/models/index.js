@@ -46,4 +46,5 @@ module.exports = {
   invoiceModel: require("./invoiceModel"),
   organisationLogModel: require("./organisationLogModel"),
   companyInfoModel: require("./companyInfoModel"),
+  wastebancAgentModel: require("./wastebancAgentModel"),
 };

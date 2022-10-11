@@ -1,4 +1,8 @@
-const { collectorModel, collectorBinModel } = require("../models");
+const {
+  collectorModel,
+  collectorBinModel,
+  wastebancAgentModel,
+} = require("../models");
 const geofenceModel = require("../models/geofenceModel");
 const organisationModel = require("../models/organisationModel");
 const scheduleModel = require("../models/scheduleModel");
@@ -2308,6 +2312,37 @@ class CollectorService {
       return res.status(500).json({
         error: true,
         message: "Error removing User",
+      });
+    }
+  }
+
+  static async saveWasteBancAgent(req, res) {
+    const agentData = req.body;
+    const { email, phone } = agentData;
+
+    try {
+      // find agent with the supplied email and phoneNo
+      let agent = await wastebancAgentModel.findOne({
+        email,
+        phone,
+      });
+
+      // return error if already exist
+      if (agent)
+        return res.send(400).json({
+          error: true,
+          message: "Agent with email or phone number already exist!",
+        });
+
+      await wastebancAgentModel.create(agentData);
+      return res.status(201).json({
+        error: false,
+        message: "Agent data saved successfully!",
+      });
+    } catch (error) {
+      res.status(500).json({
+        error: true,
+        message: "An error occured!",
       });
     }
   }

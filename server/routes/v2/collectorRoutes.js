@@ -221,4 +221,10 @@ module.exports = (APP) => {
     recyclerValidation,
     CollectorService.removeUser
   );
+
+  APP.route("/api/collector/wastebanc-agent").post(
+    collectorValidator.wastebancAgent,
+    checkRequestErrs,
+    CollectorService.saveWasteBancAgent
+  );
 };

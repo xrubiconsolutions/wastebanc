@@ -152,4 +152,26 @@ module.exports = {
       .isString()
       .withMessage("otp should be string"),
   ],
+
+  wastebancAgent: [
+    body("firstName", "First name is required").trim().notEmpty().isString(),
+    body("lastName", "Last name is required").trim().notEmpty().isString(),
+    body("phone", "Phone number is required")
+      .trim()
+      .notEmpty()
+      .isMobilePhone()
+      .withMessage("proivde a valid phone number"),
+    body("email", "Email address is required")
+      .trim()
+      .notEmpty()
+      .isEmail()
+      .withMessage("Enter a valid email address"),
+    body("state", "State is required").trim().notEmpty().isString(),
+    body("localArea", "LGA/LCDA is required").trim().notEmpty().isString(),
+    body("address", "Address is required")
+      .trim()
+      .notEmpty()
+      .isString()
+      .withMessage("Address is required"),
+  ],
 };
