@@ -38,7 +38,7 @@ class VerificationService {
 
       const msg = {
         to: `${data.email}`,
-        from:"info@pakam.ng",
+        from:"pakam@xrubiconsolutions.com",
         subject:"Passwowrd Reset token",
         text:`Hello, Your password reset request was recieved below is your reset token ${data.token}
           Best Regards
