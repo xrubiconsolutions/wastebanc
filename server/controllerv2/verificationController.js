@@ -7,6 +7,7 @@ const {
 } = require("../models");
 const COMMON_FUN = require("../util/commonFunction");
 const { VERIFICATION_OBJ, ROLES_ENUM } = require("../util/constants");
+const sgMail = require("@sendgrid/mail");
 
 class VerificationService {
   static async requestAuthToken(req, res) {
@@ -30,6 +31,22 @@ class VerificationService {
         VERIFICATION_OBJ.AUTH,
         role
       );
+      // send email
+      sgMail.setApiKey(
+        "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"
+      );
+
+      const msg = {
+        to: `${data.email}`,
+        from:"info@pakam.ng",
+        subject:"Passwowrd Reset token",
+        text:`Hello, Your password reset request was recieved below is your reset token ${data.token}
+          Best Regards
+
+          Pakam Technologies
+        `
+      };
+      await sgMail.send(msg);
       //   return response
       return res.status(201).json({
         error: false,

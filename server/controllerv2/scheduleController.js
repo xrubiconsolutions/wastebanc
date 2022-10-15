@@ -496,7 +496,7 @@ class ScheduleService {
             { client: { $regex: `.*${key}.*`, $options: "i" } },
             { phone: { $regex: `.*${key}.*`, $options: "i" } },
             { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
-            { recycler: { $regex: `.*${key}.*`, $options: "i" }}
+            { recycler: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           collectorStatus,
           completionStatus,
@@ -756,10 +756,11 @@ class ScheduleService {
         charset: "numeric",
       });
 
+      const userGain =
+        Number(householdReward.totalpointGained) - Number(pakamPercentage);
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
-        coin:
-          Number(householdReward.totalpointGained) - Number(pakamPercentage),
+        coin: userGain,
         wastePickerCoin,
         wastePickerPercentage,
         cardID: scheduler._id,
@@ -818,8 +819,7 @@ class ScheduleService {
         { email: scheduler.email },
         {
           $set: {
-            availablePoints:
-              scheduler.availablePoints + householdReward.totalpointGained,
+            availablePoints:userGain,
             schedulePoints: scheduler.schedulePoints + 1,
           },
         }
@@ -832,7 +832,7 @@ class ScheduleService {
             totalCollected:
               collector.totalCollected + householdReward.totalWeight,
             numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
-            pointGained: collector.pointGained + wastePickerCoin,
+            pointGained: collector.pointGained + wastePickerCoin - wastePickerPercentage,
             busy: false,
             last_logged_in: new Date(),
           },
@@ -857,7 +857,7 @@ class ScheduleService {
       return res.status(200).json({
         error: false,
         message: "Pickup completed successfully",
-        data: householdReward.totalpointGained,
+        data: userGain,
         da: householdReward.totalWeight,
       });
     } catch (error) {
