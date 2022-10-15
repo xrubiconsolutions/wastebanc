@@ -45,4 +45,6 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/v2/areas/script").get(lcdAreasController.scriptArea);
+
+  APP.route("/api/v2/locations/script").get(lcdAreasController.scriptlocation);
 };

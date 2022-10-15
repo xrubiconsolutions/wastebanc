@@ -3,6 +3,7 @@
 let areasController = {};
 const { localGovernmentModel } = require("../models");
 const { sendResponse, bodyValidate } = require("../util/commonFunction");
+const locations = require("../../location.json");
 
 areasController.create = async (req, res) => {
   try {
@@ -260,6 +261,22 @@ areasController.scriptArea = async (req, res) => {
     return res.status(500).json({
       message: "Something went wrong",
     });
+  }
+};
+
+areasController.scriptlocation = async (req, res) => {
+  try {
+    const removeFirst = await localGovernmentModel.deleteMany();
+    if (removeFirst) {
+      const l = await localGovernmentModel.insertMany(locations);
+      return res.status(200).json({error:false, newData:l})
+    }
+    return res.status(200).json({error: false, newData:null});
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ error: true, message: "Error scripting locations" });
   }
 };
 
