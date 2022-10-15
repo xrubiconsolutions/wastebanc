@@ -510,6 +510,69 @@ const storeActivites = async (params) => {
   return params;
 };
 
+const paginateResponse = async ({
+  model,
+  query,
+  searchQuery,
+  page = 1,
+  resultsPerPage = 20,
+  key = "",
+  start,
+  end,
+  select,
+  populate,
+  title = "data",
+}) => {
+  if (typeof page === "string") page = parseInt(page);
+  if (typeof resultsPerPage === "string")
+    resultsPerPage = parseInt(resultsPerPage);
+
+  let criteria;
+  if (key) {
+    criteria = {
+      ...searchQuery,
+      ...query,
+    };
+  } else if (start || end) {
+    if (!start || !end) {
+      return {
+        error: true,
+        message: "Please pass a start and end date",
+      };
+    }
+    const [startDate, endDate] = [new Date(start), new Date(end)];
+    endDate.setDate(endDate.getDate() + 1);
+    criteria = {
+      createdAt: {
+        $gte: startDate,
+        $lt: endDate,
+      },
+      ...query,
+    };
+  } else {
+    criteria = {};
+  }
+  const totalResult = await model.countDocuments(criteria);
+  const data = await model
+    .find(criteria)
+    .populate(populate)
+    .select(select)
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * resultsPerPage)
+    .limit(resultsPerPage);
+  return {
+    error: false,
+    message: "success",
+    data: {
+      [title]: data,
+      totalResult,
+      page,
+      resultsPerPage,
+      totalPages: Math.ceil(totalResult / resultsPerPage),
+    },
+  };
+};
+
 /*exporting all object from here*/
 module.exports = {
   sendError: sendError,
@@ -548,4 +611,5 @@ module.exports = {
   updateUser,
   updateCollector,
   storeActivites,
+  paginateResponse,
 };
