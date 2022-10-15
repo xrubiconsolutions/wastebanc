@@ -41,7 +41,7 @@ class VerificationService {
         to: `${data.email}`,
         from: "pakam@xrubiconsolutions.com",
         subject: "Passwowrd Reset token",
-        text: `Hello, Your password reset request was recieved below is your reset token ${data.t}
+        text: `Hello, Your password reset request was recieved below is your reset token ${data.token}
 
                Best Regards
 
@@ -122,7 +122,7 @@ class VerificationService {
       const { __v, updatedAt, token: t, ...data } = result.toObject();
 
       //   return log doc
-      return Promise.resolve(data);
+      return logDetails;
     } catch (error) {
       console.log(error);
       return Promise.reject(error);
