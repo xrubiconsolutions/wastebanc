@@ -41,7 +41,7 @@ class VerificationService {
         to: `${data.email}`,
         from: "pakam@xrubiconsolutions.com",
         subject: "Passwowrd Reset token",
-        text: `Hello, Your password reset request was recieved below is your reset token ${data.token}
+        text: `Your password reset request was recieved below is your reset token ${data.token}
 
                Best Regards
 
