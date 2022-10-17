@@ -1621,4 +1621,25 @@ organisationController.profile = async (req, res) => {
   }
 };
 
+organisationController.updateStreetOfAccess = async (req, res) => {
+  const result = await organisationModel.updateOne(
+    { companyName: "O D Aleginadav Nigeria Limited" },
+    {
+      streetOfAccess: [
+        "ikorodu",
+        "ikorodu-ipakodo",
+        "ikorodu-agura",
+        "ikorodu-gberigbe",
+        "ikorodu-igbogbo1",
+        "ikorodu-igbogbo2",
+        "ikorodu-ijede1",
+        "ikorodu-ijede2",
+        "ikorodu-ibeshe",
+      ],
+    }
+  );
+  console.log("re", result);
+  return result;
+};
+
 module.exports = organisationController;

@@ -126,4 +126,8 @@ module.exports = (APP) => {
     companyPakamDataValidation,
     organisationController.profile
   );
+
+  APP.route("/api/script/accessAccess").get(
+    organisationController.updateStreetOfAccess
+  );
 };
