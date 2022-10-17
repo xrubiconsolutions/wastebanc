@@ -20,7 +20,7 @@ let serverConfig = {
     },
     host    : "localhost",
     type    : "http://",
-    port    : process.env.PORT || '4000'
+    port    : process.env.PORT || '4001'
 };
 
 
