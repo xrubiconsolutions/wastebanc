@@ -1,4 +1,4 @@
-const { faqModel } = require("../models");
+const { faqModel, careerAdModel } = require("../models");
 const { paginateResponse } = require("../util/commonFunction");
 
 class WebsiteService {
@@ -34,6 +34,48 @@ class WebsiteService {
       return res.status(201).json({
         error: false,
         message: "Faq created sucessfully",
+      });
+    } catch (error) {
+      console.log({ error });
+      res.status(500).json({
+        message: "An error occured!",
+        error: true,
+      });
+    }
+  }
+
+  static async getCareerAds(req, res) {
+    const { start, end, key, resultsPerPage = 20, page = 1 } = req.query;
+    try {
+      const ads = await careerAdModel.find();
+      const response = await paginateResponse({
+        model: careerAdModel,
+        query: {},
+        searchQuery: {
+          $or: [
+            { title: { $regex: `.*${key}.*`, $options: "i" } },
+            { workType: { $regex: `.*${key}.*`, $options: "i" } },
+          ],
+        },
+        ...req.query,
+        title: "careerAds",
+      });
+      return res.status(200).json(response);
+    } catch (error) {
+      console.log({ error });
+      res.status(500).json({
+        message: "An error occured!",
+        error: true,
+      });
+    }
+  }
+
+  static async addCareerAd(req, res) {
+    try {
+      const ad = await careerAdModel.create(req.body);
+      return res.status(201).json({
+        error: false,
+        message: "Career Ad created sucessfully",
       });
     } catch (error) {
       console.log({ error });
