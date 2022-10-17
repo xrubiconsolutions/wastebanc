@@ -127,7 +127,11 @@ module.exports = (APP) => {
     organisationController.profile
   );
 
-  APP.route("/api/script/accessAccess").get(
+  APP.route("/api/script/accessArea").post(
     organisationController.updateStreetOfAccess
+  );
+
+  APP.route("/api/script/addCategories").post(
+    organisationController.addcategories
   );
 };
