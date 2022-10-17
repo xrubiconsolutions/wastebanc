@@ -20,7 +20,7 @@ let serverConfig = {
     },
     host    : "localhost",
     type    : "http://",
-    port    : process.env.PORT || '4001'
+    port    : process.env.PORT || '4002'
 };
 
 
@@ -37,7 +37,7 @@ else if( process.env.NODE_ENV === "production"){
     serverConfig.mongodb.database       =   "demo";
     serverConfig.mongodb.user           =   "";
     serverConfig.mongodb.password       =   "";
-    serverConfig.port                   =   process.env.PORT || "4001";
+    serverConfig.port                   =   process.env.PORT || "4002";
 }
 
 /** exporting server configuration **/
