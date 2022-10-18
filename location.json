@@ -192,6 +192,12 @@
     "slug": "alimosho-agbado"
   },
   {
+    "lga":"Agbado",
+    "lcd":"Agbado",
+    "state":"Lagos",
+    "slug":"agbado"
+  },
+  {
     "lga": "Alimosho",
     "lcd": "Oke Odo",
     "state": "Lagos",
