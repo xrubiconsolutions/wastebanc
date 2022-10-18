@@ -540,6 +540,12 @@ const VERIFICATION_OBJ = Object.freeze({
   PAYMENT: "PAYMENT",
 });
 const ROLES_ENUM = Object.freeze(["COLLECTOR", "CLIENT", "ADMIN", "COMPANY"]);
+const WORK_TYPE_ENUM = Object.freeze([
+  "FULL-TIME",
+  "INTERN",
+  "CONTRACT",
+  "PART-TIME",
+]);
 
 /***********************************
  ****** Application Constants ******
@@ -555,6 +561,7 @@ let APP_CONSTANTS = {
   VERIFICATION_TYPES,
   VERIFICATION_OBJ,
   ROLES_ENUM,
+  WORK_TYPE_ENUM,
 };
 
 /** Exporting APP CONSTANTS **/
