@@ -13,7 +13,7 @@ let serverConfig = {
         port        : 27017,
         name        : "mongodb",
         connector   : "mongodb", 
-        url         : process.env.dbUrl || "mongodb://pakamXrubicon:me202010*@pakam-shard-00-00.wcabw.mongodb.net:27017,pakam-shard-00-01.wcabw.mongodb.net:27017,pakam-shard-00-02.wcabw.mongodb.net:27017/demo?ssl=true&replicaSet=atlas-13j6g2-shard-0&authSource=admin&retryWrites=true&w=majority",
+        url         : process.env.dbUrl || "mongodb://pakamXrubicon:me202010*@pakam-shard-00-00.wcabw.mongodb.net:27017,pakam-shard-00-01.wcabw.mongodb.net:27017,pakam-shard-00-02.wcabw.mongodb.net:27017/pakam?ssl=true&replicaSet=atlas-13j6g2-shard-0&authSource=admin&retryWrites=true&w=majority",
         database    : "demo",
         user        : "",
         password    : "",
@@ -33,7 +33,7 @@ if(process.env.NODE_ENV === "development"){
     serverConfig.mongodb.password       =   "";
 }
 else if( process.env.NODE_ENV === "production"){
-    serverConfig.mongodb.url            =   "mongodb://pakamXrubicon:me202010*@pakam-shard-00-00.wcabw.mongodb.net:27017,pakam-shard-00-01.wcabw.mongodb.net:27017,pakam-shard-00-02.wcabw.mongodb.net:27017/demo?ssl=true&replicaSet=atlas-13j6g2-shard-0&authSource=admin&retryWrites=true&w=majority" ;
+    serverConfig.mongodb.url            =   "mongodb://pakamXrubicon:me202010*@pakam-shard-00-00.wcabw.mongodb.net:27017,pakam-shard-00-01.wcabw.mongodb.net:27017,pakam-shard-00-02.wcabw.mongodb.net:27017/pakam?ssl=true&replicaSet=atlas-13j6g2-shard-0&authSource=admin&retryWrites=true&w=majority" ;
     serverConfig.mongodb.database       =   "demo";
     serverConfig.mongodb.user           =   "";
     serverConfig.mongodb.password       =   "";

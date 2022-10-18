@@ -1623,13 +1623,16 @@ organisationController.profile = async (req, res) => {
 
 organisationController.updateStreetOfAccess = async (req, res) => {
   const result = await organisationModel.updateOne(
-    { companyName:req.body.companyName },
+    { companyName: req.body.companyName },
     {
-      streetOfAccess: req.body.streetOfAccess
+      $set: {
+        newAreaOfAccess: req.body.areaOfAccess,
+        newStreetOfAccess: req.body.streetOfAccess,
+      },
     }
   );
   console.log("re", result);
-  return res.status(200).json(result)
+  return res.status(200).json(result);
 };
 
 organisationController.addcategories = async (req, res) => {
@@ -1637,8 +1640,8 @@ organisationController.addcategories = async (req, res) => {
     { companyName: req.body.companyName },
     { $set: { categories: req.body.categories } }
   );
-  console.log('res', result);
-  return res.status(200).json(result)
+  console.log("res", result);
+  return res.status(200).json(result);
 };
 
 module.exports = organisationController;

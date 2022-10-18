@@ -83,7 +83,7 @@ const organisation_Schema = new Schema({
     {
       name: { type: String },
       price: { type: Number, default: 0 },
-      catId: { type: Schema.Types.ObjectId, ref: "categories" }
+      catId: { type: Schema.Types.ObjectId, ref: "categories" },
     },
   ],
   canEquivalent: {
@@ -158,6 +158,12 @@ const organisation_Schema = new Schema({
   systemCharge: {
     type: Number,
     default: 10,
+  },
+  newAreaOfAccess: {
+    type: Array,
+  },
+  newStreetOfAccess: {
+    type: Array,
   },
 });
 module.exports = MONGOOSE.model("Organisation", organisation_Schema);
