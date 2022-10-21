@@ -1623,23 +1623,25 @@ organisationController.profile = async (req, res) => {
 
 organisationController.updateStreetOfAccess = async (req, res) => {
   const result = await organisationModel.updateOne(
-    { companyName: "O D Aleginadav Nigeria Limited" },
+    { companyName: req.body.companyName },
     {
-      streetOfAccess: [
-        "ikorodu",
-        "ikorodu-ipakodo",
-        "ikorodu-agura",
-        "ikorodu-gberigbe",
-        "ikorodu-igbogbo1",
-        "ikorodu-igbogbo2",
-        "ikorodu-ijede1",
-        "ikorodu-ijede2",
-        "ikorodu-ibeshe",
-      ],
+      $set: {
+        newAreaOfAccess: req.body.areaOfAccess,
+        newStreetOfAccess: req.body.streetOfAccess,
+      },
     }
   );
   console.log("re", result);
-  return result;
+  return res.status(200).json(result);
+};
+
+organisationController.addcategories = async (req, res) => {
+  const result = await organisationModel.updateOne(
+    { companyName: req.body.companyName },
+    { $set: { categories: req.body.categories } }
+  );
+  console.log("res", result);
+  return res.status(200).json(result);
 };
 
 module.exports = organisationController;

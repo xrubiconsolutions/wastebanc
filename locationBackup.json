@@ -108,6 +108,12 @@
     "slug": "agege-oko-oba"
   },
   {
+    "lga":"Agege",
+    "lcd":"Idi Mangoro",
+    "state":"Lagos",
+    "slug":"agege-idi-mangoro"
+  },
+  {
     "lga": "Ajeromi Ifelodun",
     "lcd": "Ajeromi Ifelodun",
     "state": "Lagos",
@@ -190,12 +196,6 @@
     "lcd": "Agbado",
     "state": "Lagos",
     "slug": "alimosho-agbado"
-  },
-  {
-    "lga":"Agbado",
-    "lcd":"Agbado",
-    "state":"Lagos",
-    "slug":"agbado"
   },
   {
     "lga": "Alimosho",
@@ -627,7 +627,7 @@
     "lga": "Epe",
     "lcd": "Ajaganabe",
     "state": "Lagos",
-    "slug": "epe-ajagnabe"
+    "slug": "epe-ago-owu"
   },
   {
     "lga": "Epe",
@@ -649,21 +649,9 @@
   },
   {
     "lga": "Epe",
-    "lcd": "Ilara",
-    "state": "Lagos",
-    "slug": "epe-ilara"
-  },
-  {
-    "lga": "Epe",
     "lcd": "Ibonwon",
     "state": "Lagos",
     "slug": "epe-ibonwon"
-  },
-  {
-    "lga": "Epe",
-    "lcd": "Odoragunshin",
-    "state": "Lagos",
-    "slug": "epe-odoragunshin"
   },
   {
     "lga": "Epe",
@@ -679,21 +667,9 @@
   },
   {
     "lga": "Epe",
-    "lcd": "Igbohun",
-    "state": "Lagos",
-    "slug": "epe-igbohun"
-  },
-  {
-    "lga": "Epe",
     "lcd": "Igbogun",
     "state": "Lagos",
     "slug": "epe-igbogun"
-  },
-  {
-    "lga": "Epe",
-    "lcd": "Epe",
-    "state": "Lagos",
-    "slug": "epe"
   },
   {
     "lga": "Epe",
@@ -733,12 +709,6 @@
   },
   {
     "lga": "Epe",
-    "lcd": "Abomiti",
-    "state": "Lagos",
-    "slug": "epe-abomiti"
-  },
-  {
-    "lga": "Epe",
     "lcd": "Orugbo",
     "state": "Lagos",
     "slug": "epe-orugbo"
@@ -754,12 +724,6 @@
     "lcd": "Popo Oba",
     "state": "Lagos",
     "slug": "epe-popo-oba"
-  },
-  {
-    "lga": "Epe",
-    "lcd": "Ajagannabe",
-    "state": "Lagos",
-    "slug": "epe-ajagannabe"
   },
   {
     "lga": "Eti Osa",
@@ -1716,24 +1680,6 @@
     "slug": "mushin"
   },
   {
-    "lga":"Mushin",
-    "lcd":"Odi Iro",
-    "state":"Lagos",
-    "slug":"mushin-odi-iro"
-  },
-  {
-    "lga":"Mushin",
-    "lcd":"Odi Olowo",
-    "state":"Lagos",
-    "slug":"mushin-odi-olowo"
-  },
-  {
-    "lga":"Mushin",
-    "lcd":"Idi Araba",
-    "state":"Lagos",
-    "slug":"mushin-idi-araba"
-  },
-  {
     "lga": "Mushin",
     "lcd": "Odi-Olowo",
     "state": "Lagos",
@@ -1753,9 +1699,15 @@
   },
   {
     "lga": "Mushin",
-    "lcd": "Odi-Olowu",
+    "lcd": "Babalosa/Idi-Araba",
     "state": "Lagos",
-    "slug": "mushin-odi-olowu"
+    "slug": "mushin-babalosa-idi-araba"
+  },
+  {
+    "lga": "Mushin",
+    "lcd": "Idi-Oro/Odi-Olowu",
+    "state": "Lagos",
+    "slug": "mushin-idi-ori-odi-olowu"
   },
   {
     "lga": "Mushin",
@@ -1783,19 +1735,13 @@
   },
   {
     "lga": "Mushin",
-    "lcd": "Kayode",
+    "lcd": "Kayode/Fadeyi",
     "state": "Lagos",
-    "slug": "mushin-kayode"
-  },
-  {
-    "lga":"Mushin",
-    "lcd":"Fadeyi",
-    "state":"Lagos",
-    "slug":"mushin-fadeyi"
+    "slug": "mushin-kayode-fadeyi"
   },
   {
     "lga": "Mushin",
-    "lcd": "Atewolara",
+    "lcd": "Mushin/Atewolara",
     "state": "Lagos",
     "slug": "mushin-atewolara"
   },
@@ -1896,18 +1842,6 @@
     "slug": "ojo-tafi"
   },
   {
-    "lga": "Ojo",
-    "lcd": "Alaba International",
-    "state": "Lagos",
-    "slug": "ojo-alaba-international"
-  },
-  {
-    "lga": "Ojo",
-    "lcd": "Alaba Rago",
-    "state": "Lagos",
-    "slug": "ojo-alaba-ragos"
-  },
-  {
     "lga": "Oshodi-Isolo",
     "lcd": "Isolo",
     "state": "Lagos",
@@ -1937,7 +1871,6 @@
     "state": "Lagos",
     "slug": "oshodi-isolo-ilasamaja"
   },
-  
   {
     "lga": "Oshodi-Isolo",
     "lcd": "Ishagatedo",
@@ -2213,198 +2146,5 @@
     "lcd": "Ojuelegba",
     "state": "Lagos",
     "slug": "surulere-ojuelegba"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Olive Garden estate",
-    "state": "Lagos",
-    "slug": "ibeji-lekki-olive-garden-estate"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Peaceland estate",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-peaceland-estate"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "All saints estate",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-all-saints-estate"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "New Town estate",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-new-town-estate"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Meadow view estate",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-meadow-view-estate"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Victory estate",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-victory-estate"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Rovers estate",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-rovers-estate"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Ashela royal estate",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-ashela-royal-estate"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Greenland estate",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-greenland-estate"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Greenland estate 2",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-greenland-estate2"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Alabeko",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-alabeko"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Badore",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-badore"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Awoyaya",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-awoyaya"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Eleko",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-eleko"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Dangote Refinery",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-dangote-refinery"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Abraham Adesanya",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-abraham-adesanya"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Agungi",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-agungi"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Siri",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-siri"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Chevron",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-chevron"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Sangotedo",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-sangotedo"
-  },
-  {
-    "lga": "Ibeju Lekki",
-    "lcd": "Victoria Garden City",
-    "state": "Lagos",
-    "slug": "ibeju-lekki-victoria-garden-city"
-  },
-
-  {
-    "lga": "Eti Osa",
-    "lcd": "Ogombo",
-    "state": "Lagos",
-    "slug": "eti-osa-ogombo"
-  },
-  {
-    "lga": "Eti Osa",
-    "lcd": "Addo",
-    "state": "Lagos",
-    "slug": "eti-osa-addo"
-  },
-  {
-    "lga": "Eti Osa",
-    "lcd": "Parkview",
-    "state": "Lagos",
-    "slug": "eti-osa-parkview"
-  },
-  {
-    "lga": "Eti Osa",
-    "lcd": "Oniru",
-    "state": "Lagos",
-    "slug": "eti-osa-oniru"
-  },
-  {
-    "lga": "Eti Osa",
-    "lcd": "Elegushi",
-    "state": "Lagos",
-    "slug": "eti-osa-elegushi"
-  },
-  {
-    "lga": "Eti osa",
-    "lcd": "Ikota",
-    "state": "Lagos",
-    "slug": "eti-osa-ikota"
-  },
-  {
-    "lga": "Eti Osa",
-    "lcd": "Ikate Village",
-    "state": "Lagos",
-    "slug": "eti-osa-ikate-village"
-  },
-  {
-    "lga": "Eti Osa",
-    "lcd": "Igbo Efon",
-    "state": "Lagos",
-    "slug": "eti-osa-igbo-efon"
-  },
-  {
-    "lga": "Eti Osa",
-    "lcd": "Ikota Housing Estate",
-    "state": "Lagos",
-    "slug": "eti-osa-ikota-housing-estate"
-  },
-  {
-    "lga": "Eti Osa",
-    "lcd": "Ilasan Housing Estate",
-    "state": "Lagos",
-    "slug": "eti-osa-ilasan-housing-estate"
-  },
-  {
-    "lga": "Eti Osa",
-    "lcd": "Maiyegun Village",
-    "state": "Lagos",
-    "slug": "eti-osa-maiyegun-village"
   }
 ]
