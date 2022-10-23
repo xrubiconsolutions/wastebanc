@@ -349,6 +349,12 @@
   },
   {
     "lga": "Amuwo Odofin",
+    "lcd": "Ago palace way",
+    "state": "Lagos",
+    "slug": "amuwo-odofin-ago-palace-way"
+  },
+  {
+    "lga": "Amuwo Odofin",
     "lcd": "Amuwo Odofin",
     "state": "Lagos",
     "slug": "amuwo-odofin"
@@ -418,6 +424,24 @@
     "lcd": "Kirikiri",
     "state": "Lagos",
     "slug": "amuwo-odofin-kirikiri"
+  },
+  {
+    "lga":"Amuwo Odofin",
+    "lcd":"Agboju",
+    "state":"Lagos",
+    "slug":"amuwo-odofin-agboju"
+  },
+  {
+    "lga":"Amuwo Odofin",
+    "lcd":"Festac",
+    "state":"Lagos",
+    "slug":"amuwo-odofin-festac"
+  },
+  {
+    "lga":"Amuwo Odofin",
+    "lcd":"Trade Fair",
+    "state":"Lagos",
+    "slug":"amuwo-odofin-trade-fair"
   },
   {
     "lga": "Amuwo Odofin",
