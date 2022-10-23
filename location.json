@@ -192,10 +192,10 @@
     "slug": "alimosho-agbado"
   },
   {
-    "lga":"Agbado",
-    "lcd":"Agbado",
-    "state":"Lagos",
-    "slug":"agbado"
+    "lga": "Agbado",
+    "lcd": "Agbado",
+    "state": "Lagos",
+    "slug": "agbado"
   },
   {
     "lga": "Alimosho",
@@ -208,6 +208,12 @@
     "lcd": "Ayobo",
     "state": "Lagos",
     "slug": "alimosho-ayobo"
+  },
+  {
+    "lga": "Alimosho",
+    "lcd": "Ayobo-Ipaja",
+    "state": "Lagos",
+    "slug": "alimosho-ayobo-ipaja"
   },
   {
     "lga": "Alimosho",
@@ -313,9 +319,9 @@
   },
   {
     "lga": "Alimosho",
-    "lcd": "Ipaja South",
+    "lcd": "Ipaja",
     "state": "Lagos",
-    "slug": "alimosho-ipaja-south"
+    "slug": "alimosho-ipaja"
   },
   {
     "lga": "Alimosho",
@@ -340,6 +346,12 @@
     "lcd": "Oriade",
     "state": "Lagos",
     "slug": "amuwo-odofin-oriade"
+  },
+  {
+    "lga": "Amuwo Odofin",
+    "lcd": "Amuwo Odofin",
+    "state": "Lagos",
+    "slug": "amuwo-odofin"
   },
   {
     "lga": "Amuwo Odofin",
@@ -1716,22 +1728,22 @@
     "slug": "mushin"
   },
   {
-    "lga":"Mushin",
-    "lcd":"Odi Iro",
-    "state":"Lagos",
-    "slug":"mushin-odi-iro"
+    "lga": "Mushin",
+    "lcd": "Odi Iro",
+    "state": "Lagos",
+    "slug": "mushin-odi-iro"
   },
   {
-    "lga":"Mushin",
-    "lcd":"Odi Olowo",
-    "state":"Lagos",
-    "slug":"mushin-odi-olowo"
+    "lga": "Mushin",
+    "lcd": "Odi Olowo",
+    "state": "Lagos",
+    "slug": "mushin-odi-olowo"
   },
   {
-    "lga":"Mushin",
-    "lcd":"Idi Araba",
-    "state":"Lagos",
-    "slug":"mushin-idi-araba"
+    "lga": "Mushin",
+    "lcd": "Idi Araba",
+    "state": "Lagos",
+    "slug": "mushin-idi-araba"
   },
   {
     "lga": "Mushin",
@@ -1788,10 +1800,10 @@
     "slug": "mushin-kayode"
   },
   {
-    "lga":"Mushin",
-    "lcd":"Fadeyi",
-    "state":"Lagos",
-    "slug":"mushin-fadeyi"
+    "lga": "Mushin",
+    "lcd": "Fadeyi",
+    "state": "Lagos",
+    "slug": "mushin-fadeyi"
   },
   {
     "lga": "Mushin",
@@ -1905,7 +1917,19 @@
     "lga": "Ojo",
     "lcd": "Alaba Rago",
     "state": "Lagos",
-    "slug": "ojo-alaba-ragos"
+    "slug": "ojo-alaba-rago"
+  },
+  {
+    "lga": "Ojo",
+    "lcd": "Otto",
+    "state": "Lagos",
+    "slug": "ojo-otto"
+  },
+  {
+    "lga": "Ojo",
+    "lcd": "Taffi",
+    "state": "Lagos",
+    "slug": "ojo-taffi"
   },
   {
     "lga": "Oshodi-Isolo",
@@ -1937,7 +1961,7 @@
     "state": "Lagos",
     "slug": "oshodi-isolo-ilasamaja"
   },
-  
+
   {
     "lga": "Oshodi-Isolo",
     "lcd": "Ishagatedo",
