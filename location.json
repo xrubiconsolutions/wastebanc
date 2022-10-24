@@ -348,6 +348,12 @@
     "slug": "amuwo-odofin-oriade"
   },
   {
+    "lga":"Amuwo Odofin",
+    "lcd":"Iyagbe",
+    "state":"Lagos",
+    "slug":"amuwo-odofin-iyagbe"
+  },
+  {
     "lga": "Amuwo Odofin",
     "lcd": "Ago palace way",
     "state": "Lagos",
@@ -402,10 +408,10 @@
     "slug": "amuwo-odofin-ibeshe"
   },
   {
-    "lga": "Amuwo Odofin",
-    "lcd": "Igobologun",
-    "state": "Lagos",
-    "slug": "amuwo-odofin-igobologun"
+    "lga":"Amuwo Odofin",
+    "lcd":"Igbologun",
+    "state":"Lagos",
+    "slug":"amuwo-odofin-igbologun"
   },
   {
     "lga": "Amuwo Odofin",
