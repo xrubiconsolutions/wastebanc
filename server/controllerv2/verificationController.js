@@ -240,6 +240,7 @@ class VerificationService {
   static async findAccount(field, role) {
     try {
       let account;
+      console.log(field);
       // find user account based on provided role
       switch (role) {
         case ROLES_ENUM[0]:
