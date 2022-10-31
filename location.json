@@ -234,6 +234,12 @@
     "slug": "alimosho-ayobo-ipaja"
   },
   {
+    "lga":"Alimosho",
+    "lcd":"Ile Epo",
+    "state":"Lagos",
+    "slug":"alimosho-ile-epo"
+  },
+  {
     "lga": "Alimosho",
     "lcd": "Egbe Idimu",
     "state": "Lagos",
@@ -2186,6 +2192,24 @@
     "slug": "oshodi-isolo-mafoluku"
   },
   {
+    "lga":"Oshodi-Isolo",
+    "lcd":"Jakande",
+    "state":"Lagos",
+    "slug":"oshodi-isolo-jakande"
+  },
+  {
+    "lga":"Oshodi-Isolo",
+    "lcd":"Shogunle",
+    "state":"Lagos",
+    "slug":"oshodi-isolo-shogunle"
+  },
+  {
+    "lga":"Oshodi-Isolo",
+    "lcd":"Isaga Tedo",
+    "state":"Lagos",
+    "slug":"oshodi-isolo-isaga-tedo"
+  },  
+  {
     "lga": "Oshodi-Isolo",
     "lcd": "Oke-Afa",
     "state": "Lagos",
@@ -2378,6 +2402,18 @@
     "slug": "surulere-adeniran-ogunsanya"
   },
   {
+    "lga":"Surulere",
+    "lcd":"Iponrin Housing-Estate",
+    "state":"Lagos",
+    "slug":"surulere-iponrin-housing-estate"
+  },
+  {
+    "lga":"Surulere",
+    "lcd":"Eric-Moore",
+    "state":"Lagos",
+    "slug":"surulere-eric-moore"
+  },
+  {
     "lga": "Surulere",
     "lcd": "Aguda",
     "state": "Lagos",
@@ -2454,6 +2490,12 @@
     "lcd": "Ojuelegba",
     "state": "Lagos",
     "slug": "surulere-ojuelegba"
+  },
+  {
+    "lga":"Surulere",
+    "lcd":"Gbaja",
+    "state":"Lagos",
+    "slug":"surulere-gbaja"
   },
   {
     "lga": "Ibeju Lekki",
