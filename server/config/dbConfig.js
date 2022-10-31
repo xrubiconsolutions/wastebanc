@@ -29,7 +29,6 @@ let serverConfig = {
  ** Maintain server Configuration **
  **** according to env variable ****
  ***********************************/
-
 if (process.env.NODE_ENV === "development") {
   serverConfig.mongodb.user = "";
   serverConfig.mongodb.password = "";
