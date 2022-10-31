@@ -257,6 +257,7 @@ class VerificationService {
           break;
         default:
       }
+      console.log('account', account);
       return account;
     } catch (error) {
       throw error;
