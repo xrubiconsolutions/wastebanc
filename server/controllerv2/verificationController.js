@@ -31,7 +31,6 @@ class VerificationService {
         VERIFICATION_OBJ.AUTH,
         role
       );
-      console.log("data", data);
       // send email
       sgMail.setApiKey(
         "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"
@@ -41,11 +40,10 @@ class VerificationService {
         to: `${data.email}`,
         from: "pakam@xrubiconsolutions.com",
         subject: "Passwowrd Reset token",
-        text: `Your password reset request was recieved below is your reset token ${data.token}
-
-               Best Regards
-
-              Pakam Technologies
+        html: `<p>Your password reset request was recieved below is your reset token</p></br>
+                <p>Token: ${data.token}</p></br>
+                <p>Best Regards</p></br>
+                <p>Pakam Technologies</p>
         `,
       };
       await sgMail.send(msg);
