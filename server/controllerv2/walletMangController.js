@@ -53,7 +53,7 @@ class WalletController {
       };
 
       const result = await axios.post(
-        "https://apiv2.pakam.ng/api/request/otp",
+        "https://wastebancfin.pakam.ng/api/request/otp",
         body,
         {
           headers: {
@@ -84,7 +84,7 @@ class WalletController {
 
     try {
       const result = await axios.post(
-        "https://apiv2.pakam.ng/api/disbursement/initiate",
+        "https://wastebancfin.pakam.ng/api/disbursement/initiate",
         body,
         {
           headers: {
