@@ -1,5 +1,7 @@
 const { faqModel, careerAdModel } = require("../models");
 const { paginateResponse } = require("../util/commonFunction");
+const sgMail = require("@sendgrid/mail");
+const {sendwebsiteMessage} = require("../services/sendEmail");
 
 class WebsiteService {
   static async getFaqs(req, res) {
@@ -76,6 +78,42 @@ class WebsiteService {
       return res.status(201).json({
         error: false,
         message: "Career Ad created sucessfully",
+      });
+    } catch (error) {
+      console.log({ error });
+      res.status(500).json({
+        message: "An error occured!",
+        error: true,
+      });
+    }
+  }
+
+  static async contactForm(req, res) {
+    try {
+      const { message, email } = req.body;
+      await sendwebsiteMessage(email,message);
+      // sgMail.setApiKey(
+      //   "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"
+      // );
+      // //working
+      // const msg = {
+      //   to: "anihuchenna16@gmail.com",
+      //   from: "me@xrubiconsolutions.com",
+      //   subject: "Contact Form Message",
+      //   html: `<p>Hello support Team</p></br>
+      //         <p>A message with the following content just from the website</p></br>
+      //         <p>Email:${email}</p></br>
+      //         <p>Message:${message}</p></br>
+      //         <p>Best Regards</p></br>
+      //         <p>Pakam Technologies</p>
+      //   `,
+      // };
+
+      // await sgMail.send(msg);
+      //   return response
+      return res.status(201).json({
+        error: false,
+        message: "Message Sent successfully",
       });
     } catch (error) {
       console.log({ error });

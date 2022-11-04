@@ -16,6 +16,7 @@ const sgMail = require("@sendgrid/mail");
 //const { request } = require("https");
 const request = require("request");
 const { requestedPayment } = require("../controller/payController");
+const { sendResumeMail } = require("../services/sendEmail");
 
 AWS.config.update({
   accessKeyId: CONFIG.awsConfig.accessKeyId,
@@ -175,7 +176,7 @@ commonService.uploadFileS3 = (fileObj) => {
   });
 };
 
-commonService.resumeUpload = (REQUEST, RESPONSE) => {
+commonService.resumeUpload = async (REQUEST, RESPONSE) => {
   return new Promise((resolve, reject) => {
     if (!REQUEST.files) {
       return RESPONSE.status(400).json({
@@ -196,7 +197,7 @@ commonService.resumeUpload = (REQUEST, RESPONSE) => {
 
     const path = "./client/upload/" + file.name;
 
-    file.mv(path, (err) => {
+    file.mv(path, async (err) => {
       if (err) {
         console.log(err);
         return RESPONSE.status(400).json({
@@ -207,35 +208,46 @@ commonService.resumeUpload = (REQUEST, RESPONSE) => {
 
       const attachment = FS.readFileSync(path).toString("base64");
       //console.log(attachment);
-
-      sgMail.setApiKey(
-        "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"
-      );
-
-      const mail = {
-        to: "james@xrubiconsolutions.com",
-        cc: "temidayo@xrubiconsolutions.com",
-        from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
-        subject: `${jobtitle} Application`,
-        text: `User Details 
-          Fullname - ${fullname}
-          Phonenumber - ${phonenumber}
-          Email - ${email}
-          Location - ${location}
-          Linkedin - ${linkedin}
-          `,
-        attachments: [
-          {
-            content: attachment,
-            filename: file.name,
-            type: "application/pdf",
-            disposition: "attachment",
-          },
-        ],
+      const filename = file.name;
+      const data = {
+        fullname,
+        phonenumber,
+        email,
+        location,
+        linkedin,
+        attachment,
+        filename,
+        jobtitle,
       };
-      sgMail.send(mail).catch((err) => {
-        console.log(err);
-      });
+      await sendResumeMail(data);
+      // sgMail.setApiKey(
+      //   "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"
+      // );
+
+      // const mail = {
+      //   to: "james@xrubiconsolutions.com",
+      //   cc: "temidayo@xrubiconsolutions.com",
+      //   from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+      //   subject: `${jobtitle} Application`,
+      //   text: `User Details
+      //     Fullname - ${fullname}
+      //     Phonenumber - ${phonenumber}
+      //     Email - ${email}
+      //     Location - ${location}
+      //     Linkedin - ${linkedin}
+      //     `,
+      //   attachments: [
+      //     {
+      //       content: attachment,
+      //       filename: file.name,
+      //       type: "application/pdf",
+      //       disposition: "attachment",
+      //     },
+      //   ],
+      // };
+      // sgMail.send(mail).catch((err) => {
+      //   console.log(err);
+      // });
 
       commonService.deleteFile(path);
 

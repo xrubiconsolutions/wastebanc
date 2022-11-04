@@ -32,6 +32,8 @@ const sterlingService = require("../modules/partners/sterling/sterlingService");
 const ObjectId = require("mongoose").Types.ObjectId;
 const categoriesModel = require("../models/categoryModel");
 const axios = require("axios");
+const { organisationOnboardingMail } = require("../services/sendEmail");
+
 organisationController.types = async (req, res) => {
   try {
     const types = await organisationTypeModel
@@ -358,65 +360,66 @@ organisationController.create = async (req, res) => {
     body.phone = body.phone;
     body.categories = categories;
     const org = await organisationModel.create(body);
-    sgMail.setApiKey(
-      "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"
-    );
+    //     sgMail.setApiKey(
+    //       "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"
+    //     );
 
-    const msg = {
-      to: `${org.email}`,
-      from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
-      subject: "WELCOME TO PAKAM!!!",
-      text: `
-Congratulations, you have been approved by Pakam and have been on-boarded to the Pakam waste management ecosystem.
+    //     const msg = {
+    //       to: `${org.email}`,
+    //       from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+    //       subject: "WELCOME TO PAKAM!!!",
+    //       text: `
+    // Congratulations, you have been approved by Pakam and have been on-boarded to the Pakam waste management ecosystem.
 
-Kindly use the following login details to sign in to your Pakam Company Dashboard.
+    // Kindly use the following login details to sign in to your Pakam Company Dashboard.
 
+    // Email: ${org.email}
 
-Email: ${org.email}
+    // Password: ${password}
 
-Password: ${password}
+    // Please note you can reset the password after logging into the App by clicking on the image icon on the top right corner of the screen.
 
-Please note you can reset the password after logging into the App by clicking on the image icon on the top right corner of the screen.
+    // *Attached below is a guide on how to use the Company Dashboard.
 
-*Attached below is a guide on how to use the Company Dashboard.
+    // How To Use The Dashboard
+    // Kindly Logon to https://newdashboard.pakam.ng
 
-How To Use The Dashboard
-Kindly Logon to https://newdashboard.pakam.ng
+    // * Select Recycling Company
+    // * Input your Login Details
+    // * You can reset your password by clicking on the image icon at the top right of the screen.
+    // * After Login you can see a data representation of all activities pertaining to your organisation such as:
+    // Total Schedule Pickup: This is the sum total of the schedules within your jurisdiction, which include pending schedules, completed schedules, accepted schedules, cancelled schedules and missed schedules.
 
-* Select Recycling Company
-* Input your Login Details
-* You can reset your password by clicking on the image icon at the top right of the screen.
-* After Login you can see a data representation of all activities pertaining to your organisation such as:
-Total Schedule Pickup: This is the sum total of the schedules within your jurisdiction, which include pending schedules, completed schedules, accepted schedules, cancelled schedules and missed schedules.
+    // Total Waste Collected: This card display the data of all the waste collected by your organization so far. When you click on the card it shows you a data table representing the actual data of the waste collected by your organization and it's aggregators.
 
-Total Waste Collected: This card display the data of all the waste collected by your organization so far. When you click on the card it shows you a data table representing the actual data of the waste collected by your organization and it's aggregators.
+    // Total Payout: This card embodies the table that showcase details of user whose recyclables your organization have collected and how much you are meant to pay them.
 
-Total Payout: This card embodies the table that showcase details of user whose recyclables your organization have collected and how much you are meant to pay them.
+    // Instruction of How To Onboard Collectors or Aggregators
 
-Instruction of How To Onboard Collectors or Aggregators
+    // * You will need to onboard your collectors or aggregators into the system by asking them to download the Pakam Recycler's App.
+    // * Create a unique company ID No for your collector/aggregator.
+    // * Instruct them to select the name of your organization and input unique company ID No while setting up their account.
+    // * Once they choose your organization as their recycling company, you will need to approve them on your company Dashboard.
 
-* You will need to onboard your collectors or aggregators into the system by asking them to download the Pakam Recycler's App.
-* Create a unique company ID No for your collector/aggregator.
-* Instruct them to select the name of your organization and input unique company ID No while setting up their account.
-* Once they choose your organization as their recycling company, you will need to approve them on your company Dashboard.
+    // How To Approve a Collector/Aggregator
+    // * Login  into your Company Dashboard
+    // * Click on all aggregator on the side menu
+    // * Click on all pending aggregator
+    // * You will see a list of all pending aggregator and an approve button beside it.
+    // * Click on approve to Approve the aggregator
+    // * Refresh the screen, pending aggregators who have been approved will populated under All Approved aggregators.
 
-How To Approve a Collector/Aggregator
-* Login  into your Company Dashboard
-* Click on all aggregator on the side menu
-* Click on all pending aggregator
-* You will see a list of all pending aggregator and an approve button beside it. 
-* Click on approve to Approve the aggregator
-* Refresh the screen, pending aggregators who have been approved will populated under All Approved aggregators.
+    // We wish you an awesome experience using the App waste management software.
 
-We wish you an awesome experience using the App waste management software.
+    // Best Regards
 
-Best Regards
+    // Pakam Team
+    // `,
+    //     };
 
-Pakam Team
-`,
-    };
+    //     await sgMail.send(msg);
 
-    await sgMail.send(msg);
+    await organisationOnboardingMail(org.email, password);
 
     const areas = org.areaOfAccess;
     if (areas.length > 0) {

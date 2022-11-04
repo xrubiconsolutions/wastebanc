@@ -16,7 +16,7 @@ const { validationResult, body } = require("express-validator");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const sgMail = require("@sendgrid/mail");
+// const sgMail = require("@sendgrid/mail");
 const passwordResetTemplate = require("../../email-templates/password-reset.template");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
