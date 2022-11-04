@@ -22,7 +22,7 @@ let serverConfig = {
   },
   host: "localhost",
   type: "http://",
-  port: process.env.PORT || "4005",
+  port: process.env.PORT || "4004",
 };
 
 /***********************************
@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === "development") {
   serverConfig.mongodb.database = "pakam";
   serverConfig.mongodb.user = "";
   serverConfig.mongodb.password = "";
-  serverConfig.port = process.env.PORT || "4005";
+  serverConfig.port = process.env.PORT || "4004";
 }
 
 /** exporting server configuration **/
