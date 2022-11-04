@@ -8,6 +8,7 @@ const {
 const COMMON_FUN = require("../util/commonFunction");
 const { VERIFICATION_OBJ, ROLES_ENUM } = require("../util/constants");
 const sgMail = require("@sendgrid/mail");
+const { sendResetToken } = require("../services/sendEmail");
 
 class VerificationService {
   static async requestAuthToken(req, res) {
@@ -32,21 +33,22 @@ class VerificationService {
         role
       );
       // send email
-      sgMail.setApiKey(
-        "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"
-      );
+      await sendResetToken(data.email, data.token);
+      // sgMail.setApiKey(
+      //   "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"
+      // );
 
-      const msg = {
-        to: `${data.email}`,
-        from: "pakam@xrubiconsolutions.com",
-        subject: "Passwowrd Reset token",
-        html: `<p>Your password reset request was recieved below is your reset token</p></br>
-                <p>Token: ${data.token}</p></br>
-                <p>Best Regards</p></br>
-                <p>Pakam Technologies</p>
-        `,
-      };
-      await sgMail.send(msg);
+      // const msg = {
+      //   to: `${data.email}`,
+      //   from: "pakam@xrubiconsolutions.com",
+      //   subject: "Passwowrd Reset token",
+      //   html: `<p>Your password reset request was recieved below is your reset token</p></br>
+      //           <p>Token: ${data.token}</p></br>
+      //           <p>Best Regards</p></br>
+      //           <p>Pakam Technologies</p>
+      //   `,
+      // };
+      // await sgMail.send(msg);
       //   return response
       return res.status(201).json({
         error: false,
@@ -54,7 +56,7 @@ class VerificationService {
       });
     } catch (error) {
       const { code, response, body } = error;
-      console.log(response.body);
+      console.log(error);
       if ((code) => 400) {
         return res.status(200).json({
           error: false,

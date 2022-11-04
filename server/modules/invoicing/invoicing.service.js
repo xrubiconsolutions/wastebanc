@@ -14,6 +14,7 @@ const sgMail = require("@sendgrid/mail");
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const FsExtra = require("fs-extra");
+const { sendInvoiceMail } = require("../../services/sendEmail");
 
 class invoiceService {
   static async generateInvoice(start, end, companyId, authuser) {
@@ -143,22 +144,23 @@ class invoiceService {
     if (!invoiceData) return false;
 
     // prepare invoice template and send invoice
-    const template = await invoiceTemplate(invoiceData);
-    sgMail.setApiKey(
-      "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"
-    );
+    // const template = await invoiceTemplate(invoiceData);
+    // sgMail.setApiKey(
+    //   "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"
+    // );
 
-    const companyInfo = await companyInfoModel.findOne();
+    // const companyInfo = await companyInfoModel.findOne();
 
-    const msg = {
-      to: `ahmodadeora@gmail.com`,
-      // to: `${invoiceData.company.email}`,
-      from: companyInfo.email, // Use the email address or domain you verified above
-      subject: "INVOICE",
-      html: template,
-    };
+    // const msg = {
+    //   //to: `ahmodadeora@gmail.com`,
+    //   to: `${invoiceData.company.email}`,
+    //   from: companyInfo.email, // Use the email address or domain you verified above
+    //   subject: "INVOICE",
+    //   html: template,
+    // };
 
-    await sgMail.send(msg);
+    // await sgMail.send(msg);
+    await sendInvoiceMail(invoiceData);
     invoiceData.event = "sent";
     await invoiceData.save();
 
