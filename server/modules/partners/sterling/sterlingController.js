@@ -22,7 +22,7 @@ class sterlingController {
       //   console.log("here", result.data);
       const userData = { ...user };
       delete userData.password;
-      
+
       return res.status(200).json(result.data);
     } catch (error) {
       console.log("err", error);
@@ -36,6 +36,12 @@ class sterlingController {
   static async requestSAFOTP(req, res) {
     try {
       const { user } = req;
+      if (user.availablePoints < 5000) {
+        return res.status(400).json({
+          error: true,
+          message: "Insufficient Balance",
+        });
+      }
       const body = {
         userId: user._id,
       };
