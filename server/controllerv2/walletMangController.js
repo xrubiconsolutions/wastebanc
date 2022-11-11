@@ -36,6 +36,13 @@ class WalletController {
   static async requestOTP(req, res) {
     try {
       const { user } = req;
+
+      if(user.availablePoints < 5000){
+        return res.status(400).json({
+          error: true,
+          message: "Insufficient Balance",
+        });
+      }
       const body = {
         userId: user._id,
         destinationAccount: req.body.destinationAccount,
