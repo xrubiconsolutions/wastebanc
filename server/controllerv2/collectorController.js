@@ -794,24 +794,28 @@ class CollectorService {
       let organisationName;
       let organisationId;
       let areaOfAccess = [];
-      if (body.organisation) {
-        const org = await organisationModel.findOne({
-          companyName: body.organisation.trim(),
-        });
-        if (!org) {
-          return res.status(400).json({
-            error: true,
-            message: "Invalid organisation passed",
-          });
-        }
-        organisationName = org.companyName;
-        organisationId = org._id.toString();
-        areaOfAccess = org.streetOfAccess;
-      } else {
-        organisationName = "";
-        organsationId = "";
-        areaOfAccess = [];
-      }
+      const org = await organisationModel.findById("6368e676b0ed8d44fa7cff5b");
+      organisationName = org.companyName;
+      organisationId = org._id.toString();
+      areaOfAccess = org.streetOfAccess;
+      // if (body.organisation) {
+      //   const org = await organisationModel.findOne({
+      //     companyName: body.organisation.trim(),
+      //   });
+      //   if (!org) {
+      //     return res.status(400).json({
+      //       error: true,
+      //       message: "Invalid organisation passed",
+      //     });
+      //   }
+      //   organisationName = org.companyName;
+      //   organisationId = org._id.toString();
+      //   areaOfAccess = org.streetOfAccess;
+      // } else {
+      //   organisationName = "";
+      //   organsationId = "";
+      //   areaOfAccess = [];
+      // }
 
       const create = await collectorModel.create({
         fullname: body.fullname,
@@ -830,6 +834,8 @@ class CollectorService {
         onesignal_id,
         dateOfBirth: body.dateOfBirth || "",
         terms_condition: body.terms_condition || false,
+        lcd: body.lcd,
+        address: body.address,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -887,6 +893,8 @@ class CollectorService {
           terms_condition: create.terms_condition,
           aggregatorId: create.aggregatorId,
           token,
+          lcd: create.lcd,
+          address: create.address,
         },
       });
     } catch (error) {
