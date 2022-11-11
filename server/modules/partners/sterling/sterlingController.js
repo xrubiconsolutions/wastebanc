@@ -5,7 +5,7 @@ class sterlingController {
       const { user } = req;
       const body = {
         BVN: req.body.bvn,
-        NIN: req.body.NIN,
+        NIN: req.body.nin,
         PhoneNumber: user.phone,
       };
 
