@@ -659,6 +659,8 @@ class UserService {
             lcd: user.lcd,
             last_logged_in: user.last_logged_in,
             pin_id: send.data.pinId,
+            accountNo: user.accountNo || "",
+            bankName: user.bankName || "",
             token,
           },
         });
@@ -720,6 +722,8 @@ class UserService {
           last_logged_in: user.last_logged_in,
           firstLogin: user.last_logged_in ? false : true,
           terms_condition: user.terms_condition,
+          accountNo: user.accountNo || "",
+          bankName: user.bankName || "",
           token,
         },
       });

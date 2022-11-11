@@ -227,6 +227,24 @@ locationController.worldlocations = async (req, res) => {
   }
 };
 
+locationController.availableStates = async (req, res) => {
+  try {
+    const { country = "Nigeria" } = req.query;
+
+    const locations = await MODEL.worldlocationModel.find({ name: country });
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: locations,
+    });
+  } catch (error) {
+    return res.status(200).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 locationController.getLGA = async (req, res) => {
   try {
     const { state = "Lagos" } = req.query;

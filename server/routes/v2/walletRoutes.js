@@ -1,4 +1,5 @@
 const walletController = require("../../controllerv2/walletMangController.js");
+const sterlingController = require("../../modules/partners/sterling/sterlingController");
 const {
   adminPakamValidation,
   recyclerValidation,
@@ -13,6 +14,7 @@ const {
 } = require("../../validators/userValidator");
 const {
   OtpRequest,
+  openSAF,
   ConfirmOtp,
 } = require("../../validators/verificationValidator");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
@@ -66,9 +68,9 @@ module.exports = (APP) => {
 
   APP.route("/api/user/sterling/openAccount").post(
     userValidation,
-    openAccount,
+    openSAF,
     checkRequestErrs,
-    walletController.openingAccount
+    sterlingController.openSAF
   );
 
   APP.route("/api/user/sterling/nip/transfer").post(
@@ -83,6 +85,11 @@ module.exports = (APP) => {
     intraBankTransfer,
     checkRequestErrs,
     walletController.intraBank
+  );
+
+  APP.route("/api/user/safOTP/request").post(
+    userValidation,
+    sterlingController.requestSAFOTP
   );
 
   APP.route("/api/encrypt").post(walletController.encrypt);
