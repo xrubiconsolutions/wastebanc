@@ -19,7 +19,10 @@ class sterlingController {
           },
         }
       );
-      console.log("here", result.data);
+      //   console.log("here", result.data);
+      const userData = { ...user };
+      delete userData.password;
+      
       return res.status(200).json(result.data);
     } catch (error) {
       console.log("err", error);
