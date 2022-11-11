@@ -175,9 +175,10 @@ const user_Schema = new Schema({
     type: Boolean,
     default: false,
   },
-  accountNo: { type: String },
-  cifNo: { type: String },
-  bankName: { type: String },
+  accountNo: { type: String, default: "" },
+  cifNo: { type: String, default: "" },
+  bankName: { type: String, default: "" },
+  bankCode: {type: String, default:""},
   percentageAcc: { type: Number },
 });
 
