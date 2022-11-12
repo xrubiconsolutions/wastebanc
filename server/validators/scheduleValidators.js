@@ -117,6 +117,7 @@ module.exports = {
       .isString()
       .withMessage("organisationPhone should be string"),
     body("dropOffDate").notEmpty().withMessage("dropOffDate is required"),
+    body("locationId").notEmpty().withMessage("locationId is required"),
   ],
 
   rewardUser: [
