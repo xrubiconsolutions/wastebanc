@@ -406,9 +406,10 @@ class CollectorService {
       });
       // return error if data doesn't exist for company
       if (!coordinateData)
-        return res.status(400).json({
-          error: true,
+        return res.status(200).json({
+          error: false,
           message: "Geo fence coordinates not found for organisation",
+          data: [],
         });
 
       // handle pagination
