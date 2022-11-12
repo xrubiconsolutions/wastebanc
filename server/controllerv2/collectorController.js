@@ -795,7 +795,7 @@ class CollectorService {
       let organisationName;
       let organisationId;
       let areaOfAccess = [];
-      const org = await organisationModel.findById("6368e676b0ed8d44fa7cff5b");
+      const org = await organisationModel.findOne({});
       organisationName = org.companyName;
       organisationId = org._id.toString();
       areaOfAccess = org.streetOfAccess;

@@ -22,6 +22,7 @@ dropoffController.aggregateQuery = async ({
   page = 1,
   resultsPerPage = 20,
 }) => {
+  console.log("criteria", criteria);
   try {
     const paginationQuery = [
       {
@@ -92,6 +93,8 @@ dropoffController.aggregateQuery = async ({
           expiryDuration: 1,
           state: 1,
           collectedBy: 1,
+          phone: 1,
+          locationId: 1,
         },
       },
       {
@@ -138,6 +141,38 @@ dropoffController.aggregateQuery = async ({
           expiryDuration: 1,
           state: 1,
           collectedBy: 1,
+          phone: 1,
+          locationId: 1,
+        },
+      },
+      {
+        $lookup: {
+          from: "dropoffs",
+          let: {
+            locationId: "$locationId",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$locationId"],
+                },
+              },
+            },
+            {
+              $project: {
+                "location.address": 1,
+                _id: 0,
+              },
+            },
+          ],
+          as: "dropofflocation",
+        },
+      },
+      {
+        $unwind: {
+          path: "$dropofflocation",
+          preserveNullAndEmptyArrays: true,
         },
       },
     ];
@@ -275,7 +310,7 @@ dropoffController.dropOffs = async (req, res) => {
 dropoffController.companydropOffs = async (req, res) => {
   try {
     let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
-    const { companyName: organisation } = req.user;
+    const { _id: organisation } = req.user;
 
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
@@ -312,7 +347,7 @@ dropoffController.companydropOffs = async (req, res) => {
           { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
           { Category: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        organisation,
+        organisationCollection: organisation.toString(),
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -328,11 +363,11 @@ dropoffController.companydropOffs = async (req, res) => {
           $gte: startDate,
           $lt: endDate,
         },
-        organisation,
+        organisationCollection: organisation.toString(),
       };
     } else {
       criteria = {
-        organisation,
+        organisationCollection: organisation.toString(),
       };
     }
 
