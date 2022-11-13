@@ -495,6 +495,8 @@ payController.afterPayment = (req, res) => {
       var test = JSON.parse(JSON.stringify(result));
       var jwtToken = COMMON_FUN.createToken(test); /** creating jwt token */
       test.token = jwtToken;
+      test.charge = 100;
+      test.withdrawableAmount = test.availablePoints - 100;
       return res
         .status(200)
         .jsonp(
