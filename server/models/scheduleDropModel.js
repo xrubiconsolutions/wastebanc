@@ -87,6 +87,9 @@ const scheduleDrop = new Schema({
     type: Schema.Types.ObjectId,
     ref: "dropoffs",
   },
+  location: {
+    type: String,
+  },
 });
 
 module.exports = MONGOOSE.model("scheduleDrop", scheduleDrop);

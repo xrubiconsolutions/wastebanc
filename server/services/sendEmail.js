@@ -168,14 +168,14 @@ const transporter = nodemailer.createTransport({
   secure: true,
   port: 465,
   auth: {
-    user: "me@xrubiconsolutions.com",
-    pass: "Info2022//??",
+    user: "info@pakam.ng",
+    pass: "Leyeolaide1",
   },
 });
 const mailOptions = (data) => {
   const { to, subject, html } = data;
   return {
-    from: "me@xrubiconsolutions.com",
+    from: "info@pakam.ng",
     to,
     subject,
     html,

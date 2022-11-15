@@ -100,7 +100,7 @@ module.exports = {
       .notEmpty()
       .withMessage("address is required")
       .isString()
-      .withMessage("address should be string"),
+    .withMessage("address should be string"),
     body("organisation")
       .notEmpty()
       .withMessage("organisation is required")

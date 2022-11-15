@@ -95,6 +95,7 @@ dropoffController.aggregateQuery = async ({
           collectedBy: 1,
           phone: 1,
           locationId: 1,
+          location: 1,
         },
       },
       {
@@ -143,6 +144,7 @@ dropoffController.aggregateQuery = async ({
           collectedBy: 1,
           phone: 1,
           locationId: 1,
+          location: 1,
         },
       },
       {
@@ -737,11 +739,20 @@ dropoffController.scheduledropOffs = async (req, res) => {
       });
     }
 
+    const dropoffLocation = await dropOffModel.findById(locationId);
+    if (!dropoffLocation) {
+      return res.status(400).json({
+        error: true,
+        message: "Dropoff has been removed from the system",
+      });
+    }
+
     const expireDate = moment(data.dropOffDate, "YYYY-MM-DD").add(7, "days");
     data.expiryDuration = expireDate;
     data.clientId = user._id.toString();
     data.state = user.state || "Lagos";
     data.categories = categories;
+    data.location = dropoffLocation.location.address;
 
     const schedule = await scheduleDropModel.create(data);
     const items = categories.map((category) => category.name);
