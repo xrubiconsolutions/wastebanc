@@ -304,6 +304,7 @@ class CollectorService {
       if (key) {
         criteria = {
           $or: [
+            { address: { $regex: `.*${key}.*`, $options: "i" } },
             { fullname: { $regex: `.*${key}.*`, $options: "i" } },
             { gender: { $regex: `.*${key}.*`, $options: "i" } },
             { phone: { $regex: `.*${key}.*`, $options: "i" } },
