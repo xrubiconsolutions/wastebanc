@@ -107,9 +107,9 @@ module.exports = {
       .notEmpty()
       .withMessage("gender is required")
       .isIn(["male", "female", "prefer not to say"]),
-    body("country").notEmpty().withMessage("country is required"),
-    body("state").notEmpty().withMessage("state is required"),
-    body("lga").notEmpty().withMessage("lga is required"),
+    body("country").optional({ default: "Nigeria" }),
+    body("state").optional({ default: "Lagos" }),
+    body("lga").optional({ default: "" }),
     body("uType").notEmpty().withMessage("uType is required"),
     body("organisation").optional(),
     //body("onesignal_id").notEmpty().withMessage("onesignal_id is required"),

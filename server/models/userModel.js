@@ -34,7 +34,7 @@ const user_Schema = new Schema({
   address: {
     type: String,
     required: true,
-    default: "Lagos",
+    default: "",
   },
   cardID: {
     type: String,
