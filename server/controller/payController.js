@@ -488,21 +488,66 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
   });
 };
 
-payController.afterPayment = (req, res) => {
+payController.afterPayment = async (req, res) => {
   const userID = req.query.userID;
   try {
-    MODEL.userModel.findOne({ _id: userID }).then((result) => {
-      var test = JSON.parse(JSON.stringify(result));
-      var jwtToken = COMMON_FUN.createToken(test); /** creating jwt token */
-      test.token = jwtToken;
-      test.charge = 100;
-      test.withdrawableAmount = test.availablePoints - 100;
-      return res
-        .status(200)
-        .jsonp(
-          COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, test)
-        );
-    });
+    const user = await MODEL.userModel.findById(userID);
+    if (!user) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid userId passed",
+        data: null,
+      });
+    }
+    const token = COMMON_FUN.authToken(user);
+
+    const test = {
+      _id: user._id,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      phone: user.phone,
+      fullname: user.fullname,
+      gender: user.gender,
+      country: user.country,
+      state: user.state,
+      username: user.username,
+      othernames: user.othernames,
+      address: user.address,
+      profile_picture: user.profile_picture,
+      roles: user.roles,
+      countryCode: user.countryCode,
+      verified: user.verified,
+      availablePoints: user.availablePoints,
+      rafflePoints: user.rafflePoints,
+      schedulePoints: user.schedulePoints,
+      onesignal_id: user.signal_id,
+      cardID: user.cardID,
+      lcd: user.lcd,
+      last_logged_in: user.last_logged_in,
+      firstLogin: user.last_logged_in ? false : true,
+      terms_condition: true,
+      token,
+      charge: 100,
+      withdrawableAmount: user.availablePoints - 100,
+    };
+    return res
+      .status(200)
+      .jsonp(
+        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, test)
+      );
+    // MODEL.userModel.findOne({ _id: userID }).then((result) => {
+    //   var test = JSON.parse(JSON.stringify(result));
+    //   var jwtToken = COMMON_FUN.createToken(test); /** creating jwt token */
+    //   test.token = jwtToken;
+    //   test.charge = 100;
+    //   test.withdrawableAmount = test.availablePoints - 100;
+    //   return res
+    //     .status(200)
+    //     .jsonp(
+    //       COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, test)
+    //     );
+    // });
   } catch (err) {
     return res.status(500).json(err);
   }

@@ -9,27 +9,32 @@ module.exports = {
 
   userAgencies: [
     body("name")
+      .trim()
       .notEmpty()
       .withMessage("name is required")
       .isString()
       .withMessage("name should be string"),
     body("email").trim().notEmpty().withMessage("email is required"),
     body("countries")
+      .trim()
       .notEmpty()
       .withMessage("countries is required")
       .isArray()
       .withMessage("countries should be array"),
     body("states")
+      .trim()
       .notEmpty()
       .withMessage("states is required")
       .isArray()
       .withMessage("states should be array"),
     body("role")
+      .trim()
       .notEmpty()
       .withMessage("role is required")
       .isString()
       .withMessage("role should be string"),
     body("phone")
+      .trim()
       .notEmpty()
       .withMessage("phone is required")
       .isNumeric()
@@ -89,11 +94,13 @@ module.exports = {
 
   register: [
     body("fullname")
+      .trim()
       .notEmpty()
       .withMessage("fullname is required")
       .isString()
       .withMessage("fullname should be string"),
     body("phone")
+      .trim()
       .notEmpty()
       .withMessage("phone is required")
       .isNumeric()
@@ -107,11 +114,11 @@ module.exports = {
       .notEmpty()
       .withMessage("gender is required")
       .isIn(["male", "female", "prefer not to say"]),
-    body("country").optional({ default: "Nigeria" }),
-    body("state").optional({ default: "Lagos" }),
-    body("lga").optional({ default: "" }),
-    body("uType").notEmpty().withMessage("uType is required"),
-    body("organisation").optional(),
+    body("country").trim().optional({ default: "Nigeria" }),
+    body("state").trim().optional({ default: "Lagos" }),
+    body("lga").trim().optional({ default: "" }),
+    body("uType").trim().notEmpty().withMessage("uType is required"),
+    body("organisation").trim().optional(),
     //body("onesignal_id").notEmpty().withMessage("onesignal_id is required"),
   ],
 
@@ -175,6 +182,7 @@ module.exports = {
 
   accountNo: [
     param("accountNo")
+      .trim()
       .notEmpty()
       .withMessage("accountNo is required")
       .isString()
@@ -183,16 +191,19 @@ module.exports = {
 
   openAccount: [
     body("bvn")
+      .trim()
       .notEmpty()
       .withMessage("bvn is required")
       .isString()
       .withMessage("bvn should be string"),
     body("nin")
+      .trim()
       .notEmpty()
       .withMessage("nin is required")
       .isString()
       .withMessage("nin should be string"),
     body("phone")
+      .trim()
       .notEmpty()
       .withMessage("phone is required")
       .isString()
@@ -201,21 +212,25 @@ module.exports = {
 
   nipTransfer: [
     body("OTP")
+      .trim()
       .notEmpty()
       .withMessage("OTP is required")
       .isString()
       .withMessage("OTP should be string"),
     body("accountNumber")
+      .trim()
       .notEmpty()
       .withMessage("accountNumber is required")
       .isString()
       .withMessage("accountNumber should be string"),
     body("customerName")
+      .trim()
       .notEmpty()
       .withMessage("customerName is required")
       .isString()
       .withMessage("customerName should be string"),
     body("bankCode")
+      .trim()
       .notEmpty()
       .withMessage("bankCode is required")
       .isString()
@@ -225,13 +240,15 @@ module.exports = {
       .withMessage("nesid is required")
       .isString()
       .withMessage("nesid should be string"),
-    body("nersp").optional(),
+    body("nersp").trim().optional(),
     body("bvn")
+      .trim()
       .notEmpty()
       .withMessage("bvn is required")
       .isString()
       .withMessage("bvn should be string"),
     body("kycLevel")
+      .trim()
       .notEmpty()
       .withMessage("kycLevel is required")
       .isString()
@@ -240,21 +257,25 @@ module.exports = {
 
   intraBankTransfer: [
     body("OTP")
+      .trim()
       .notEmpty()
       .withMessage("OTP is required")
       .isString()
       .withMessage("OTP should be string"),
     body("accountNumber")
+      .trim()
       .notEmpty()
       .withMessage("accountNumber is required")
       .isString()
       .withMessage("accountNumber should be string"),
     body("beneName")
+      .trim()
       .notEmpty()
       .withMessage("beneName is required")
       .isString()
       .withMessage("beneName should be string"),
     body("terms_condition")
+      .trim()
       .notEmpty()
       .withMessage("terms_condition is required")
       .isBoolean()
@@ -263,6 +284,7 @@ module.exports = {
 
   termsCondition: [
     body("userId")
+      .trim()
       .notEmpty()
       .withMessage("userId is required")
       .isString()
