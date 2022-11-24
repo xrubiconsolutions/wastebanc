@@ -191,6 +191,7 @@ class UserService {
   }
 
   static async register(req, res) {
+    console.log(req.body);
     //bodyValidate(req, res);
     try {
       const onesignal_id = uuid.v1().toString();
@@ -312,7 +313,7 @@ class UserService {
         password: await encryptPassword(body.password),
         gender: body.gender.toLowerCase(),
         email: body.email,
-        lcd: body.lga,
+        lcd: body.lga || "",
         uType: body.uType,
         organisationType: body.organisation,
         //onesignal_id: body.onesignal_id,
