@@ -595,16 +595,45 @@ scheduleController.allPendingSchedules = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
-scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
-  MODEL.scheduleModel
-    .find({ completionStatus: "completed", client: REQUEST.query.client })
+scheduleController.allCompletedSchedules = async (REQUEST, RESPONSE) => {
+  let { page = 1, resultsPerPage = 3 } = REQUEST.query;
+  if (typeof page === "string") page = parseInt(page);
+  if (typeof resultsPerPage === "string")
+    resultsPerPage = parseInt(resultsPerPage);
 
-    .then((schedules) => {
-      RESPONSE.status(200).jsonp(
-        COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
-      );
-    })
-    .catch((err) => RESPONSE.status(200).jsonp(COMMON_FUN.sendError(err)));
+  try {
+    const schedules = await MODEL.scheduleModel
+      .find({ completionStatus: "completed", client: REQUEST.query.client })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * resultsPerPage)
+      .limit(resultsPerPage);
+    const total = await MODEL.scheduleModel.countDocuments({
+      completionStatus: "completed",
+      client: REQUEST.query.client,
+    });
+    return RESPONSE.status(200).jsonp({
+      error: false,
+      message: "success",
+      data: {
+        schedules,
+        total,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(total / resultsPerPage),
+      },
+    });
+  } catch (err) {
+    return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err));
+  }
+  // MODEL.scheduleModel
+  //   .find({ completionStatus: "completed", client: REQUEST.query.client })
+
+  //   .then((schedules) => {
+  //     RESPONSE.status(200).jsonp(
+  //       COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)
+  //     );
+  //   })
+  //   .catch((err) => RESPONSE.status(200).jsonp(COMMON_FUN.sendError(err)));
 };
 
 scheduleController.dashboardCompleted = (REQUEST, RESPONSE) => {

@@ -380,7 +380,7 @@ class ScheduleService {
       });
     } catch (error) {
       console.log(error);
-      sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+      return sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
     }
   }
 
