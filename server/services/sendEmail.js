@@ -77,7 +77,7 @@ const messageData = (email, message) => {
   const data = {
     to: "support@pakam.ng",
     subject: "FAQ Form Message",
-    html: `<pHello Support Team</p></br>
+    html: `<p>Hello Support Team</p></br>
     <p>You just received this message from the Pakam Website.</p></br>
     <p>Email:${email}</p></br>
     <p>Message:${message}</p></br>
