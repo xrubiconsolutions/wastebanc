@@ -104,5 +104,4 @@ const transaction_Schema = {
     type: String,
   },
 };
-
 module.exports = MONGOOSE.model("transaction", transaction_Schema);

@@ -4,6 +4,7 @@ const {
   adminPakamValidation,
   recyclerValidation,
   userValidation,
+  companyPakamDataValidation,
 } = require("../../util/auth");
 const {
   accountLookup,
@@ -94,4 +95,8 @@ module.exports = (APP) => {
 
   APP.route("/api/encrypt").post(walletController.encrypt);
   APP.route("/api/decrypt").post(walletController.decrypt);
+  APP.route("/api/wallet/transactions").get(
+    companyPakamDataValidation,
+    walletController.paymentRequest
+  );
 };

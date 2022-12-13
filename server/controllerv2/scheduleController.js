@@ -783,6 +783,7 @@ class ScheduleService {
       });
 
       const items = categories.map((category) => category.name);
+      console.log(items);
 
       //  send push notification to household user
       const message = {
