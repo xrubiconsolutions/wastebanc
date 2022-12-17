@@ -785,7 +785,7 @@ class WalletController {
         message: "success",
         data: {
           result,
-          total,
+          totalResult: total,
           page,
           resultsPerPage,
           totalPages: Math.ceil(total / resultsPerPage),
