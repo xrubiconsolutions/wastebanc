@@ -99,4 +99,8 @@ module.exports = (APP) => {
     companyPakamDataValidation,
     walletController.paymentRequest
   );
+  APP.route("/api/admin/wallet/transactions").get(
+    adminPakamValidation,
+    walletController.paymentRequest
+  );
 };

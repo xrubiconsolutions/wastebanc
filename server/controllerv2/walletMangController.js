@@ -702,9 +702,6 @@ class WalletController {
       ];
       const pipeline = [
         {
-          $match: criteria,
-        },
-        {
           $lookup: {
             from: "users",
             localField: "user",
@@ -771,7 +768,11 @@ class WalletController {
             fullname: "$user.fullname",
           },
         },
+        {
+          $match: criteria,
+        },
       ];
+      console.log({ pipeline, criteria, key });
 
       const result = await paymentRequestModel.aggregate([
         ...paginationQuery,
