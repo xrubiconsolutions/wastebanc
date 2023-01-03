@@ -15,7 +15,7 @@ let serverConfig = {
     connector: "mongodb",
     url:
       process.env.dbUrl ||
-      "mongodb://pakamXrubicon:me202010*@pakam-shard-00-00.wcabw.mongodb.net:27017,pakam-shard-00-01.wcabw.mongodb.net:27017,pakam-shard-00-02.wcabw.mongodb.net:27017/wastebanc?ssl=true&replicaSet=atlas-13j6g2-shard-0&authSource=admin&retryWrites=true&w=majority",
+      "mongodb://pakamXrubicon:me202010*@pakam-shard-00-00.wcabw.mongodb.net:27017,pakam-shard-00-01.wcabw.mongodb.net:27017,pakam-shard-00-02.wcabw.mongodb.net:27017/wastebanc-demo?ssl=true&replicaSet=atlas-13j6g2-shard-0&authSource=admin&retryWrites=true&w=majority",
     database: "demo",
     user: "",
     password: "",
