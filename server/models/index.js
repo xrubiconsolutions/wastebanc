@@ -50,4 +50,5 @@ module.exports = {
   faqModel: require("./faqModel"),
   careerAdModel: require("./careerAdModel"),
   paymentRequestModel: require("./paymentRequestModel"),
+  newsModel: require("./newsModel"),
 };
