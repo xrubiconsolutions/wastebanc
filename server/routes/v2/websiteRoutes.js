@@ -3,14 +3,14 @@ const {
   addFaq,
   addCareerAd,
   getCareerAds,
-  getNews,
-  addNews,
+  contactForm,
 } = require("../../controllerv2/websiteController");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 const {
   faqValidation,
   careerAdValidation,
   newsValidation,
+  contactFormValidation,
 } = require("../../validators/websiteValidator");
 const { adminPakamValidation } = require("../../util/auth");
 
@@ -29,4 +29,9 @@ module.exports = (APP) => {
   APP.route("/api/v2/news")
     .post(adminPakamValidation, newsValidation, checkRequestErrs, addNews)
     .get(getNews);
+  APP.route("/api/v2/contactUs").post(
+    contactFormValidation,
+    checkRequestErrs,
+    contactForm
+  );
 };

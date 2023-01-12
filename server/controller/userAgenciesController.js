@@ -6,6 +6,7 @@ const COMMON_FUN = require("../util/commonFunction");
 const mongodb = require("mongodb");
 
 const { validationResult, body } = require("express-validator");
+const { userAgenciesMail } = require("../services/sendEmail");
 const sgMail = require("@sendgrid/mail");
 const welcomeTemplate = require("../../email-templates/welcome-email.template");
 
@@ -84,21 +85,22 @@ agenciesController.create = async (req, res) => {
       { email: agency.email },
       { cardID: agency._id }
     );
-    const emailTemplate = welcomeTemplate(agency, password);
+    //const emailTemplate = welcomeTemplate(agency, password);
 
     //send mail to the company holding the agencies password
-    sgMail.setApiKey(
-      "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"
-    );
+    // sgMail.setApiKey(
+    //   "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"
+    // );
 
-    const msg = {
-      to: `${agency.email}`,
-      from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
-      subject: "WELCOME PAKAM",
-      html: emailTemplate,
-    };
+    // const msg = {
+    //   to: `${agency.email}`,
+    //   from: "pakam@xrubiconsolutions.com", // Use the email address or domain you verified above
+    //   subject: "WELCOME PAKAM",
+    //   html: emailTemplate,
+    // };
 
-    await sgMail.send(msg);
+    // await sgMail.send(msg);
+    await userAgenciesMail(agency, password);
     return res.status(200).json({
       error: false,
       message: "User agency created successfully",

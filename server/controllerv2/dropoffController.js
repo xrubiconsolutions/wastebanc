@@ -522,6 +522,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
 
     let wastePickerCoin = 0;
     let wastePickerPercentage = 0;
+    let collectorPoint = collector.pointGained || 0;
     if (collector.collectorType == "waste-picker") {
       const wastepickerReward = await rewardService.picker(cat, organisation);
       if (!wastepickerReward.error) {
@@ -530,8 +531,12 @@ dropoffController.rewardDropSystem = async (req, res) => {
           wastepickerReward.totalpointGained,
           10
         );
+        collectorPoint = wastePickerCoin - wastePickerPercentage;
       }
     }
+
+    const userCoin =
+      Number(householdReward.totalpointGained) - Number(pakamPercentage);
 
     const pakamPercentage = rewardService.calPercentage(
       householdReward.totalpointGained,
@@ -544,7 +549,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
     const t = await transactionModel.create({
       weight: householdReward.totalWeight,
       wastePickerCoin: 0,
-      coin: Number(householdReward.totalpointGained) - Number(pakamPercentage),
+      coin: userCoin,
       cardID: scheduler._id,
       completedBy: collectorId,
       categories,
@@ -598,7 +603,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       { email: scheduler.email },
       {
         $set: {
-          availablePoints: scheduler.availablePoints + t.coin,
+          availablePoints: scheduler.availablePoints + userCoin,
           schedulePoints: scheduler.schedulePoints + 1,
         },
       }

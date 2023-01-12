@@ -92,4 +92,8 @@ module.exports = {
       return true;
     }),
   ],
+  contactFormValidation: [
+    body("message", "message is required").notEmpty().isString(),
+    body("email", "Email is required").notEmpty().isEmail(),
+  ],
 };

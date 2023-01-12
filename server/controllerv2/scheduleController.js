@@ -733,6 +733,7 @@ class ScheduleService {
 
       let wastePickerCoin = 0;
       let wastePickerPercentage = 0;
+      let collectorPoint = collector.pointGained || 0;
       if (collector.collectorType == "waste-picker") {
         console.log("happened");
         const wastepickerReward = await rewardService.picker(cat, organisation);
@@ -743,6 +744,7 @@ class ScheduleService {
             wastepickerReward.totalpointGained,
             10
           );
+          collectorPoint = wastePickerCoin - wastePickerPercentage;
         }
       }
 
@@ -750,6 +752,9 @@ class ScheduleService {
         householdReward.totalpointGained,
         10
       );
+
+      const userCoin =
+        Number(householdReward.totalpointGained) - Number(pakamPercentage);
 
       const ref = randomstring.generate({
         length: 7,
@@ -760,7 +765,7 @@ class ScheduleService {
         Number(householdReward.totalpointGained) - Number(pakamPercentage);
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
-        coin: userGain,
+        coin: userCoin,
         wastePickerCoin,
         wastePickerPercentage,
         cardID: scheduler._id,
@@ -785,7 +790,7 @@ class ScheduleService {
       const message = {
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
-          en: `You have just been credited ${householdReward.totalpointGained} for your ${items} pickup`,
+          en: `You have just been credited ${userCoin} for your ${items} pickup`,
         },
         channel_for_external_user_ids: "push",
         include_external_user_ids: [scheduler.onesignal_id],
@@ -794,7 +799,7 @@ class ScheduleService {
       await notificationModel.create({
         title: "Pickup Schedule completed",
         lcd: scheduler.lcd,
-        message: `You have just been credited ${householdReward.totalpointGained} for the ${items} pickup`,
+        message: `You have just been credited ${userCoin} for the ${items} pickup`,
         schedulerId: scheduler._id,
       });
 
@@ -819,7 +824,7 @@ class ScheduleService {
         { email: scheduler.email },
         {
           $set: {
-            availablePoints:userGain,
+            availablePoints: scheduler.availablePoints + userCoin,
             schedulePoints: scheduler.schedulePoints + 1,
           },
         }
@@ -832,7 +837,7 @@ class ScheduleService {
             totalCollected:
               collector.totalCollected + householdReward.totalWeight,
             numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
-            pointGained: collector.pointGained + wastePickerCoin - wastePickerPercentage,
+            pointGained: collectorPoint,
             busy: false,
             last_logged_in: new Date(),
           },

@@ -46,6 +46,7 @@ module.exports = {
 
   storeactivites: [
     body("userId")
+      .trim()
       .notEmpty()
       .withMessage("userId is required")
       .isString()
@@ -89,11 +90,13 @@ module.exports = {
 
   register: [
     body("fullname")
+      .trim()
       .notEmpty()
       .withMessage("fullname is required")
       .isString()
       .withMessage("fullname should be string"),
     body("phone")
+      .trim()
       .notEmpty()
       .withMessage("phone is required")
       .isNumeric()
@@ -107,11 +110,11 @@ module.exports = {
       .notEmpty()
       .withMessage("gender is required")
       .isIn(["male", "female", "prefer not to say"]),
-    body("country").notEmpty().withMessage("country is required"),
-    body("state").notEmpty().withMessage("state is required"),
-    body("lga").notEmpty().withMessage("lga is required"),
-    body("uType").notEmpty().withMessage("uType is required"),
-    body("organisation").optional(),
+    body("country").trim().optional({ default: "Nigeria" }),
+    body("state").trim().optional({ default: "Lagos" }),
+    body("lga").trim().optional({ default: "" }),
+    body("uType").trim().notEmpty().withMessage("uType is required"),
+    body("organisation").trim().optional(),
     //body("onesignal_id").notEmpty().withMessage("onesignal_id is required"),
   ],
 
