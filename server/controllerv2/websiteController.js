@@ -1,7 +1,7 @@
 const { faqModel, careerAdModel, newsModel } = require("../models");
 const { paginateResponse } = require("../util/commonFunction");
 const sgMail = require("@sendgrid/mail");
-const {sendwebsiteMessage} = require("../services/sendEmail");
+const { sendwebsiteMessage } = require("../services/sendEmail");
 
 class WebsiteService {
   static async getFaqs(req, res) {
@@ -126,10 +126,12 @@ class WebsiteService {
       });
     } catch (error) {
       console.log(error.stack);
+    }
+  }
   static async contactForm(req, res) {
     try {
       const { message, email } = req.body;
-      await sendwebsiteMessage(email,message);
+      await sendwebsiteMessage(email, message);
       // sgMail.setApiKey(
       //   "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"
       // );
