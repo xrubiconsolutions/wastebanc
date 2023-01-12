@@ -546,6 +546,12 @@ const WORK_TYPE_ENUM = Object.freeze([
   "CONTRACT",
   "PART-TIME",
 ]);
+const NEWS_CATEGORY_ENUM = Object.freeze([
+  "NEWS_MEDIA",
+  "PRESS_RELEASE",
+  "INTERVIEWS",
+  "PUBLICATIONS_PODCAST",
+]);
 
 /***********************************
  ****** Application Constants ******
@@ -562,6 +568,7 @@ let APP_CONSTANTS = {
   VERIFICATION_OBJ,
   ROLES_ENUM,
   WORK_TYPE_ENUM,
+  NEWS_CATEGORY_ENUM,
 };
 
 /** Exporting APP CONSTANTS **/
