@@ -1,13 +1,14 @@
-const { faqModel, careerAdModel } = require("../models");
+const { faqModel, careerAdModel, newsModel } = require("../models");
 const { paginateResponse } = require("../util/commonFunction");
 const sgMail = require("@sendgrid/mail");
-const {sendwebsiteMessage} = require("../services/sendEmail");
+const { sendwebsiteMessage } = require("../services/sendEmail");
 
 class WebsiteService {
   static async getFaqs(req, res) {
+    // destructure request arguments
     const { start, end, key, resultsPerPage = 20, page = 1 } = req.query;
     try {
-      const faqs = await faqModel.find();
+      // get paginated career data and return response
       const response = await paginateResponse({
         model: faqModel,
         query: {},
@@ -47,9 +48,10 @@ class WebsiteService {
   }
 
   static async getCareerAds(req, res) {
+    // destructure request arguments
     const { start, end, key, resultsPerPage = 20, page = 1 } = req.query;
     try {
-      const ads = await careerAdModel.find();
+      // get paginated career data and return response
       const response = await paginateResponse({
         model: careerAdModel,
         query: {},
@@ -88,10 +90,48 @@ class WebsiteService {
     }
   }
 
+  static async getNews(req, res) {
+    // destructure request arguments
+    const { start, end, key, resultsPerPage = 20, page = 1 } = req.query;
+    try {
+      // get paginated career data and return response
+      const response = await paginateResponse({
+        model: newsModel,
+        query: {},
+        searchQuery: {
+          $or: [
+            { headline: { $regex: `.*${key}.*`, $options: "i" } },
+            { body: { $regex: `.*${key}.*`, $options: "i" } },
+          ],
+        },
+        ...req.query,
+        title: "news",
+      });
+      return res.status(200).json(response);
+    } catch (error) {
+      console.log({ error });
+      res.status(500).json({
+        message: "An error occured!",
+        error: true,
+      });
+    }
+  }
+
+  static async addNews(req, res) {
+    try {
+      const response = await newsModel.create(req.body);
+      return res.status(200).json({
+        error: false,
+        message: "News added successfully",
+      });
+    } catch (error) {
+      console.log(error.stack);
+    }
+  }
   static async contactForm(req, res) {
     try {
       const { message, email } = req.body;
-      await sendwebsiteMessage(email,message);
+      await sendwebsiteMessage(email, message);
       // sgMail.setApiKey(
       //   "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"
       // );
