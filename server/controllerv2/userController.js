@@ -580,6 +580,7 @@ class UserService {
         });
       }
 
+      console.log('user', user.password);
       const compare = await comparePassword(req.body.password, user.password);
       console.log("compare", compare);
       if (!compare) {
