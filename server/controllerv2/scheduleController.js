@@ -761,6 +761,8 @@ class ScheduleService {
         charset: "numeric",
       });
 
+      const userGain =
+        Number(householdReward.totalpointGained) - Number(pakamPercentage);
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
         coin: userCoin,
@@ -860,7 +862,7 @@ class ScheduleService {
       return res.status(200).json({
         error: false,
         message: "Pickup completed successfully",
-        data: householdReward.totalpointGained,
+        data: userGain,
         da: householdReward.totalWeight,
       });
     } catch (error) {

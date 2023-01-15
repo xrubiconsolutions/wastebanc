@@ -49,4 +49,5 @@ module.exports = {
   wastebancAgentModel: require("./wastebancAgentModel"),
   faqModel: require("./faqModel"),
   careerAdModel: require("./careerAdModel"),
+  newsModel: require("./newsModel"),
 };
