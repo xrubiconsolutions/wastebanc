@@ -903,9 +903,9 @@ class ScheduleService {
                 pickUpDate: {
                   $gte: active_today,
                 },
-                pickUpDate: {
-                  $lt: tomorrow,
-                },
+                // pickUpDate: {
+                //   $lt: tomorrow,
+                // },
                 completionStatus: "pending",
                 collectorStatus: "decline",
                 state: user.state || "Lagos",
