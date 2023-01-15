@@ -559,6 +559,7 @@ class UserService {
   }
 
   static async login(req, res) {
+    console.log("h");
     try {
       const user = await userModel.findOne({
         phone: req.body.phone,
@@ -579,7 +580,9 @@ class UserService {
         });
       }
 
-      if (!(await comparePassword(req.body.password, user.password))) {
+      const compare = await comparePassword(req.body.password, user.password);
+      console.log("compare", compare);
+      if (!compare) {
         return res.status(400).json({
           error: true,
           message: "Invalid credentials",
