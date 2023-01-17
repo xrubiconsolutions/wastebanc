@@ -30,7 +30,6 @@ const transaction_Schema = {
   type: {
     type: String,
   },
-
   scheduleId: {
     type: String,
     required: true,
@@ -101,6 +100,9 @@ const transaction_Schema = {
     type: Number,
   },
   address: {
+    type: String,
+  },
+  phone: {
     type: String,
   },
 };

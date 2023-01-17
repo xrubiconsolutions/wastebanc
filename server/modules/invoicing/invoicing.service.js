@@ -322,6 +322,18 @@ class invoiceService {
     const invoices = await invoiceModel
       .find(criteria)
       .populate("company", "companyName email phone location country")
+      .populate("transactions", [
+        "ref_id",
+        "categories",
+        "category",
+        "type",
+        "weight",
+        "coin",
+        "wastePickerCoin",
+        "type",
+        "address",
+        "phone",
+      ])
       .select([
         "_id",
         "invoiceNumber",
@@ -360,6 +372,8 @@ class invoiceService {
         "coin",
         "wastePickerCoin",
         "type",
+        "address",
+        "phone",
       ]);
 
     if (!invoice)
