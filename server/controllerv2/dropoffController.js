@@ -564,6 +564,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       ref_id: ref,
       percentage: pakamPercentage,
       address: dropoffs.address,
+      phone: scheduler.phone,
     });
 
     const items = categories.map((category) => category.name);

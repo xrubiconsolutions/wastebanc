@@ -782,6 +782,7 @@ class ScheduleService {
         ref_id: ref,
         percentage: pakamPercentage,
         address: schedule.address,
+        phone: schedule.phone
       });
 
       const items = categories.map((category) => category.name);
