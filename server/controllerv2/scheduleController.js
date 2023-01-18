@@ -878,6 +878,7 @@ class ScheduleService {
     try {
       const { user } = req;
       let areaOfAccess;
+
       if (user.organisationId) {
         const organisation = await organisationModel.findById(
           user.organisationId
@@ -895,7 +896,7 @@ class ScheduleService {
       active_today.setHours(0);
       active_today.setMinutes(0);
       let tomorrow = new Date();
-      tomorrow.setDate(new Date().getDate() + 7);
+      tomorrow.setDate(new Date().getDate() + 1);
 
       const active_schedules = await scheduleModel.aggregate([
         {
@@ -904,10 +905,8 @@ class ScheduleService {
               {
                 pickUpDate: {
                   $gte: active_today,
+                  $lt: tomorrow,
                 },
-                // pickUpDate: {
-                //   $lt: tomorrow,
-                // },
                 completionStatus: "pending",
                 collectorStatus: "decline",
                 state: user.state || "Lagos",
@@ -936,21 +935,19 @@ class ScheduleService {
         },
       ]);
 
-      await Promise.all(
-        active_schedules.map(async (schedule) => {
-          if (collectorAccessArea.includes(schedule.lcd)) {
-            geofencedSchedules.push(schedule);
-          }
-          const splitAddress = schedule.address.split(", ");
-          await Promise.all(
-            splitAddress.map((address) => {
-              if (collectorAccessArea.includes(address)) {
-                geofencedSchedules.push(schedule);
-              }
-            })
-          );
-        })
-      );
+      active_schedules.forEach((schedule) => {
+        if (collectorAccessArea.includes(schedule.lcd)) {
+          geofencedSchedules.push(schedule);
+        }
+        // const splitAddress = schedule.address.split(", ");
+        // await Promise.all(
+        //   splitAddress.map((address) => {
+        //     if (collectorAccessArea.includes(address)) {
+        //       geofencedSchedules.push(schedule);
+        //     }
+        //   })
+        // );
+      });
 
       const referenceSchedules = [...new Set(geofencedSchedules)];
 
