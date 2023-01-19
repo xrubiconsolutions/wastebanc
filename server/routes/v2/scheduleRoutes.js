@@ -77,4 +77,11 @@ module.exports = (APP) => {
     checkRequestErrs,
     ScheduleService.hubRejectSchedule
   );
+
+  APP.route("/api/v2/schedule/admin/approve").post(
+    adminPakamValidation,
+    scheduleValidator.disapproveSchedule,
+    checkRequestErrs,
+    ScheduleService.pakamConfirmSchedule
+  );
 };
