@@ -70,4 +70,11 @@ module.exports = (APP) => {
     checkRequestErrs,
     dropoffController.hubRejectSchedule
   );
+
+  APP.route("/api/v2/schedule/admin/dropoff/approve").post(
+    adminPakamValidation,
+    scheduleValidator.approveSchedule,
+    checkRequestErrs,
+    dropoffController.hubConfirmSchedule
+  );
 };

@@ -1304,7 +1304,7 @@ class ScheduleService {
           email: user.email.trim(),
           userId: user._id,
         };
-        schedule.approvalDate = Date.now();
+        schedule.approvalDate = new Date();
         schedule.save();
       }
 
@@ -1366,12 +1366,105 @@ class ScheduleService {
 
       schedule.scheduleApproval = false;
       schedule.rejectReason = reason;
-      schedule.rejectionDate = Date.now();
+      schedule.rejectionDate = new Date();
       schedule.save();
 
       return res.status(200).json({
         error: false,
         message: "Pickup schedule rejected",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async pakamConfirmSchedule(req, res) {
+    try {
+      const { user } = req;
+      const organisationId = user._id.toString();
+      const { scheduleId } = req.body;
+      const schedule = await scheduleModel.findById(scheduleId);
+      if (!schedule) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not found",
+        });
+      }
+
+      // if (schedule.organisationCollection != organisationId) {
+      //   return res.status(400).json({
+      //     error: true,
+      //     message: "Action cannot be perform",
+      //   });
+      // }
+
+      if (schedule.scheduleApproval == true) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule already been approved",
+        });
+      }
+
+      const scheduler = await userModel.findById(schedule.clientId);
+      if (!scheduler) {
+        return res.status(400).json({
+          error: true,
+          message: "No Household user connected to this schedule",
+        });
+      }
+
+      const userpoint = scheduler.ledgerPoints.find(
+        (schedule) => schedule.scheduleId == scheduleId
+      );
+
+      if (userpoint) {
+        const newledgerPoints = scheduler.ledgerPoints.filter(
+          (schedule) => schedule.scheduleId != scheduleId
+        );
+        scheduler.availablePoints = scheduler.availablePoints + userpoint.point;
+        scheduler.ledgerPoints = newledgerPoints;
+        scheduler.save();
+
+        schedule.scheduleApproval = true;
+        schedule.approvedBy = {
+          user: user.displayRole || user.roles,
+          email: user.email.trim(),
+          userId: user._id,
+        };
+        schedule.approvalDate = new Date();
+        schedule.save();
+      }
+
+      const collector = await collectorModel.findById(schedule.collectedBy);
+
+      if (!collector) {
+        return res.status(400).json({
+          error: true,
+          message: "No Collector connected to this schedule",
+        });
+      }
+
+      if (collector.collectorType == "waste-picker") {
+        const collectorPoint = collector.ledgerPoints.find(
+          (schedule) => schedule.scheduleId == scheduleId
+        );
+        if (collectorPoint) {
+          const newpoints = collector.ledgerPoints.filter(
+            (schedule) => schedule.scheduleId == scheduleId
+          );
+          collector.pointGained = collector.pointGained + collectorPoint.point;
+          collector.ledgerPoints = newpoints;
+          collector.save();
+        }
+      }
+
+      return res.status(200).json({
+        error: false,
+        message: "Pickup schedule verified successfully",
       });
     } catch (error) {
       console.log(error);
