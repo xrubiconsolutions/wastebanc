@@ -8,7 +8,7 @@ const activitiesModel = new Schema({
   userId: { type: String },
   message: { type: String },
   activity_type: { type: String },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: new Date() },
 });
 
 module.exports = MONGOOSE.model("userActivities", activitiesModel);

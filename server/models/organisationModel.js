@@ -121,7 +121,7 @@ const organisation_Schema = new Schema({
   },
   createAt: {
     type: Date,
-    default: Date.now,
+    default: new Date(),
   },
   wallet: {
     type: Number,

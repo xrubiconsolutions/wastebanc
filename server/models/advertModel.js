@@ -1,61 +1,64 @@
-'use strict';
+"use strict";
 /************* Modules ***********/
-const MONGOOSE = require('mongoose');
+const MONGOOSE = require("mongoose");
 const Schema = MONGOOSE.Schema;
-const Constants = require('../util/constants');
+const Constants = require("../util/constants");
 
 /**************************************************
  ************* advert Model or collection ***********
  **************************************************/
-const advert_Schema = new Schema({
-  title:{
-    type: String
+const advert_Schema = new Schema(
+  {
+    title: {
+      type: String,
+    },
+    advert_url: {
+      type: String,
+      required: true,
+    },
+    duration: {
+      //In seconds
+      type: Date,
+    },
+    start_date: {
+      type: Date,
+      required: true,
+    },
+    thumbnail_url: {
+      type: String,
+    },
+    // createdAt: {
+    //   type: Date,
+    //   default: Date.now,
+    // },
+    authenticated: {
+      type: Boolean,
+      default: true,
+      required: true,
+    },
+    expired: {
+      type: Date,
+    },
+    name: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    typeOfAdvert: {
+      type: String,
+    },
+    price: {
+      type: Number,
+    },
   },
-  advert_url: {
-    type: String,
-    required: true,
-  },
-  duration : {   //In seconds
-    type: Date
-  },
-  start_date:{
-    type: Date,
-    required:true
-  },
-  thumbnail_url:{
-    type: String
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  authenticated:{
-    type: Boolean,
-    default: true,
-    required: true
-  },
-  expired: {
-    type: Date
-  },
-  name : {
-    type : String
-  },
-  email: {
-    type: String
-  },
-  phone:{
-    type: String
-  },
-  address :{
-    type: String
-  },
-  typeOfAdvert:{
-    type: String
-  },
-  price:{
-    type: Number
-    
-  }
-});
+  { timestamps: true }
+);
 
-module.exports = MONGOOSE.model('adverts', advert_Schema);
+module.exports = MONGOOSE.model("adverts", advert_Schema);
