@@ -94,6 +94,10 @@ const user_Schema = new Schema({
     required: true,
     default: 0,
   },
+  ledgerPoints: {
+    type: Array,
+    default: [],
+  },
   rafflePoints: {
     type: Number,
     default: 0,

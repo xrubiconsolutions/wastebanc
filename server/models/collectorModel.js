@@ -106,6 +106,10 @@ const collector_Schema = new Schema({
     type: Number,
     default: 0,
   },
+  ledgerPoints: {
+    type: Array,
+    default: [],
+  },
   numberOfTripsCompleted: {
     type: Number,
     default: 0,

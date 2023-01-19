@@ -130,4 +130,23 @@ module.exports = {
   ],
 
   acceptSchedule: [body("_id").notEmpty().withMessage("_id is required")],
+  approveSchedule: [
+    body("scheduleId")
+      .notEmpty()
+      .withMessage("scheduleId is required")
+      .isString()
+      .withMessage("scheduleId should be string"),
+  ],
+  disapproveSchedule: [
+    body("scheduleId")
+      .notEmpty()
+      .withMessage("scheduleId is required")
+      .isString()
+      .withMessage("scheduleId should be string"),
+    body("reason")
+      .notEmpty()
+      .withMessage("reason is required")
+      .isString()
+      .withMessage("reason should be string"),
+  ],
 };

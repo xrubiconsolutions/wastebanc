@@ -63,4 +63,18 @@ module.exports = (APP) => {
     checkRequestErrs,
     ScheduleService.getCompanySchedulesForAdmin
   );
+
+  APP.route("/api/v2/schedule/approve").post(
+    companyPakamDataValidation,
+    scheduleValidator.approveSchedule,
+    checkRequestErrs,
+    ScheduleService.hubConfirmSchedule
+  );
+
+  APP.route("/api/v2/schedule/disapprove").post(
+    companyPakamDataValidation,
+    scheduleValidator.disapproveSchedule,
+    checkRequestErrs,
+    ScheduleService.hubRejectSchedule
+  );
 };

@@ -56,4 +56,18 @@ module.exports = (APP) => {
     checkRequestErrs,
     dropoffController.scheduledropOffs
   );
+
+  APP.route("/api/v2/dropoff/approve").post(
+    companyPakamDataValidation,
+    scheduleValidator.approveSchedule,
+    checkRequestErrs,
+    dropoffController.hubConfirmSchedule
+  );
+
+  APP.route("/api/v2/dropoff/disapprove").post(
+    companyPakamDataValidation,
+    scheduleValidator.disapproveSchedule,
+    checkRequestErrs,
+    dropoffController.hubRejectSchedule
+  );
 };
