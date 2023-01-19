@@ -909,6 +909,7 @@ class CollectorService {
         organisationId: req.user._id.toString(),
         companyVerified: true,
         collectorType,
+        status: { $ne: "deleted" },
       });
 
       // count male company collectors
@@ -918,6 +919,7 @@ class CollectorService {
         //verified: true,
         //companyVerified: true,
         collectorType,
+        status: { $ne: "deleted" },
       });
 
       // count female company collectors
@@ -927,6 +929,7 @@ class CollectorService {
         //verified: true,
         //companyVerified: true,
         collectorType,
+        status: { $ne: "deleted" },
       });
 
       // count new company collectors withon 30 days
@@ -940,6 +943,7 @@ class CollectorService {
         organisationId: req.user._id.toString(),
         //companyVerified: t,
         collectorType,
+        status: { $ne: "deleted" },
       });
 
       // get all company collectors
@@ -947,6 +951,7 @@ class CollectorService {
         organisationId: req.user._id.toString(),
         //companyVerified: true,
         collectorType,
+        status: { $ne: "deleted" },
       });
 
       return res.status(200).json({

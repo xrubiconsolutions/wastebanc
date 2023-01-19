@@ -80,6 +80,9 @@ dropoffController.aggregateQuery = async ({
           clientId: {
             $ifNull: ["$customer.userId", "$clientId"],
           },
+          phone: {
+            $ifNull: ["$customer.phone", "$phone"],
+          },
           scheduleCreator: 1,
           categories: 1,
           quantity: 1,
@@ -125,6 +128,7 @@ dropoffController.aggregateQuery = async ({
             $arrayElemAt: ["$cats.categories", 0],
           },
           fullname: 1,
+          phone: 1,
           clientId: 1,
           scheduleCreator: 1,
           categories: 1,
