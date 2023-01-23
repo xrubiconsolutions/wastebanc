@@ -566,7 +566,7 @@ class UserService {
       if (!user) {
         return res.status(400).json({
           error: true,
-          message: "Incorrect email or password",
+          message: "Incorrect phone number or password",
           statusCode: 400,
         });
       }
@@ -574,7 +574,7 @@ class UserService {
       if (user.status == "deleted") {
         return res.status(400).json({
           error: true,
-          message: "Incorrect email or password",
+          message: "Incorrect phone number or password",
           statusCode: 400,
         });
       }
@@ -585,7 +585,7 @@ class UserService {
       if (!compare) {
         return res.status(400).json({
           error: true,
-          message: "Incorrect email or password",
+          message: "Incorrect phone number or password",
           statusCode: 400,
         });
       }

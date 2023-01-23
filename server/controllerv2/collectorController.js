@@ -1329,7 +1329,7 @@ class CollectorService {
       if (!collector) {
         return res.status(400).json({
           error: true,
-          message: "Invalid credentials",
+          message: "Incorrect phone number or password",
           statusCode: 400,
         });
       }
@@ -1337,14 +1337,14 @@ class CollectorService {
       if (collector.status == "deleted") {
         return res.status(400).json({
           error: true,
-          message: "Invalid credentials",
+          message: "Incorrect phone number or password",
           statusCode: 400,
         });
       }
       if (!(await comparePassword(req.body.password, collector.password))) {
         return res.status(400).json({
           error: true,
-          message: "Invalid credentials",
+          message: "Incorrect phone number or password",
           statusCode: 400,
         });
       }

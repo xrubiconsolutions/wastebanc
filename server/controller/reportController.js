@@ -237,8 +237,30 @@ reportController.endReport = async (req, res) => {
 
   try {
     const user = await MODEL.reportModel.findOne({ userReportID: ID });
+    await MODEL.reportModel.updateOne(
+      { userReportID: ID },
+      { $set: { active: false } }
+    );
+    await MODEL.userModel.updateOne(
+      { _id: req.body.userID },
+      { last_logged_in: new Date() }
+    );
+    const log = {
+      userReportID: user.userReportID,
+      active: false,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      lat: user.lat,
+      long: user.long,
+      addressArea: req.body.addressArea,
+      address: req.body.address,
+    };
 
-    console.log("user", user);
+    await MODEL.reportLogModel.create(log);
+    await MODEL.reportModel.deleteOne({
+      userReportID: ID,
+    });
     return res.status(200).json({ message: "Session successfully ended" });
   } catch (error) {
     return res.status(500).json(err);
