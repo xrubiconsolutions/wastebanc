@@ -230,63 +230,66 @@ reportController.allReport = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(500).json(err));
 };
 
-reportController.endReport = (req, res) => {
-  var ID = req.body.userID.toString();
+reportController.endReport = async (req, res) => {
+  var ID = req.body.userID;
   var addressArea = req.body.addressArea;
   var address = req.body.addressArea;
 
-  MODEL.reportModel
-    .findOne({ userReportID: ID })
-    .then((user) => {
-      if (!user) {
-        console.log("user here", user);
-        return res.status(400).json({
-          message: "No user report here",
-        });
-      }
-      MODEL.reportModel.updateOne(
-        { userReportID: ID },
-        { $set: { active: false } },
-        (err, resp) => {
-          if (err) {
-            return res.status(400).json(err);
-          } else {
-            MODEL.userModel.updateOne(
-              { _id: req.body.userID },
-              { last_logged_in: new Date() },
-              (res) => {
-                console.log("Logged date updated", new Date());
-              }
-            );
-            var log = {
-              userReportID: user.userReportID,
-              active: false,
-              name: user.name,
-              email: user.email,
-              phone: user.phone,
-              lat: user.lat,
-              long: user.long,
-              addressArea: req.body.addressArea,
-              address: req.body.address,
-            };
-            MODEL.reportLogModel(log).save({}, (ERR, RESULT) => {
-              if (ERR) return res.status(400).json(ERR);
-              MODEL.reportModel
-                .deleteOne({
-                  userReportID: ID,
-                })
-                .then((result) => {
-                  console.log("User deleted successfully");
-                });
-              return res
-                .status(200)
-                .json({ message: "Session successfully ended" });
-            });
-          }
-        }
-      );
-    })
-    .catch((err) => res.status(500).json(err));
+  try {
+    const user = await MODEL.reportModel.findOne({ userReportID: ID });
+
+    console.log("user", user);
+    return res.status(200).json({ message: "Session successfully ended" });
+  } catch (error) {
+    return res.status(500).json(err);
+  }
+  // MODEL.reportModel
+  // .findOne({ userReportID: ID })
+  // .then((user) => {
+  //   if(!user){
+  //     console.log("user here", user)
+  //     return res.status(400).json({
+  //       message: "No user report here"
+  //     })
+  //   }
+  //   MODEL.reportModel.updateOne({ userReportID: ID }, { $set: { "active" : false } }, (err, resp)=>{
+  //     if(err) { return res.status(400).json(err) }
+
+  //     else {
+  //       MODEL.userModel.updateOne(
+  //         { _id: req.body.userID },
+  //         { last_logged_in: new Date() },
+  //         (res) => {
+  //           console.log('Logged date updated', new Date());
+  //         }
+  //       );
+  //       var log =  {
+  //         userReportID: user.userReportID,
+  //         active: false,
+  //         name: user.name,
+  //         email:user.email,
+  //         phone: user.phone,
+  //         lat: user.lat,
+  //         long: user.long,
+  //         addressArea: req.body.addressArea,
+  //         address: req.body.address
+  //        }
+  //           MODEL.reportLogModel(log).save( {} , (ERR, RESULT) => {
+  //             if(ERR) return res.status(400).json(ERR)
+  //     MODEL.reportModel
+  //     .deleteOne({
+  //       userReportID: ID,
+  //     })
+  //     .then((result) => {
+  //        console.log('User deleted successfully');
+  //     });
+  //             return res.status(200).json({message: "Session successfully ended"})
+  //           })
+  //     }
+
+  //   })
+  // })
+  // .catch((err) => res.status(500).json(err));
 };
 
 reportController.allReportAnalytics = (req, res) => {
