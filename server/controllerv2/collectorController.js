@@ -2090,6 +2090,7 @@ class CollectorService {
         .map((x) => x.point)
         .reduce((acc, curr) => acc + curr, 0);
 
+      console.log(ledgerBalance);
       if (ledgerBalance == null) {
         ledgerBalance = 0;
       }

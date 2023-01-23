@@ -82,6 +82,13 @@ class WalletController {
       otp: req.body.otp,
     };
 
+    if(user.availablePoints < 5000){
+      return res.status(400).json({
+        message:"You do not have enough points to complete this transaction",
+        error:true,
+      })
+    }
+
     try {
       const result = await axios.post(
         "https://apiv2.pakam.ng/api/disbursement/initiate",
