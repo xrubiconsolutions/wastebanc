@@ -106,6 +106,10 @@ const transaction_Schema = new Schema(
     phone: {
       type: String,
     },
+    approval: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

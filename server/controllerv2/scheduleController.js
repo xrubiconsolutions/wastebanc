@@ -1306,6 +1306,13 @@ class ScheduleService {
         };
         schedule.approvalDate = new Date();
         schedule.save();
+
+        await transactionModel.updateOne(
+          { scheduleId: schedule._id.toString() },
+          {
+            approval: true,
+          }
+        );
       }
 
       const collector = await collectorModel.findById(schedule.collectedBy);
@@ -1368,6 +1375,13 @@ class ScheduleService {
       schedule.rejectReason = reason;
       schedule.rejectionDate = new Date();
       schedule.save();
+
+      await transactionModel.updateOne(
+        { scheduleId: schedule._id.toString() },
+        {
+          approval: false,
+        }
+      );
 
       return res.status(200).json({
         error: false,
@@ -1437,6 +1451,13 @@ class ScheduleService {
         };
         schedule.approvalDate = new Date();
         schedule.save();
+
+        await transactionModel.updateOne(
+          { scheduleId: schedule._id.toString() },
+          {
+            approval: true,
+          }
+        );
       }
 
       const collector = await collectorModel.findById(schedule.collectedBy);
