@@ -1312,7 +1312,7 @@ class ScheduleService {
         await transactionModel.updateOne(
           { scheduleId: schedule._id.toString() },
           {
-            approval: true,
+            approval: "true",
           }
         );
       }
@@ -1381,7 +1381,7 @@ class ScheduleService {
       await transactionModel.updateOne(
         { scheduleId: schedule._id.toString() },
         {
-          approval: false,
+          approval: "false",
         }
       );
 
@@ -1457,7 +1457,7 @@ class ScheduleService {
         await transactionModel.updateOne(
           { scheduleId: schedule._id.toString() },
           {
-            approval: true,
+            approval: "true",
           }
         );
       }

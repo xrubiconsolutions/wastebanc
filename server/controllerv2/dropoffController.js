@@ -840,7 +840,7 @@ dropoffController.hubConfirmSchedule = async (req, res) => {
       await transactionModel.updateOne(
         { scheduleId: schedule._id.toString() },
         {
-          approval: true,
+          approval: "true",
         }
       );
     }
@@ -910,7 +910,7 @@ dropoffController.hubRejectSchedule = async (req, res) => {
     await transactionModel.updateOne(
       { scheduleId: schedule._id.toString() },
       {
-        approval: false,
+        approval: "false",
       }
     );
 
@@ -986,7 +986,7 @@ dropoffController.pakamConfirmSchedule = async (req, res) => {
       await transactionModel.updateOne(
         { scheduleId: schedule._id.toString() },
         {
-          approval: true,
+          approval: "true",
         }
       );
     }
