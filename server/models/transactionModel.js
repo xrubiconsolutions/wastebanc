@@ -107,8 +107,8 @@ const transaction_Schema = new Schema(
       type: String,
     },
     approval: {
-      type: Boolean,
-      default: false,
+      type: String,
+      default: "pending",
     },
   },
   { timestamps: true }
