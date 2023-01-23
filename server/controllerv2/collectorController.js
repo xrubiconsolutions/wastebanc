@@ -2079,6 +2079,9 @@ class CollectorService {
     try {
       const { user } = req;
       const collector = await collectorModel.findById(user._id);
+      const ledgerBalance = collector.ledgerPoints
+        .map((x) => x.point)
+        .reduce((acc, curr) => acc + curr, 0);
       if (!collector) {
         return res.status(400).json({
           error: true,
@@ -2089,6 +2092,7 @@ class CollectorService {
         error: false,
         message: "Point Balance",
         data: collector.pointGained,
+        ledgerBalance,
       });
     } catch (error) {
       console.log(error);

@@ -488,7 +488,7 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
   });
 };
 
-payController.afterPayment = async(req, res) => {
+payController.afterPayment = async (req, res) => {
   const userID = req.query.userID;
   try {
     const user = await MODEL.userModel.findById(userID);
@@ -500,6 +500,10 @@ payController.afterPayment = async(req, res) => {
       });
     }
     const token = COMMON_FUN.authToken(user);
+
+    const ledgerBalance = user.ledgerPoints
+      .map((x) => x.point)
+      .reduce((acc, curr) => acc + curr, 0);
 
     const test = {
       _id: user._id,
@@ -530,6 +534,7 @@ payController.afterPayment = async(req, res) => {
       token,
       charge: 100,
       withdrawableAmount: user.availablePoints - 100,
+      ledgerBalance,
     };
     return res
       .status(200)
@@ -547,6 +552,7 @@ payController.afterPayment = async(req, res) => {
     //     );
     // });
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 };

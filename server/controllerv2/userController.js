@@ -600,6 +600,12 @@ class UserService {
         });
       }
 
+      let ledgerBalance = 0;
+      if (user.ledgerPoints) {
+        ledgerBalance = user.ledgerPoints
+          .map((x) => c.point)
+          .reduce((acc, curr) => acc + curr, 0);
+      }
       if (!user.verified) {
         const phoneNo = String(user.phone).substring(1, 11);
         const token = authToken(user);
@@ -656,6 +662,7 @@ class UserService {
             countryCode: user.countryCode,
             verified: user.verified,
             availablePoints: user.availablePoints,
+            ledgerBalance,
             rafflePoints: user.rafflePoints,
             schedulePoints: user.schedulePoints,
             cardID: user.cardID,
@@ -715,6 +722,7 @@ class UserService {
           countryCode: user.countryCode,
           verified: user.verified,
           availablePoints: user.availablePoints,
+          ledgerBalance,
           rafflePoints: user.rafflePoints,
           schedulePoints: user.schedulePoints,
           onesignal_id: signal_id,
