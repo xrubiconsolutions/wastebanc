@@ -1304,7 +1304,7 @@ class ScheduleService {
         scheduler.ledgerPoints = newledgerPoints;
         scheduler.save();
 
-        schedule.scheduleApproval = true;
+        schedule.scheduleApproval = "true";
         schedule.approvedBy = {
           user: "company",
           email: user.email.trim(),
@@ -1377,7 +1377,7 @@ class ScheduleService {
         });
       }
 
-      schedule.scheduleApproval = false;
+      schedule.scheduleApproval = "false";
       schedule.rejectReason = reason;
       schedule.rejectionDate = new Date();
       schedule.save();
@@ -1449,7 +1449,7 @@ class ScheduleService {
         scheduler.ledgerPoints = newledgerPoints;
         scheduler.save();
 
-        schedule.scheduleApproval = true;
+        schedule.scheduleApproval = "true";
         schedule.approvedBy = {
           user: user.displayRole || user.roles,
           email: user.email.trim(),
