@@ -467,6 +467,7 @@ class ScheduleService {
       start,
       end,
       completionStatus = { $ne: "" },
+      scheduleApproval = {$ne:""},
       key,
     },
     type = "pickup"
@@ -507,6 +508,8 @@ class ScheduleService {
           collectorStatus,
           completionStatus,
           organisationCollection,
+          scheduleApproval
+
         }
       : {
           createdAt: {
@@ -516,6 +519,7 @@ class ScheduleService {
           organisationCollection,
           completionStatus,
           collectorStatus,
+          scheduleApproval
         };
 
     try {
