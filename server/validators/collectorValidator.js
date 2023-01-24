@@ -22,8 +22,8 @@ module.exports = {
     body("phone").notEmpty().withMessage("phone is required"),
     body("password").notEmpty().withMessage("password is required"),
     body("gender").notEmpty().withMessage("gender is required"),
-    body("state").notEmpty().withMessage("state is required"),
-    body("country").notEmpty().withMessage("country is required"),
+    //body("state").notEmpty().withMessage("state is required"),
+    //body("country").notEmpty().withMessage("country is required"),
     body("organisation")
       .optional()
       .isString()

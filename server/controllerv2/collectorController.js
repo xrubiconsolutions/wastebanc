@@ -819,8 +819,8 @@ class CollectorService {
         phone: body.phone,
         password: await encryptPassword(body.password),
         gender: body.gender.toLowerCase(),
-        country: body.country,
-        state: body.state,
+        country: body.country || "",
+        state: body.state ||"",
         long: body.long || "",
         lat: body.lat || "",
         organisation: organisationName,
@@ -830,6 +830,8 @@ class CollectorService {
         onesignal_id,
         dateOfBirth: body.dateOfBirth || "",
         terms_condition: body.terms_condition || false,
+        lcd: body.lcd || "",
+        address: body.address || ""
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
