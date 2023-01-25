@@ -263,7 +263,7 @@ reportController.endReport = async (req, res) => {
     });
     return res.status(200).json({ message: "Session successfully ended" });
   } catch (error) {
-    return res.status(500).json(err);
+    return res.status(500).json(error);
   }
   // MODEL.reportModel
   // .findOne({ userReportID: ID })
