@@ -467,7 +467,7 @@ class ScheduleService {
       start,
       end,
       completionStatus = { $ne: "" },
-      scheduleApproval = {$ne:""},
+      scheduleApproval = { $ne: "" },
       key,
     },
     type = "pickup"
@@ -508,8 +508,7 @@ class ScheduleService {
           collectorStatus,
           completionStatus,
           organisationCollection,
-          scheduleApproval
-
+          scheduleApproval,
         }
       : {
           createdAt: {
@@ -519,7 +518,7 @@ class ScheduleService {
           organisationCollection,
           completionStatus,
           collectorStatus,
-          scheduleApproval
+          scheduleApproval,
         };
 
     try {
@@ -1281,7 +1280,10 @@ class ScheduleService {
         });
       }
 
-      if (schedule.scheduleApproval == "true" || schedule.scheduleApproval == "false") {
+      if (
+        schedule.scheduleApproval == "true" ||
+        schedule.scheduleApproval == "false"
+      ) {
         return res.status(400).json({
           error: true,
           message: "Action cannot be perform. contact support team",
@@ -1327,24 +1329,20 @@ class ScheduleService {
 
       const collector = await collectorModel.findById(schedule.collectedBy);
 
-      if (!collector) {
-        return res.status(400).json({
-          error: true,
-          message: "No Collector connected to this schedule",
-        });
-      }
-
-      if (collector.collectorType == "waste-picker") {
-        const collectorPoint = collector.ledgerPoints.find(
-          (schedule) => schedule.scheduleId == scheduleId
-        );
-        if (collectorPoint) {
-          const newpoints = collector.ledgerPoints.filter(
+      if (collector) {
+        if (collector.collectorType == "waste-picker") {
+          const collectorPoint = collector.ledgerPoints.find(
             (schedule) => schedule.scheduleId == scheduleId
           );
-          collector.pointGained = collector.pointGained + collectorPoint.point;
-          collector.ledgerPoints = newpoints;
-          collector.save();
+          if (collectorPoint) {
+            const newpoints = collector.ledgerPoints.filter(
+              (schedule) => schedule.scheduleId == scheduleId
+            );
+            collector.pointGained =
+              collector.pointGained + collectorPoint.point;
+            collector.ledgerPoints = newpoints;
+            collector.save();
+          }
         }
       }
 
@@ -1374,7 +1372,10 @@ class ScheduleService {
         });
       }
 
-      if (schedule.scheduleApproval == "true" || schedule.scheduleApproval == "false") {
+      if (
+        schedule.scheduleApproval == "true" ||
+        schedule.scheduleApproval == "false"
+      ) {
         return res.status(400).json({
           error: true,
           message: "Action cannot be perform. contact support team",
@@ -1391,8 +1392,6 @@ class ScheduleService {
       schedule.rejectReason = reason;
       schedule.rejectionDate = new Date();
       schedule.save();
-
-      
 
       await transactionModel.updateOne(
         { scheduleId: schedule._id.toString() },

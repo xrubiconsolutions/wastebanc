@@ -797,6 +797,7 @@ dropoffController.hubConfirmSchedule = async (req, res) => {
     const { user } = req;
     const organisationId = user._id.toString();
     const { scheduleId } = req.body;
+    console.log("s", scheduleId);
     const schedule = await scheduleDropModel.findById(scheduleId);
     if (!schedule) {
       return res.status(400).json({
@@ -812,7 +813,10 @@ dropoffController.hubConfirmSchedule = async (req, res) => {
       });
     }
 
-    if (schedule.scheduleApproval == "true" || schedule.scheduleApproval == "false") {
+    if (
+      schedule.scheduleApproval == "true" ||
+      schedule.scheduleApproval == "false"
+    ) {
       return res.status(400).json({
         error: true,
         message: "Action cannot be perform. contact support team",
@@ -856,29 +860,29 @@ dropoffController.hubConfirmSchedule = async (req, res) => {
       );
     }
 
-    const collector = await collectorModel.findById(schedule.collectedBy);
+    // const collector = await collectorModel.findById(schedule.collectedBy);
 
-    if (!collector) {
-      return res.status(400).json({
-        error: true,
-        message: "No Collector connected to this schedule",
-      });
-    }
+    // if (!collector) {
+    //   return res.status(400).json({
+    //     error: true,
+    //     message: "No Collector connected to this schedule",
+    //   });
+    // }
 
-    if (collector.collectorType == "waste-picker") {
-      const collectorPoint = collector.ledgerPoints.find(
-        (schedule) => schedule.scheduleId == scheduleId
-      );
+    // if (collector.collectorType == "waste-picker") {
+    //   const collectorPoint = collector.ledgerPoints.find(
+    //     (schedule) => schedule.scheduleId == scheduleId
+    //   );
 
-      if (collectorPoint) {
-        const newpoints = collector.ledgerPoints.filter(
-          (schedule) => schedule.scheduleId == scheduleId
-        );
-        collector.pointGained = collector.pointGained + collectorPoint.point;
-        collector.ledgerPoints = newpoints;
-        collector.save();
-      }
-    }
+    //   if (collectorPoint) {
+    //     const newpoints = collector.ledgerPoints.filter(
+    //       (schedule) => schedule.scheduleId == scheduleId
+    //     );
+    //     collector.pointGained = collector.pointGained + collectorPoint.point;
+    //     collector.ledgerPoints = newpoints;
+    //     collector.save();
+    //   }
+    // }
 
     return res.status(200).json({
       error: false,
@@ -906,7 +910,10 @@ dropoffController.hubRejectSchedule = async (req, res) => {
       });
     }
 
-    if (schedule.scheduleApproval == "true" || schedule.scheduleApproval == "false") {
+    if (
+      schedule.scheduleApproval == "true" ||
+      schedule.scheduleApproval == "false"
+    ) {
       return res.status(400).json({
         error: true,
         message: "Action cannot be perform. contact support team",
