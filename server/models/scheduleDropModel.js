@@ -57,7 +57,7 @@ const scheduleDrop = new Schema(
       default: "pending",
     },
     scheduleApproval: {
-      type: string,
+      type: String,
       default: "pending",
     },
     approvedBy: {
