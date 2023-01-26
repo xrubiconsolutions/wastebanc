@@ -2680,6 +2680,7 @@ userController.adminLogin = async (req, res) => {
       .findById(user.role)
       .populate({
         path: "claims.claimId",
+        match: { show: true },
         populate: {
           path: "children",
           match: { show: true },
