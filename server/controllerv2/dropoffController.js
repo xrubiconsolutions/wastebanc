@@ -278,7 +278,15 @@ dropoffController.dropOffs = async (req, res) => {
 
 dropoffController.companydropOffs = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      start,
+      end,
+      state,
+      key,
+      scheduleApproval = { $ne: "" },
+    } = req.query;
     const { companyName: organisation } = req.user;
 
     if (typeof page === "string") page = parseInt(page);
@@ -317,6 +325,7 @@ dropoffController.companydropOffs = async (req, res) => {
           { Category: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         organisation,
+        scheduleApproval,
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -333,10 +342,12 @@ dropoffController.companydropOffs = async (req, res) => {
           $lt: endDate,
         },
         organisation,
+        scheduleApproval,
       };
     } else {
       criteria = {
         organisation,
+        scheduleApproval,
       };
     }
 
@@ -801,10 +812,10 @@ dropoffController.hubConfirmSchedule = async (req, res) => {
       });
     }
 
-    if (schedule.scheduleApproval == true) {
+    if (schedule.scheduleApproval == "true" || schedule.scheduleApproval == "false") {
       return res.status(400).json({
         error: true,
-        message: "Schedule already been approved",
+        message: "Action cannot be perform. contact support team",
       });
     }
 
@@ -828,7 +839,7 @@ dropoffController.hubConfirmSchedule = async (req, res) => {
       scheduler.ledgerPoints = newledgerPoints;
       scheduler.save();
 
-      schedule.scheduleApproval = true;
+      schedule.scheduleApproval = "true";
       schedule.approvedBy = {
         user: "company",
         email: user.email.trim(),
@@ -895,6 +906,13 @@ dropoffController.hubRejectSchedule = async (req, res) => {
       });
     }
 
+    if (schedule.scheduleApproval == "true" || schedule.scheduleApproval == "false") {
+      return res.status(400).json({
+        error: true,
+        message: "Action cannot be perform. contact support team",
+      });
+    }
+
     if (schedule.organisationCollection != organisationId) {
       return res.status(400).json({
         error: true,
@@ -902,7 +920,7 @@ dropoffController.hubRejectSchedule = async (req, res) => {
       });
     }
 
-    schedule.scheduleApproval = false;
+    schedule.scheduleApproval = "false";
     schedule.rejectReason = reason;
     schedule.rejectionDate = new Date();
     schedule.save();

@@ -1281,10 +1281,10 @@ class ScheduleService {
         });
       }
 
-      if (schedule.scheduleApproval == true) {
+      if (schedule.scheduleApproval == "true" || schedule.scheduleApproval == "false") {
         return res.status(400).json({
           error: true,
-          message: "Schedule already been approved",
+          message: "Action cannot be perform. contact support team",
         });
       }
 
@@ -1374,17 +1374,25 @@ class ScheduleService {
         });
       }
 
+      if (schedule.scheduleApproval == "true" || schedule.scheduleApproval == "false") {
+        return res.status(400).json({
+          error: true,
+          message: "Action cannot be perform. contact support team",
+        });
+      }
+
       if (schedule.organisationCollection != organisationId) {
         return res.status(400).json({
           error: true,
           message: "Action cannot be perform",
         });
       }
-
       schedule.scheduleApproval = "false";
       schedule.rejectReason = reason;
       schedule.rejectionDate = new Date();
       schedule.save();
+
+      
 
       await transactionModel.updateOne(
         { scheduleId: schedule._id.toString() },
