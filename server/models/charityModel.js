@@ -6,6 +6,14 @@ const Constants = require("../util/constants");
 
 const charity_Schema = new Schema(
   {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    charity: {
+      type: Schema.Types.ObjectId,
+      ref: "CharityOrganisation",
+    },
     userId: {
       type: String,
       required: true,

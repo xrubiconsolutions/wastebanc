@@ -574,7 +574,7 @@ class UserService {
       if (user.status == "deleted") {
         return res.status(400).json({
           error: true,
-          message: "Incorrect phone number or password",
+          message: "Account disabled contact support team",
           statusCode: 400,
         });
       }
@@ -686,14 +686,20 @@ class UserService {
         console.log("changing", signal_id);
         await userModel.updateOne(
           { email: user.email },
-          { $set: { last_logged_in: new Date(), onesignal_id: signal_id } }
+          {
+            $set: {
+              last_logged_in: new Date(),
+              onesignal_id: signal_id,
+              firstLogin: false,
+            },
+          }
         );
       } else {
         signal_id = user.onesignal_id;
         console.log("not changing", user.onesignal_id);
         await userModel.updateOne(
           { email: user.email },
-          { $set: { last_logged_in: new Date() } }
+          { $set: { last_logged_in: new Date(), firstLogin: false } }
         );
       }
 
@@ -729,7 +735,7 @@ class UserService {
           cardID: user.cardID,
           lcd: user.lcd,
           last_logged_in: user.last_logged_in,
-          firstLogin: user.last_logged_in ? false : true,
+          firstLogin: user.firstLogin,
           terms_condition: user.terms_condition,
           token,
         },
@@ -869,7 +875,7 @@ class UserService {
           cardID: user.cardID,
           lcd: user.lcd,
           last_logged_in: user.last_logged_in,
-          firstLogin: user.last_logged_in ? false : true,
+          firstLogin: user.firstLogin,
           terms_condition: true,
           token,
         },
