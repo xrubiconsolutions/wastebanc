@@ -820,7 +820,7 @@ class CollectorService {
         password: await encryptPassword(body.password),
         gender: body.gender.toLowerCase(),
         country: body.country || "",
-        state: body.state ||"",
+        state: body.state || "",
         long: body.long || "",
         lat: body.lat || "",
         organisation: organisationName,
@@ -831,7 +831,9 @@ class CollectorService {
         dateOfBirth: body.dateOfBirth || "",
         terms_condition: body.terms_condition || false,
         lcd: body.lcd || "",
-        address: body.address || ""
+        address: body.address || "",
+        status: "active",
+        companyVerified: false,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
