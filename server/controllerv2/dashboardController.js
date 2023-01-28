@@ -80,34 +80,37 @@ dashboardController.cardMapData = async (req, res) => {
       criteria.state = currentScope;
     }
 
-    const schedules = await allSchedules(criteria);
-    const totalWastes = await totalWaste(criteria);
-    const totalPayment = await totalpayout(criteria);
-    const totalOutstanding = await totaloutstanding(criteria);
-    const totalDropOff = await dropOffs(criteria);
-    const totalMissed = await missed(criteria);
-    const totalCompleted = await completed(criteria);
-    const initPending = await pending(criteria);
-    const allPending = await scheduleModel.countDocuments({
+    const totalSchedules =  await scheduleModel.countDocuments({
+      ...criteria,
+    });
+    const schedules =  await allSchedules(criteria);
+    const totalWastes =  await totalWaste(criteria);
+    const totalPayment =  await totalpayout(criteria);
+    const totalOutstanding =  await totaloutstanding(criteria);
+    const totalDropOff =  await dropOffs(criteria);
+    const totalMissed =  await missed(criteria);
+    const totalCompleted =  await completed(criteria);
+    const initPending =  await pending(criteria);
+    const allPending =  await scheduleModel.countDocuments({
       ...criteria,
       completionStatus: "pending",
     });
-    const allAccepted = await scheduleModel.countDocuments({
+    const allAccepted =  await scheduleModel.countDocuments({
       ...criteria,
       completionStatus: "pending",
     });
-    const totalCancelled = await cancelled(criteria);
-    const totalWasterPickers = await wastePickers(criteria);
-    const totalOrganisation = await organisation(criteria);
-    const allSchedulesCount =
-      schedules.length - allPending + initPending + allAccepted;
+    const totalCancelled =  await cancelled(criteria);
+    const totalWasterPickers =  await wastePickers(criteria);
+    const totalOrganisation =  await  organisation(criteria);
+    // const allSchedulesCount =
+    //   schedules.length - allPending + initPending + allAccepted;
 
     return res.status(200).json({
       error: false,
       message: "success",
       data: {
         schedules,
-        totalSchedules: schedules.length,
+        totalSchedules,
         totalPending: initPending,
         totalMissed,
         totalCompleted,
@@ -703,7 +706,11 @@ dashboardController.chartData = async (req, res) => {
 
 const allSchedules = async (criteria) => {
   // get length of schedules within given date range
-  const schedules = await scheduleModel.find(criteria).sort({ createdAt: -1 });
+
+  const schedules = await scheduleModel
+    .find(criteria)
+    .sort({ createdAt: -1 })
+    .limit(100);
   return schedules;
 };
 
