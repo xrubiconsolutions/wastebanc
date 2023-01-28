@@ -234,71 +234,130 @@ organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
   });
 };
 
-organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
+organisationController.loginOrganisation = async (REQUEST, RESPONSE) => {
   console.log("body", REQUEST.body);
   var PROJECTION = { __v: 0, createAt: 0 };
 
-  if (!REQUEST.body.email || !REQUEST.body.password) {
-    return RESPONSE.json({
-      error: false,
-      message: "Invalid Body request",
+  try {
+    if (!REQUEST.body.email || !REQUEST.body.password) {
+      return RESPONSE.json({
+        error: true,
+        message: "Invalid Body request",
+      });
+    }
+
+    const organisation = await MODEL.organisationModel.findOne({
+      email: REQUEST.body.email,
+    });
+
+    if (!organisation) {
+      return RESPONSE.status(400).json({
+        error: true,
+        message: "Incorrect email or password",
+      });
+    }
+
+    const compare = await COMMON_FUN.comparePassword(
+      REQUEST.body.password,
+      organisation.password
+    );
+    if (!compare) {
+      return RESPONSE.status(400).json({
+        error: true,
+        message: "Incorrect email or password",
+      });
+    }
+
+    if (organisation.isDisabled) {
+      return RESPONSE.status(400).json({
+        error: true,
+        message: "Account disabled contact support team",
+        statusCode: 400,
+      });
+    }
+
+    const token = COMMON_FUN.adminToken(organisation);
+
+    return RESPONSE.status(200).json({
+      _id: organisation._id,
+      role: organisation.role,
+      licence_active: organisation.licence_active,
+      areaOfAccess: organisation.areaOfAccess,
+      companyName: organisation.companyName,
+      location: organisation.location,
+      rcNo: organisation.rcNo,
+      email: organisation.email,
+      streetOfAccess: organisation.streetOfAccess,
+      roles: organisation.roles,
+      country: organisation.country,
+      firstLogin: organisation.firstLogin,
+      isDisabled: organisation.isDisabled,
+      state: organisation.state,
+      token,
+    });
+  } catch (error) {
+    console.log(error);
+    return RESPONSE.status(500).json({
+      error: true,
+      message: "An error occurred",
     });
   }
-  /** find user is exists or not */
-  MODEL.organisationModel
-    .findOne({ email: REQUEST.body.email }, PROJECTION, { lean: true })
-    .then((USER) => {
-      USER /** matching password */
-        ? COMMON_FUN.decryptPswrd(
-            REQUEST.body.password,
-            USER.password,
-            async (ERR, MATCHED) => {
-              if (ERR)
-                return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-              else if (!MATCHED)
-                return RESPONSE.status(400).jsonp(
-                  COMMON_FUN.sendSuccess(
-                    CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
-                  )
-                );
-              else {
-                var jwtToken =
-                  COMMON_FUN.adminToken(USER); /** creating jwt token */
-                USER.token = jwtToken;
-                if (USER.licence_active == false) {
-                  return RESPONSE.status(400).json({
-                    message:
-                      "Your licence expired. Kindly contact support for difficulty in renewal",
-                  });
-                }
 
-                const firstLogin = USER.last_logged_in ? false : true;
-                const { password, resetToken, ...data } = USER;
-                if (USER.firstLogin && USER.firstLogin === true) {
-                  return RESPONSE.jsonp({
-                    message: "Please change password",
-                    ...data,
-                    firstLogin: true,
-                  });
-                } else {
-                  await MODEL.organisationModel.updateOne(
-                    {
-                      email: REQUEST.body.email,
-                    },
-                    { last_logged_in: new Date() }
-                  );
-                  return RESPONSE.jsonp({ ...data, firstLogin: false });
-                }
-              }
-            }
-          )
-        : RESPONSE.status(400).jsonp(
-            COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
-          );
-    })
-    .catch((err) => {
-      return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err));
-    });
+  /** find user is exists or not */
+  // MODEL.organisationModel
+  //   .findOne({ email: REQUEST.body.email }, PROJECTION, { lean: true })
+  //   .then((USER) => {
+  //     USER /** matching password */
+  //       ? COMMON_FUN.decryptPswrd(
+  //           REQUEST.body.password,
+  //           USER.password,
+  //           async (ERR, MATCHED) => {
+  //             if (ERR)
+  //               return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+  //             else if (!MATCHED)
+  //               return RESPONSE.status(400).jsonp(
+  //                 COMMON_FUN.sendSuccess(
+  //                   CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
+  //                 )
+  //               );
+  //             else {
+  //               var jwtToken =
+  //                 COMMON_FUN.adminToken(USER); /** creating jwt token */
+  //               USER.token = jwtToken;
+  //               if (USER.licence_active == false) {
+  //                 return RESPONSE.status(400).json({
+  //                   message:
+  //                     "Your licence expired. Kindly contact support for difficulty in renewal",
+  //                 });
+  //               }
+
+  //               const firstLogin = USER.last_logged_in ? false : true;
+  //               const { password, resetToken, ...data } = USER;
+  //               if (USER.firstLogin && USER.firstLogin === true) {
+  //                 return RESPONSE.jsonp({
+  //                   message: "Please change password",
+  //                   ...data,
+  //                   firstLogin: true,
+  //                 });
+  //               } else {
+  //                 await MODEL.organisationModel.updateOne(
+  //                   {
+  //                     email: REQUEST.body.email,
+  //                   },
+  //                   { last_logged_in: new Date() }
+  //                 );
+  //                 return RESPONSE.jsonp({ ...data, firstLogin: false });
+  //               }
+  //             }
+  //           }
+  //         )
+  //       : RESPONSE.status(400).jsonp(
+  //           COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+  //         );
+  //   })
+  //   .catch((err) => {
+  //     return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err));
+  //   });
 };
 
 organisationController.listOrganisation = (req, res) => {
