@@ -80,28 +80,28 @@ dashboardController.cardMapData = async (req, res) => {
       criteria.state = currentScope;
     }
 
-    const totalSchedules =  await scheduleModel.countDocuments({
+    const totalSchedules = await scheduleModel.countDocuments({
       ...criteria,
     });
-    const schedules =  await allSchedules(criteria);
-    const totalWastes =  await totalWaste(criteria);
-    const totalPayment =  await totalpayout(criteria);
-    const totalOutstanding =  await totaloutstanding(criteria);
-    const totalDropOff =  await dropOffs(criteria);
-    const totalMissed =  await missed(criteria);
-    const totalCompleted =  await completed(criteria);
-    const initPending =  await pending(criteria);
-    const allPending =  await scheduleModel.countDocuments({
-      ...criteria,
-      completionStatus: "pending",
-    });
-    const allAccepted =  await scheduleModel.countDocuments({
+    const schedules = await allSchedules(criteria);
+    const totalWastes = await totalWaste(criteria);
+    const totalPayment = await totalpayout(criteria);
+    const totalOutstanding = await totaloutstanding(criteria);
+    const totalDropOff = await dropOffs(criteria);
+    const totalMissed = await missed(criteria);
+    const totalCompleted = await completed(criteria);
+    const initPending = await pending(criteria);
+    const allPending = await scheduleModel.countDocuments({
       ...criteria,
       completionStatus: "pending",
     });
-    const totalCancelled =  await cancelled(criteria);
-    const totalWasterPickers =  await wastePickers(criteria);
-    const totalOrganisation =  await  organisation(criteria);
+    const allAccepted = await scheduleModel.countDocuments({
+      ...criteria,
+      completionStatus: "pending",
+    });
+    const totalCancelled = await cancelled(criteria);
+    const totalWasterPickers = await wastePickers(criteria);
+    const totalOrganisation = await organisation(criteria);
     // const allSchedulesCount =
     //   schedules.length - allPending + initPending + allAccepted;
 
