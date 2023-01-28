@@ -719,7 +719,7 @@ const companyAllSchedules = async (criteria, organisationId) => {
 
   const schedules = await scheduleModel
     .find({ ...criteria, organisationCollection: organisationId })
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 }).limit(100);
   return schedules;
 };
 
