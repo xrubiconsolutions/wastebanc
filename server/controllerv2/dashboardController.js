@@ -741,6 +741,7 @@ const organisation = async (criteria) => {
   condition.createAt = condition.createdAt;
   delete condition.createdAt;
 
+  console.log("c", condition);
   const totalOrganisation = await organisationModel.countDocuments(condition);
 
   return totalOrganisation;
