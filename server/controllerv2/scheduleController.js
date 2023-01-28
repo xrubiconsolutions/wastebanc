@@ -675,6 +675,7 @@ class ScheduleService {
         });
       }
 
+      //
       const scheduler = await userModel.findOne({
         email: schedule.client,
       });
