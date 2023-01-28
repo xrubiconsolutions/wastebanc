@@ -84,7 +84,7 @@ class WalletController {
 
     if(user.availablePoints < 5000){
       return res.status(400).json({
-        message:"You do not have enough points to complete this transaction",
+        message:"Insufficient available balance",
         error:true,
       })
     }
