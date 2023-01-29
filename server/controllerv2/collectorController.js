@@ -1345,6 +1345,14 @@ class CollectorService {
           statusCode: 400,
         });
       }
+
+      if (collector.isDisabled) {
+        return res.status(400).json({
+          error: true,
+          message: "Account disabled,Contact support team",
+          statusCode: 400,
+        });
+      }
       if (!(await comparePassword(req.body.password, collector.password))) {
         return res.status(400).json({
           error: true,

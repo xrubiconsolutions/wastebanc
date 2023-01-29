@@ -579,6 +579,14 @@ class UserService {
         });
       }
 
+      if (user.status == "disabled") {
+        return res.status(400).json({
+          error: true,
+          message: "Account disabled contact support team",
+          statusCode: 400,
+        });
+      }
+
       console.log("user", user.password);
       const compare = await comparePassword(req.body.password, user.password);
       console.log("compare", compare);
