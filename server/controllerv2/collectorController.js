@@ -203,7 +203,6 @@ class CollectorService {
 
       //console.log
 
-      console.log(criteria);
       //if (state) criteria.state = state;
 
       const { collectors, totalResult } = await CollectorService.aggregateQuery(

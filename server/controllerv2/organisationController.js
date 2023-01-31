@@ -141,7 +141,7 @@ organisationController.getOrganisationCompleted = async (req, res) => {
       },
       {
         $sort: {
-          createdAt: -1,
+          _id: 1,
         },
       },
       {

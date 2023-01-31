@@ -537,8 +537,8 @@ dashboardController.collectormapData = async (req, res) => {
     const [startDate, endDate] = [new Date(start), new Date(end)];
     endDate.setDate(endDate.getDate() + 1);
 
-    if (req.query.collectoryType) {
-      collectorType = req.query.collectoryType;
+    if (req.query.collectorType) {
+      collectorType = req.query.collectorType;
     }
     let criteria = {
       createdAt: {
