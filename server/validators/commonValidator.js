@@ -25,8 +25,8 @@ module.exports = {
   createArea: [
     body("coverageArea").notEmpty().withMessage("coverageArea is required"),
     body("lga").notEmpty().withMessage("lga is required"),
-    body("country").optional({ default: "" }),
-    body("state").optional({ default: "" }),
+    body("country").optional({ default: "Nigeria" }),
+    body("state").optional({ default: "Lagos" }),
   ],
   areaId: [param("areaId").notEmpty().withMessage("areaId is required")],
   removenotification: [
