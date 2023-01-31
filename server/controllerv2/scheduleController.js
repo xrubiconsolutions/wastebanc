@@ -906,10 +906,9 @@ class ScheduleService {
       const { user } = req;
       let areaOfAccess;
 
-      if (user.organisationId) {
-        const organisation = await organisationModel.findById(
-          user.organisationId
-        );
+      if (user.organisationId || user.approvedBy) {
+        const organisationID = user.organisationId || user.approvedBy;
+        const organisation = await organisationModel.findById(organisationID);
         if (organisation) {
           areaOfAccess = organisation.streetOfAccess;
         }
