@@ -1336,7 +1336,7 @@ class ScheduleService {
           );
           if (collectorPoint) {
             const newpoints = collector.ledgerPoints.filter(
-              (schedule) => schedule.scheduleId == scheduleId
+              (schedule) => schedule.scheduleId != scheduleId
             );
             collector.pointGained =
               collector.pointGained + collectorPoint.point;
