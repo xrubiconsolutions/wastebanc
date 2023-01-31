@@ -21,6 +21,7 @@ const passwordResetTemplate = require("../../email-templates/password-reset.temp
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
 const { sendNotification } = require("../util/commonFunction");
+const mongoose = require("mongoose");
 
 const ustorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -2680,7 +2681,7 @@ userController.adminLogin = async (req, res) => {
       .findById(user.role)
       .populate({
         path: "claims.claimId",
-        match: { show: true },
+        //options: { sort: { "claims.claimId.display": -1 } },
         populate: {
           path: "children",
           match: { show: true },
@@ -2690,7 +2691,7 @@ userController.adminLogin = async (req, res) => {
           },
         },
       })
-      .sort({ display: -1 });
+      .sort({ "claims.claimId.display": 1 });
 
     if (!claims) {
       return res.status(400).json({

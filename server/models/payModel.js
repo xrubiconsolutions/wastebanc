@@ -10,7 +10,8 @@ const pay_Schema = new Schema(
       type: String,
       required: true,
     },
-    transactionId: [{ type: Schema.Types.ObjectId, ref: "transaction" }],
+    user:{type:Schema.Types.ObjectId, ref:"User"},
+    transaction: { type: Schema.Types.ObjectId, ref: "transaction" },
     fullname: {
       type: String,
       required: true,

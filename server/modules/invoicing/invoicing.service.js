@@ -30,6 +30,7 @@ class invoiceService {
       },
       organisationID: companyId,
       organisationPaid: false,
+      paid: false,
     };
 
     let state = [];
@@ -69,7 +70,7 @@ class invoiceService {
         wastePickersTotal += e.wastePickerCoin;
       });
 
-      const charges = organisation.systemCharge || 10;
+      const charges = organisation.systemCharge || 15;
       totalValue = householdTotal + wastePickersTotal;
 
       sumPercentage = rewardService.calPercentage(totalValue, charges);
@@ -249,6 +250,7 @@ class invoiceService {
         { _id: { $in: invoice.transactions } },
         {
           organisationPaid: true,
+          paid: true,
         }
       );
     }

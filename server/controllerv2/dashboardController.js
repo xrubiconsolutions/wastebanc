@@ -80,6 +80,9 @@ dashboardController.cardMapData = async (req, res) => {
       criteria.state = currentScope;
     }
 
+    const totalSchedules = await scheduleModel.countDocuments({
+      ...criteria,
+    });
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
     const totalPayment = await totalpayout(criteria);
@@ -99,15 +102,15 @@ dashboardController.cardMapData = async (req, res) => {
     const totalCancelled = await cancelled(criteria);
     const totalWasterPickers = await wastePickers(criteria);
     const totalOrganisation = await organisation(criteria);
-    const allSchedulesCount =
-      schedules.length - allPending + initPending + allAccepted;
+    // const allSchedulesCount =
+    //   schedules.length - allPending + initPending + allAccepted;
 
     return res.status(200).json({
       error: false,
       message: "success",
       data: {
         schedules,
-        totalSchedules: schedules.length,
+        totalSchedules,
         totalPending: initPending,
         totalMissed,
         totalCompleted,
@@ -703,7 +706,11 @@ dashboardController.chartData = async (req, res) => {
 
 const allSchedules = async (criteria) => {
   // get length of schedules within given date range
-  const schedules = await scheduleModel.find(criteria).sort({ createdAt: -1 });
+
+  const schedules = await scheduleModel
+    .find(criteria)
+    .sort({ createdAt: -1 })
+    .limit(100);
   return schedules;
 };
 
@@ -712,7 +719,7 @@ const companyAllSchedules = async (criteria, organisationId) => {
 
   const schedules = await scheduleModel
     .find({ ...criteria, organisationCollection: organisationId })
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 }).limit(100);
   return schedules;
 };
 
@@ -741,6 +748,7 @@ const organisation = async (criteria) => {
   condition.createAt = condition.createdAt;
   delete condition.createdAt;
 
+  console.log("c", condition);
   const totalOrganisation = await organisationModel.countDocuments(condition);
 
   return totalOrganisation;

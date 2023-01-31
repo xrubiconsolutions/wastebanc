@@ -831,6 +831,8 @@ class CollectorService {
         terms_condition: body.terms_condition || false,
         lcd: body.lcd || "",
         address: body.address || "",
+        status: "active",
+        companyVerified: false,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -1339,6 +1341,14 @@ class CollectorService {
         return res.status(400).json({
           error: true,
           message: "Incorrect phone number or password",
+          statusCode: 400,
+        });
+      }
+
+      if (collector.isDisabled) {
+        return res.status(400).json({
+          error: true,
+          message: "Account disabled,Contact support team",
           statusCode: 400,
         });
       }
