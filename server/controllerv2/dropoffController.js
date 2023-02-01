@@ -633,8 +633,8 @@ dropoffController.rewardDropSystem = async (req, res) => {
       { email: scheduler.email },
       {
         $set: {
-          //availablePoints: scheduler.availablePoints + userCoin,
-          ledgerPoints: newledgerBalance,
+          availablePoints: scheduler.availablePoints + userCoin,
+          //ledgerPoints: newledgerBalance,
           schedulePoints: scheduler.schedulePoints + 1,
         },
       }
@@ -647,8 +647,8 @@ dropoffController.rewardDropSystem = async (req, res) => {
           totalCollected:
             collector.totalCollected + householdReward.totalWeight,
           numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
-          //pointGained: collectorPoint + collector.pointGained,
-          ledgerPoints: newCollectorLedgerBalance,
+          pointGained: collectorPoint + collector.pointGained,
+          //ledgerPoints: newCollectorLedgerBalance,
           busy: false,
           last_logged_in: new Date(),
         },

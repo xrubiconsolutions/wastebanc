@@ -273,7 +273,7 @@ const authToken = (user) => {
 
 const adminToken = (user) => {
   return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
-    expiresIn: "7h",
+    expiresIn: "4d",
   });
 };
 
