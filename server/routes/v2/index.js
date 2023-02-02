@@ -20,5 +20,5 @@ module.exports = function (app) {
   require("./walletRoutes")(app);
   require("../../modules/invoicing/invoicing.route")(app);
   require("./websiteRoutes")(app);
-  //require("./scriptRoutes")(app);
+  require("./scriptRoutes")(app);
 };

@@ -12,6 +12,7 @@ const {
   payModel,
   scheduleDropModel,
 } = require("../models");
+const axios = require("axios");
 
 class ScriptController {
   static async charitModelScript(req, res) {
@@ -154,7 +155,9 @@ class ScriptController {
 
   static async ScheduleDropOffModelScript(req, res) {
     try {
-      const datas = await scheduleDropModel.find({categories:{$exists:false}});
+      const datas = await scheduleDropModel.find({
+        categories: { $exists: false },
+      });
       Promise.all(
         datas.map(async (data) => {
           const categories = [];
@@ -182,6 +185,44 @@ class ScriptController {
       return res.status(500).json({
         error: true,
         message: "An error occurred!",
+      });
+    }
+  }
+
+  static async UserSmsScript(req, res) {
+    const { message } = req.body;
+    try {
+      const users = await userModel.find({ phone: { $ne: "" } });
+      const url = "https://api.ng.termii.com/api/sms/send";
+      const smsRes = await Promise.all(
+        users.map((user) => {
+          const msg = {
+            api_key:
+              "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
+            type: "plain",
+            to: `+234${user.phone}`,
+            from: "N-Alert",
+            channel: "dnd",
+            sms: message,
+          };
+
+          return axios.post(url, JSON.stringify(msg), {
+            headers: {
+              "Content-Type": ["application/json", "application/json"],
+            },
+          });
+        })
+      );
+
+      return res.status(200).json({
+        error: false,
+        message: "message sent successfully!",
+      });
+    } catch (error) {
+      console.log(error.stack);
+      res.status(500).json({
+        error: true,
+        message: "An error occured",
       });
     }
   }
