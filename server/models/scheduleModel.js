@@ -148,6 +148,10 @@ const schedulePick = new Schema(
     rejectionDate: {
       type: Date,
     },
+    channel: {
+      type: String,
+      default: "mobile",
+    },
   },
   { timestamps: true }
 );
