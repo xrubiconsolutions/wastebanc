@@ -906,10 +906,9 @@ class ScheduleService {
       const { user } = req;
       let areaOfAccess;
 
-      if (user.organisationId) {
-        const organisation = await organisationModel.findById(
-          user.organisationId
-        );
+      if (user.organisationId || user.approvedBy) {
+        const organisationID = user.organisationId || user.approvedBy;
+        const organisation = await organisationModel.findById(organisationID);
         if (organisation) {
           areaOfAccess = organisation.streetOfAccess;
         }
@@ -1337,7 +1336,7 @@ class ScheduleService {
           );
           if (collectorPoint) {
             const newpoints = collector.ledgerPoints.filter(
-              (schedule) => schedule.scheduleId == scheduleId
+              (schedule) => schedule.scheduleId != scheduleId
             );
             collector.pointGained =
               collector.pointGained + collectorPoint.point;

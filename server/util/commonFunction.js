@@ -267,13 +267,13 @@ let createToken = (objData) => {
 
 const authToken = (user) => {
   return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
-    expiresIn: "3h",
+    expiresIn: "7h",
   });
 };
 
 const adminToken = (user) => {
   return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
-    expiresIn: "7h",
+    expiresIn: "4d",
   });
 };
 
