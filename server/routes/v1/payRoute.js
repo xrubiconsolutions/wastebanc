@@ -1,6 +1,8 @@
 "use strict";
 let CONTROLLER = require("../../controller");
 let auth = require("../../util/auth");
+const { checkRequestErrs } = require("../../util/commonFunction.js");
+const payValidator = require("../../validators/payValidators.js");
 
 /****************************************
  ***** Managing User Routes here ********
@@ -43,6 +45,8 @@ module.exports = (APP) => {
   );
   APP.route("/api/charity/payment").post(
     auth.userValidation,
+    payValidator.charityPay,
+    checkRequestErrs,
     CONTROLLER.payController.charityP
   );
 };

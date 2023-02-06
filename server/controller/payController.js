@@ -10,9 +10,9 @@ let COMMON_FUN = require("../util/commonFunction");
 let SERVICE = require("../services/commonService");
 let CONSTANTS = require("../util/constants");
 var request = require("request");
-const payModel = require("../models/payModel");
 var ObjectId = require("mongodb").ObjectID;
 const axios = require("axios");
+const { payModel, charityOrganisationModel } = require("../models");
 
 payController.getBanks = (req, res) => {
   request(
@@ -200,10 +200,8 @@ payController.saveR = async (req, res) => {
 // new charity function nn
 payController.charityP = async (req, res) => {
   try {
-    const receipt = { ...req.body };
-    let cardID = req.body.cardID;
-    let amount = req.body.amount;
-    var balance;
+    const { cardID, amount, charityOrganisationID } = req.body;
+    let balance;
 
     const user = await MODEL.userModel.findOne({ cardID });
     if (!user) {
@@ -211,6 +209,15 @@ payController.charityP = async (req, res) => {
         message: "Enter a valid card ID",
       });
     }
+
+    const charityOrganisation = await charityOrganisationModel.findById(
+      charityOrganisationID
+    );
+    if (!charityOrganisation)
+      return res.status(404).json({
+        error: true,
+        message: "Charity organisation not found!",
+      });
 
     if (Number(user.availablePoints) < 0) {
       return res.status(400).json({
@@ -233,78 +240,13 @@ payController.charityP = async (req, res) => {
       }
     );
 
-    //help
-    const allTransations = await MODEL.transactionModel.find({
-      paid: false,
-      requestedForPayment: false,
-      cardID: cardID,
+    await MODEL.charityModel.create({
+      cardID,
+      amount: tran.coin,
+      state: user.state,
+      user: user._id,
+      charityOrganisation: charityOrganisationID,
     });
-
-    await Promise.all(
-      allTransations.map(async (tran) => {
-        await MODEL.userModel.updateOne(
-          { _id: user._id },
-          {
-            availablePoints: balance,
-          }
-        );
-        const storePaymentRequest = await MODEL.charityModel.create({
-          ...receipt,
-          aggregatorName: tran.recycler || " ",
-          aggregatorId: tran.aggregatorId || " ",
-          aggregatorOrganisation: tran.organisation || " ",
-          scheduleId: tran.scheduleId || " ",
-          quantityOfWaste: tran.weight || " ",
-          amount: tran.coin,
-          organisation: tran.organisation,
-          organisationID: tran.organisationID,
-          status: user.state,
-          userPhone: user.phone,
-        });
-
-        console.log("store", storePaymentRequest);
-
-        await MODEL.transactionModel.updateOne(
-          { _id: tran._id },
-          {
-            $set: {
-              requestedForPayment: true,
-              paymentResolution: "charity",
-            },
-          }
-        );
-
-        // const organisation = await MODEL.organisationModel.findOne({
-        //   companyName: tran.organisation,
-        // });
-
-        // var phoneNo = String(organisation.phone);
-        // var data = {
-        //   to: `234${phoneNo}`,
-        //   from: "N-Alert",
-        //   sms: `Dear ${tran.organisation}, a user named ${receipt.fullname} just requested for a payout of ${unpaidFees[i].coin}, kindly attend to the payment.`,
-        //   type: "plain",
-        //   api_key:
-        //     "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-        //   channel: "dnd",
-        // };
-
-        // var options = {
-        //   method: "POST",
-        //   url: "https://termii.com/api/sms/send",
-        //   headers: {
-        //     "Content-Type": ["application/json", "application/json"],
-        //   },
-        //   body: JSON.stringify(data),
-        // };
-
-        // const send = await axios.post(options.url, options.body, {
-        //   headers: options.headers,
-        // });
-
-        console.log("res", send.data);
-      })
-    );
 
     return res.status(200).json({
       error: false,
