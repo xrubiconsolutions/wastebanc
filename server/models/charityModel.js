@@ -51,7 +51,7 @@ const charity_Schema = new Schema(
     },
     quantityOfWaste: {
       type: Number,
-      required: true,
+      //required: true,
     },
     cardID: {
       type: String,
