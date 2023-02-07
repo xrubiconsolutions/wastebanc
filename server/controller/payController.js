@@ -242,7 +242,7 @@ payController.charityP = async (req, res) => {
 
     await MODEL.charityModel.create({
       cardID,
-      amount: tran.coin,
+      amount,
       state: user.state,
       user: user._id,
       charityOrganisation: charityOrganisationID,
