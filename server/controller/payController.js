@@ -13,6 +13,7 @@ var request = require("request");
 var ObjectId = require("mongodb").ObjectID;
 const axios = require("axios");
 const { payModel, charityOrganisationModel } = require("../models");
+const SlackService = require("../services/slackService");
 
 payController.getBanks = (req, res) => {
   request(
@@ -242,12 +243,16 @@ payController.charityP = async (req, res) => {
 
     await MODEL.charityModel.create({
       cardID,
-      amount: tran.coin,
+      amount,
       state: user.state,
       user: user._id,
       charityOrganisation: charityOrganisationID,
     });
-
+    await SlackService.charityPayment({
+      amount,
+      user: user._id,
+      charityOrganisation: charityOrganisation.name,
+    });
     return res.status(200).json({
       error: false,
       message: "payment successfully made to charity",
