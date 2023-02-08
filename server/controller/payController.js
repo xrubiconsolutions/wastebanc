@@ -248,6 +248,25 @@ payController.charityP = async (req, res) => {
       charityOrganisation: charityOrganisationID,
     });
 
+    await MODEL.transactionModel.create({
+      userId: user._id,
+      address: user.address,
+      fullname: user.fullname,
+      coin: amount,
+      wastePickerCoin: 0,
+      weight: 0,
+      type: "charity",
+      scheduleId: "",
+      cardID: user._id.toString(),
+      completedBy: user._id.toString(),
+      paid: true,
+      approval: "true",
+      phone: user.phone,
+      paymentResolution: "charity",
+      state:"Lagos",
+      ref_id:Math.floor(100000 + Math.random() * 900000)
+    });
+
     return res.status(200).json({
       error: false,
       message: "payment successfully made to charity",
