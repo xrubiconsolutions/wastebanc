@@ -22,15 +22,15 @@ class ScheduleService {
   static async aggregateQuery({ criteria, page = 1, resultsPerPage = 20 }) {
     const paginationQuery = [
       {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
         $skip: (page - 1) * resultsPerPage,
       },
       {
         $limit: resultsPerPage,
-      },
-      {
-        $sort: {
-          createdAt: -1,
-        },
       },
     ];
     try {
@@ -927,17 +927,12 @@ class ScheduleService {
       const active_schedules = await scheduleModel.aggregate([
         {
           $match: {
-            $and: [
-              {
-                pickUpDate: {
-                  $gte: active_today,
-                  $lt: tomorrow,
-                },
-                completionStatus: "pending",
-                collectorStatus: "decline",
-                state: user.state || "Lagos",
-              },
-            ],
+            completionStatus: "pending",
+            collectorStatus: "decline",
+            state: user.state || "Lagos",
+            expiryDuration: {
+              $gt: active_today,
+            },
           },
         },
         {
@@ -956,11 +951,12 @@ class ScheduleService {
         },
         {
           $sort: {
-            _id: -1,
+            pickUpDate: 1,
           },
         },
       ]);
 
+      console.log(active_schedules, JSON.stringify());
       active_schedules.forEach((schedule) => {
         if (collectorAccessArea.includes(schedule.lcd)) {
           geofencedSchedules.push(schedule);
