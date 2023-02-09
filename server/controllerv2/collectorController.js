@@ -30,15 +30,15 @@ class CollectorService {
         $match: criteria,
       },
       {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
         $skip: (page - 1) * resultsPerPage,
       },
       {
         $limit: resultsPerPage,
-      },
-      {
-        $sort: {
-          createdAt: -1,
-        },
       },
     ];
 

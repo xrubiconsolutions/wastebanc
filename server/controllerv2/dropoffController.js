@@ -25,15 +25,15 @@ dropoffController.aggregateQuery = async ({
   try {
     const paginationQuery = [
       {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
         $skip: (page - 1) * resultsPerPage,
       },
       {
         $limit: resultsPerPage,
-      },
-      {
-        $sort: {
-          createdAt: -1,
-        },
       },
     ];
     const pipeline = [
