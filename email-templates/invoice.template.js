@@ -46,7 +46,8 @@ module.exports = async (invoice) => {
   <body>
   <div
   style="
-    max-width: 1300px;
+    max-width: 1800px;
+    width: 800px;
     margin: auto;
     padding-left: 25px;
     padding-right: 25px;
