@@ -115,10 +115,10 @@ const collector_Schema = new Schema({
     default: 0,
   },
   lat: {
-    type: String,
+    type: Number,
   },
   long: {
-    type: String,
+    type: Number,
   },
   onesignal_id: {
     type: String,
