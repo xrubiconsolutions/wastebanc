@@ -33,6 +33,9 @@ class ScheduleService {
         $limit: resultsPerPage,
       },
     ];
+
+    if (criteria.completionStatus === "completed") paginationQuery.shift();
+
     try {
       const pipeline = [
         {
