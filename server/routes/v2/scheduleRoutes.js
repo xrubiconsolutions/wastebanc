@@ -84,4 +84,6 @@ module.exports = (APP) => {
     checkRequestErrs,
     ScheduleService.pakamConfirmSchedule
   );
+
+  APP.route("/api/v2/admin/reward").post(ScheduleService.adminCompleteScheudle);
 };

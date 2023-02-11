@@ -743,7 +743,7 @@ class ScheduleService {
 
       let wastePickerCoin = 0;
       let wastePickerPercentage = 0;
-      let collectorPoint = collector.pointGained || 0;
+      let collectorPoint = 0;
       if (collector.collectorType == "waste-picker") {
         const wastepickerReward = await rewardService.picker(cat, organisation);
         if (!wastepickerReward.error) {
@@ -769,13 +769,13 @@ class ScheduleService {
         charset: "numeric",
       });
 
-      const userGain =
-        Number(householdReward.totalpointGained) - Number(pakamPercentage);
+      // const userGain =
+      //   Number(householdReward.totalpointGained) - Number(pakamPercentage);
 
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
         coin: userCoin,
-        wastePickerCoin,
+        wastePickerCoin: collectorPoint,
         wastePickerPercentage,
         cardID: scheduler._id,
         completedBy: collectorId,
@@ -832,11 +832,11 @@ class ScheduleService {
 
       const userledgerBalance = {
         scheduleId: schedule._id.toString(),
-        point: scheduler.availablePoints + userCoin,
+        point: userCoin,
       };
       const collectorledgerBalance = {
         scheduleId: schedule._id.toString(),
-        point: collectorPoint + collector.pointGained,
+        point: collectorPoint,
       };
 
       let newledgerBalance = scheduler.ledgerPoints || [];
@@ -889,7 +889,7 @@ class ScheduleService {
       return res.status(200).json({
         error: false,
         message: "Pickup completed successfully",
-        data: userGain,
+        data: userCoin,
         da: householdReward.totalWeight,
       });
     } catch (error) {
@@ -1500,6 +1500,88 @@ class ScheduleService {
         error: false,
         message: "Pickup schedule verified successfully",
       });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async adminCompleteScheudle(req, res) {
+    try {
+      const { scheduleId } = req.body;
+      const schedule = await scheduleModel.findById(scheduleId);
+      if (!schedule) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not found",
+        });
+      }
+
+      const transaction = await transactionModel.findOne({
+        scheduleId,
+      });
+
+      if (!transaction) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not found",
+        });
+      }
+
+      const organisation = await organisationModel.findById(
+        schedule.organisationCollection
+      );
+      if (!organisation) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid schedule",
+        });
+      }
+
+      let pointGained = [];
+      transaction.categories.forEach((cat) => {
+        const organisationCat = organisation.categories.find(
+          (category) => category.name.toString() == cat.name.toString()
+        );
+
+        if (organisationCat) {
+          console.log(organisationCat);
+          const p =
+            parseFloat(cat.quantity) * parseFloat(organisationCat.price);
+          pointGained.push(p);
+        } else {
+          const p = parseFloat(cat.quantity) * 0;
+          pointGained.push(p);
+        }
+      });
+
+      let totalPointGained = 0;
+      let totalWeight = 0;
+
+      pointGained.forEach((a) => {
+        totalPointGained += parseFloat(a);
+      });
+
+      transaction.categories.forEach((a) => {
+        totalWeight += parseFloat(a["quantity"] || 0);
+      });
+
+      const pakamPer = rewardService.calPercentage(totalPointGained, 10);
+
+      const userCoin = Number(totalPointGained) - Number(pakamPer);
+
+      const collector = await collectorModel.findById(schedule.collectedBy);
+      if (collector && collector.collectorType == "waste-picker") {
+        console.log("collector is waste picker");
+      }
+      console.log("collector not a waste picker");
+
+      return res
+        .status(200)
+        .json({ totalPointGained, totalWeight, userCoin, pakamPer });
     } catch (error) {
       console.log(error);
       return res.status(500).json({
