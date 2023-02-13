@@ -100,7 +100,7 @@ payController.saveR = async (req, res) => {
       });
     }
 
-    if (Number(user.availablePoints) < 10) {
+    if (Number(user.availablePoints) < 5000) {
       return res.status(400).json({
         message: "Insufficent Available balance",
       });
