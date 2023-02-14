@@ -23,7 +23,7 @@ areasController.create = async (req, res) => {
 
     if (req.body.lga.includes(" ")) {
       lga = req.body.lga.replace(" ", "-").toLowerCase();
-    } else if (req.body.lcd.includes(" ")) {
+    } else if (req.body.coverageArea.includes(" ")) {
       lcd = req.body.coverageArea.replace(" ", "-").toLowerCase();
     } else {
       lga = req.body.lga.toLowerCase();
