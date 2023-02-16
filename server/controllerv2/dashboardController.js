@@ -719,7 +719,8 @@ const companyAllSchedules = async (criteria, organisationId) => {
 
   const schedules = await scheduleModel
     .find({ ...criteria, organisationCollection: organisationId })
-    .sort({ createdAt: -1 }).limit(100);
+    .sort({ createdAt: -1 })
+    .limit(100);
   return schedules;
 };
 
@@ -727,7 +728,7 @@ const completed = async (criteria) => {
   const totalCompleted = await scheduleModel.countDocuments({
     ...criteria,
     completionStatus: "completed",
-    collectorStatus: "accept",
+    collectorStatus: { $ne: "" },
   });
   return totalCompleted;
 };
@@ -820,7 +821,6 @@ const cancelled = async (criteria) => {
 };
 
 const companyCancelled = async (criteria, organisationId) => {
-  console.log("total cancelled", criteria);
   const totalCancelled = await scheduleModel.countDocuments({
     ...criteria,
     organisationCollection: organisationId,
