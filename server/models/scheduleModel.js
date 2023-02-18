@@ -101,6 +101,9 @@ const schedulePick = new Schema(
     collectedBy: {
       type: String,
     },
+    collectorType: {
+      type: String,
+    },
     collectedPhone: {
       type: String,
     },

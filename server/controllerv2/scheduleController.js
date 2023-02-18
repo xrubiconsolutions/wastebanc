@@ -851,8 +851,8 @@ class ScheduleService {
         { email: scheduler.email },
         {
           $set: {
-            //availablePoints:scheduler.availablePoints + userCoin,
-            ledgerPoints: newledgerBalance,
+            availablePoints: scheduler.availablePoints + userCoin,
+            //ledgerPoints: newledgerBalance,
             schedulePoints: scheduler.schedulePoints + 1,
           },
         }
@@ -1191,6 +1191,7 @@ class ScheduleService {
             organisationCollection: user.approvedBy,
             recycler: user.fullname,
             acceptedDate: new Date(),
+            collectorType: user.collectorType,
           },
         }
       );
@@ -1297,34 +1298,34 @@ class ScheduleService {
         });
       }
 
-      const userpoint = scheduler.ledgerPoints.find(
-        (schedule) => schedule.scheduleId == scheduleId
-      );
+      // const userpoint = scheduler.ledgerPoints.find(
+      //   (schedule) => schedule.scheduleId == scheduleId
+      // );
 
-      if (userpoint) {
-        const newledgerPoints = scheduler.ledgerPoints.filter(
-          (schedule) => schedule.scheduleId != scheduleId
-        );
-        scheduler.availablePoints = scheduler.availablePoints + userpoint.point;
-        scheduler.ledgerPoints = newledgerPoints;
-        scheduler.save();
+      // if (userpoint) {
+      //   const newledgerPoints = scheduler.ledgerPoints.filter(
+      //     (schedule) => schedule.scheduleId != scheduleId
+      //   );
+      //   scheduler.availablePoints = scheduler.availablePoints + userpoint.point;
+      //   scheduler.ledgerPoints = newledgerPoints;
+      //   scheduler.save();
 
-        schedule.scheduleApproval = "true";
-        schedule.approvedBy = {
-          user: "company",
-          email: user.email.trim(),
-          userId: user._id,
-        };
-        schedule.approvalDate = new Date();
-        schedule.save();
+      //   schedule.scheduleApproval = "true";
+      //   schedule.approvedBy = {
+      //     user: "company",
+      //     email: user.email.trim(),
+      //     userId: user._id,
+      //   };
+      //   schedule.approvalDate = new Date();
+      //   schedule.save();
 
-        await transactionModel.updateOne(
-          { scheduleId: schedule._id.toString() },
-          {
-            approval: "true",
-          }
-        );
-      }
+      //   await transactionModel.updateOne(
+      //     { scheduleId: schedule._id.toString() },
+      //     {
+      //       approval: "true",
+      //     }
+      //   );
+      // }
 
       const collector = await collectorModel.findById(schedule.collectedBy);
 
@@ -1341,6 +1342,22 @@ class ScheduleService {
               collector.pointGained + collectorPoint.point;
             collector.ledgerPoints = newpoints;
             collector.save();
+
+            schedule.scheduleApproval = "true";
+            schedule.approvedBy = {
+              user: "company",
+              email: user.email.trim(),
+              userId: user._id,
+            };
+            schedule.approvalDate = new Date();
+            schedule.save();
+
+            await transactionModel.updateOne(
+              { scheduleId: schedule._id.toString() },
+              {
+                approval: "true",
+              }
+            );
           }
         }
       }
@@ -1447,34 +1464,34 @@ class ScheduleService {
         });
       }
 
-      const userpoint = scheduler.ledgerPoints.find(
-        (schedule) => schedule.scheduleId == scheduleId
-      );
+      // const userpoint = scheduler.ledgerPoints.find(
+      //   (schedule) => schedule.scheduleId == scheduleId
+      // );
 
-      if (userpoint) {
-        const newledgerPoints = scheduler.ledgerPoints.filter(
-          (schedule) => schedule.scheduleId != scheduleId
-        );
-        scheduler.availablePoints = scheduler.availablePoints + userpoint.point;
-        scheduler.ledgerPoints = newledgerPoints;
-        scheduler.save();
+      // if (userpoint) {
+      //   const newledgerPoints = scheduler.ledgerPoints.filter(
+      //     (schedule) => schedule.scheduleId != scheduleId
+      //   );
+      //   scheduler.availablePoints = scheduler.availablePoints + userpoint.point;
+      //   scheduler.ledgerPoints = newledgerPoints;
+      //   scheduler.save();
 
-        schedule.scheduleApproval = "true";
-        schedule.approvedBy = {
-          user: user.displayRole || user.roles,
-          email: user.email.trim(),
-          userId: user._id,
-        };
-        schedule.approvalDate = new Date();
-        schedule.save();
+      //   schedule.scheduleApproval = "true";
+      //   schedule.approvedBy = {
+      //     user: user.displayRole || user.roles,
+      //     email: user.email.trim(),
+      //     userId: user._id,
+      //   };
+      //   schedule.approvalDate = new Date();
+      //   schedule.save();
 
-        await transactionModel.updateOne(
-          { scheduleId: schedule._id.toString() },
-          {
-            approval: "true",
-          }
-        );
-      }
+      //   await transactionModel.updateOne(
+      //     { scheduleId: schedule._id.toString() },
+      //     {
+      //       approval: "true",
+      //     }
+      //   );
+      // }
 
       const collector = await collectorModel.findById(schedule.collectedBy);
 
@@ -1496,6 +1513,22 @@ class ScheduleService {
           collector.pointGained = collector.pointGained + collectorPoint.point;
           collector.ledgerPoints = newpoints;
           collector.save();
+
+          schedule.scheduleApproval = "true";
+          schedule.approvedBy = {
+            user: user.displayRole || user.roles,
+            email: user.email.trim(),
+            userId: user._id,
+          };
+          schedule.approvalDate = new Date();
+          schedule.save();
+
+          await transactionModel.updateOne(
+            { scheduleId: schedule._id.toString() },
+            {
+              approval: "true",
+            }
+          );
         }
       }
 
