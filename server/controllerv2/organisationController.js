@@ -1100,7 +1100,7 @@ organisationController.disableCompany = async (req, res) => {
       {
         organisationID: company._id.toString(),
       },
-      { status: "disabled" }
+      { status: "disabled", isDisabled: true }
     );
 
     // add action to log
@@ -1148,7 +1148,7 @@ organisationController.enableCompany = async (req, res) => {
       {
         organisation: company.companyName,
       },
-      { status: "active" }
+      { status: "active", isDisabled: false }
     );
 
     // add action to log
