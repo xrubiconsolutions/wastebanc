@@ -113,7 +113,7 @@ const organisationOnboardingData = (email, password) => {
             <p><strong>How To Use The Dashboard</strong></p></br>
             <p>*Attached below is a guide on how to use the Company Dashboard.</p></br>
             <p>How To Use The Dashboard</p></br>
-            <p>Kindly Logon to https://newdashboard.pakam.ng</p></br>
+            <p>Kindly Logon to https://dashboard.pakam.ng</p></br>
             <p>
               <ol>
                 <li>Select Recycling Company</li>
