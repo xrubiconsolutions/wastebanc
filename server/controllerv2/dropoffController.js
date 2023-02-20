@@ -286,7 +286,7 @@ dropoffController.companydropOffs = async (req, res) => {
       state,
       key,
       scheduleApproval = { $ne: "" },
-      completionStatus = "pending"
+      completionStatus = "pending",
     } = req.query;
     const { companyName: organisation } = req.user;
 
@@ -345,13 +345,13 @@ dropoffController.companydropOffs = async (req, res) => {
         },
         organisation,
         //scheduleApproval,
-        completionStatus
+        completionStatus,
       };
     } else {
       criteria = {
         organisation,
         //scheduleApproval,
-        completionStatus
+        completionStatus,
       };
     }
 
@@ -539,20 +539,20 @@ dropoffController.rewardDropSystem = async (req, res) => {
       return res.status(400).json(householdReward);
     }
 
-    let wastePickerCoin = 0;
-    let wastePickerPercentage = 0;
-    let collectorPoint = collector.pointGained || 0;
-    if (collector.collectorType == "waste-picker") {
-      const wastepickerReward = await rewardService.picker(cat, organisation);
-      if (!wastepickerReward.error) {
-        wastePickerCoin = wastepickerReward.totalpointGained;
-        wastePickerPercentage = rewardService.calPercentage(
-          wastepickerReward.totalpointGained,
-          10
-        );
-        collectorPoint = wastePickerCoin - wastePickerPercentage;
-      }
-    }
+    // let wastePickerCoin = 0;
+    // let wastePickerPercentage = 0;
+    // let collectorPoint = collector.pointGained || 0;
+    // if (collector.collectorType == "waste-picker") {
+    //   const wastepickerReward = await rewardService.picker(cat, organisation);
+    //   if (!wastepickerReward.error) {
+    //     wastePickerCoin = wastepickerReward.totalpointGained;
+    //     wastePickerPercentage = rewardService.calPercentage(
+    //       wastepickerReward.totalpointGained,
+    //       10
+    //     );
+    //     collectorPoint = wastePickerCoin - wastePickerPercentage;
+    //   }
+    // }
 
     const userCoin =
       Number(householdReward.totalpointGained) - Number(pakamPercentage);
@@ -598,28 +598,19 @@ dropoffController.rewardDropSystem = async (req, res) => {
       //include_player_ids: [`${scheduler.onesignal_id}`],
     };
 
-    await notificationModel.create({
-      title: "Dropoff Schedule completed",
-      lcd: scheduler.lcd,
-      message: `You have just been credited ${t.coin} for your ${items} drop off`,
-      schedulerId: scheduler._id,
-    });
+    // const userledgerBalance = {
+    //   dropoffId: dropoffs._id.toString(),
+    //   point: scheduler.availablePoints + userCoin,
+    // };
+    // const collectorledgerBalance = {
+    //   dropoffId: dropoffs._id.toString(),
+    //   point: collectorPoint + collector.pointGained,
+    // };
 
-    sendNotification(message);
-
-    const userledgerBalance = {
-      dropoffId: dropoffs._id.toString(),
-      point: scheduler.availablePoints + userCoin,
-    };
-    const collectorledgerBalance = {
-      dropoffId: dropoffs._id.toString(),
-      point: collectorPoint + collector.pointGained,
-    };
-
-    let newledgerBalance = scheduler.ledgerPoints || [];
-    let newCollectorLedgerBalance = collector.ledgerPoints || [];
-    newledgerBalance.push(userledgerBalance);
-    newCollectorLedgerBalance.push(collectorledgerBalance);
+    // let newledgerBalance = scheduler.ledgerPoints || [];
+    // let newCollectorLedgerBalance = collector.ledgerPoints || [];
+    // newledgerBalance.push(userledgerBalance);
+    // newCollectorLedgerBalance.push(collectorledgerBalance);
 
     await scheduleDropModel.updateOne(
       { _id: dropoffs._id },
@@ -644,20 +635,20 @@ dropoffController.rewardDropSystem = async (req, res) => {
       }
     );
 
-    await collectorModel.updateOne(
-      { _id: collector._id },
-      {
-        $set: {
-          totalCollected:
-            collector.totalCollected + householdReward.totalWeight,
-          numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
-          pointGained: collectorPoint + collector.pointGained,
-          //ledgerPoints: newCollectorLedgerBalance,
-          busy: false,
-          last_logged_in: new Date(),
-        },
-      }
-    );
+    // await collectorModel.updateOne(
+    //   { _id: collector._id },
+    //   {
+    //     $set: {
+    //       totalCollected:
+    //         collector.totalCollected + householdReward.totalWeight,
+    //       numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
+    //       pointGained: collectorPoint + collector.pointGained,
+    //       //ledgerPoints: newCollectorLedgerBalance,
+    //       busy: false,
+    //       last_logged_in: new Date(),
+    //     },
+    //   }
+    // );
 
     // store the user activity for both scheduler and collector
     // collector
@@ -674,6 +665,16 @@ dropoffController.rewardDropSystem = async (req, res) => {
       message: `Dropoff completed. Reference ID: ${t.ref_id}`,
       activity_type: "dropoff",
     });
+
+    await notificationModel.create({
+      title: "Dropoff Schedule completed",
+      lcd: scheduler.lcd,
+      message: `You have just been credited ${t.coin} for your ${items} drop off`,
+      schedulerId: scheduler._id,
+    });
+
+    sendNotification(message);
+
     return res.status(200).json({
       error: false,
       message: "Dropoff completed successfully",
