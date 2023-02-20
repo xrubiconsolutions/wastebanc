@@ -286,6 +286,7 @@ dropoffController.companydropOffs = async (req, res) => {
       state,
       key,
       scheduleApproval = { $ne: "" },
+      completionStatus = "pending"
     } = req.query;
     const { companyName: organisation } = req.user;
 
@@ -325,7 +326,8 @@ dropoffController.companydropOffs = async (req, res) => {
           { Category: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         organisation,
-        scheduleApproval,
+        //scheduleApproval,
+        completionStatus,
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -342,12 +344,14 @@ dropoffController.companydropOffs = async (req, res) => {
           $lt: endDate,
         },
         organisation,
-        scheduleApproval,
+        //scheduleApproval,
+        completionStatus
       };
     } else {
       criteria = {
         organisation,
-        scheduleApproval,
+        //scheduleApproval,
+        completionStatus
       };
     }
 
