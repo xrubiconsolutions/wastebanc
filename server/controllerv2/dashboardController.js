@@ -166,8 +166,9 @@ dashboardController.companyCardMapData = async (req, res) => {
     const totalDropOff = await companyDropOffs(criteria, organisationId);
     const totalMissed = await companyMissed(criteria, organisationId);
     const totalCompleted = await companyCompleted(criteria, organisationId);
-    const totalPending = await companyPending(criteria, organisationId);
+
     const totalCancelled = await companyCancelled(criteria, organisationId);
+    const totalPending = await companyPending(criteria, organisationId);
 
     return res.status(200).json({
       error: false,
@@ -803,13 +804,40 @@ const pending = async (criteria) => {
 };
 
 const companyPending = async (criteria, organisationId) => {
-  const totalPending = await scheduleModel.countDocuments({
-    ...criteria,
-    organisationCollection: organisationId,
+  console.log("cat", criteria);
+  const newCat = { ...criteria };
+  delete newCat.organisationCollection;
+  console.log("n", newCat);
+  const active_today = new Date();
+  active_today.setHours(0);
+  active_today.setMinutes(0);
+
+  const totalPending = await scheduleModel.find({
+    ...newCat,
+    expiryDuration: {
+      $gt: active_today,
+    },
+    //organisationCollection: organisationId,
     completionStatus: "pending",
     collectorStatus: "decline",
   });
-  return totalPending;
+
+  const company = await organisationModel.findById(organisationId);
+
+  const accessArea = company.streetOfAccess;
+
+  let schedules = [];
+
+  totalPending.forEach((schedule) => {
+    if (accessArea.includes(schedule.lcd)) {
+      schedules.push(schedule);
+    }
+  });
+
+  // remove duplicate schedules
+  schedules = [...new Set(schedules)];
+
+  return schedules.length;
 };
 
 const cancelled = async (criteria) => {
@@ -839,6 +867,7 @@ const companyDropOffs = async (criteria, organisationId) => {
   console.log("total dropoffs", criteria);
   const totalResult = await scheduleDropModel.countDocuments({
     ...criteria,
+    completionStatus: "pending",
     organisationCollection: organisationId,
   });
   return totalResult;
