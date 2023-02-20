@@ -470,12 +470,16 @@ class CollectorService {
 
     // constructs criteria to find schedules
     const schedulesCriteria = {
-      pickUpDate: {
-        $gte: active_today,
-        $lt: nextWeek,
+      // pickUpDate: {
+      //   $gte: active_today,
+      //   $lt: nextWeek,
+      // },
+      expiryDuration: {
+        $gt: active_today,
       },
+      state: req.user.state || "Lagos",
       completionStatus: "pending",
-      collectorStatus: { $ne: "accept" },
+      collectorStatus: "decline",
     };
     try {
       const company = await organisationModel.findById(organisationId);
@@ -483,7 +487,9 @@ class CollectorService {
       const accessArea = company.streetOfAccess;
 
       // initial schedules
-      const initSchedules = await scheduleModel.find(schedulesCriteria);
+      const initSchedules = await scheduleModel
+        .find(schedulesCriteria)
+        .sort({pickUpDate:1});
 
       // result schedules accumlation list
       let schedules = [];
@@ -491,13 +497,19 @@ class CollectorService {
       // for every area in company's access area, find schedules for which have
       // the schedule's lcd matches the current area or the current area is
       // included in the schedule's address
-      accessArea.forEach((area) => {
-        const matchSchedules = initSchedules.filter(
-          (schedule) =>
-            schedule?.address?.toLowerCase().indexOf(area?.toLowerCase()) >
-              -1 || schedule?.lcd === area
-        );
-        schedules = schedules.concat(matchSchedules);
+      // accessArea.forEach((area) => {
+      //   const matchSchedules = initSchedules.filter(
+      //     (schedule) =>
+      //       schedule?.address?.toLowerCase().indexOf(area?.toLowerCase()) >
+      //         -1 || schedule?.lcd === area
+      //   );
+      //   schedules = schedules.concat(matchSchedules);
+      // });
+
+      initSchedules.forEach((schedule) => {
+        if (accessArea.includes(schedule.lcd)) {
+          schedules.push(schedule);
+        }
       });
 
       // remove duplicate schedules
