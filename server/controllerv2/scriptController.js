@@ -13,6 +13,8 @@ const {
   scheduleDropModel,
 } = require("../models");
 const axios = require("axios");
+const { organisationOnboardingMail } = require("../services/sendEmail");
+const { generateRandomString } = require("../util/commonFunction");
 
 class ScriptController {
   static async charitModelScript(req, res) {
@@ -223,6 +225,47 @@ class ScriptController {
       res.status(500).json({
         error: true,
         message: "An error occured",
+      });
+    }
+  }
+
+  static async resendOnboardMail(req, res) {
+    const { type, email } = req.body;
+    const password = generateRandomString();
+
+    const accountModels = {
+      organisation: organisationModel,
+    };
+
+    // get the model of the type of account
+    const model = accountModels[type];
+    const account = await model.findOne({ email }, { password: 0 });
+
+    // find account or return error if not found
+    if (!account)
+      return res.status(404).json({
+        error: true,
+        message: "Account not found",
+      });
+
+    const accountResend = {
+      organisation: async () =>
+        await organisationOnboardingMail(email, password),
+    };
+
+    // get the resend function based on type
+    const resendFunc = accountResend[type];
+    const done = await resendFunc();
+
+    return res.status(200).json({
+      error: false,
+      message: "Mail sent!",
+    });
+    try {
+    } catch (error) {
+      res.status(500).json({
+        error: true,
+        message: "An error occured!",
       });
     }
   }

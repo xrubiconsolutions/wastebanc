@@ -18,4 +18,10 @@ module.exports = (APP) => {
     checkRequestErrs,
     ScriptController.UserSmsScript
   );
+  APP.route("/api/v2/script/resend-onboard-mail").get(
+    adminPakamValidation,
+    scriptValidator.resendMail,
+    checkRequestErrs,
+    ScriptController.resendOnboardMail
+  );
 };
