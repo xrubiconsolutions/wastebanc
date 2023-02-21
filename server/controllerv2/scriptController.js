@@ -233,35 +233,38 @@ class ScriptController {
     const { type, email } = req.body;
     const password = generateRandomString();
 
-    const accountModels = {
-      organisation: organisationModel,
-    };
-
-    // get the model of the type of account
-    const model = accountModels[type];
-    const account = await model.findOne({ email }, { password: 0 });
-
-    // find account or return error if not found
-    if (!account)
-      return res.status(404).json({
-        error: true,
-        message: "Account not found",
-      });
-
-    const accountResend = {
-      organisation: async () =>
-        await organisationOnboardingMail(email, password),
-    };
-
-    // get the resend function based on type
-    const resendFunc = accountResend[type];
-    const done = await resendFunc();
-
-    return res.status(200).json({
-      error: false,
-      message: "Mail sent!",
-    });
     try {
+      const accountModels = {
+        organisation: organisationModel,
+      };
+
+      // get the model of the type of account
+      const model = accountModels[type];
+      const account = await model.findOne({ email });
+
+      // find account or return error if not found
+      if (!account)
+        return res.status(404).json({
+          error: true,
+          message: "Account not found",
+        });
+
+      const accountResend = {
+        organisation: async () =>
+          await organisationOnboardingMail(email, password),
+      };
+
+      account.password = password;
+      await account.save();
+
+      // get the resend function based on type
+      const resendFunc = accountResend[type];
+      const done = await resendFunc();
+
+      return res.status(200).json({
+        error: false,
+        message: "Mail sent!",
+      });
     } catch (error) {
       res.status(500).json({
         error: true,
