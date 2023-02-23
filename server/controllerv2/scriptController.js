@@ -272,6 +272,38 @@ class ScriptController {
       });
     }
   }
+
+  static async transactionScript(req, res) {
+    try {
+      const transactions = await transactionModel.find({
+        categories: { $exists: false },
+      });
+      if (transactions.length > 0) {
+        transactions.forEach(async (transaction) => {
+          await transactionModel.updateOne(
+            { _id: transaction._id },
+            {
+              $set: {
+                categories: [
+                  {
+                    name: transaction.Category,
+                    catId: null,
+                  },
+                ],
+              },
+            }
+          );
+        });
+      }
+      return res.status(200).json({ error: false, message: "Done" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occured!",
+      });
+    }
+  }
 }
 
 module.exports = ScriptController;

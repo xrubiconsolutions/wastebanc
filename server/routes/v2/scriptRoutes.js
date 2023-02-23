@@ -12,6 +12,9 @@ module.exports = (APP) => {
   APP.route("/api/v2/script/schedulepickup").get(
     ScriptController.SchedulePickModelScript
   );
+  APP.route("/api/v2/script/transactions").get(
+    ScriptController.transactionScript
+  );
   APP.route("/api/v2/script/users-sms").post(
     adminPakamValidation,
     scriptValidator.usersSMS,
