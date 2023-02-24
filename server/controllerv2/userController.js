@@ -560,6 +560,7 @@ class UserService {
 
   static async login(req, res) {
     try {
+      console.log("phone", phone);
       const user = await userModel.findOne({
         phone: req.body.phone,
       });
