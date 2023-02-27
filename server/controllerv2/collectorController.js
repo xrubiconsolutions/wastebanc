@@ -489,7 +489,7 @@ class CollectorService {
       // initial schedules
       const initSchedules = await scheduleModel
         .find(schedulesCriteria)
-        .sort({pickUpDate:1});
+        .sort({ pickUpDate: 1 });
 
       // result schedules accumlation list
       let schedules = [];
@@ -1095,7 +1095,7 @@ class CollectorService {
           },
           createdAt: 1,
           weight: {
-            $ifNull: ["$categories.quantity", "$weight"],
+            $sum: { $ifNull: ["$categories.quantity", "$weight"] },
           },
         },
       },
