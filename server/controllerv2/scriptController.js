@@ -14,7 +14,10 @@ const {
 } = require("../models");
 const axios = require("axios");
 const { organisationOnboardingMail } = require("../services/sendEmail");
-const { generateRandomString } = require("../util/commonFunction");
+const {
+  generateRandomString,
+  encryptPassword,
+} = require("../util/commonFunction");
 
 class ScriptController {
   static async charitModelScript(req, res) {
@@ -254,7 +257,7 @@ class ScriptController {
           await organisationOnboardingMail(email, password),
       };
 
-      account.password = password;
+      account.password = await encryptPassword(password);
       await account.save();
 
       // get the resend function based on type
