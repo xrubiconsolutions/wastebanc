@@ -901,6 +901,7 @@ class CollectorService {
           pin_id: send.data.pinId,
           terms_condition: create.terms_condition,
           aggregatorId: create.aggregatorId,
+          requestedAmount: create.requestedAmount,
           token,
         },
       });
@@ -2120,7 +2121,11 @@ class CollectorService {
       return res.status(200).json({
         error: false,
         message: "Point Balance",
-        data: { balance: collector.pointGained, ledgerBalance },
+        data: {
+          balance: collector.pointGained,
+          ledgerBalance,
+          requestedAmount: 0,
+        },
       });
     } catch (error) {
       console.log(error);

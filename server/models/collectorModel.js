@@ -174,6 +174,10 @@ const collector_Schema = new Schema({
     default: "PENDING",
     enum: ["PENDING", "APPROVED", "DECLINED"],
   },
+  requestedAmount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = MONGOOSE.model("Collector", collector_Schema);

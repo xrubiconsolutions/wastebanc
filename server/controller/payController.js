@@ -501,6 +501,7 @@ payController.afterPayment = async (req, res) => {
       token,
       charge: 100,
       withdrawableAmount: user.availablePoints - 100,
+      requestedAmount:user.requestedAmount,
       ledgerBalance,
     };
     return res

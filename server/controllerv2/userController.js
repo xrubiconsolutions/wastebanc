@@ -383,6 +383,7 @@ class UserService {
           // uType: create.uType,
           // organisationType: create.organisationType,
           organisationName: typename.name,
+          requestedAmount: create.requestedAmount,
           token,
         },
       });
@@ -746,6 +747,7 @@ class UserService {
           last_logged_in: user.last_logged_in,
           firstLogin: user.firstLogin,
           terms_condition: user.terms_condition,
+          requestedAmount: user.requestedAmount,
           token,
         },
       });
