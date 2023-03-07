@@ -4,6 +4,17 @@ const MONGOOSE = require("mongoose");
 const Schema = MONGOOSE.Schema;
 const Constants = require("../util/constants");
 
+const GeoSchema = new Schema({
+  type: {
+    type: String,
+    default: "Point",
+  },
+  coordinates: {
+    type: [Number],
+    index: "2dsphere",
+  },
+});
+
 /**************************************************
  ************* User Model or collection ***********
  **************************************************/
@@ -21,6 +32,7 @@ const dropOff_Schema = new Schema(
       type: String,
       required: true,
     },
+
     location: {
       type: {
         address: {
@@ -28,11 +40,11 @@ const dropOff_Schema = new Schema(
           required: true,
         },
         lat: {
-          type: String,
+          type: Number,
           required: true,
         },
         long: {
-          type: String,
+          type: Number,
           required: true,
         },
       },
@@ -56,6 +68,16 @@ const dropOff_Schema = new Schema(
     //   type: Date,
     //   default: Date.now,
     // },
+
+    newLocation: GeoSchema,
+    status: {
+      type: String,
+      default: "active",
+    },
+    orgID: {
+      type: Schema.Types.ObjectId,
+      ref: "Organisation",
+    },
   },
   { timestamps: true }
 );

@@ -7895,93 +7895,138 @@ organisationController.getCompletedSchedulesDrop = (req, res) => {
   }
 };
 
+// organisationController.getDropOffUser = async (req, res) => {
+//   const lat = req.query.lat;
+//   const long = req.query.long;
+//   function rad(x) {
+//     return (x * Math.PI) / 180;
+//   }
+
+//   const getDistance = function (p1, p2) {
+//     let R = 6378137; // Earth’s mean radius in meter
+//     let dLat = rad(p2.lat - p1.lat);
+//     let dLong = rad(p2.long - p1.long);
+
+//     let a =
+//       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+//       Math.cos(rad(p1.lat)) *
+//         Math.cos(rad(p2.lat)) *
+//         Math.sin(dLong / 2) *
+//         Math.sin(dLong / 2);
+//     let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+//     let d = R * c;
+//     return d;
+//   };
+
+//   try {
+//     var nearestLocation = [];
+//     var nearestDistances = [];
+//     var addresses = [];
+//     var datum = [];
+
+//     const d = await MODEL.dropOffModel.find({});
+//     for (let i = 0; i < d.length; i++) {
+//       getDistance(d[i].location, { lat, long });
+
+//       nearestLocation.push(d[i].location);
+//       nearestDistances.push(getDistance(d[i].location, { lat, long }));
+//       datum.push(d[i]);
+//     }
+
+//     await Promise.all(
+//       datum
+//         .map(async (address) => {
+//           const categories = await MODEL.organisationModel
+//             .findById(address.organisationId)
+//             .select("categories");
+//           let r = {
+//             Organisation: address.organisation,
+//             phone: address.phone,
+
+//             OrganisationId: address.organisationId,
+//             distance: getDistance(address.location, { lat, long }),
+
+//             location: address.location,
+//             categories,
+//           };
+//           addresses.push(r);
+//         })
+//         .sort((a, b) => a.distance - b.distance)
+//     );
+
+//     return res.status(200).json(addresses);
+
+//     // MODEL.dropOffModel.find({}).then((drop) => {
+//     //   for (let i = 0; i < drop.length; i++) {
+//     //     getDistance(drop[i].location, { lat, long });
+
+//     //     nearestLocation.push(drop[i].location);
+//     //     nearestDistances.push(getDistance(drop[i].location, { lat, long }));
+//     //     datum.push(drop[i]);
+//     //   }
+//     //   addresses = datum
+//     //     .map((address) => ({
+//     //       Organisation: address.organisation,
+//     //       phone: address.phone,
+
+//     //       OrganisationId: address.organisationId,
+//     //       distance: getDistance(address.location, { lat, long }),
+
+//     //       location: address.location,
+//     //     }))
+//     //     .sort((a, b) => a.distance - b.distance);
+//     //   return res.status(200).json(addresses);
+//     // });
+//   } catch (err) {
+//     return res.status(500).json(err);
+//   }
+// };
+
 organisationController.getDropOffUser = async (req, res) => {
-  const lat = req.query.lat;
-  const long = req.query.long;
-  function rad(x) {
-    return (x * Math.PI) / 180;
-  }
-
-  const getDistance = function (p1, p2) {
-    let R = 6378137; // Earth’s mean radius in meter
-    let dLat = rad(p2.lat - p1.lat);
-    let dLong = rad(p2.long - p1.long);
-
-    let a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(rad(p1.lat)) *
-        Math.cos(rad(p2.lat)) *
-        Math.sin(dLong / 2) *
-        Math.sin(dLong / 2);
-    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    let d = R * c;
-    return d;
-  };
-
   try {
-    var nearestLocation = [];
-    var nearestDistances = [];
-    var addresses = [];
-    var datum = [];
+    const { lat, long } = req.query;
 
-    const d = await MODEL.dropOffModel.find({});
-    for (let i = 0; i < d.length; i++) {
-      getDistance(d[i].location, { lat, long });
+    const results = await MODEL.dropOffModel
+      .find({
+        newLocation: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [long, lat],
+            },
+            $minDistance: 1000,
+            $maxDistance: 5000,
+          },
+        },
+      })
+      .populate("orgID", "categories")
+      .lean();
 
-      nearestLocation.push(d[i].location);
-      nearestDistances.push(getDistance(d[i].location, { lat, long }));
-      datum.push(d[i]);
-    }
+    const addresses = [];
 
-    await Promise.all(
-      datum
-        .map(async (address) => {
-          const categories = await MODEL.organisationModel
-            .findById(address.organisationId)
-            .select("categories");
-          let r = {
-            Organisation: address.organisation,
-            phone: address.phone,
+    results.forEach((result) => {
+      const r = {
+        Organisation: result.organisation,
+        phone: result.phone,
 
-            OrganisationId: address.organisationId,
-            distance: getDistance(address.location, { lat, long }),
+        OrganisationId: result.organisationId,
+        distance: 0,
 
-            location: address.location,
-            categories,
-          };
-          addresses.push(r);
-        })
-        .sort((a, b) => a.distance - b.distance)
-    );
+        location: result.location,
+        categories: result.orgID.categories,
+      };
+      addresses.push(r);
+    });
 
     return res.status(200).json(addresses);
-
-    // MODEL.dropOffModel.find({}).then((drop) => {
-    //   for (let i = 0; i < drop.length; i++) {
-    //     getDistance(drop[i].location, { lat, long });
-
-    //     nearestLocation.push(drop[i].location);
-    //     nearestDistances.push(getDistance(drop[i].location, { lat, long }));
-    //     datum.push(drop[i]);
-    //   }
-    //   addresses = datum
-    //     .map((address) => ({
-    //       Organisation: address.organisation,
-    //       phone: address.phone,
-
-    //       OrganisationId: address.organisationId,
-    //       distance: getDistance(address.location, { lat, long }),
-
-    //       location: address.location,
-    //     }))
-    //     .sort((a, b) => a.distance - b.distance);
-    //   return res.status(200).json(addresses);
-    // });
-  } catch (err) {
-    return res.status(500).json(err);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
   }
 };
-
 organisationController.sendInvoiceMail = (req, res) => {
   const organisationId = req.body.organisationId;
   const file = req.body.file || " ";

@@ -11,6 +11,7 @@ const {
   charityModel,
   payModel,
   scheduleDropModel,
+  dropOffModel,
 } = require("../models");
 const axios = require("axios");
 const { organisationOnboardingMail } = require("../services/sendEmail");
@@ -299,6 +300,41 @@ class ScriptController {
         });
       }
       return res.status(200).json({ error: false, message: "Done" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occured!",
+      });
+    }
+  }
+
+  static async updateDropOffLocations(req, res) {
+    try {
+      const locations = await dropOffModel.find({});
+      await Promise.all(
+        locations.forEach(async (location) => {
+          console.log("loca", location);
+          const newLocation = {
+            type: "Point",
+            coordinates: [Number(location.location.long), Number(location.location.lat)],
+          };
+          //console.log('n', newLocation);
+          await dropOffModel.updateOne(
+            { _id: location._id },
+            {
+              $set: {
+                newLocation,
+                status: "active",
+                orgID: location.organisationId,
+              },
+            }
+          );
+        })
+      );
+      return res.status(200).json({
+        message: "Done",
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({

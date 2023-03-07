@@ -27,4 +27,6 @@ module.exports = (APP) => {
     checkRequestErrs,
     ScriptController.resendOnboardMail
   );
+
+  APP.route("/api/v2/script/dropofflocation").get(ScriptController.updateDropOffLocations);
 };
