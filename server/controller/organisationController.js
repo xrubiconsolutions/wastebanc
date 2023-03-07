@@ -8005,6 +8005,7 @@ organisationController.getDropOffUser = async (req, res) => {
     const addresses = [];
 
     results.forEach((result) => {
+      console.log('resu', result.orgID);
       const r = {
         Organisation: result.organisation,
         phone: result.phone,
@@ -8013,7 +8014,7 @@ organisationController.getDropOffUser = async (req, res) => {
         distance: 0,
 
         location: result.location,
-        categories: result.orgID.categories,
+        categories: result.orgID.categories || [],
       };
       addresses.push(r);
     });
