@@ -7998,27 +7998,32 @@ organisationController.getDropOffUser = async (req, res) => {
             $maxDistance: 5000,
           },
         },
+        status: "active",
       })
+
       .populate("orgID", "categories")
       .lean();
 
     const addresses = [];
 
-    results.forEach((result) => {
-      console.log('resu', result.orgID);
-      const r = {
-        Organisation: result.organisation,
-        phone: result.phone,
+    if (results.length > 0) {
+      results.forEach((result) => {
+        console.log("resu", result.orgID);
+        const r = {
+          Organisation: result.organisation,
+          phone: result.phone,
 
-        OrganisationId: result.organisationId,
-        distance: 0,
+          OrganisationId: result.organisationId,
+          distance: 0,
 
-        location: result.location,
-        categories: result.orgID.categories || [],
-      };
-      addresses.push(r);
-    });
+          location: result.location,
+          categories: result.orgID.categories || [],
+        };
+        addresses.push(r);
+      });
 
+      return res.status(200).json(addresses);
+    }
     return res.status(200).json(addresses);
   } catch (error) {
     console.log(error);
