@@ -49,9 +49,7 @@ module.exports = {
     body("localGovernment")
       .optional()
       .isString("localGovernment should be string"),
-    body("profile_picture")
-      .optional()
-      .isString("profile_picture should be string"),
+    body("profile_picture").optional(),
   ],
 
   createPicker: [
