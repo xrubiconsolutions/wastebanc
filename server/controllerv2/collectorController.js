@@ -1656,24 +1656,21 @@ class CollectorService {
       await collectorModel.updateOne(
         { _id: user._id },
         {
-          $set: {
-            email,
-            phone: user.phone,
-            gender: req.body.gender.toLowerCase() || user.gender,
-            dateOfBirth: req.body.dateOfBirth,
-            address: req.body.address,
-            fullname: req.body.fullname.trim().toLowerCase(),
-            country: req.body.country || user.country,
-            state: req.body.state || user.state,
-            place: req.body.place || user.place,
-            aggregatorId: req.body.aggregatorId,
-            organisation: req.body.organisation || user.organisation,
-            organisationId: organisationId,
-            localGovernment: req.body.localGovernment,
-            profile_picture: req.body.profile_picture,
-            areaOfAccess:
-              organisation.streetOfAccess || user.areaOfAccess || [],
-          },
+          email,
+          phone: user.phone,
+          gender: req.body.gender || user.gender,
+          dateOfBirth: req.body.dateOfBirth,
+          address: req.body.address,
+          fullname: req.body.fullname,
+          country: req.body.country || user.country,
+          state: req.body.state || user.state,
+          place: req.body.place || user.place,
+          aggregatorId: req.body.aggregatorId,
+          organisation: req.body.organisation || user.organisation,
+          organisationId: organisationId,
+          localGovernment: req.body.localGovernment,
+          profile_picture: req.body.profile_picture,
+          areaOfAccess: organisation.streetOfAccess || user.areaOfAccess || [],
         }
       );
 
