@@ -409,7 +409,11 @@ dropoffController.deleteDropOff = async (req, res) => {
 dropoffController.addDropOffLocation = async (req, res) => {
   const dropLocation = { ...req.body };
   try {
-    const drop = await dropOffModel.create(dropLocation);
+    const newLocation = {
+      type: "Point",
+      coordinates: [dropLocation.location.long, dropLocation.location.lat],
+    };
+    const drop = await dropOffModel.create({ ...dropLocation, newLocation });
     return res.status(201).json({
       error: false,
       message: "Drop-off submitted successfully!",
