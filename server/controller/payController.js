@@ -226,6 +226,12 @@ payController.charityP = async (req, res) => {
       });
     }
 
+    if (Number(amount) > Number(user.availablePoints)) {
+      return res.status(400).json({
+        message: "You don't have enough points to complete this transaction",
+      });
+    }
+
     // if (Number(user.availablePoints) < 5000) {
     //   return res.status(400).json({
     //     message: "You don't have enough points to complete this transaction",
@@ -264,8 +270,8 @@ payController.charityP = async (req, res) => {
       approval: "true",
       phone: user.phone,
       paymentResolution: "charity",
-      state:"Lagos",
-      ref_id:Math.floor(100000 + Math.random() * 900000)
+      state: "Lagos",
+      ref_id: Math.floor(100000 + Math.random() * 900000),
     });
 
     SlackService.charityPayment({
@@ -501,7 +507,7 @@ payController.afterPayment = async (req, res) => {
       token,
       charge: 100,
       withdrawableAmount: user.availablePoints - 100,
-      requestedAmount:user.requestedAmount,
+      requestedAmount: user.requestedAmount,
       ledgerBalance,
     };
     return res
