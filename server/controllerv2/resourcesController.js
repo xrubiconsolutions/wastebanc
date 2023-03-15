@@ -205,7 +205,7 @@ class Resources_Service {
     try {
       const ID = new MONGOOSE.Schema.Types.ObjectId(req.params.resourceId);
       const remove = await resourcesModel.deleteOne({
-        _id: ID,
+        _id: req.params.resourceId,
       });
 
       if (!remove) {
