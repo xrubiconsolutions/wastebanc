@@ -1,6 +1,8 @@
 const { resourcesModel } = require("../models");
 const thumbnail = require("youtube-thumbnail");
 
+const MONGOOSE = require("mongoose");
+
 // resource
 class Resources_Service {
   static async addResource(req, res) {
@@ -36,17 +38,80 @@ class Resources_Service {
 
   static async listResources(req, res) {
     try {
-      const resources = await resourcesModel
-        .find({
+      let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      if (!key) {
+        if (!start || !end) {
+          return res.status(400).json({
+            error: true,
+            message: "Please pass a start and end date",
+          });
+        }
+      }
+
+      if (start || end) {
+        if (new Date(start) > new Date(end)) {
+          return res.status(400).json({
+            error: true,
+            message: "Start date cannot be greater than end date",
+          });
+        }
+      }
+
+      let criteria;
+
+      if (key) {
+        criteria = {
+          $or: [
+            { title: { $regex: `.*${key}.*`, $options: "i" } },
+            { message: { $regex: `.*${key}.*`, $options: "i" } },
+          ],
           show: true,
-        })
+        };
+      } else if (start || end) {
+        const [startDate, endDate] = [new Date(start), new Date(end)];
+        endDate.setDate(endDate.getDate() + 1);
+        criteria = {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          show: true,
+        };
+      } else {
+        criteria = {
+          show: true,
+        };
+      }
+
+      const totalResult = await resourcesModel.countDocuments(criteria);
+
+      const resources = await resourcesModel
+        .find(criteria)
         .sort({ createdAt: -1 })
-        .limit(5);
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      // const resources = await resourcesModel
+      //   .find({
+      //     show: true,
+      //   })
+      //   .sort({ createdAt: -1 })
+      //   .limit(5);
 
       return res.status(200).json({
         error: false,
         message: "resources retrieved",
-        data: resources,
+        data: {
+          resources,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
       });
     } catch (error) {
       console.log(error);
@@ -138,8 +203,9 @@ class Resources_Service {
 
   static async removeResource(req, res) {
     try {
+      const ID = new MONGOOSE.Schema.Types.ObjectId(req.params.resourceId);
       const remove = await resourcesModel.deleteOne({
-        _id: req.params.resourceId,
+        _id: ID,
       });
 
       if (!remove) {
