@@ -31,7 +31,7 @@ class invoiceService {
       organisationID: companyId,
       //organisationPaid: false,
       paid: false,
-      requestedForPayment: false,
+      //requestedForPayment: false,
     };
 
     let state = [];
