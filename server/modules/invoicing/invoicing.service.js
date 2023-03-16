@@ -58,7 +58,9 @@ class invoiceService {
       wastePickersTotal = 0,
       totalValue = 0,
       sumPercentage = 0,
-      transId = [];
+      transId = [],
+      householdPercentageTotal = 0,
+      wastePickersPercentageTotal = 0;
 
     const totalResult = await transactionModel.find(criteria);
 
@@ -68,15 +70,29 @@ class invoiceService {
       });
 
       totalResult.forEach((e) => {
+        householdPercentageTotal += e.percentage;
+      });
+
+      totalResult.forEach((e) => {
+        wastePickersPercentageTotal += e.wastePickerPercentage;
+      });
+
+      totalResult.forEach((e) => {
         wastePickersTotal += e.wastePickerCoin;
       });
 
       const charges = organisation.systemCharge || 15;
-      totalValue = householdTotal + wastePickersTotal;
+      const totalHouseholdTotal = householdTotal + householdPercentageTotal;
+      const totalWastePickersTotal =
+        wastePickersTotal + (wastePickersPercentageTotal || 0);
+
+      totalValue = totalHouseholdTotal + totalWastePickersTotal;
 
       sumPercentage = rewardService.calPercentage(totalValue, charges);
       totalValue = totalValue + sumPercentage;
 
+      // console.log("totalH", totalHouseholdTotal);
+      // console.log("totalWas", totalWastePickersTotal);
       transId = totalResult.map((value) => value._id);
 
       const dd = Date.now();
@@ -92,8 +108,8 @@ class invoiceService {
         endDate,
         transactions: transId,
         amount: totalValue.toFixed(2),
-        householdTotal,
-        wastePickersTotal,
+        householdTotal: totalHouseholdTotal.toFixed(2),
+        wastePickersTotal: totalWastePickersTotal.toFixed(2),
         serviceCharge: sumPercentage.toFixed(2),
         expectedPaymentDate,
         state,
@@ -114,8 +130,8 @@ class invoiceService {
         start: invoiceResult.startDate,
         end: invoiceResult.endDate,
         result: totalResult,
-        householdTotal,
-        wastePickersTotal,
+        householdTotal: totalHouseholdTotal.toFixed(2),
+        wastePickersTotal: totalWastePickersTotal.toFixed(2),
         totalValue: totalValue.toFixed(2),
         sumPercentage: sumPercentage.toFixed(2),
         from,
