@@ -29,8 +29,9 @@ class invoiceService {
         $lt: endDate,
       },
       organisationID: companyId,
-      organisationPaid: false,
+      //organisationPaid: false,
       paid: false,
+      requestedForPayment: false,
     };
 
     let state = [];
