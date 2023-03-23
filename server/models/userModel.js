@@ -183,6 +183,8 @@ const user_Schema = new Schema({
   cifNo: { type: String },
   percentageAcc: { type: Number },
   requestedAmount: { type: Number, default:0 },
+  insuranceUser: {type: Boolean, default:false},
+  insurancePolicyID:{ type: String},
 });
 
 user_Schema.pre("save", function (next) {

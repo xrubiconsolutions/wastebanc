@@ -7,6 +7,7 @@
 /***********************************
  **** node module defined here *****
  ***********************************/
+require('dotenv').config()
 const EXPRESS = require("express");
 const BODY_PARSER = require("body-parser");
 const ALLFILES = require("./../filebundle");
