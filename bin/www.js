@@ -7,7 +7,7 @@
 /***********************************
  **** node module defined here *****
  ***********************************/
-require('dotenv').config()
+require("dotenv").config();
 const EXPRESS = require("express");
 const BODY_PARSER = require("body-parser");
 const ALLFILES = require("./../filebundle");
@@ -246,7 +246,10 @@ const io = require("socket.io")(http, {
 
   handlePreflightRequest: (req, res) => {
     res.writeHead(200, {
-      "Access-Control-Allow-Origin": "https://dashboard.pakam.ng",
+      "Access-Control-Allow-Origin": [
+        "https://dashboard.pakam.ng",
+        "https://ft-dev--musical-macaron-c39880.netlify.app",
+      ],
       "Access-Control-Allow-Methods": "GET,POST",
       "Access-Control-Allow-Headers": "Access-Control-Allow-Origin",
       "Access-Control-Allow-Credentials": true,
