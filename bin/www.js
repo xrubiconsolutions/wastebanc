@@ -323,7 +323,14 @@ app.set("view engine", "jade");
 app.use(EXPRESS.static("client"));
 app.use(BODY_PARSER.json({ limit: "50mb" }));
 app.use(BODY_PARSER.urlencoded({ limit: "100mb", extended: false }));
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://dashboard.pakam.ng",
+      "https://ft-dev--musical-macaron-c39880.netlify.app",
+    ],
+  })
+);
 app.use(logger("dev"));
 
 /** middleware for api's logging with deployment mode */
