@@ -328,6 +328,7 @@ app.use(
     origin: [
       "https://dashboard.pakam.ng",
       "https://ft-dev--musical-macaron-c39880.netlify.app",
+      "http://localhost:3000",
     ],
   })
 );
