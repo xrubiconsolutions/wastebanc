@@ -746,7 +746,7 @@ const companyCompleted = async (criteria, organisationId) => {
 };
 
 const organisation = async (criteria) => {
-  const condition = { ...criteria };
+  const condition = { ...criteria, isDisabled: false };
   condition.createAt = condition.createdAt;
   delete condition.createdAt;
 
