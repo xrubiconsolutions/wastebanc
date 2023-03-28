@@ -24,7 +24,14 @@ class UserService {
     try {
       const { user } = req;
       const currentScope = user.locationScope;
-      let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        start,
+        end,
+        key,
+        channel = "mobile",
+      } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
@@ -43,6 +50,7 @@ class UserService {
             { lcd: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           roles: "client",
+          channel,
         };
       } else if (start || end) {
         const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -59,9 +67,13 @@ class UserService {
             $lt: endDate,
           },
           roles: "client",
+          channel,
         };
       } else {
-        criteria = {};
+        criteria = {
+          roles: "client",
+          channel,
+        };
       }
 
       if (!currentScope) {
