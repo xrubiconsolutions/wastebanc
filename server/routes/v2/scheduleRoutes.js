@@ -18,6 +18,13 @@ module.exports = (APP) => {
     ScheduleService.getSchedulesWithFilter
   );
 
+  APP.route("/api/v2/household/schedules").get(
+    adminPakamValidation,
+    commonValidator.householdScheduleValidation,
+    checkRequestErrs,
+    ScheduleService.userSchedules
+  );
+
   APP.route("/api/v2/schedules/search").get(
     adminPakamValidation,
     commonValidator.search,
