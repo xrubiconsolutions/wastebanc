@@ -249,6 +249,8 @@ const io = require("socket.io")(http, {
       "Access-Control-Allow-Origin": [
         "https://dashboard.pakam.ng",
         "https://ft-dev--musical-macaron-c39880.netlify.app",
+        "http://localhost:3000",
+        "http://localhost:3001",
       ],
       "Access-Control-Allow-Methods": "GET,POST",
       "Access-Control-Allow-Headers": "Access-Control-Allow-Origin",
@@ -329,6 +331,7 @@ app.use(
       "https://dashboard.pakam.ng",
       "https://ft-dev--musical-macaron-c39880.netlify.app",
       "http://localhost:3000",
+      "http://localhost:3001",
     ],
   })
 );
