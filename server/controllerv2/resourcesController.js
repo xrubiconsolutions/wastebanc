@@ -38,6 +38,28 @@ class Resources_Service {
 
   static async listResources(req, res) {
     try {
+      const resources = await resourcesModel
+        .find({
+          show: true,
+        })
+        .sort({ createdAt: -1 })
+        .limit(5);
+
+      return res.status(200).json({
+        error: false,
+        message: "resources retrieved",
+        data: resources,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+  static async listResourcesV2(req, res) {
+    try {
       let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")

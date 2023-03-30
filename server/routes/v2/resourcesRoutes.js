@@ -27,6 +27,7 @@ module.exports = (APP) => {
     ResourcesCtrl.updateResource
   );
 
+  APP.route("/api/get/resources").get(ResourcesCtrl.listResourcesV2);
   APP.route("/api/resources").get(ResourcesCtrl.listResources);
   APP.route("/api/resource/:resourceId").get(
     resourceId,
