@@ -227,6 +227,7 @@ organisationController.listOrganisation = async (req, res) => {
           },
           { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
         ],
+        isDisabled: false,
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -241,9 +242,12 @@ organisationController.listOrganisation = async (req, res) => {
           $gte: startDate,
           $lt: endDate,
         },
+        isDisabled: false,
       };
     } else {
-      criteria = {};
+      criteria = {
+        isDisabled: false,
+      };
     }
 
     //if (state) criteria.state = state;
