@@ -556,9 +556,11 @@ class ScheduleService {
         req,
         {
           type: type === "pickup" ? "pickup" : "dropoff",
+          organisationID: companyId
         },
         searchFields
       );
+      //console.log('c', criteria);
     try {
       const company = await organisationModel.findById(companyId);
       if (!company)
