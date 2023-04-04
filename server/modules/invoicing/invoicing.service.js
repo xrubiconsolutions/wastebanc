@@ -18,6 +18,7 @@ const { sendInvoiceMail } = require("../../services/sendEmail");
 
 class invoiceService {
   static async generateInvoice(start, end, companyId, authuser) {
+    console.log('com', companyId);
     const organisation = await organisationModel.findById(companyId);
 
     if (!organisation) throw new Error("Invalid companyId passed");
@@ -60,7 +61,8 @@ class invoiceService {
       sumPercentage = 0,
       transId = [],
       householdPercentageTotal = 0,
-      wastePickersPercentageTotal = 0;
+      wastePickersPercentageTotal = 0,
+      amountPayable = 0;
 
     const totalResult = await transactionModel.find(criteria);
 
@@ -89,7 +91,7 @@ class invoiceService {
       totalValue = totalHouseholdTotal + totalWastePickersTotal;
 
       sumPercentage = rewardService.calPercentage(totalValue, charges);
-      totalValue = totalValue + sumPercentage;
+      amountPayable = totalValue + sumPercentage;
 
       // console.log("totalH", totalHouseholdTotal);
       // console.log("totalWas", totalWastePickersTotal);
@@ -107,7 +109,8 @@ class invoiceService {
         startDate,
         endDate,
         transactions: transId,
-        amount: totalValue.toFixed(2),
+        amountWithServiceCharge: totalValue,
+        amount: amountPayable.toFixed(2),
         householdTotal: totalHouseholdTotal.toFixed(2),
         wastePickersTotal: totalWastePickersTotal.toFixed(2),
         serviceCharge: sumPercentage.toFixed(2),
