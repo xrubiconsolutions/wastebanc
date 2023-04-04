@@ -899,6 +899,7 @@ class ScheduleService {
       // const userGain =
       //   Number(householdReward.totalpointGained) - Number(pakamPercentage);
 
+      const amountTobePaid = userCoin + collectorPoint +pakamPercentage +wastePickerPercentage;
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
         coin: userCoin,
@@ -919,6 +920,7 @@ class ScheduleService {
         percentage: pakamPercentage,
         address: schedule.address,
         phone: schedule.phone,
+        amountTobePaid, 
       });
 
       const items = categories.map((category) => category.name);

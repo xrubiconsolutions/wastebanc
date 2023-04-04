@@ -683,9 +683,11 @@ dropoffController.rewardDropSystem = async (req, res) => {
       length: 7,
       charset: "numeric",
     });
+    const amountTobePaid = userCoin + pakamPercentage;
     const t = await transactionModel.create({
       weight: householdReward.totalWeight,
       wastePickerCoin: 0,
+      wastePickerPercentage: 0,
       coin: userCoin,
       cardID: scheduler._id,
       completedBy: collectorId,
@@ -702,6 +704,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       percentage: pakamPercentage,
       address: dropoffs.address,
       phone: scheduler.phone,
+      amountTobePaid, 
     });
 
     const items = categories.map((category) => category.name);
