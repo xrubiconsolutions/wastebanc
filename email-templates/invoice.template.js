@@ -20,9 +20,9 @@ module.exports = async (invoice) => {
   const companyInfo = await companyInfoModel.findOne();
 
   const data = transactions.map(
-    ({ ref_id, address, phone, fullname, type, categories, weight, coin }) => {
+    ({ ref_id, address, phone, fullname, type, categories, weight, amountTobePaid }) => {
       const catgs = categories.map((cat) => cat.name).join(", ");
-      return [ref_id, address, phone, weight, coin.toLocaleString()];
+      return [ref_id, address, phone, weight, amountTobePaid.toLocaleString()];
     }
   );
   let bodyData = data

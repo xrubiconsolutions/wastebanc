@@ -317,7 +317,10 @@ class ScriptController {
           console.log("loca", location);
           const newLocation = {
             type: "Point",
-            coordinates: [Number(location.location.long), Number(location.location.lat)],
+            coordinates: [
+              Number(location.location.long),
+              Number(location.location.lat),
+            ],
           };
           //console.log('n', newLocation);
           await dropOffModel.updateOne(
@@ -340,6 +343,46 @@ class ScriptController {
       return res.status(500).json({
         error: true,
         message: "An error occured!",
+      });
+    }
+  }
+
+  static async calculateSumAmountTobePaid(req, res) {
+    try {
+      const transactions = await transactionModel.find({
+       
+        amountTobePaid: { $exists: false },
+        //wastePickerPercentage: { $exists: true },
+      });
+      if (transactions.length <= 0) {
+        return res.status(200).json({ error: false, message: "No data found" });
+      }
+      transactions.forEach(async (transaction) => {
+        //console.log("transaction", transaction._id);
+        const wastePickerPercentage = transaction.wastePickerPercentage || 0;
+        const coin = transaction.coin || 0;
+        const percentage = transaction.percentage || 0;
+        const wastePickerCoin = transaction.wastePickerCoin || 0;
+
+        const total =
+          coin + percentage + wastePickerCoin + wastePickerPercentage;
+        //console.log("total", total);
+        await transactionModel.updateOne(
+          { _id: transaction._id },
+          {
+            $set: {
+              amountTobePaid: total,
+            },
+          }
+        );
+      });
+
+      return res.status(200).json({ error: false, message: "Done" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occured",
       });
     }
   }

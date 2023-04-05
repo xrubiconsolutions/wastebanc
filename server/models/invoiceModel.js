@@ -13,7 +13,7 @@ const invoiceSchema = new Schema(
     transactions: [{ type: Schema.Types.ObjectId, ref: "transaction" }],
     householdTotal: { type: Number },
     wastePickersTotal: { type: Number },
-    amountWithServiceCharge: { type: Number },
+    amountWithoutServiceCharge: { type: Number },
     amount: { type: Number },
     serviceCharge: { type: Number },
     paidStatus: { type: String, default: "pending" },

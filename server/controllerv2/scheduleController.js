@@ -556,11 +556,11 @@ class ScheduleService {
         req,
         {
           type: type === "pickup" ? "pickup" : "dropoff",
-          organisationID: companyId
+          organisationID: companyId,
         },
         searchFields
       );
-      //console.log('c', criteria);
+    //console.log('c', criteria);
     try {
       const company = await organisationModel.findById(companyId);
       if (!company)
@@ -899,7 +899,9 @@ class ScheduleService {
       // const userGain =
       //   Number(householdReward.totalpointGained) - Number(pakamPercentage);
 
-      const amountTobePaid = userCoin + collectorPoint +pakamPercentage +wastePickerPercentage;
+      // sum up the total amount the recycler will be paying pakam
+      const amountTobePaid =
+        userCoin + collectorPoint + pakamPercentage + wastePickerPercentage;
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
         coin: userCoin,
@@ -920,7 +922,7 @@ class ScheduleService {
         percentage: pakamPercentage,
         address: schedule.address,
         phone: schedule.phone,
-        amountTobePaid, 
+        amountTobePaid,
       });
 
       const items = categories.map((category) => category.name);

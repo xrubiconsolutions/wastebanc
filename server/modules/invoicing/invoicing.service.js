@@ -18,7 +18,7 @@ const { sendInvoiceMail } = require("../../services/sendEmail");
 
 class invoiceService {
   static async generateInvoice(start, end, companyId, authuser) {
-    console.log('com', companyId);
+    console.log("com", companyId);
     const organisation = await organisationModel.findById(companyId);
 
     if (!organisation) throw new Error("Invalid companyId passed");
@@ -62,6 +62,7 @@ class invoiceService {
       transId = [],
       householdPercentageTotal = 0,
       wastePickersPercentageTotal = 0,
+      amountTobePaid = 0,
       amountPayable = 0;
 
     const totalResult = await transactionModel.find(criteria);
@@ -69,6 +70,10 @@ class invoiceService {
     if (totalResult.length > 0) {
       totalResult.forEach((e) => {
         householdTotal += e.coin;
+      });
+
+      totalResult.forEach((e) => {
+        amountTobePaid += e.amountTobePaid;
       });
 
       totalResult.forEach((e) => {
@@ -90,8 +95,8 @@ class invoiceService {
 
       totalValue = totalHouseholdTotal + totalWastePickersTotal;
 
-      sumPercentage = rewardService.calPercentage(totalValue, charges);
-      amountPayable = totalValue + sumPercentage;
+      sumPercentage = rewardService.calPercentage(amountTobePaid, charges);
+      amountPayable = amountTobePaid + sumPercentage;
 
       // console.log("totalH", totalHouseholdTotal);
       // console.log("totalWas", totalWastePickersTotal);
@@ -109,7 +114,7 @@ class invoiceService {
         startDate,
         endDate,
         transactions: transId,
-        amountWithServiceCharge: totalValue,
+        amountWithoutServiceCharge: amountTobePaid.toFixed(2),
         amount: amountPayable.toFixed(2),
         householdTotal: totalHouseholdTotal.toFixed(2),
         wastePickersTotal: totalWastePickersTotal.toFixed(2),
