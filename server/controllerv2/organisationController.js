@@ -1244,8 +1244,13 @@ organisationController.estimatedCost = async (req, res) => {
 
     let houseHoldTotalCoins = 0;
     let wastePickerTotalCoins = 0;
+    let amountTobePaid = 0;
     sumData.forEach((e) => {
       houseHoldTotalCoins += e.coin;
+    });
+
+    sumData.forEach((e) => {
+      amountTobePaid += e.amountTobePaid;
     });
 
     sumData.forEach((e) => {
@@ -1254,11 +1259,11 @@ organisationController.estimatedCost = async (req, res) => {
     const sumTotal = houseHoldTotalCoins + wastePickerTotalCoins;
 
     const sumPercentage = rewardService.calPercentage(
-      sumTotal,
+      amountTobePaid,
       user.systemCharge
     );
 
-    const sum = sumTotal + sumPercentage;
+    const sum = amountTobePaid + sumPercentage;
 
     return res.status(200).json({
       error: false,
