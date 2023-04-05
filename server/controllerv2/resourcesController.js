@@ -1,4 +1,4 @@
-const { resourcesModel } = require("../models");
+const { resourcesModel, centralAccountModel } = require("../models");
 const thumbnail = require("youtube-thumbnail");
 
 const MONGOOSE = require("mongoose");
@@ -246,6 +246,30 @@ class Resources_Service {
       return res.status(500).json({
         error: true,
         message: "An error occurred",
+      });
+    }
+  }
+
+  static async bankDetails(req, res) {
+    try {
+      const centralAc = await centralAccountModel.findOne({
+        bank: "sterling",
+      });
+      console.log("ce", centralAc);
+      return res.status(200).json({
+        error: false,
+        message: "Account details",
+        data: {
+          name: centralAc.name,
+          acnumber: centralAc.acnumber,
+          bank: centralAc.bank,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occur red",
       });
     }
   }

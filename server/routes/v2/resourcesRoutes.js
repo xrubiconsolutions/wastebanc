@@ -39,4 +39,9 @@ module.exports = (APP) => {
     checkRequestErrs,
     ResourcesCtrl.removeResource
   );
+
+  APP.route("/api/organisation/account/details").get(
+    companyPakamDataValidation,
+    ResourcesCtrl.bankDetails
+  );
 };
