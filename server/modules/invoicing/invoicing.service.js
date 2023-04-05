@@ -401,6 +401,7 @@ class invoiceService {
         "type",
         "address",
         "phone",
+        "amountTobePaid",
       ]);
 
     if (!invoice)
