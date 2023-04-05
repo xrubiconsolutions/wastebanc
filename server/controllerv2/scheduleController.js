@@ -125,6 +125,7 @@ class ScheduleService {
             rejectReason: 1,
             rejectionDate: 1,
             approvalDate: 1,
+            channel: 1,
           },
         },
         {
@@ -198,6 +199,7 @@ class ScheduleService {
             collectorStatus: 1,
             scheduleApproval: 1,
             approvalDate: 1,
+            channel: 1,
           },
         },
       ];
