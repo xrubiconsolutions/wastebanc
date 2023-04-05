@@ -519,7 +519,10 @@ class invoiceService {
 
     const template = await invoiceTemplate(invoiceData);
 
-    const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
+    const browser = await puppeteer.launch({
+      args: ["--no-sandbox"],
+      executablePath: "/usr/bin/chromium-browser",
+    });
     const page = await browser.newPage();
     const path = "invoice.pdf";
 
