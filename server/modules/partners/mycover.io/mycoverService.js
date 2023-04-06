@@ -102,13 +102,14 @@ const buyHealthInsurance = async (data, userId) => {
       {
         insuranceUser: true,
         insurancePolicyID: result.data.data.policy.id,
+        availablePoints: userBalance,
       }
     );
 
     await insuranceLog.create({
       userId,
       amountPaid: Number(amount),
-      availablePoints: userBalance,
+      userBalance,
       insuranceObject: result.data.data.policy,
     });
 
