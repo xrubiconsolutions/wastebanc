@@ -103,6 +103,7 @@ const buyHealthInsurance = async (data, userId) => {
         insuranceUser: true,
         insurancePolicyID: result.data.data.policy.id,
         availablePoints: userBalance,
+        insuranceAmount: amount,
       }
     );
 
@@ -126,6 +127,30 @@ const buyHealthInsurance = async (data, userId) => {
       error: true,
       message: "Error occurred purchasing insurance",
       data: null,
+    };
+  }
+};
+
+const renewInsurance = async (userId, policyId) => {
+  try {
+    const user = await userModel.findById(userId);
+    const availableBalance = user.availablePoints;
+    if (user.insuranceAmount > availableBalance) {
+      return {
+        error: true,
+        message: "Insufficient available balance",
+      };
+    }
+
+    const url = `${process.env.MYCOVER_BASEURL}products/mcg/renew-flexi-care`;
+    const result = await axios.post(url, {
+      policyId: user.insurancePolicyID,
+    });
+  } catch (error) {
+    console.log(error);
+    return {
+      error: true,
+      message: "Error occurred renew insurance",
     };
   }
 };

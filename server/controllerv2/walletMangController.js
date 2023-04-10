@@ -54,7 +54,7 @@ class WalletController {
       };
 
       const result = await axios.post(
-        "https://apiv2.pakam.ng/api/request/otp",
+        `${process.env.PAYMENT_URL}request/otp`,
         body,
         {
           headers: {
@@ -92,7 +92,7 @@ class WalletController {
 
     try {
       const result = await axios.post(
-        "https://apiv2.pakam.ng/api/disbursement/initiate",
+        `${process.env.PAYMENT_URL}disbursement/initiate`,
         body,
         {
           headers: {

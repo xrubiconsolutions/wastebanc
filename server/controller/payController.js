@@ -29,7 +29,7 @@ payController.getBanks = (req, res) => {
     //   json: true,
     // },
     {
-      url: "https://apiv2.pakam.ng/api/all/banks",
+      url: `${process.env.PAYMENT_URL}all/banks`,
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -51,7 +51,7 @@ payController.resolveAccount = (req, res) => {
   console.log({ user });
   request(
     {
-      url: `https://apiv2.pakam.ng/api/resolve/account?account_number=${account_number}&bank_code=${bank_code}&userId=${user._id}`,
+      url: `${process.env.PAYMENT_URL}resolve/account?account_number=${account_number}&bank_code=${bank_code}&userId=${user._id}`,
       method: "GET",
       headers: {
         Accept: "application/json",

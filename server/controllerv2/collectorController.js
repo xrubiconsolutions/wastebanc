@@ -2209,7 +2209,7 @@ class CollectorService {
       };
 
       const result = await axios.post(
-        "https://apiv2.pakam.ng./api/wastepicker/withdrawal/summary",
+        `${process.env.PAYMENT_URL}wastepicker/withdrawal/summary`,
         body,
         {
           headers: {
@@ -2236,7 +2236,7 @@ class CollectorService {
         collectorId: user._id,
       };
       const result = await axios.post(
-        "https://apiv2.pakam.ng./api/wastepicker/request/otp",
+        `${process.env.PAYMENT_URL}wastepicker/request/otp`,
         body,
         {
           headers: {
@@ -2267,7 +2267,7 @@ class CollectorService {
       };
 
       const result = await axios.post(
-        "https://apiv2.pakam.ng./api/disbursement/collector/initiate",
+        `${process.env.PAYMENT_URL}disbursement/collector/initiate`,
         body,
         {
           headers: {
@@ -2297,7 +2297,7 @@ class CollectorService {
       };
 
       const result = await axios.post(
-        "https://apiv2.pakam.ng./api/wastepicker/request/otp",
+        `${process.env.PAYMENT_URL}wastepicker/request/otp`,
         body,
         {
           headers: {
