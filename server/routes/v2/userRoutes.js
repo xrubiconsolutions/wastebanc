@@ -54,8 +54,12 @@ module.exports = (APP) => {
     UserService.acceptTermsCondition
   );
 
-  APP.route("/api/user/remove").post(
-    userValidation,
-    UserService.deleteUser
+  APP.route("/api/user/remove").post(userValidation, UserService.deleteUser);
+
+  APP.route("/api/user/details/:userId").get(
+    adminPakamValidation,
+    userValidator.userDetails,
+    checkRequestErrs,
+    UserService.userDetails
   );
 };

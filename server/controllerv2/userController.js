@@ -5,6 +5,8 @@ const {
   verificationLogModel,
   organisationTypeModel,
   userBinModel,
+  scheduleModel,
+  scheduleDropModel,
 } = require("../models");
 const {
   sendResponse,
@@ -945,6 +947,67 @@ class UserService {
     }
   }
 
+  //TODO
+  // get user details
+  static async userDetails(req, res) {
+    try {
+      const { userId } = req.params;
+      console.log("userId", userId);
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+      const totalSchedulePickup = await scheduleModel.countDocuments({
+        client: user.email,
+      });
+      const totalScheduleDrop = await scheduleDropModel.countDocuments({
+        clientId: user._id.toString(),
+      });
+
+      const pendingSchedulePickup = await scheduleModel.countDocuments({
+        client: user.email,
+        completionStatus: "pending",
+      });
+
+      const completedSchedulePickup = await scheduleModel.countDocuments({
+        client: user.email,
+        completionStatus: "completed",
+      });
+
+      const missedSchedulePickup = await scheduleModel.countDocuments({
+        client: user.email,
+        completionStatus: "missed",
+      });
+
+      return res.status(200).json({
+        error: false,
+        message: "User Details",
+        data: {
+          firstName: user.fullname,
+          phoneNumber: user.phone,
+          gender: user.gender,
+          lcd: user.lcd,
+          walletBalance: user.availablePoints,
+          address: user.address,
+          createdAt: user.createAt,
+          totalSchedulePickup,
+          pendingSchedulePickup,
+          completedSchedulePickup,
+          missedSchedulePickup,
+          totalScheduleDrop,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error deleting User",
+      });
+    }
+  }
 }
 
 module.exports = UserService;
