@@ -7,6 +7,7 @@ const {
   userBinModel,
   scheduleModel,
   scheduleDropModel,
+  disbursementRequestModel,
 } = require("../models");
 const {
   sendResponse,
@@ -952,7 +953,7 @@ class UserService {
   static async userDetails(req, res) {
     try {
       const { userId } = req.params;
-      console.log("userId", userId);
+
       const user = await userModel.findById(userId);
       if (!user) {
         return res.status(400).json({
@@ -1008,6 +1009,139 @@ class UserService {
       });
     }
   }
+
+  // get user payment to bank requests
+
+  static async userBankPayoutRequests(req, res) {
+    try {
+      const { userId } = req.params;
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        key,
+        start,
+        end,
+        status = "initiated",
+      } = req.query;
+
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+
+      if (!key && (!start || !end))
+        return res.status(422).json({
+          error: true,
+          message: "Supply a date range (start and end) or key to search",
+        });
+
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
+
+      let criteria;
+
+      if (key) {
+        criteria = {
+          $or: [
+            { destinationAccount: { $regex: `.*${key}.*`, $options: "i" } },
+            { bankName: { $regex: `.*${key}.*`, $options: "i" } },
+            { status: { $regex: `.*${key}.*`, $options: "i" } },
+            { beneName: { $regex: `.*${key}.*`, $options: "i" } },
+            { withdrawalAmount: { $eq: parseFloat(key) } },
+          ],
+          user: user._id,
+          status,
+        };
+      } else if (startDate || endDate) {
+        criteria = {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          user: user._id,
+          status,
+        };
+      } else {
+        criteria = {
+          user: user._id,
+          status,
+        };
+      }
+
+      const totalPayments = await disbursementRequestModel.countDocuments(
+        criteria
+      );
+
+      const payments = await disbursementRequestModel.aggregate([
+        {
+          $match: criteria,
+        },
+        {
+          $lookup: {
+            from: "transactions",
+            localField: "transactions._id",
+            foreignField: "_id",
+            as: "transactions",
+          },
+        },
+        {
+          $project: {
+            otp: 0,
+          },
+        },
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+        {
+          $skip: (page - 1) * resultsPerPage,
+        },
+        {
+          $limit: resultsPerPage,
+        },
+      ]);
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          payments,
+          totalPayments,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalPayments / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error retrieving data",
+      });
+    }
+  }
+
+  // get user payment to charity requests
+  static async userCharityPayments(req, res) {}
+
+  // get user insurance purchases
+  static async userInsurancePurchases(req, res) {}
+
+  //get insurance users
 }
 
 module.exports = UserService;
