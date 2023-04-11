@@ -604,7 +604,6 @@ class UserService {
         });
       }
 
-      console.log("user", user.password);
       const compare = await comparePassword(req.body.password, user.password);
       console.log("compare", compare);
       if (!compare) {
@@ -1142,6 +1141,92 @@ class UserService {
   static async userInsurancePurchases(req, res) {}
 
   //get insurance users
+
+  static async insuranceUser(req, res) {
+    let { page = 1, resultsPerPage = 20, key, start, end } = req.query;
+
+    try {
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      if (!key && (!start || !end))
+        return res.status(422).json({
+          error: true,
+          message: "Supply a date range (start and end) or key to search",
+        });
+
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
+
+      let criteria;
+
+      if (key) {
+        criteria = {
+          $or: [
+            {
+              "insuranceDetails.phone": { $regex: `.*${key}.*`, $options: "i" },
+            },
+            {
+              "insuranceDetails.first_name": {
+                $regex: `.*${key}.*`,
+                $options: "i",
+              },
+            },
+            { purchaseAmount: { $regex: `.*${key}.*`, $options: "i" } },
+            { calAmount: { $regex: `.*${key}.*`, $options: "i" } },
+          ],
+          insuranceUser: true,
+        };
+      } else if (startDate || endDate) {
+        criteria = {
+          purchaseDate: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          insuranceUser: true,
+        };
+      } else {
+        criteria = {
+          insuranceUser: true,
+        };
+      }
+
+      console.log("c", criteria);
+      const totalUsers = await userModel.countDocuments(criteria);
+      const users = await userModel
+        .find(criteria)
+        .select({ password: 0, availablePoints: 0 })
+        .sort({ purchaseDate: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage);
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          users,
+          totalUsers,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalUsers / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error retrieving data",
+      });
+    }
+  }
 }
 
 module.exports = UserService;

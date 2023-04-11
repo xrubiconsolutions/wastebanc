@@ -104,6 +104,13 @@ const buyHealthInsurance = async (data, userId) => {
         insurancePolicyID: result.data.data.policy.id,
         availablePoints: userBalance,
         insuranceAmount: amount,
+        purchaseDate: new Date().toISOString(),
+        insuranceStartDate: result.data.data.policy.activation_date,
+        insuranceExpirationDate: result.data.data.policy.expiration_date,
+        hmo_policy_id: result.data.data.policy.meta.hmo_policy_id,
+        insuranceDetails: result.data.data.policy.meta.payload,
+        purchaseAmount: result.data.data.policy.genius_price,
+        calAmount: amount,
       }
     );
 

@@ -69,4 +69,9 @@ module.exports = (APP) => {
     checkRequestErrs,
     UserService.userBankPayoutRequests
   );
+
+  APP.route("/api/user/insurance").get(
+    adminPakamValidation,
+    UserService.insuranceUser
+  );
 };
