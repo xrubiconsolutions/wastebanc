@@ -8,6 +8,7 @@ const {
   scheduleModel,
   scheduleDropModel,
   disbursementRequestModel,
+  charityModel,
 } = require("../models");
 const {
   sendResponse,
@@ -1135,7 +1136,122 @@ class UserService {
   }
 
   // get user payment to charity requests
-  static async userCharityPayments(req, res) {}
+  static async userCharityPayments(req, res) {
+    try {
+      const { userId } = req.params;
+      let { page = 1, resultsPerPage = 20, key, start, end } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+
+      if (!key && (!start || !end))
+        return res.status(422).json({
+          error: true,
+          message: "Supply a date range (start and end) or key to search",
+        });
+
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
+
+      let criteria;
+
+      if (key) {
+        criteria = {
+          $or: [{ amount: { $eq: parseFloat(key) } }],
+          cardID: user._id.toString(),
+        };
+      } else if (startDate || endDate) {
+        criteria = {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          cardID: user._id.toString(),
+        };
+      } else {
+        criteria = {
+          cardID: user._id.toString(),
+        };
+      }
+
+      console.log("c", criteria);
+
+      const totalCharityPayout = await charityModel.countDocuments(criteria);
+      const charityPayouts = await charityModel.aggregate([
+        {
+          $match: criteria,
+        },
+        {
+          $lookup: {
+            from: "charityorganisations",
+            localField: "charityOrganisation",
+            foreignField: "_id",
+            as: "charityOrganisation",
+          },
+        },
+        {
+          $unwind: {
+            path: "$charityOrganisation",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            "charityOrganisation._id": 0,
+            "charityOrganisation.bank": 0,
+            "charityOrganisation.accountNumber": 0,
+            "charityOrganisation.createdAt": 0,
+            "charityOrganisation.updatedAt": 0,
+            "charityOrganisation.__v": 0,
+          },
+        },
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+        {
+          $skip: (page - 1) * resultsPerPage,
+        },
+        {
+          $limit: resultsPerPage,
+        },
+      ]);
+
+      return res.status(200).json({
+        error: false,
+        message: "Data retrieved",
+        data: {
+          charityPayouts,
+          totalCharityPayout,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalCharityPayout / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error retrieving data",
+      });
+    }
+  }
 
   // get user insurance purchases
   static async userInsurancePurchases(req, res) {}
