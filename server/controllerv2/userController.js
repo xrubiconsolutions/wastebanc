@@ -9,6 +9,7 @@ const {
   scheduleDropModel,
   disbursementRequestModel,
   charityModel,
+  insuranceLog,
 } = require("../models");
 const {
   sendResponse,
@@ -1254,7 +1255,85 @@ class UserService {
   }
 
   // get user insurance purchases
-  static async userInsurancePurchases(req, res) {}
+  static async userInsurancePurchases(req, res) {
+    try {
+      const { userId } = req.params;
+      let { page = 1, resultsPerPage = 20, key, start, end } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+
+      if (!key && (!start || !end))
+        return res.status(422).json({
+          error: true,
+          message: "Supply a date range (start and end) or key to search",
+        });
+
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
+
+      let criteria;
+
+      if (key) {
+        criteria = {
+          $or: [{ amountPaid: { $eq: parseFloat(key) } }],
+          user: user._id,
+        };
+      } else if (startDate || endDate) {
+        criteria = {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          user: user._id,
+        };
+      } else {
+        criteria = {
+          user: user._id,
+        };
+      }
+
+      const totalInsurance = await insuranceLog.countDocuments(criteria);
+      const insurance = await insuranceLog
+        .find(criteria)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * resultsPerPage)
+        .limit(resultsPerPage)
+        .lean();
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          insurance,
+          totalInsurance,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalInsurance / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error retrieving data",
+      });
+    }
+  }
 
   //get insurance users
 
@@ -1343,6 +1422,8 @@ class UserService {
       });
     }
   }
+
+  // completed 
 }
 
 module.exports = UserService;

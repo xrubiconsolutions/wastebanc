@@ -278,9 +278,17 @@ dropoffController.dropOffs = async (req, res) => {
 
 dropoffController.userdropOffs = async (req, res) => {
   try {
-    const { user } = req;
-    const currentScope = user.locationScope;
-    let { page = 1, resultsPerPage = 20, start, end, key, userId } = req.query;
+    //const { user } = req;
+    //const currentScope = user.locationScope;
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      start,
+      end,
+      key,
+      completionStatus = "pending",
+      userId,
+    } = req.query;
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
       resultsPerPage = parseInt(resultsPerPage);
@@ -321,6 +329,7 @@ dropoffController.userdropOffs = async (req, res) => {
           { Category: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         scheduleCreator: client.email,
+        completionStatus,
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -337,28 +346,31 @@ dropoffController.userdropOffs = async (req, res) => {
           $lt: endDate,
         },
         scheduleCreator: client.email,
+        completionStatus,
       };
     } else {
       criteria = {
         scheduleCreator: client.email,
+        completionStatus,
       };
     }
 
-    if (!currentScope) {
-      return res.status(400).json({
-        error: true,
-        message: "Invalid request",
-      });
-    }
+    // if (!currentScope) {
+    //   return res.status(400).json({
+    //     error: true,
+    //     message: "Invalid request",
+    //   });
+    // }
 
-    if (currentScope === "All") {
-      criteria.state = {
-        $in: user.states,
-        scheduleCreator: client.email,
-      };
-    } else {
-      criteria.state = currentScope;
-    }
+    // if (currentScope === "All") {
+    //   criteria.state = {
+    //     $in: user.states,
+    //     scheduleCreator: client.email,
+    //     completionStatus,
+    //   };
+    // } else {
+    //   criteria.state = currentScope;
+    // }
 
     console.log("criteria", criteria);
 
@@ -704,7 +716,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       percentage: pakamPercentage,
       address: dropoffs.address,
       phone: scheduler.phone,
-      amountTobePaid, 
+      amountTobePaid,
     });
 
     const items = categories.map((category) => category.name);

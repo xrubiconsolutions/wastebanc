@@ -81,4 +81,11 @@ module.exports = (APP) => {
     checkRequestErrs,
     UserService.userCharityPayments
   );
+
+  APP.route("/api/user/insurance_purchase/:userId").get(
+    adminPakamValidation,
+    userValidator.userDetails,
+    checkRequestErrs,
+    UserService.userInsurancePurchases
+  );
 };
