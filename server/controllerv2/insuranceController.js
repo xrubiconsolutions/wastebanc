@@ -7,7 +7,10 @@ class InsuranceController {
   static async healthProductLists(req, res) {
     try {
       const products = await productLists();
-      return res.status(200).json({ ...products });
+      const availableProducts = products.data.filter(
+        ({ price }) => parseFloat(price) <= 2500
+      );
+      return res.status(200).json({ ...products, data: availableProducts });
     } catch (error) {
       console.log("error", error);
       return res.status(400).json({
