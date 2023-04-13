@@ -60,10 +60,6 @@ const buyHealthInsurance = async (data, userId) => {
   try {
     const user = await userModel.findById(userId);
 
-    console.log({
-      expiry: user.insuranceExpiryDate,
-      isGr: new Date() > user.insuranceExpiryDate,
-    });
     if (
       user.insuranceExpiryDate &&
       new Date() < new Date(user.insuranceExpiryDate)
