@@ -184,8 +184,9 @@ const user_Schema = new Schema({
   percentageAcc: { type: Number },
   requestedAmount: { type: Number, default: 0 },
   insuranceUser: { type: Boolean, default: false },
-  insuranceAmount:{type:Number, default:0},
+  insuranceAmount: { type: Number, default: 0 },
   insurancePolicyID: { type: String },
+  insuranceExpiryDate: { type: Date },
   channel: { type: String, default: "mobile" },
 });
 

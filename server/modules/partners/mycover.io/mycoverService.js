@@ -8,6 +8,7 @@ const {
   disbursementRequestModel,
   insuranceLog,
 } = require("../../../models");
+const moment = require("moment");
 
 const productLists = async () => {
   try {
@@ -55,11 +56,40 @@ const buyHealthInsurance = async (data, userId) => {
     dob,
     phone,
     product_id,
-    price,
   } = data;
   try {
     const user = await userModel.findById(userId);
+
+    console.log({
+      expiry: user.insuranceExpiryDate,
+      isGr: new Date() > user.insuranceExpiryDate,
+    });
+    if (
+      user.insuranceExpiryDate &&
+      new Date() < new Date(user.insuranceExpiryDate)
+    )
+      return {
+        error: true,
+        message: "Existing Insurance plan is still active",
+      };
     const availableBalance = user.availablePoints;
+
+    // fetch product list
+    const { data: productList } = await productLists();
+
+    // find product with the provided id
+    const product = productList.find(({ id }) => id === product_id);
+
+    // throw error if product with provided id not found
+    if (!product)
+      return {
+        error: true,
+        message: "Product with ID not found",
+      };
+
+    const { price } = product;
+
+    // calculate insurance amount and check if user has enough to py
     const amount = Number(price) * plan_duration;
     const userBalance = user.availablePoints - Number(amount);
     if (Number(amount) > availableBalance) {
@@ -104,6 +134,7 @@ const buyHealthInsurance = async (data, userId) => {
         insurancePolicyID: result.data.data.policy.id,
         availablePoints: userBalance,
         insuranceAmount: amount,
+        insuranceExpiryDate: moment().add(plan_duration, "months").calendar(),
       }
     );
 
