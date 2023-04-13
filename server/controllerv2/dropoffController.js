@@ -276,6 +276,120 @@ dropoffController.dropOffs = async (req, res) => {
   }
 };
 
+dropoffController.userdropOffs = async (req, res) => {
+  try {
+    const { user } = req;
+    const currentScope = user.locationScope;
+    let { page = 1, resultsPerPage = 20, start, end, key, userId } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    const client = await userModel.findById(userId);
+
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+    }
+    // if (!key) {
+    //   if (!start || !end) {
+    //     return res.status(400).json({
+    //       error: true,
+    //       message: "Please pass a start and end date",
+    //     });
+    //   }
+    // }
+
+    let criteria;
+
+    if (key) {
+      criteria = {
+        $or: [
+          { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+          { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+          { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+          { phone: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisationPhone: { $regex: `.*${key}.*`, $options: "i" } },
+          //{ quantity: key },
+          { categories: { $in: [key] } },
+          { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
+          { Category: { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+        scheduleCreator: client.email,
+      };
+    } else if (start || end) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+        scheduleCreator: client.email,
+      };
+    } else {
+      criteria = {
+        scheduleCreator: client.email,
+      };
+    }
+
+    if (!currentScope) {
+      return res.status(400).json({
+        error: true,
+        message: "Invalid request",
+      });
+    }
+
+    if (currentScope === "All") {
+      criteria.state = {
+        $in: user.states,
+        scheduleCreator: client.email,
+      };
+    } else {
+      criteria.state = currentScope;
+    }
+
+    console.log("criteria", criteria);
+
+    // const totalResult = await scheduleDropModel.countDocuments(criteria);
+
+    const { dropoffs, totalResult } = await dropoffController.aggregateQuery({
+      criteria,
+      page,
+      resultsPerPage,
+    });
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        dropoffs,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 dropoffController.companydropOffs = async (req, res) => {
   try {
     let {
@@ -409,7 +523,11 @@ dropoffController.deleteDropOff = async (req, res) => {
 dropoffController.addDropOffLocation = async (req, res) => {
   const dropLocation = { ...req.body };
   try {
-    const drop = await dropOffModel.create(dropLocation);
+    const newLocation = {
+      type: "Point",
+      coordinates: [dropLocation.location.long, dropLocation.location.lat],
+    };
+    const drop = await dropOffModel.create({ ...dropLocation, newLocation });
     return res.status(201).json({
       error: false,
       message: "Drop-off submitted successfully!",
@@ -565,9 +683,11 @@ dropoffController.rewardDropSystem = async (req, res) => {
       length: 7,
       charset: "numeric",
     });
+    const amountTobePaid = userCoin + pakamPercentage;
     const t = await transactionModel.create({
       weight: householdReward.totalWeight,
       wastePickerCoin: 0,
+      wastePickerPercentage: 0,
       coin: userCoin,
       cardID: scheduler._id,
       completedBy: collectorId,
@@ -584,6 +704,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       percentage: pakamPercentage,
       address: dropoffs.address,
       phone: scheduler.phone,
+      amountTobePaid, 
     });
 
     const items = categories.map((category) => category.name);

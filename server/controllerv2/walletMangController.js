@@ -4,6 +4,7 @@ const {
   transactionModel,
   payModel,
   userModel,
+  disbursementRequestModel,
 } = require("../models");
 const {
   generateRandomString,
@@ -53,7 +54,7 @@ class WalletController {
       };
 
       const result = await axios.post(
-        "https://apiv2.pakam.ng/api/request/otp",
+        `${process.env.PAYMENT_URL}request/otp`,
         body,
         {
           headers: {
@@ -82,16 +83,16 @@ class WalletController {
       otp: req.body.otp,
     };
 
-    if(user.availablePoints < 5000){
+    if (user.availablePoints < 5000) {
       return res.status(400).json({
-        message:"Insufficient available balance",
-        error:true,
-      })
+        message: "Insufficient available balance",
+        error: true,
+      });
     }
 
     try {
       const result = await axios.post(
-        "https://apiv2.pakam.ng/api/disbursement/initiate",
+        `${process.env.PAYMENT_URL}disbursement/initiate`,
         body,
         {
           headers: {
@@ -629,6 +630,56 @@ class WalletController {
         error: true,
         message: "An error occurred",
         data: result,
+      });
+    }
+  }
+
+  static async markDisbursementAsCompleted(req, res) {
+    try {
+      const { reference } = req.body;
+      const disbursement = await disbursementRequestModel.findOne({
+        reference,
+      });
+      if (!disbursement) {
+        return res.status(400).json({
+          error: true,
+          message: "No request attached to reference",
+        });
+      }
+
+      if (disbursement.status == "successful") {
+        return res.status(200).json({
+          error: false,
+          message: "Transaction already completed",
+        });
+      }
+
+      const transactions = disbursement.transactions;
+
+      transactions.forEach(async (transaction) => {
+        await transactionModel.updateOne(
+          { _id: transaction._id },
+          {
+            $set: {
+              paid: true,
+              dateOfCompletion: new Date(),
+            },
+          }
+        );
+      });
+
+      disbursement.status = "successful";
+      disbursement.save();
+
+      return res.status(200).json({
+        error: false,
+        message: "Transaction marked as completed successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
       });
     }
   }

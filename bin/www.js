@@ -7,6 +7,7 @@
 /***********************************
  **** node module defined here *****
  ***********************************/
+require("dotenv").config();
 const EXPRESS = require("express");
 const BODY_PARSER = require("body-parser");
 const ALLFILES = require("./../filebundle");
@@ -245,7 +246,12 @@ const io = require("socket.io")(http, {
 
   handlePreflightRequest: (req, res) => {
     res.writeHead(200, {
-      "Access-Control-Allow-Origin": "https://dashboard.pakam.ng",
+      "Access-Control-Allow-Origin": [
+        "https://dashboard.pakam.ng",
+        "https://ft-dev--musical-macaron-c39880.netlify.app",
+        "http://localhost:3000",
+        "http://localhost:3001",
+      ],
       "Access-Control-Allow-Methods": "GET,POST",
       "Access-Control-Allow-Headers": "Access-Control-Allow-Origin",
       "Access-Control-Allow-Credentials": true,
@@ -319,7 +325,16 @@ app.set("view engine", "jade");
 app.use(EXPRESS.static("client"));
 app.use(BODY_PARSER.json({ limit: "50mb" }));
 app.use(BODY_PARSER.urlencoded({ limit: "100mb", extended: false }));
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://dashboard.pakam.ng",
+      "https://ft-dev--musical-macaron-c39880.netlify.app",
+      "http://localhost:3000",
+      "http://localhost:3001",
+    ],
+  })
+);
 app.use(logger("dev"));
 
 /** middleware for api's logging with deployment mode */

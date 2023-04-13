@@ -338,6 +338,128 @@ class ScheduleService {
     }
   }
 
+  static async userSchedules(req, res) {
+    try {
+      const { user } = req;
+      const currentScope = user.locationScope;
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        start,
+        end,
+        //state,
+        key,
+        completionStatus = { $ne: "" },
+        userId,
+      } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      const household = await userModel.findById(userId);
+
+      console.log("email", household.email);
+      if (!household) {
+        return res.status(400).json({
+          error: true,
+          message: "Household user not found",
+        });
+      }
+      let criteria;
+      let collectorStatus = { $ne: "" };
+      if (completionStatus === "accepted") {
+        collectorStatus = "accept";
+        completionStatus = "pending";
+      } else if (completionStatus === "pending") {
+        collectorStatus = "decline";
+        completionStatus = "pending";
+      }
+      if (key) {
+        criteria = {
+          $or: [
+            { Category: { $regex: `.*${key}.*`, $options: "i" } },
+            { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
+            { categories: { $regex: `.*${key}.*`, $options: "i" } },
+            { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+            { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+            { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
+            { client: { $regex: `.*${key}.*`, $options: "i" } },
+            { phone: { $regex: `.*${key}.*`, $options: "i" } },
+            { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
+            { recycler: { $regex: `.*${key}.*`, $options: "i" } },
+          ],
+          collectorStatus,
+          completionStatus,
+          client: household.email,
+        };
+      } else if (start || end) {
+        if (!start || !end) {
+          return res.status(400).json({
+            error: true,
+            message: "Please pass a start and end date",
+          });
+        }
+        const [startDate, endDate] = [new Date(start), new Date(end)];
+        endDate.setDate(endDate.getDate() + 1);
+        criteria = {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          collectorStatus,
+          completionStatus,
+          client: household.email,
+        };
+      } else {
+        criteria = {
+          collectorStatus,
+          completionStatus,
+          client: household.email,
+        };
+      }
+
+      if (!currentScope) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid request",
+        });
+      }
+
+      if (currentScope === "All") {
+        criteria.state = {
+          $in: user.states,
+          client: household.email,
+        };
+      } else {
+        criteria.state = currentScope;
+      }
+
+      const { schedules, totalResult } = await ScheduleService.aggregateQuery({
+        criteria,
+        page,
+        resultsPerPage,
+      });
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          schedules,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
   static async searchSchedules(req, res) {
     let {
       state,
@@ -436,9 +558,11 @@ class ScheduleService {
         req,
         {
           type: type === "pickup" ? "pickup" : "dropoff",
+          organisationID: companyId,
         },
         searchFields
       );
+    //console.log('c', criteria);
     try {
       const company = await organisationModel.findById(companyId);
       if (!company)
@@ -777,6 +901,9 @@ class ScheduleService {
       // const userGain =
       //   Number(householdReward.totalpointGained) - Number(pakamPercentage);
 
+      // sum up the total amount the recycler will be paying pakam
+      const amountTobePaid =
+        userCoin + collectorPoint + pakamPercentage + wastePickerPercentage;
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
         coin: userCoin,
@@ -797,6 +924,7 @@ class ScheduleService {
         percentage: pakamPercentage,
         address: schedule.address,
         phone: schedule.phone,
+        amountTobePaid,
       });
 
       const items = categories.map((category) => category.name);

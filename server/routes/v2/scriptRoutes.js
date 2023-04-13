@@ -27,4 +27,12 @@ module.exports = (APP) => {
     checkRequestErrs,
     ScriptController.resendOnboardMail
   );
+
+  APP.route("/api/v2/script/dropofflocation").get(
+    ScriptController.updateDropOffLocations
+  );
+
+  APP.route("/api/v2/script/sumTotal").get(
+    ScriptController.calculateSumAmountTobePaid
+  );
 };

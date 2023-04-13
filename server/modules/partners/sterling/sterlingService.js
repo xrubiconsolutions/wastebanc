@@ -6,7 +6,7 @@ const {
   removeObjDuplicate,
   Sterlingkeys,
 } = require("../../../util/commonFunction");
-const { centralAccountModel } = require("../../../models");
+const { centralAccountModel, partnersModel } = require("../../../models");
 
 const BankList = async () => {
   try {
@@ -474,9 +474,10 @@ const GenerateVirtualAccount = async (bvn, nin, phoneNumber) => {
 };
 
 const bankDetails = async () => {
-  const centralAc = await centralAccountModel.findOne({
+  const centralAc = await partnersModel.findOne({
     bank: "sterling",
   });
+  console.log("c", centralAc);
   return {
     error: false,
     message: "",

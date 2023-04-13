@@ -182,6 +182,11 @@ const user_Schema = new Schema({
   accountNo: { type: String },
   cifNo: { type: String },
   percentageAcc: { type: Number },
+  requestedAmount: { type: Number, default: 0 },
+  insuranceUser: { type: Boolean, default: false },
+  insuranceAmount:{type:Number, default:0},
+  insurancePolicyID: { type: String },
+  channel: { type: String, default: "mobile" },
 });
 
 user_Schema.pre("save", function (next) {

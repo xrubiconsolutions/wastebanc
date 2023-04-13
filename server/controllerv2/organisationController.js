@@ -227,6 +227,7 @@ organisationController.listOrganisation = async (req, res) => {
           },
           { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
         ],
+        isDisabled: false,
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -241,9 +242,12 @@ organisationController.listOrganisation = async (req, res) => {
           $gte: startDate,
           $lt: endDate,
         },
+        isDisabled: false,
       };
     } else {
-      criteria = {};
+      criteria = {
+        isDisabled: false,
+      };
     }
 
     //if (state) criteria.state = state;
@@ -1240,8 +1244,13 @@ organisationController.estimatedCost = async (req, res) => {
 
     let houseHoldTotalCoins = 0;
     let wastePickerTotalCoins = 0;
+    let amountTobePaid = 0;
     sumData.forEach((e) => {
       houseHoldTotalCoins += e.coin;
+    });
+
+    sumData.forEach((e) => {
+      amountTobePaid += e.amountTobePaid;
     });
 
     sumData.forEach((e) => {
@@ -1250,11 +1259,11 @@ organisationController.estimatedCost = async (req, res) => {
     const sumTotal = houseHoldTotalCoins + wastePickerTotalCoins;
 
     const sumPercentage = rewardService.calPercentage(
-      sumTotal,
+      amountTobePaid,
       user.systemCharge
     );
 
-    const sum = sumTotal + sumPercentage;
+    const sum = amountTobePaid + sumPercentage;
 
     return res.status(200).json({
       error: false,
@@ -1284,7 +1293,8 @@ organisationController.ongoingbilling = async (req, res) => {
       subtotal = 0,
       total = 0,
       household = 0,
-      wastePickersTotal = 0;
+      wastePickersTotal = 0,
+      amountTobePaid = 0;
     if (transactions.length > 0) {
       // get the highest createdAt and lowest created At
       let arr = [];
@@ -1296,13 +1306,20 @@ organisationController.ongoingbilling = async (req, res) => {
       });
 
       transactions.forEach((e) => {
+        amountTobePaid += e.amountTobePaid;
+      });
+
+      transactions.forEach((e) => {
         wastePickersTotal += e.wastePickerCoin;
       });
 
       subtotal = household + wastePickersTotal;
       if (subtotal > 0) {
-        percentage = rewardService.calPercentage(subtotal, user.systemCharge);
-        total = subtotal + percentage;
+        percentage = rewardService.calPercentage(
+          amountTobePaid,
+          user.systemCharge
+        );
+        total = amountTobePaid + percentage;
       }
 
       end = new Date(Math.max(...arr));
@@ -1311,6 +1328,7 @@ organisationController.ongoingbilling = async (req, res) => {
       start.toUTCString().split(" ").slice(0, 3).join(" ");
       end.toUTCString().split(" ").slice(0, 4).join(" ");
     }
+    console.log("start", start);
 
     // billing
     return res.status(200).json({
@@ -1320,9 +1338,9 @@ organisationController.ongoingbilling = async (req, res) => {
         startMonth: start,
         endMonth: end,
         transactions,
-        household,
-        wastePickersTotal,
-        subtotal: subtotal.toFixed(2),
+        //household,
+        //wastePickersTotal,
+        subtotal: amountTobePaid.toFixed(2),
         serviceCharge: percentage.toFixed(2),
         total: total.toFixed(2),
       },

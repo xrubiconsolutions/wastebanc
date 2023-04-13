@@ -38,8 +38,8 @@ async function AuthTokenVerify(req, res, next, canPass) {
       CONSTANTS.SERVER.JWT_SECRET_KEY
     );
 
-    console.log("user id", userId);
-    console.log("expire in", exp);
+    //console.log("user id", userId);
+    //console.log("expire in", exp);
 
     if (Date.now() >= exp * 1000) {
       return res.status(401).json({

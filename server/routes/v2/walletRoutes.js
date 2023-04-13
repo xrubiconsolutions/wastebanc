@@ -87,4 +87,8 @@ module.exports = (APP) => {
 
   APP.route("/api/encrypt").post(walletController.encrypt);
   APP.route("/api/decrypt").post(walletController.decrypt);
+
+  APP.route("/api/transaction/markAsCompleted").post(
+    walletController.markDisbursementAsCompleted
+  );
 };

@@ -104,7 +104,7 @@ dashboardController.cardMapData = async (req, res) => {
     const totalOrganisation = await organisation(criteria);
     // const allSchedulesCount =
     //   schedules.length - allPending + initPending + allAccepted;
-
+    const totalInsuranceUsers = await insuranceUsers(criteria);
     return res.status(200).json({
       error: false,
       message: "success",
@@ -121,6 +121,7 @@ dashboardController.cardMapData = async (req, res) => {
         totalWastes: Math.ceil(totalWastes),
         totalPayment: Math.ceil(totalPayment),
         totalOutstanding: Math.ceil(totalOutstanding),
+        totalInsuranceUsers,
       },
     });
   } catch (error) {
@@ -746,11 +747,10 @@ const companyCompleted = async (criteria, organisationId) => {
 };
 
 const organisation = async (criteria) => {
-  const condition = { ...criteria };
+  const condition = { ...criteria, isDisabled: false };
   condition.createAt = condition.createdAt;
   delete condition.createdAt;
 
-  console.log("c", condition);
   const totalOrganisation = await organisationModel.countDocuments(condition);
 
   return totalOrganisation;
@@ -763,6 +763,17 @@ const wastePickers = async (criteria) => {
   });
 
   return totalwastePicker;
+};
+
+const insuranceUsers = async (criteria) => {
+  const c = {
+    createAt: criteria.createdAt,
+    state: criteria.state,
+    insuranceUser: true,
+  };
+  const total = await userModel.countDocuments(c);
+
+  return total;
 };
 
 const companyWastePickers = async (criteria, organisationId) => {

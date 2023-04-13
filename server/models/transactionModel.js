@@ -97,6 +97,9 @@ const transaction_Schema = new Schema(
     percentage: {
       type: Number,
     },
+    amountTobePaid: {
+      type: Number,
+    },
     wastePickerPercentage: {
       type: Number,
     },

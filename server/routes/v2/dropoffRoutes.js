@@ -4,6 +4,8 @@ const {
   recyclerValidation,
   companyPakamDataValidation,
 } = require("../../util/auth");
+const commonValidator = require("../../validators/commonValidator.js");
+
 const {
   createDropOffLocation,
   deleteDropOff,
@@ -16,6 +18,13 @@ module.exports = (APP) => {
   APP.route("/api/v2/dropoffs").get(
     adminPakamValidation,
     dropoffController.dropOffs
+  );
+
+  APP.route("/api/v2/household/dropoffs").get(
+    adminPakamValidation,
+    commonValidator.householdScheduleValidation,
+    checkRequestErrs,
+    dropoffController.userdropOffs
   );
 
   APP.route("/api/v2/company/dropoffs").get(

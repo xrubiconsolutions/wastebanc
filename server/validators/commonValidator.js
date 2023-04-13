@@ -22,6 +22,9 @@ module.exports = {
       }),
   ],
   search: [query("key", "search key cannot be empty").exists().notEmpty()],
+  householdScheduleValidation: [
+    query("userId").notEmpty().withMessage("userId is required"),
+  ],
   createArea: [
     body("coverageArea").notEmpty().withMessage("coverageArea is required"),
     body("lga").notEmpty().withMessage("lga is required"),

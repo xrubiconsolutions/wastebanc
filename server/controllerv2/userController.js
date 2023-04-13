@@ -24,7 +24,14 @@ class UserService {
     try {
       const { user } = req;
       const currentScope = user.locationScope;
-      let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        start,
+        end,
+        key,
+        channel = "mobile",
+      } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
@@ -43,6 +50,7 @@ class UserService {
             { lcd: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           roles: "client",
+          channel,
         };
       } else if (start || end) {
         const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -59,9 +67,13 @@ class UserService {
             $lt: endDate,
           },
           roles: "client",
+          channel,
         };
       } else {
-        criteria = {};
+        criteria = {
+          roles: "client",
+          channel,
+        };
       }
 
       if (!currentScope) {
@@ -383,6 +395,7 @@ class UserService {
           // uType: create.uType,
           // organisationType: create.organisationType,
           organisationName: typename.name,
+          requestedAmount: create.requestedAmount,
           token,
         },
       });
@@ -685,7 +698,7 @@ class UserService {
 
       let signal_id;
 
-      console.log("user id", user.onesignal_id);
+      //console.log("user id", user.onesignal_id);
       if (
         !user.onesignal_id ||
         user.onesignal_id === "" ||
@@ -746,6 +759,7 @@ class UserService {
           last_logged_in: user.last_logged_in,
           firstLogin: user.firstLogin,
           terms_condition: user.terms_condition,
+          requestedAmount: user.requestedAmount,
           token,
         },
       });
@@ -930,6 +944,7 @@ class UserService {
       });
     }
   }
+
 }
 
 module.exports = UserService;

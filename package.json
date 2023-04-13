@@ -32,6 +32,7 @@
     "crypto": "^1.0.1",
     "crypto-js": "^4.1.1",
     "derive-password-bytes": "0.0.2",
+    "dotenv": "^16.0.3",
     "express": "^4.16.2",
     "express-fileupload": "^1.2.0",
     "express-validation-swagger": "^0.1.3",

@@ -19,6 +19,7 @@ const {
   userModel,
   collectorModel,
 } = require("../models");
+const axios = require("axios");
 /**
  * incrypt password in case user login implementation
  * @param {*} userPassword
@@ -573,6 +574,16 @@ const paginateResponse = async ({
   };
 };
 
+const makeAxiosRequest = async (requestObj, contentType) => {
+  requestObj.headers = {
+    Authorization: requestObj.authorization,
+    "Content-Type": contentType,
+  };
+  console.log("obj", requestObj);
+  const result = await axios(requestObj);
+  return result.data;
+};
+
 /*exporting all object from here*/
 module.exports = {
   sendError: sendError,
@@ -612,4 +623,5 @@ module.exports = {
   updateCollector,
   storeActivites,
   paginateResponse,
+  makeAxiosRequest,
 };

@@ -18,6 +18,7 @@ const { sendInvoiceMail } = require("../../services/sendEmail");
 
 class invoiceService {
   static async generateInvoice(start, end, companyId, authuser) {
+    console.log("com", companyId);
     const organisation = await organisationModel.findById(companyId);
 
     if (!organisation) throw new Error("Invalid companyId passed");
@@ -29,8 +30,9 @@ class invoiceService {
         $lt: endDate,
       },
       organisationID: companyId,
-      organisationPaid: false,
+      //organisationPaid: false,
       paid: false,
+      //requestedForPayment: false,
     };
 
     let state = [];
@@ -57,7 +59,11 @@ class invoiceService {
       wastePickersTotal = 0,
       totalValue = 0,
       sumPercentage = 0,
-      transId = [];
+      transId = [],
+      householdPercentageTotal = 0,
+      wastePickersPercentageTotal = 0,
+      amountTobePaid = 0,
+      amountPayable = 0;
 
     const totalResult = await transactionModel.find(criteria);
 
@@ -67,15 +73,33 @@ class invoiceService {
       });
 
       totalResult.forEach((e) => {
+        amountTobePaid += e.amountTobePaid;
+      });
+
+      totalResult.forEach((e) => {
+        householdPercentageTotal += e.percentage;
+      });
+
+      totalResult.forEach((e) => {
+        wastePickersPercentageTotal += e.wastePickerPercentage;
+      });
+
+      totalResult.forEach((e) => {
         wastePickersTotal += e.wastePickerCoin;
       });
 
       const charges = organisation.systemCharge || 15;
-      totalValue = householdTotal + wastePickersTotal;
+      const totalHouseholdTotal = householdTotal + householdPercentageTotal;
+      const totalWastePickersTotal =
+        wastePickersTotal + (wastePickersPercentageTotal || 0);
 
-      sumPercentage = rewardService.calPercentage(totalValue, charges);
-      totalValue = totalValue + sumPercentage;
+      totalValue = totalHouseholdTotal + totalWastePickersTotal;
 
+      sumPercentage = rewardService.calPercentage(amountTobePaid, charges);
+      amountPayable = amountTobePaid + sumPercentage;
+
+      // console.log("totalH", totalHouseholdTotal);
+      // console.log("totalWas", totalWastePickersTotal);
       transId = totalResult.map((value) => value._id);
 
       const dd = Date.now();
@@ -90,9 +114,10 @@ class invoiceService {
         startDate,
         endDate,
         transactions: transId,
-        amount: totalValue.toFixed(2),
-        householdTotal,
-        wastePickersTotal,
+        amountWithoutServiceCharge: amountTobePaid.toFixed(2),
+        amount: amountPayable.toFixed(2),
+        householdTotal: totalHouseholdTotal.toFixed(2),
+        wastePickersTotal: totalWastePickersTotal.toFixed(2),
         serviceCharge: sumPercentage.toFixed(2),
         expectedPaymentDate,
         state,
@@ -113,8 +138,8 @@ class invoiceService {
         start: invoiceResult.startDate,
         end: invoiceResult.endDate,
         result: totalResult,
-        householdTotal,
-        wastePickersTotal,
+        householdTotal: totalHouseholdTotal.toFixed(2),
+        wastePickersTotal: totalWastePickersTotal.toFixed(2),
         totalValue: totalValue.toFixed(2),
         sumPercentage: sumPercentage.toFixed(2),
         from,
@@ -376,6 +401,7 @@ class invoiceService {
         "type",
         "address",
         "phone",
+        "amountTobePaid",
       ]);
 
     if (!invoice)
@@ -494,7 +520,10 @@ class invoiceService {
 
     const template = await invoiceTemplate(invoiceData);
 
-    const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
+    const browser = await puppeteer.launch({
+      args: ["--no-sandbox"],
+      executablePath: "/usr/bin/chromium-browser",
+    });
     const page = await browser.newPage();
     const path = "invoice.pdf";
 

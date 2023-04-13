@@ -2555,11 +2555,18 @@ userController.totalGender = async (REQUEST, RESPONSE) => {
         gender: "female",
       })
       .countDocuments();
+    const totalInsuranceUser = await MODEL.userModel
+      .find({
+        ...criteria,
+        insuranceUser: true,
+      })
+      .countDocuments();
     return RESPONSE.status(200).json({
       message: "Total users",
       data: {
         male: totalMales,
         female: totalFemales,
+        totalInsuranceUser: totalInsuranceUser,
       },
     });
   } catch (error) {

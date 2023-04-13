@@ -901,6 +901,7 @@ class CollectorService {
           pin_id: send.data.pinId,
           terms_condition: create.terms_condition,
           aggregatorId: create.aggregatorId,
+          requestedAmount: create.requestedAmount,
           token,
         },
       });
@@ -1655,24 +1656,21 @@ class CollectorService {
       await collectorModel.updateOne(
         { _id: user._id },
         {
-          $set: {
-            email,
-            phone: user.phone,
-            gender: req.body.gender.toLowerCase() || user.gender,
-            dateOfBirth: req.body.dateOfBirth || user.dateOfBirth,
-            address: req.body.address || user.address,
-            fullname,
-            country: req.body.country || user.country,
-            state: req.body.state || user.state,
-            place: req.body.place || user.place,
-            aggregatorId: req.body.aggregatorId || user.aggregatorId,
-            organisation: req.body.organisation || user.organisation,
-            organisationId: organisationId,
-            localGovernment: req.body.localGovernment || user.localGovernment,
-            profile_picture: req.body.profile_picture || user.profile_picture,
-            areaOfAccess:
-              organisation.streetOfAccess || user.areaOfAccess || [],
-          },
+          email,
+          phone: user.phone,
+          gender: req.body.gender || user.gender,
+          dateOfBirth: req.body.dateOfBirth,
+          address: req.body.address,
+          fullname: req.body.fullname,
+          country: req.body.country || user.country,
+          state: req.body.state || user.state,
+          place: req.body.place || user.place,
+          aggregatorId: req.body.aggregatorId,
+          organisation: req.body.organisation || user.organisation,
+          organisationId: organisationId,
+          localGovernment: req.body.localGovernment,
+          profile_picture: req.body.profile_picture,
+          areaOfAccess: organisation.streetOfAccess || user.areaOfAccess || [],
         }
       );
 
@@ -2120,7 +2118,11 @@ class CollectorService {
       return res.status(200).json({
         error: false,
         message: "Point Balance",
-        data: { balance: collector.pointGained, ledgerBalance },
+        data: {
+          balance: collector.pointGained,
+          ledgerBalance,
+          requestedAmount: 0,
+        },
       });
     } catch (error) {
       console.log(error);
@@ -2207,7 +2209,7 @@ class CollectorService {
       };
 
       const result = await axios.post(
-        "https://apiv2.pakam.ng./api/wastepicker/withdrawal/summary",
+        `${process.env.PAYMENT_URL}wastepicker/withdrawal/summary`,
         body,
         {
           headers: {
@@ -2234,7 +2236,7 @@ class CollectorService {
         collectorId: user._id,
       };
       const result = await axios.post(
-        "https://apiv2.pakam.ng./api/wastepicker/request/otp",
+        `${process.env.PAYMENT_URL}wastepicker/request/otp`,
         body,
         {
           headers: {
@@ -2265,7 +2267,7 @@ class CollectorService {
       };
 
       const result = await axios.post(
-        "https://apiv2.pakam.ng./api/disbursement/collector/initiate",
+        `${process.env.PAYMENT_URL}disbursement/collector/initiate`,
         body,
         {
           headers: {
@@ -2295,7 +2297,7 @@ class CollectorService {
       };
 
       const result = await axios.post(
-        "https://apiv2.pakam.ng./api/wastepicker/request/otp",
+        `${process.env.PAYMENT_URL}wastepicker/request/otp`,
         body,
         {
           headers: {
