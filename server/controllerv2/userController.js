@@ -5,6 +5,7 @@ const {
   verificationLogModel,
   organisationTypeModel,
   userBinModel,
+  userInsuranceModel,
 } = require("../models");
 const {
   sendResponse,
@@ -601,7 +602,6 @@ class UserService {
         });
       }
 
-      console.log("user", user.password);
       const compare = await comparePassword(req.body.password, user.password);
       console.log("compare", compare);
       if (!compare) {
@@ -659,8 +659,6 @@ class UserService {
         const send = await axios.post(options.url, options.body, {
           headers: options.headers,
         });
-
-        console.log("res", send.data);
 
         return res.status(200).json({
           error: false,
@@ -728,6 +726,12 @@ class UserService {
       const token = authToken(user);
       delete user.password;
 
+      const userInsurance = await userInsuranceModel.find({
+        expiration_date: {
+          $gte: new Date(),
+        },
+      });
+      console.log({ userInsurance });
       return res.status(200).json({
         error: false,
         message: "Login successfull",
@@ -944,7 +948,6 @@ class UserService {
       });
     }
   }
-
 }
 
 module.exports = UserService;

@@ -411,7 +411,7 @@ userController.loginUser = async (REQUEST, RESPONSE) => {
         ? COMMON_FUN.decryptPswrd(
             REQUEST.body.password,
             USER.password,
-            (ERR, MATCHED) => {
+            async (ERR, MATCHED) => {
               if (ERR)
                 return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
               else if (!MATCHED)
@@ -431,8 +431,26 @@ userController.loginUser = async (REQUEST, RESPONSE) => {
                     console.log("Logged date updated", new Date());
                   }
                 );
+                const userInsurance = await MODEL.userInsuranceModel.findOne(
+                  {
+                    expiration_date: {
+                      $gte: new Date(),
+                    },
+                  },
+                  {
+                    _id: 1,
+                    payment_plan: 1,
+                    plan_name: 1,
+                    product_id: 1,
+                    price: 1,
+                    expiration_date: 1,
+                    activation_date: 1,
+                    policy_id: 1,
+                  }
+                );
 
                 USER.token = jwtToken;
+                USER.insurance = userInsurance;
 
                 return RESPONSE.jsonp(USER);
               }
