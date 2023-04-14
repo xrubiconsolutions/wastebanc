@@ -2,7 +2,7 @@ const {
   productLists,
   buyHealthInsurance,
 } = require("../modules/partners/mycover.io/mycoverService");
-
+const { userInsuranceModel } = require("../models");
 class InsuranceController {
   static async healthProductLists(req, res) {
     try {
@@ -27,6 +27,36 @@ class InsuranceController {
       return res.status(400).json({ ...result });
     }
     return res.status(200).json({ ...result });
+  }
+
+  static async getUserInsuranceHistory(req, res) {
+    try {
+      const { user } = req;
+      const insuranceList = await userInsuranceModel.find(
+        {
+          user: user._id,
+        },
+        {
+          _id: 1,
+          payment_plan: 1,
+          plan_name: 1,
+          product_id: 1,
+          price: 1,
+          expiration_date: 1,
+          activation_date: 1,
+          policy_id: 1,
+        }
+      );
+      return res.status(200).json({
+        error: false,
+        data: insuranceList,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: true,
+        message: "An error occured",
+      });
+    }
   }
 }
 
