@@ -1734,6 +1734,9 @@ class ScheduleService {
 
       let totalPointGained = 0;
       let totalWeight = 0;
+      let wastePickerCoin = 0;
+      let wastePickerPercentage = 0;
+      let collectorPoint = 0;
 
       pointGained.forEach((a) => {
         totalPointGained += parseFloat(a);
@@ -1743,19 +1746,61 @@ class ScheduleService {
         totalWeight += parseFloat(a["quantity"] || 0);
       });
 
+      let cat = [];
+      await Promise.all(
+        transaction.categories.map(async (category) => {
+          console.log("c", category);
+          const catDetail = await categoryModel.findOne({
+            $or: [{ name: category.name }, { value: category.name }],
+          });
+          if (catDetail) {
+            const value = {
+              name: catDetail.name,
+              catId: catDetail._id,
+              quantity: category.quantity,
+            };
+            cat.push(value);
+          }
+        })
+      );
+
+      if (cat.length == 0) {
+        return res.status(400).json({
+          message: "Invaild category passed",
+          error: true,
+        });
+      }
+
       const pakamPer = rewardService.calPercentage(totalPointGained, 10);
 
       const userCoin = Number(totalPointGained) - Number(pakamPer);
 
       const collector = await collectorModel.findById(schedule.collectedBy);
       if (collector && collector.collectorType == "waste-picker") {
-        console.log("collector is waste picker");
+        const wastepickerReward = await rewardService.picker(
+          cat,
+          organisation
+        );
+        if (!wastepickerReward.error) {
+          wastePickerCoin = wastepickerReward.totalpointGained;
+          wastePickerPercentage = rewardService.calPercentage(
+            wastepickerReward.totalpointGained,
+            10
+          );
+          collectorPoint = wastePickerCoin - wastePickerPercentage;
+        }
       }
       console.log("collector not a waste picker");
 
-      return res
-        .status(200)
-        .json({ totalPointGained, totalWeight, userCoin, pakamPer });
+      return res.status(200).json({
+        totalPointGained,
+        totalWeight,
+        userCoin,
+        pakamPer,
+        wastePickerCoin,
+        collectorPoint,
+        wastePickerPercentage,
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({
