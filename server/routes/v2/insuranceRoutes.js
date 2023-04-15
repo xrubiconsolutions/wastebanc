@@ -22,4 +22,9 @@ module.exports = (APP) => {
     checkRequestErrs,
     InsuranceController.purchaseHealthInsuance
   );
+
+  APP.route("/api/insurance/health/history").get(
+    userValidation,
+    InsuranceController.getUserInsuranceHistory
+  );
 };

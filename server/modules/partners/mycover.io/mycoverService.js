@@ -7,6 +7,7 @@ const {
   userModel,
   disbursementRequestModel,
   insuranceLog,
+  userInsuranceModel,
 } = require("../../../models");
 const moment = require("moment");
 
@@ -59,11 +60,14 @@ const buyHealthInsurance = async (data, userId) => {
   } = data;
   try {
     const user = await userModel.findById(userId);
+    const userInsurance = await userInsuranceModel.find({
+      expiration_date: {
+        $gte: new Date(),
+      },
+    });
 
-    if (
-      user.insuranceExpiryDate &&
-      new Date() < new Date(user.insuranceExpiryDate)
-    )
+    // return error if user has unexpired insurance
+    if (userInsurance.length > 0)
       return {
         error: true,
         message: "Existing Insurance plan is still active",
@@ -84,7 +88,6 @@ const buyHealthInsurance = async (data, userId) => {
       };
 
     const { price } = product;
-
     // calculate insurance amount and check if user has enough to py
     const amount = Number(price) * plan_duration;
     const userBalance = user.availablePoints - Number(amount);
@@ -130,9 +133,35 @@ const buyHealthInsurance = async (data, userId) => {
         insurancePolicyID: result.data.data.policy.id,
         availablePoints: userBalance,
         insuranceAmount: amount,
-        insuranceExpiryDate: moment().add(plan_duration, "months").calendar(),
+        // insuranceExpiryDate: moment().add(plan_duration, "months").calendar(),
       }
     );
+
+    const {
+      expiration_date,
+      activation_date,
+      id: policyId,
+    } = result.data.data.policy;
+
+    // create user insurance document and add log
+    await userInsuranceModel.create({
+      payment_plan: plan_duration,
+      gender,
+      image_url,
+      first_name,
+      last_name,
+      email,
+      dob: new Date(dob).toISOString(),
+      phone,
+      product_id,
+      user: userId,
+      expiration_date,
+      activation_date,
+      price,
+      policy_id: policyId,
+      user: user._id,
+      plan_name: product.name,
+    });
 
     await insuranceLog.create({
       user: userId,

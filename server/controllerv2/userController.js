@@ -5,11 +5,15 @@ const {
   verificationLogModel,
   organisationTypeModel,
   userBinModel,
+<<<<<<< HEAD
   scheduleModel,
   scheduleDropModel,
   disbursementRequestModel,
   charityModel,
   insuranceLog,
+=======
+  userInsuranceModel,
+>>>>>>> 15d1e291808ac2d71148d62de7dfb11e0d0ce865
 } = require("../models");
 const {
   sendResponse,
@@ -664,8 +668,6 @@ class UserService {
           headers: options.headers,
         });
 
-        console.log("res", send.data);
-
         return res.status(200).json({
           error: false,
           message: "Phone number not verified",
@@ -732,6 +734,12 @@ class UserService {
       const token = authToken(user);
       delete user.password;
 
+      const userInsurance = await userInsuranceModel.find({
+        expiration_date: {
+          $gte: new Date(),
+        },
+      });
+      console.log({ userInsurance });
       return res.status(200).json({
         error: false,
         message: "Login successfull",
@@ -948,6 +956,7 @@ class UserService {
       });
     }
   }
+<<<<<<< HEAD
 
   //TODO
   // get user details
@@ -1424,6 +1433,8 @@ class UserService {
   }
 
   // completed 
+=======
+>>>>>>> 15d1e291808ac2d71148d62de7dfb11e0d0ce865
 }
 
 module.exports = UserService;

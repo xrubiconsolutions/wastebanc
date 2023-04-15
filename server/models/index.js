@@ -52,4 +52,5 @@ module.exports = {
   newsModel: require("./newsModel"),
   disbursementRequestModel: require("./disbursementRequestModel"),
   insuranceLog: require("./insuranceLogsModel"),
+  userInsuranceModel: require("./userInsuranceModel"),
 };
