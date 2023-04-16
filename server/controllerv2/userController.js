@@ -1067,11 +1067,16 @@ class UserService {
             { bankName: { $regex: `.*${key}.*`, $options: "i" } },
             { status: { $regex: `.*${key}.*`, $options: "i" } },
             { beneName: { $regex: `.*${key}.*`, $options: "i" } },
-            { withdrawalAmount: { $eq: parseFloat(key) } },
+            //{ withdrawalAmount: { $eq: parseFloat(key) } },
           ],
           user: user._id,
           status,
         };
+        if(typeof parseFloat(key) == 'number'){
+          criteria.withdrawalAmount = {
+            $eq: parseFloat(key) 
+          }
+        }
       } else if (startDate || endDate) {
         criteria = {
           createdAt: {
