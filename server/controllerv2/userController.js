@@ -1072,11 +1072,18 @@ class UserService {
           user: user._id,
           status,
         };
-        // if(typeof parseFloat(key) == 'number'){
-        //   criteria.withdrawalAmount = {
-        //     $eq: parseFloat(key) 
-        //   }
-        // }
+      } else if (key && parseFloat(key)) {
+        criteria = {
+          $or: [
+            { destinationAccount: { $regex: `.*${key}.*`, $options: "i" } },
+            { bankName: { $regex: `.*${key}.*`, $options: "i" } },
+            { status: { $regex: `.*${key}.*`, $options: "i" } },
+            { beneName: { $regex: `.*${key}.*`, $options: "i" } },
+            { withdrawalAmount: { $eq: parseFloat(key) } },
+          ],
+          user: user._id,
+          status,
+        };
       } else if (startDate || endDate) {
         criteria = {
           createdAt: {
@@ -1181,7 +1188,7 @@ class UserService {
 
       let criteria;
 
-      if (key) {
+      if (key && parseFloat(key)) {
         criteria = {
           $or: [{ amount: { $eq: parseFloat(key) } }],
           cardID: user._id.toString(),
@@ -1299,7 +1306,7 @@ class UserService {
 
       let criteria;
 
-      if (key) {
+      if (key && parseFloat(key)) {
         criteria = {
           $or: [{ amountPaid: { $eq: parseFloat(key) } }],
           user: user._id,
