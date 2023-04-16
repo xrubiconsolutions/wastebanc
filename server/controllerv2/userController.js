@@ -5,15 +5,12 @@ const {
   verificationLogModel,
   organisationTypeModel,
   userBinModel,
-<<<<<<< HEAD
   scheduleModel,
   scheduleDropModel,
   disbursementRequestModel,
   charityModel,
   insuranceLog,
-=======
   userInsuranceModel,
->>>>>>> 15d1e291808ac2d71148d62de7dfb11e0d0ce865
 } = require("../models");
 const {
   sendResponse,
@@ -956,7 +953,6 @@ class UserService {
       });
     }
   }
-<<<<<<< HEAD
 
   //TODO
   // get user details
@@ -1432,9 +1428,7 @@ class UserService {
     }
   }
 
-  // completed 
-=======
->>>>>>> 15d1e291808ac2d71148d62de7dfb11e0d0ce865
+  // completed
 }
 
 module.exports = UserService;
