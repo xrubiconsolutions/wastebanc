@@ -1072,11 +1072,11 @@ class UserService {
           user: user._id,
           status,
         };
-        if(typeof parseFloat(key) == 'number'){
-          criteria.withdrawalAmount = {
-            $eq: parseFloat(key) 
-          }
-        }
+        // if(typeof parseFloat(key) == 'number'){
+        //   criteria.withdrawalAmount = {
+        //     $eq: parseFloat(key) 
+        //   }
+        // }
       } else if (startDate || endDate) {
         criteria = {
           createdAt: {
