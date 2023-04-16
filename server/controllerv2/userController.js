@@ -1126,7 +1126,7 @@ class UserService {
         message: "success",
         data: {
           payments,
-          totalPayments,
+          totalResult: totalPayments,
           page,
           resultsPerPage,
           totalPages: Math.ceil(totalPayments / resultsPerPage),
@@ -1244,7 +1244,7 @@ class UserService {
         message: "Data retrieved",
         data: {
           charityPayouts,
-          totalCharityPayout,
+          totalResult: totalCharityPayout,
           page,
           resultsPerPage,
           totalPages: Math.ceil(totalCharityPayout / resultsPerPage),
@@ -1325,7 +1325,7 @@ class UserService {
         message: "success",
         data: {
           insurance,
-          totalInsurance,
+          totalResult: totalInsurance,
           page,
           resultsPerPage,
           totalPages: Math.ceil(totalInsurance / resultsPerPage),
@@ -1413,7 +1413,7 @@ class UserService {
         message: "success",
         data: {
           users,
-          totalUsers,
+          totalResult: totalUsers,
           page,
           resultsPerPage,
           totalPages: Math.ceil(totalUsers / resultsPerPage),
