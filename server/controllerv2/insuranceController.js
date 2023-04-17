@@ -2,7 +2,7 @@ const {
   productLists,
   buyHealthInsurance,
 } = require("../modules/partners/mycover.io/mycoverService");
-const { userInsuranceModel } = require("../models");
+const { userInsuranceModel, userModel } = require("../models");
 class InsuranceController {
   static async healthProductLists(req, res) {
     try {
@@ -29,6 +29,7 @@ class InsuranceController {
     return res.status(200).json({ ...result });
   }
 
+  // for mobile request
   static async getUserInsuranceHistory(req, res) {
     try {
       const { user } = req;

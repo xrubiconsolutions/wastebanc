@@ -10,6 +10,7 @@ const {
   userInsuranceModel,
 } = require("../../../models");
 const moment = require("moment");
+const ObjectId = require("mongodb").ObjectID;
 
 const productLists = async () => {
   try {
@@ -61,6 +62,7 @@ const buyHealthInsurance = async (data, userId) => {
   try {
     const user = await userModel.findById(userId);
     const userInsurance = await userInsuranceModel.find({
+      user: ObjectId(user._id),
       expiration_date: {
         $gte: new Date(),
       },

@@ -47,4 +47,12 @@ module.exports = {
       .withMessage("companyId id is invalid")
       .isMongoId(),
   ],
+  userId: [
+    param("userId")
+      .notEmpty()
+      .isString()
+      .withMessage("userId is required")
+      .isMongoId()
+      .withMessage("userId id is invalid"),
+  ],
 };

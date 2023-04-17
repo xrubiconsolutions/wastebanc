@@ -18,6 +18,7 @@ const {
   encryptPassword,
   authToken,
   comparePassword,
+  paginateResponse,
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const request = require("request");
@@ -1273,76 +1274,44 @@ class UserService {
 
   // get user insurance purchases
   static async userInsurancePurchases(req, res) {
+    const { userId } = req.params;
+    const { key } = req.query;
     try {
-      const { userId } = req.params;
-      let { page = 1, resultsPerPage = 20, key, start, end } = req.query;
-      if (typeof page === "string") page = parseInt(page);
-      if (typeof resultsPerPage === "string")
-        resultsPerPage = parseInt(resultsPerPage);
-
+      // find user or throw error if no user found
       const user = await userModel.findById(userId);
-      if (!user) {
-        return res.status(400).json({
+      if (!user)
+        return res.status(404).json({
           error: true,
-          message: "User not found",
-        });
-      }
-
-      if (!key && (!start || !end))
-        return res.status(422).json({
-          error: true,
-          message: "Supply a date range (start and end) or key to search",
+          message: "Account not found",
         });
 
-      if (new Date(start) > new Date(end)) {
-        return res.status(400).json({
-          error: true,
-          message: "Start date cannot be greater than end date",
-        });
-      }
-
-      const [startDate, endDate] = [new Date(start), new Date(end)];
-      endDate.setDate(endDate.getDate() + 1);
-
-      let criteria;
-
-      if (key && parseFloat(key)) {
-        criteria = {
-          $or: [{ amountPaid: { $eq: parseFloat(key) } }],
-          user: user._id,
-        };
-      } else if (startDate || endDate) {
-        criteria = {
-          createdAt: {
-            $gte: startDate,
-            $lt: endDate,
-          },
-          user: user._id,
-        };
-      } else {
-        criteria = {
-          user: user._id,
-        };
-      }
-
-      const totalInsurance = await insuranceLog.countDocuments(criteria);
-      const insurance = await insuranceLog
-        .find(criteria)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * resultsPerPage)
-        .limit(resultsPerPage)
-        .lean();
-      return res.status(200).json({
-        error: false,
-        message: "success",
-        data: {
-          insurance,
-          totalResult: totalInsurance,
-          page,
-          resultsPerPage,
-          totalPages: Math.ceil(totalInsurance / resultsPerPage),
+      // gather the user insurance history and return
+      const response = await paginateResponse({
+        model: userInsuranceModel,
+        query: {},
+        searchQuery: {
+          $or: [
+            { plan_name: { $regex: `.*${key}.*`, $options: "i" } },
+            { product_id: { $regex: `.*${key}.*`, $options: "i" } },
+            { price: { $regex: `.*${key}.*`, $options: "i" } },
+          ],
+        },
+        startDate: "2020-01-01",
+        endDate: new Date(),
+        ...req.query,
+        title: "data",
+        projection: {
+          _id: 1,
+          payment_plan: 1,
+          plan_name: 1,
+          product_id: 1,
+          price: 1,
+          expiration_date: 1,
+          activation_date: 1,
+          policy_id: 1,
         },
       });
+      return res.status(200).json(response);
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -1355,80 +1324,151 @@ class UserService {
   //get insurance users
 
   static async insuranceUser(req, res) {
-    let { page = 1, resultsPerPage = 20, key, start, end } = req.query;
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      key,
+      start = "2020-01-01",
+      end = new Date(),
+    } = req.query;
+    // construct pagination data
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    if (!key && (!start || !end))
+      return res.status(422).json({
+        error: true,
+        message: "Supply a date range (start and end) or key to search",
+      });
+
+    if (new Date(start) > new Date(end)) {
+      return res.status(400).json({
+        error: true,
+        message: "Start date cannot be greater than end date",
+      });
+    }
+
+    const [startDate, endDate] = [new Date(start), new Date(end)];
+    endDate.setDate(endDate.getDate() + 1);
+
+    // construct criteria
+    let criteria;
+
+    if (key) {
+      criteria = {
+        $or: [
+          {
+            phone: { $regex: `.*${key}.*`, $options: "i" },
+          },
+          {
+            first_name: {
+              $regex: `.*${key}.*`,
+              $options: "i",
+            },
+          },
+          {
+            last_name: {
+              $regex: `.*${key}.*`,
+              $options: "i",
+            },
+          },
+          { price: { $regex: `.*${key}.*`, $options: "i" } },
+          { plan_name: { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+      };
+    } else if (startDate || endDate) {
+      criteria = {
+        activation_date: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+      };
+    } else {
+      criteria = {};
+    }
+
+    const paginationQuery = [
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $skip: (page - 1) * resultsPerPage,
+      },
+      {
+        $limit: resultsPerPage,
+      },
+    ];
+
+    const pipeline = [
+      {
+        $match: criteria,
+      },
+      {
+        $group: {
+          _id: "$user",
+          purchases: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+      {
+        $project: {
+          lastPurchase: {
+            $last: "$purchases",
+          },
+          userId: "$_id",
+          _id: 0,
+        },
+      },
+      {
+        $project: {
+          _id: "$lastPurchase._id",
+          userId: 1,
+          plan_name: "$lastPurchase.plan_name",
+          price: "$lastPurchase.price",
+          first_name: "$lastPurchase.first_name",
+          last_name: "$lastPurchase.last_name",
+          phone: "$lastPurchase.phone_name",
+          activation_date: "$lastPurchase.activation_date",
+          expiration_date: "$lastPurchase.expiration_date",
+          createdAt: "$lastPurchase.createdAt",
+        },
+      },
+    ];
+
+    const countCriteria = [
+      ...pipeline,
+      {
+        $count: "createdAt",
+      },
+    ];
 
     try {
-      if (typeof page === "string") page = parseInt(page);
-      if (typeof resultsPerPage === "string")
-        resultsPerPage = parseInt(resultsPerPage);
+      let totalResult = await userInsuranceModel.aggregate(countCriteria);
+      const users = await userInsuranceModel.aggregate([
+        ...pipeline,
+        ...paginationQuery,
+      ]);
 
-      if (!key && (!start || !end))
-        return res.status(422).json({
-          error: true,
-          message: "Supply a date range (start and end) or key to search",
-        });
-
-      if (new Date(start) > new Date(end)) {
-        return res.status(400).json({
-          error: true,
-          message: "Start date cannot be greater than end date",
-        });
-      }
-
-      const [startDate, endDate] = [new Date(start), new Date(end)];
-      endDate.setDate(endDate.getDate() + 1);
-
-      let criteria;
-
-      if (key) {
-        criteria = {
-          $or: [
-            {
-              "insuranceDetails.phone": { $regex: `.*${key}.*`, $options: "i" },
-            },
-            {
-              "insuranceDetails.first_name": {
-                $regex: `.*${key}.*`,
-                $options: "i",
-              },
-            },
-            { purchaseAmount: { $regex: `.*${key}.*`, $options: "i" } },
-            { calAmount: { $regex: `.*${key}.*`, $options: "i" } },
-          ],
-          insuranceUser: true,
-        };
-      } else if (startDate || endDate) {
-        criteria = {
-          purchaseDate: {
-            $gte: startDate,
-            $lt: endDate,
-          },
-          insuranceUser: true,
-        };
+      let totalValue;
+      if (totalResult.length == 0) {
+        totalValue = 0;
       } else {
-        criteria = {
-          insuranceUser: true,
-        };
+        totalValue = Object.values(totalResult[0])[0];
       }
-
-      console.log("c", criteria);
-      const totalUsers = await userModel.countDocuments(criteria);
-      const users = await userModel
-        .find(criteria)
-        .select({ password: 0, availablePoints: 0 })
-        .sort({ purchaseDate: -1 })
-        .skip((page - 1) * resultsPerPage)
-        .limit(resultsPerPage);
 
       return res.status(200).json({
         error: false,
         message: "success",
         data: {
           users,
-          totalResult: totalUsers,
+          totalResult: totalValue,
           page,
           resultsPerPage,
-          totalPages: Math.ceil(totalUsers / resultsPerPage),
+          totalPages: Math.ceil(totalValue / resultsPerPage),
         },
       });
     } catch (error) {

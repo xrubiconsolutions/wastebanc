@@ -5,6 +5,8 @@ const {
   userValidation,
 } = require("../../util/auth");
 
+const commonValidator = require("../../validators/commonValidator");
+
 const {
   purchaseHealthInsuranceValidator,
 } = require("../../validators/insuranceValidator");
