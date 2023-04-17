@@ -2,7 +2,6 @@ const {
   productLists,
   buyHealthInsurance,
 } = require("../modules/partners/mycover.io/mycoverService");
-const { paginateResponse } = require("../util/commonFunction");
 const { userInsuranceModel, userModel } = require("../models");
 class InsuranceController {
   static async healthProductLists(req, res) {

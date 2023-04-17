@@ -29,11 +29,4 @@ module.exports = (APP) => {
     userValidation,
     InsuranceController.getUserInsuranceHistory
   );
-
-  APP.route("/api/insurance/health/user-history/:userId").get(
-    adminPakamValidation,
-    commonValidator.userId,
-    checkRequestErrs,
-    InsuranceController.getInsuranceHistory
-  );
 };
