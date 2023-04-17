@@ -60,55 +60,6 @@ class InsuranceController {
       });
     }
   }
-
-  // admin request for user insurance history
-  static async getInsuranceHistory(req, res) {
-    const { userId } = req.params;
-    const { key } = req.query;
-    console.log({ userId });
-    try {
-      // find user or throw error if no user found
-      const user = await userModel.findById(userId);
-      if (!user)
-        return res.status(404).json({
-          error: true,
-          message: "Account not found",
-        });
-
-      // gather the user insurance history and return
-      const response = await paginateResponse({
-        model: userInsuranceModel,
-        query: {},
-        searchQuery: {
-          $or: [
-            { plan_name: { $regex: `.*${key}.*`, $options: "i" } },
-            { product_id: { $regex: `.*${key}.*`, $options: "i" } },
-          ],
-        },
-        startDate: "2020-01-01",
-        endDate: new Date(),
-        ...req.query,
-        title: "data",
-        projection: {
-          _id: 1,
-          payment_plan: 1,
-          plan_name: 1,
-          product_id: 1,
-          price: 1,
-          expiration_date: 1,
-          activation_date: 1,
-          policy_id: 1,
-        },
-      });
-      return res.status(200).json(response);
-    } catch (e) {
-      console.log(e.stack);
-      res.status(500).json({
-        error: true,
-        message: "An error occured",
-      });
-    }
-  }
 }
 
 module.exports = InsuranceController;

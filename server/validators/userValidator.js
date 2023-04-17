@@ -277,6 +277,8 @@ module.exports = {
       .notEmpty()
       .withMessage("userId is required")
       .isString()
-      .withMessage("userId should be a string"),
+      .withMessage("userId should be a string")
+      .isMongoId()
+      .withMessage("userId id is invalid"),
   ],
 };
