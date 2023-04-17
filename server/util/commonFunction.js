@@ -522,6 +522,7 @@ const paginateResponse = async ({
   end,
   select,
   populate,
+  projection,
   title = "data",
 }) => {
   if (typeof page === "string") page = parseInt(page);
@@ -555,7 +556,7 @@ const paginateResponse = async ({
   }
   const totalResult = await model.countDocuments(criteria);
   const data = await model
-    .find(criteria)
+    .find(criteria, projection)
     .populate(populate)
     .select(select)
     .sort({ createdAt: -1 })
