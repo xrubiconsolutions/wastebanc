@@ -271,4 +271,12 @@ module.exports = {
       .isString()
       .withMessage("userId should be string"),
   ],
+
+  userDetails: [
+    param("userId")
+      .notEmpty()
+      .withMessage("userId is required")
+      .isString()
+      .withMessage("userId should be a string"),
+  ],
 };

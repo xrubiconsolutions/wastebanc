@@ -187,6 +187,13 @@ const user_Schema = new Schema({
   insuranceAmount: { type: Number, default: 0 },
   insurancePolicyID: { type: String },
   channel: { type: String, default: "mobile" },
+  purchaseDate: { type: Date },
+  insuranceStartDate: { type: Date },
+  insuranceExpirationDate: { type: Date },
+  hmo_policy_id: { type: String },
+  purchaseAmount: { type: String },
+  calAmount: { type: String },
+  insuranceDetails: { type: Object },
 });
 
 user_Schema.pre("save", function (next) {

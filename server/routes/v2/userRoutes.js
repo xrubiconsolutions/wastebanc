@@ -54,8 +54,38 @@ module.exports = (APP) => {
     UserService.acceptTermsCondition
   );
 
-  APP.route("/api/user/remove").post(
-    userValidation,
-    UserService.deleteUser
+  APP.route("/api/user/remove").post(userValidation, UserService.deleteUser);
+
+  APP.route("/api/user/details/:userId").get(
+    adminPakamValidation,
+    userValidator.userDetails,
+    checkRequestErrs,
+    UserService.userDetails
+  );
+
+  APP.route("/api/user/payout_requests/:userId").get(
+    adminPakamValidation,
+    userValidator.userDetails,
+    checkRequestErrs,
+    UserService.userBankPayoutRequests
+  );
+
+  APP.route("/api/user/insurance").get(
+    adminPakamValidation,
+    UserService.insuranceUser
+  );
+
+  APP.route("/api/user/charity/payout_requests/:userId").get(
+    adminPakamValidation,
+    userValidator.userDetails,
+    checkRequestErrs,
+    UserService.userCharityPayments
+  );
+
+  APP.route("/api/user/insurance_purchase/:userId").get(
+    adminPakamValidation,
+    userValidator.userDetails,
+    checkRequestErrs,
+    UserService.userInsurancePurchases
   );
 };
