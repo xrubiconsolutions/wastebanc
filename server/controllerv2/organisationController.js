@@ -592,33 +592,28 @@ organisationController.update = async (req, res) => {
       categories = organisation.categories;
     }
 
+    let areaOfAccess = [];
+    let streetOfAccess = [];
+
     if (req.body.areaOfAccess.length <= 0) {
-      return res.status(400).json({
-        error: true,
-        message: "Area of access cannot be empty",
+      areaOfAccess = organisation.areaOfAccess;
+    } else {
+      req.body.areaOfAccess.forEach((area) => {
+        if (area != null) {
+          areaOfAccess.push(area);
+        }
       });
     }
 
     if (req.body.streetOfAccess.length <= 0) {
-      return res.status(400).json({
-        error: true,
-        message: "Street of access cannot be empty",
+      streetOfAccess = organisation.streetOfAccess;
+    } else {
+      req.body.streetOfAccess.forEach((area) => {
+        if (area != null) {
+          streetOfAccess.push(area);
+        }
       });
     }
-
-    let areaOfAccess = [];
-    let streetOfAccess = [];
-    req.body.areaOfAccess.forEach((area) => {
-      if (area != null) {
-        areaOfAccess.push(area);
-      }
-    });
-
-    req.body.streetOfAccess.forEach((area) => {
-      if (area != null) {
-        streetOfAccess.push(area);
-      }
-    });
 
     await organisationModel.updateOne(
       { _id: organisation._id },
