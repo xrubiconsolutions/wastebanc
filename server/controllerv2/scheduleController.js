@@ -1602,6 +1602,24 @@ class ScheduleService {
         });
       }
 
+      const transaction = await transactionModel.findOne({
+        scheduleId: scheduleId,
+      });
+
+      if (!transaction) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not yet completed",
+        });
+      }
+
+      if (transaction.approval == "true") {
+        return res.status(400).json({
+          erro: true,
+          message: "Schedule already approved",
+        });
+      }
+
       // const userpoint = scheduler.ledgerPoints.find(
       //   (schedule) => schedule.scheduleId == scheduleId
       // );
@@ -1641,33 +1659,49 @@ class ScheduleService {
       }
 
       if (collector.collectorType == "waste-picker") {
-        const collectorPoint = collector.ledgerPoints.find(
-          (schedule) => schedule.scheduleId == scheduleId
+        // const collectorPoint = collector.ledgerPoints.find(
+        //   (schedule) => schedule.scheduleId == scheduleId
+        // );
+        // if (collectorPoint) {
+        //   const newpoints = collector.ledgerPoints.filter(
+        //     (schedule) => schedule.scheduleId == scheduleId
+        //   );
+        //   collector.pointGained = collector.pointGained + collectorPoint.point;
+        //   collector.ledgerPoints = newpoints;
+        //   collector.save();
+        //   schedule.scheduleApproval = "true";
+        //   schedule.approvedBy = {
+        //     user: user.displayRole || user.roles,
+        //     email: user.email.trim(),
+        //     userId: user._id,
+        //   };
+        //   schedule.approvalDate = new Date();
+        //   schedule.save();
+        //   await transactionModel.updateOne(
+        //     { scheduleId: schedule._id.toString() },
+        //     {
+        //       approval: "true",
+        //     }
+        //   );
+        // }
+
+        collector.pointGained =
+          collector.pointGained + transaction.wastePickerCoin;
+        collector.save();
+        schedule.scheduleApproval = "true";
+        schedule.approvedBy = {
+          user: user.displayRole || user.roles,
+          email: user.email.trim(),
+          userId: user._id,
+        };
+        schedule.approvalDate = new Date();
+        schedule.save();
+        await transactionModel.updateOne(
+          { scheduleId: schedule._id.toString() },
+          {
+            approval: "true",
+          }
         );
-        if (collectorPoint) {
-          const newpoints = collector.ledgerPoints.filter(
-            (schedule) => schedule.scheduleId == scheduleId
-          );
-          collector.pointGained = collector.pointGained + collectorPoint.point;
-          collector.ledgerPoints = newpoints;
-          collector.save();
-
-          schedule.scheduleApproval = "true";
-          schedule.approvedBy = {
-            user: user.displayRole || user.roles,
-            email: user.email.trim(),
-            userId: user._id,
-          };
-          schedule.approvalDate = new Date();
-          schedule.save();
-
-          await transactionModel.updateOne(
-            { scheduleId: schedule._id.toString() },
-            {
-              approval: "true",
-            }
-          );
-        }
       }
 
       return res.status(200).json({
@@ -1777,10 +1811,7 @@ class ScheduleService {
 
       const collector = await collectorModel.findById(schedule.collectedBy);
       if (collector && collector.collectorType == "waste-picker") {
-        const wastepickerReward = await rewardService.picker(
-          cat,
-          organisation
-        );
+        const wastepickerReward = await rewardService.picker(cat, organisation);
         if (!wastepickerReward.error) {
           wastePickerCoin = wastepickerReward.totalpointGained;
           wastePickerPercentage = rewardService.calPercentage(
