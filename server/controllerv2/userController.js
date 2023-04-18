@@ -1431,10 +1431,11 @@ class UserService {
           price: "$lastPurchase.price",
           first_name: "$lastPurchase.first_name",
           last_name: "$lastPurchase.last_name",
-          phone: "$lastPurchase.phone_name",
+          phone: "$lastPurchase.phone",
           activation_date: "$lastPurchase.activation_date",
           expiration_date: "$lastPurchase.expiration_date",
           createdAt: "$lastPurchase.createdAt",
+          phone: "",
         },
       },
     ];
