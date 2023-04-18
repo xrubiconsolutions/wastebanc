@@ -194,6 +194,7 @@ const user_Schema = new Schema({
   purchaseAmount: { type: String },
   calAmount: { type: String },
   insuranceDetails: { type: Object },
+  isChatAdmin: { type: Boolean, default:false },
 });
 
 user_Schema.pre("save", function (next) {

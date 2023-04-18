@@ -839,12 +839,12 @@ class ScheduleService {
 
       // check and make sure the number of category passed from the mobile is equal to the number of categories on the schedule
 
-      if (schedule.categories.length != categories.length) {
-        return res.status(400).json({
-          error: true,
-          message: "Error in the list of categories passed",
-        });
-      }
+      // if (schedule.categories.length != categories.length) {
+      //   return res.status(400).json({
+      //     error: true,
+      //     message: "Error in the list of categories passed",
+      //   });
+      // }
       let cat = [];
 
       await Promise.all(

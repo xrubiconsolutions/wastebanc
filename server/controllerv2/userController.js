@@ -281,6 +281,7 @@ class UserService {
             pin_id: send.data.pinId,
             verified: checkPhone.verified,
             terms_condition: checkPhone.terms_condition || false,
+            isChatAdmin: checkPhone.isChatAdmin || false,
             // uType: create.uType,
             // organisationType: create.organisationType,
             //organisationName: typename.name,
@@ -403,6 +404,7 @@ class UserService {
           // organisationType: create.organisationType,
           organisationName: typename.name,
           requestedAmount: create.requestedAmount,
+          isChatAdmin: create.isChatAdmin || false,
           token,
         },
       });
@@ -580,7 +582,6 @@ class UserService {
 
   static async login(req, res) {
     try {
-      console.log("phone", req.body.phone);
       const user = await userModel.findOne({
         phone: req.body.phone,
       });
@@ -695,6 +696,7 @@ class UserService {
             lcd: user.lcd,
             last_logged_in: user.last_logged_in,
             pin_id: send.data.pinId,
+            isChatAdmin: user.isChatAdmin || false,
             token,
           },
         });
@@ -770,6 +772,7 @@ class UserService {
           firstLogin: user.firstLogin,
           terms_condition: user.terms_condition,
           requestedAmount: user.requestedAmount,
+          isChatAdmin: user.isChatAdmin || false,
           token,
         },
       });
@@ -910,6 +913,7 @@ class UserService {
           last_logged_in: user.last_logged_in,
           firstLogin: user.firstLogin,
           terms_condition: true,
+          isChatAdmin: user.isChatAdmin || false,
           token,
         },
       });
