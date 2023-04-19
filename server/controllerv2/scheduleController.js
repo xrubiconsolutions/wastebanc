@@ -914,8 +914,8 @@ class ScheduleService {
         userCoin + collectorPoint + pakamPercentage + wastePickerPercentage;
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
-        coin: userCoin,
-        wastePickerCoin: collectorPoint,
+        coin: +userCoin.toFixed(),
+        wastePickerCoin: collectorPoint.toFixed(),
         wastePickerPercentage,
         cardID: scheduler._id,
         completedBy: collectorId,
