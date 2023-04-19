@@ -915,7 +915,7 @@ class ScheduleService {
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
         coin: +userCoin.toFixed(),
-        wastePickerCoin: collectorPoint.toFixed(),
+        wastePickerCoin: +collectorPoint.toFixed(),
         wastePickerPercentage,
         cardID: scheduler._id,
         completedBy: collectorId,
@@ -941,7 +941,7 @@ class ScheduleService {
       const message = {
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
-          en: `You have just been credited ${userCoin} for your ${items} pickup`,
+          en: `You have just been credited ${userCoin.toFixed()} for your ${items} pickup`,
         },
         channel_for_external_user_ids: "push",
         include_external_user_ids: [scheduler.onesignal_id],
@@ -950,7 +950,7 @@ class ScheduleService {
       await notificationModel.create({
         title: "Pickup Schedule completed",
         lcd: scheduler.lcd,
-        message: `You have just been credited ${userCoin} for the ${items} pickup`,
+        message: `You have just been credited ${userCoin.toFixed()} for the ${items} pickup`,
         schedulerId: scheduler._id,
       });
 
@@ -989,7 +989,8 @@ class ScheduleService {
         { email: scheduler.email },
         {
           $set: {
-            availablePoints: scheduler.availablePoints + userCoin,
+            availablePoints:
+              scheduler.availablePoints + Number(userCoin.toFixed()),
             //ledgerPoints: newledgerBalance,
             schedulePoints: scheduler.schedulePoints + 1,
           },
