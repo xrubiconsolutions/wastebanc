@@ -303,7 +303,7 @@ class invoiceService {
 
     if (!invoice) return { error: true, msg: "Invoice not found", data: null };
 
-    await invoiceModel.deleteOne(
+    await invoiceModel.updateOne(
       { invoiceNumber },
       {
         isDeleted: true,
