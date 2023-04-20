@@ -592,16 +592,39 @@ organisationController.update = async (req, res) => {
       categories = organisation.categories;
     }
 
+    let areaOfAccess = [];
+    let streetOfAccess = [];
+
+    if (req.body.areaOfAccess.length <= 0) {
+      areaOfAccess = organisation.areaOfAccess;
+    } else {
+      req.body.areaOfAccess.forEach((area) => {
+        if (area != null) {
+          areaOfAccess.push(area);
+        }
+      });
+    }
+
+    if (req.body.streetOfAccess.length <= 0) {
+      streetOfAccess = organisation.streetOfAccess;
+    } else {
+      req.body.streetOfAccess.forEach((area) => {
+        if (area != null) {
+          streetOfAccess.push(area);
+        }
+      });
+    }
+
     await organisationModel.updateOne(
       { _id: organisation._id },
       {
         email: req.body.email || organisation.email,
-        areaOfAccess: req.body.areaOfAccess || organisation.areaOfAccess,
+        areaOfAccess: areaOfAccess,
         companyName: req.body.companyName || organisation.companyName,
         rcNo: req.body.rcNo || organisation.rcNo,
         companyTag: req.body.companyTag || organisation.companyTag,
         phone: req.body.phone || organisation.phone,
-        streetOfAccess: req.body.streetOfAccess || organisation.streetOfAccess,
+        streetOfAccess: streetOfAccess,
         categories: categories,
         location: req.body.location || organisation.location,
         allowPickers,

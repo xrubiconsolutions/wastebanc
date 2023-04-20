@@ -112,7 +112,7 @@ class rewardService {
     return {
       error: false,
       totalpointGained,
-      totalWeight,
+      totalWeight: +totalWeight.toFixed(2),
     };
   }
 
@@ -218,7 +218,7 @@ class rewardService {
     return {
       error: false,
       totalpointGained,
-      totalWeight,
+      totalWeight: +totalWeight.toFixed(2),
     };
   }
 

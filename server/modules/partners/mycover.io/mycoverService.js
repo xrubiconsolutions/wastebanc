@@ -135,7 +135,7 @@ const buyHealthInsurance = async (data, userId) => {
         insurancePolicyID: result.data.data.policy.id,
         availablePoints: userBalance,
         insuranceAmount: amount,
-        // insuranceExpiryDate: moment().add(plan_duration, "months").calendar(),
+        insuranceExpiryDate: result.data.data.policy.expiration_date,
       }
     );
 

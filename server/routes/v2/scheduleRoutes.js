@@ -87,7 +87,7 @@ module.exports = (APP) => {
 
   APP.route("/api/v2/schedule/admin/approve").post(
     adminPakamValidation,
-    scheduleValidator.disapproveSchedule,
+    scheduleValidator.approveSchedule,
     checkRequestErrs,
     ScheduleService.pakamConfirmSchedule
   );
