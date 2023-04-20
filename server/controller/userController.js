@@ -22,6 +22,7 @@ const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
 const { sendNotification } = require("../util/commonFunction");
 const mongoose = require("mongoose");
+const ObjectId = require("mongodb").ObjectID;
 
 const ustorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -431,11 +432,14 @@ userController.loginUser = async (REQUEST, RESPONSE) => {
                     console.log("Logged date updated", new Date());
                   }
                 );
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
                 const userInsurance = await MODEL.userInsuranceModel.findOne(
                   {
                     expiration_date: {
-                      $gte: new Date(),
+                      $gt: new Date(),
                     },
+                    user: ObjectId(USER._id),
                   },
                   {
                     _id: 1,

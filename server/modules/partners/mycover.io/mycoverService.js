@@ -64,7 +64,7 @@ const buyHealthInsurance = async (data, userId) => {
     const userInsurance = await userInsuranceModel.find({
       user: ObjectId(user._id),
       expiration_date: {
-        $gte: new Date(),
+        $gt: new Date(),
       },
     });
 

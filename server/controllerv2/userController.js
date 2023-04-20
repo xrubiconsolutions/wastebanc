@@ -25,7 +25,7 @@ const request = require("request");
 const axios = require("axios");
 const uuid = require("uuid");
 const VerificationService = require("./verificationController");
-
+const ObjectId = require("mongodb").ObjectID;
 class UserService {
   static async getClients(req, res) {
     try {
@@ -731,12 +731,27 @@ class UserService {
 
       const token = authToken(user);
       delete user.password;
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
 
-      const userInsurance = await userInsuranceModel.find({
-        expiration_date: {
-          $gte: new Date(),
+      const userInsurance = await userInsuranceModel.findOne(
+        {
+          expiration_date: {
+            $gt: new Date(),
+          },
+          user: ObjectId(user._id),
         },
-      });
+        {
+          _id: 1,
+          payment_plan: 1,
+          plan_name: 1,
+          product_id: 1,
+          price: 1,
+          expiration_date: 1,
+          activation_date: 1,
+          policy_id: 1,
+        }
+      );
       console.log({ userInsurance });
       return res.status(200).json({
         error: false,
@@ -771,6 +786,7 @@ class UserService {
           terms_condition: user.terms_condition,
           requestedAmount: user.requestedAmount,
           token,
+          insurance: userInsurance,
         },
       });
     } catch (error) {
