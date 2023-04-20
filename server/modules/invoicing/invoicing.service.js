@@ -114,11 +114,11 @@ class invoiceService {
         startDate,
         endDate,
         transactions: transId,
-        amountWithoutServiceCharge: amountTobePaid.toFixed(2),
-        amount: amountPayable.toFixed(2),
-        householdTotal: totalHouseholdTotal.toFixed(2),
-        wastePickersTotal: totalWastePickersTotal.toFixed(2),
-        serviceCharge: sumPercentage.toFixed(2),
+        amountWithoutServiceCharge: amountTobePaid.toFixed(),
+        amount: amountPayable.toFixed(),
+        householdTotal: totalHouseholdTotal.toFixed(),
+        wastePickersTotal: totalWastePickersTotal.toFixed(),
+        serviceCharge: sumPercentage.toFixed(),
         expectedPaymentDate,
         state,
       });
@@ -245,10 +245,10 @@ class invoiceService {
     // });
 
     return {
-      totalPayment,
-      totalOutStanding,
-      totalCompleted,
-      totalMaintanceFee,
+      totalPayment: totalPayment.toFixed(),
+      totalOutStanding: totalOutStanding.toFixed(),
+      totalCompleted: totalCompleted.toFixed(),
+      totalMaintanceFee: totalMaintanceFee.toFixed(),
     };
   }
 
