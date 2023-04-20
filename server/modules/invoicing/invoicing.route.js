@@ -80,4 +80,11 @@ module.exports = (APP) => {
     checkRequestErrs,
     invoiceController.fetchInvoiceRecord
   );
+
+  APP.route("/api/invoice/:invoiceNumber").delete(
+    adminPakamValidation,
+    invoiceNumber,
+    checkRequestErrs,
+    invoiceController.deleteInvoice
+  );
 };

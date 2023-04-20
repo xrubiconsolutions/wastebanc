@@ -164,6 +164,7 @@ class invoiceService {
     const invoiceData = await invoiceModel
       .findOne({
         invoiceNumber,
+        isDeleted: false,
       })
       .populate("company", "companyName email phone location country")
       .populate("transactions");
@@ -201,6 +202,7 @@ class invoiceService {
       totalMaintanceFee = 0;
     let criteria = {
       event: "sent",
+      isDeleted: false,
     };
 
     const invoices = await invoiceModel.find(criteria);
@@ -253,6 +255,7 @@ class invoiceService {
   static async markAsPaid(invoiceNumber, authuser) {
     const invoice = await invoiceModel.findOne({
       invoiceNumber,
+      isDeleted: false,
     });
 
     if (!invoice) return { error: true, msg: "Invoice not found", data: null };
@@ -292,6 +295,27 @@ class invoiceService {
     };
   }
 
+  static async deleteInvoice(invoiceNumber) {
+    const invoice = await invoiceModel.findOne({
+      invoiceNumber,
+      isDeleted: false,
+    });
+
+    if (!invoice) return { error: true, msg: "Invoice not found", data: null };
+
+    await invoiceModel.deleteOne(
+      { invoiceNumber },
+      {
+        isDeleted: true,
+      }
+    );
+
+    return {
+      error: false,
+      msg: "Invoice deleted successfully",
+    };
+  }
+
   static async invoices(page, resultsPerPage, user, key, start, end, status) {
     const currentScope = user.locationScope;
     if (!currentScope) {
@@ -313,6 +337,7 @@ class invoiceService {
           { serviceCharge: { $regex: `.*${key}.*`, $options: "i" } },
           { organisationName: { $regex: `.*${key}.*`, $options: "i" } },
         ],
+        isDeleted: false,
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -328,9 +353,12 @@ class invoiceService {
           $gte: startDate,
           $lt: endDate,
         },
+        isDeleted: false,
       };
     } else {
-      criteria = {};
+      criteria = {
+        isDeleted: false,
+      };
     }
 
     if (currentScope === "All") {
@@ -389,7 +417,7 @@ class invoiceService {
 
   static async getinvoiceById(invoiceId) {
     const invoice = await invoiceModel
-      .findOne({ _id: invoiceId })
+      .findOne({ _id: invoiceId, isDeleted: false })
       .populate("company", "companyName email phone location country")
       .populate("transactions", [
         "categories",
@@ -451,6 +479,7 @@ class invoiceService {
           { serviceCharge: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         company: ObjectId(companyId),
+        isDeleted: false,
         ...query,
       };
     } else if (start || end) {
@@ -469,11 +498,13 @@ class invoiceService {
         },
         company: ObjectId(companyId),
         ...query,
+        isDeleted: false,
       };
     } else {
       criteria = {
         ...query,
         company: ObjectId(companyId),
+        isDeleted: false,
       };
     }
 
@@ -513,6 +544,7 @@ class invoiceService {
     const invoiceData = await invoiceModel
       .findOne({
         invoiceNumber,
+        isDeleted: false,
       })
       .populate("company", "companyName email phone location")
       .populate("transactions");

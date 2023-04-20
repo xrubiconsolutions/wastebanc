@@ -26,6 +26,7 @@ const invoiceSchema = new Schema(
     balance: { type: String },
     event: { type: String, default: "generated" },
     state: { type: Array, defaule: [] },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

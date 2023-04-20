@@ -224,6 +224,20 @@ class invoiceController {
 
     return res.status(200).download(generatePDF.path);
   }
+
+  static async deleteInvoice(req, res) {
+    try {
+      const { invoiceNumber } = req.params;
+      const remove = await invoiceService.deleteInvoice(invoiceNumber);
+      return res.status(200).json(remove);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
 }
 
 module.exports = invoiceController;
