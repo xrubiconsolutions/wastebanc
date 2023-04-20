@@ -754,7 +754,6 @@ class UserService {
           policy_id: 1,
         }
       );
-      console.log({ userInsurance });
       return res.status(200).json({
         error: false,
         message: "Login successfull",
