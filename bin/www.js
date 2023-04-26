@@ -251,6 +251,8 @@ const io = require("socket.io")(http, {
         "https://ft-dev--musical-macaron-c39880.netlify.app",
         "http://localhost:3000",
         "http://localhost:3001",
+        "http://localhost:3004",
+        "http://localhost:3005"
       ],
       "Access-Control-Allow-Methods": "GET,POST",
       "Access-Control-Allow-Headers": "Access-Control-Allow-Origin",
