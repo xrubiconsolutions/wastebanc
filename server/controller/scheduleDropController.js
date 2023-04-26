@@ -128,39 +128,8 @@ scheduleDropController.getPendingScheduleUser = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(400).jsonp(COMMON_FUN.sendError(err)));
 };
 
-scheduleDropController.getCompletedScheduleUser = async (REQUEST, RESPONSE) => {
-  let { page = 1, resultsPerPage = 3 } = REQUEST.query;
-  if (typeof page === "string") page = parseInt(page);
-  if (typeof resultsPerPage === "string")
-    resultsPerPage = parseInt(resultsPerPage);
+scheduleDropController.getCompletedScheduleUser = (REQUEST, RESPONSE) => {
   const phone = REQUEST.query.phone;
-
-  try {
-    const schedules = await MODEL.scheduleDropModel
-      .find({ completionStatus: "completed", phone })
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * resultsPerPage)
-      .limit(resultsPerPage);
-
-    const total = await MODEL.scheduleDropModel.countDocuments({
-      completionStatus: "completed",
-      phone,
-    });
-
-    return RESPONSE.status(200).jsonp({
-      error: false,
-      message: "success",
-      data: {
-        schedules,
-        total,
-        page,
-        resultsPerPage,
-        totalPages: Math.ceil(total / resultsPerPage),
-      },
-    });
-  } catch (error) {
-    return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(error));
-  }
   MODEL.scheduleDropModel
     .find({
       completionStatus: "completed",

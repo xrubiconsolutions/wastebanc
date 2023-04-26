@@ -58,7 +58,7 @@ const userBin_Schema = new Schema({
   },
   createAt: {
     type: Date,
-    default: Date.now,
+    default: new Date(),
   },
 
   role: {

@@ -1,5 +1,5 @@
 const { body } = require("express-validator");
-const { WORK_TYPE_ENUM } = require("../util/constants");
+const { WORK_TYPE_ENUM, NEWS_CATEGORY_ENUM } = require("../util/constants");
 
 const tomorrow = new Date();
 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -59,5 +59,41 @@ module.exports = {
           "requirements must be a string or array of non-empty string"
         );
       }),
+  ],
+
+  newsValidation: [
+    body("headline", "News headline is required")
+      .notEmpty()
+      .isString()
+      .withMessage("News headline must be a string")
+      .isLength({ min: 5, max: 255 })
+      .withMessage("Headline length should be between 5 and 255 characters"),
+    body("category", "News Category is required")
+      .notEmpty()
+      .isIn(NEWS_CATEGORY_ENUM)
+      .withMessage(`News category type must be within ${NEWS_CATEGORY_ENUM}`),
+    body("body").custom((val, { req }) => {
+      if (NEWS_CATEGORY_ENUM.slice(0, 2).includes(req.body.category) && !val) {
+        throw new Error("News body cannot be empty for this category");
+      }
+      return true;
+    }),
+    body("contentUrl").custom((val, { req }) => {
+      if (NEWS_CATEGORY_ENUM[1] !== req.body.category && !val) {
+        console.log(req.body);
+        throw new Error("News content url cannot be empty for this category");
+      }
+      return true;
+    }),
+    body("imageUrl").custom((val, { req }) => {
+      if (NEWS_CATEGORY_ENUM[2] !== req.body.category && !val) {
+        throw new Error("News image url cannot be empty for this category");
+      }
+      return true;
+    }),
+  ],
+  contactFormValidation: [
+    body("message", "message is required").notEmpty().isString(),
+    body("email", "Email is required").notEmpty().isEmail(),
   ],
 };

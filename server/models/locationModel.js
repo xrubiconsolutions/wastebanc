@@ -3,13 +3,16 @@
 const MONGOOSE = require("mongoose");
 const Schema = MONGOOSE.Schema;
 
-const locationSchema = new Schema({
-  country: { type: String, required: true },
-  states: { type: Array, required: true },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+const locationSchema = new Schema(
+  {
+    country: { type: String, required: true },
+    states: { type: Array, required: true },
+    // createdAt: {
+    //   type: Date,
+    //   default: Date.now,
+    // },
   },
-});
+  { timestamps: true }
+);
 
 module.exports = MONGOOSE.model("locations", locationSchema);

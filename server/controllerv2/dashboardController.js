@@ -80,6 +80,9 @@ dashboardController.cardMapData = async (req, res) => {
       criteria.state = currentScope;
     }
 
+    const totalSchedules = await scheduleModel.countDocuments({
+      ...criteria,
+    });
     const schedules = await allSchedules(criteria);
     const totalWastes = await totalWaste(criteria);
     const totalPayment = await totalpayout(criteria);
@@ -99,15 +102,15 @@ dashboardController.cardMapData = async (req, res) => {
     const totalCancelled = await cancelled(criteria);
     const totalWasterPickers = await wastePickers(criteria);
     const totalOrganisation = await organisation(criteria);
-    const allSchedulesCount =
-      schedules.length - allPending + initPending + allAccepted;
-
+    // const allSchedulesCount =
+    //   schedules.length - allPending + initPending + allAccepted;
+    const totalInsuranceUsers = await insuranceUsers(criteria);
     return res.status(200).json({
       error: false,
       message: "success",
       data: {
         schedules,
-        totalSchedules: schedules.length,
+        totalSchedules,
         totalPending: initPending,
         totalMissed,
         totalCompleted,
@@ -118,6 +121,7 @@ dashboardController.cardMapData = async (req, res) => {
         totalWastes: Math.ceil(totalWastes),
         totalPayment: Math.ceil(totalPayment),
         totalOutstanding: Math.ceil(totalOutstanding),
+        totalInsuranceUsers,
       },
     });
   } catch (error) {
@@ -163,8 +167,9 @@ dashboardController.companyCardMapData = async (req, res) => {
     const totalDropOff = await companyDropOffs(criteria, organisationId);
     const totalMissed = await companyMissed(criteria, organisationId);
     const totalCompleted = await companyCompleted(criteria, organisationId);
-    const totalPending = await companyPending(criteria, organisationId);
+
     const totalCancelled = await companyCancelled(criteria, organisationId);
+    const totalPending = await companyPending(criteria, organisationId);
 
     return res.status(200).json({
       error: false,
@@ -534,8 +539,8 @@ dashboardController.collectormapData = async (req, res) => {
     const [startDate, endDate] = [new Date(start), new Date(end)];
     endDate.setDate(endDate.getDate() + 1);
 
-    if (req.query.collectoryType) {
-      collectorType = req.query.collectoryType;
+    if (req.query.collectorType) {
+      collectorType = req.query.collectorType;
     }
     let criteria = {
       createdAt: {
@@ -703,7 +708,11 @@ dashboardController.chartData = async (req, res) => {
 
 const allSchedules = async (criteria) => {
   // get length of schedules within given date range
-  const schedules = await scheduleModel.find(criteria).sort({ createdAt: -1 });
+
+  const schedules = await scheduleModel
+    .find(criteria)
+    .sort({ createdAt: -1 })
+    .limit(100);
   return schedules;
 };
 
@@ -712,7 +721,8 @@ const companyAllSchedules = async (criteria, organisationId) => {
 
   const schedules = await scheduleModel
     .find({ ...criteria, organisationCollection: organisationId })
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .limit(100);
   return schedules;
 };
 
@@ -720,7 +730,7 @@ const completed = async (criteria) => {
   const totalCompleted = await scheduleModel.countDocuments({
     ...criteria,
     completionStatus: "completed",
-    collectorStatus: "accept",
+    collectorStatus: { $ne: "" },
   });
   return totalCompleted;
 };
@@ -737,7 +747,7 @@ const companyCompleted = async (criteria, organisationId) => {
 };
 
 const organisation = async (criteria) => {
-  const condition = { ...criteria };
+  const condition = { ...criteria, isDisabled: false };
   condition.createAt = condition.createdAt;
   delete condition.createdAt;
 
@@ -753,6 +763,17 @@ const wastePickers = async (criteria) => {
   });
 
   return totalwastePicker;
+};
+
+const insuranceUsers = async (criteria) => {
+  const c = {
+    createAt: criteria.createdAt,
+    state: criteria.state,
+    insuranceUser: true,
+  };
+  const total = await userModel.countDocuments(c);
+
+  return total;
 };
 
 const companyWastePickers = async (criteria, organisationId) => {
@@ -794,13 +815,40 @@ const pending = async (criteria) => {
 };
 
 const companyPending = async (criteria, organisationId) => {
-  const totalPending = await scheduleModel.countDocuments({
-    ...criteria,
-    organisationCollection: organisationId,
+  console.log("cat", criteria);
+  const newCat = { ...criteria };
+  delete newCat.organisationCollection;
+  console.log("n", newCat);
+  const active_today = new Date();
+  active_today.setHours(0);
+  active_today.setMinutes(0);
+
+  const totalPending = await scheduleModel.find({
+    ...newCat,
+    expiryDuration: {
+      $gt: active_today,
+    },
+    //organisationCollection: organisationId,
     completionStatus: "pending",
     collectorStatus: "decline",
   });
-  return totalPending;
+
+  const company = await organisationModel.findById(organisationId);
+
+  const accessArea = company.streetOfAccess;
+
+  let schedules = [];
+
+  totalPending.forEach((schedule) => {
+    if (accessArea.includes(schedule.lcd)) {
+      schedules.push(schedule);
+    }
+  });
+
+  // remove duplicate schedules
+  schedules = [...new Set(schedules)];
+
+  return schedules.length;
 };
 
 const cancelled = async (criteria) => {
@@ -812,7 +860,6 @@ const cancelled = async (criteria) => {
 };
 
 const companyCancelled = async (criteria, organisationId) => {
-  console.log("total cancelled", criteria);
   const totalCancelled = await scheduleModel.countDocuments({
     ...criteria,
     organisationCollection: organisationId,
@@ -831,6 +878,7 @@ const companyDropOffs = async (criteria, organisationId) => {
   console.log("total dropoffs", criteria);
   const totalResult = await scheduleDropModel.countDocuments({
     ...criteria,
+    completionStatus: "pending",
     organisationCollection: organisationId,
   });
   return totalResult;

@@ -18,6 +18,7 @@ const { sendInvoiceMail } = require("../../services/sendEmail");
 
 class invoiceService {
   static async generateInvoice(start, end, companyId, authuser) {
+    console.log("com", companyId);
     const organisation = await organisationModel.findById(companyId);
 
     if (!organisation) throw new Error("Invalid companyId passed");
@@ -29,7 +30,9 @@ class invoiceService {
         $lt: endDate,
       },
       organisationID: companyId,
-      organisationPaid: false,
+      //organisationPaid: false,
+      paid: false,
+      //requestedForPayment: false,
     };
 
     let state = [];
@@ -56,7 +59,11 @@ class invoiceService {
       wastePickersTotal = 0,
       totalValue = 0,
       sumPercentage = 0,
-      transId = [];
+      transId = [],
+      householdPercentageTotal = 0,
+      wastePickersPercentageTotal = 0,
+      amountTobePaid = 0,
+      amountPayable = 0;
 
     const totalResult = await transactionModel.find(criteria);
 
@@ -66,15 +73,33 @@ class invoiceService {
       });
 
       totalResult.forEach((e) => {
+        amountTobePaid += e.amountTobePaid;
+      });
+
+      totalResult.forEach((e) => {
+        householdPercentageTotal += e.percentage;
+      });
+
+      totalResult.forEach((e) => {
+        wastePickersPercentageTotal += e.wastePickerPercentage;
+      });
+
+      totalResult.forEach((e) => {
         wastePickersTotal += e.wastePickerCoin;
       });
 
-      const charges = organisation.systemCharge || 10;
-      totalValue = householdTotal + wastePickersTotal;
+      const charges = organisation.systemCharge || 15;
+      const totalHouseholdTotal = householdTotal + householdPercentageTotal;
+      const totalWastePickersTotal =
+        wastePickersTotal + (wastePickersPercentageTotal || 0);
 
-      sumPercentage = rewardService.calPercentage(totalValue, charges);
-      totalValue = totalValue + sumPercentage;
+      totalValue = totalHouseholdTotal + totalWastePickersTotal;
 
+      sumPercentage = rewardService.calPercentage(amountTobePaid, charges);
+      amountPayable = amountTobePaid + sumPercentage;
+
+      // console.log("totalH", totalHouseholdTotal);
+      // console.log("totalWas", totalWastePickersTotal);
       transId = totalResult.map((value) => value._id);
 
       const dd = Date.now();
@@ -89,10 +114,11 @@ class invoiceService {
         startDate,
         endDate,
         transactions: transId,
-        amount: totalValue.toFixed(2),
-        householdTotal,
-        wastePickersTotal,
-        serviceCharge: sumPercentage.toFixed(2),
+        amountWithoutServiceCharge: amountTobePaid.toFixed(),
+        amount: amountPayable.toFixed(),
+        householdTotal: totalHouseholdTotal.toFixed(),
+        wastePickersTotal: totalWastePickersTotal.toFixed(),
+        serviceCharge: sumPercentage.toFixed(),
         expectedPaymentDate,
         state,
       });
@@ -112,8 +138,8 @@ class invoiceService {
         start: invoiceResult.startDate,
         end: invoiceResult.endDate,
         result: totalResult,
-        householdTotal,
-        wastePickersTotal,
+        householdTotal: totalHouseholdTotal.toFixed(2),
+        wastePickersTotal: totalWastePickersTotal.toFixed(2),
         totalValue: totalValue.toFixed(2),
         sumPercentage: sumPercentage.toFixed(2),
         from,
@@ -138,13 +164,13 @@ class invoiceService {
     const invoiceData = await invoiceModel
       .findOne({
         invoiceNumber,
+        isDeleted: false,
       })
       .populate("company", "companyName email phone location country")
       .populate("transactions");
     if (!invoiceData) return false;
 
     // prepare invoice template and send invoice
-    await sendInvoiceMail(invoiceData);
     // const template = await invoiceTemplate(invoiceData);
     // sgMail.setApiKey(
     //   "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"
@@ -153,14 +179,15 @@ class invoiceService {
     // const companyInfo = await companyInfoModel.findOne();
 
     // const msg = {
-    //   to: `ahmodadeora@gmail.com`,
-    //   // to: `${invoiceData.company.email}`,
+    //   //to: `ahmodadeora@gmail.com`,
+    //   to: `${invoiceData.company.email}`,
     //   from: companyInfo.email, // Use the email address or domain you verified above
     //   subject: "INVOICE",
     //   html: template,
     // };
 
     // await sgMail.send(msg);
+    await sendInvoiceMail(invoiceData);
     invoiceData.event = "sent";
     await invoiceData.save();
 
@@ -175,6 +202,7 @@ class invoiceService {
       totalMaintanceFee = 0;
     let criteria = {
       event: "sent",
+      isDeleted: false,
     };
 
     const invoices = await invoiceModel.find(criteria);
@@ -217,16 +245,17 @@ class invoiceService {
     // });
 
     return {
-      totalPayment,
-      totalOutStanding,
-      totalCompleted,
-      totalMaintanceFee,
+      totalPayment: totalPayment.toFixed(),
+      totalOutStanding: totalOutStanding.toFixed(),
+      totalCompleted: totalCompleted.toFixed(),
+      totalMaintanceFee: totalMaintanceFee.toFixed(),
     };
   }
 
   static async markAsPaid(invoiceNumber, authuser) {
     const invoice = await invoiceModel.findOne({
       invoiceNumber,
+      isDeleted: false,
     });
 
     if (!invoice) return { error: true, msg: "Invoice not found", data: null };
@@ -249,6 +278,7 @@ class invoiceService {
         { _id: { $in: invoice.transactions } },
         {
           organisationPaid: true,
+          paid: true,
         }
       );
     }
@@ -262,6 +292,27 @@ class invoiceService {
       error: false,
       msg: "Invoice marked as paid successfully",
       data: invoice,
+    };
+  }
+
+  static async deleteInvoice(invoiceNumber) {
+    const invoice = await invoiceModel.findOne({
+      invoiceNumber,
+      isDeleted: false,
+    });
+
+    if (!invoice) return { error: true, msg: "Invoice not found", data: null };
+
+    await invoiceModel.updateOne(
+      { invoiceNumber },
+      {
+        isDeleted: true,
+      }
+    );
+
+    return {
+      error: false,
+      msg: "Invoice deleted successfully",
     };
   }
 
@@ -286,6 +337,7 @@ class invoiceService {
           { serviceCharge: { $regex: `.*${key}.*`, $options: "i" } },
           { organisationName: { $regex: `.*${key}.*`, $options: "i" } },
         ],
+        isDeleted: false,
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -301,9 +353,12 @@ class invoiceService {
           $gte: startDate,
           $lt: endDate,
         },
+        isDeleted: false,
       };
     } else {
-      criteria = {};
+      criteria = {
+        isDeleted: false,
+      };
     }
 
     if (currentScope === "All") {
@@ -322,6 +377,18 @@ class invoiceService {
     const invoices = await invoiceModel
       .find(criteria)
       .populate("company", "companyName email phone location country")
+      .populate("transactions", [
+        "ref_id",
+        "categories",
+        "category",
+        "type",
+        "weight",
+        "coin",
+        "wastePickerCoin",
+        "type",
+        "address",
+        "phone",
+      ])
       .select([
         "_id",
         "invoiceNumber",
@@ -350,7 +417,7 @@ class invoiceService {
 
   static async getinvoiceById(invoiceId) {
     const invoice = await invoiceModel
-      .findOne({ _id: invoiceId })
+      .findOne({ _id: invoiceId, isDeleted: false })
       .populate("company", "companyName email phone location country")
       .populate("transactions", [
         "categories",
@@ -360,6 +427,9 @@ class invoiceService {
         "coin",
         "wastePickerCoin",
         "type",
+        "address",
+        "phone",
+        "amountTobePaid",
       ]);
 
     if (!invoice)
@@ -409,6 +479,7 @@ class invoiceService {
           { serviceCharge: { $regex: `.*${key}.*`, $options: "i" } },
         ],
         company: ObjectId(companyId),
+        isDeleted: false,
         ...query,
       };
     } else if (start || end) {
@@ -427,11 +498,13 @@ class invoiceService {
         },
         company: ObjectId(companyId),
         ...query,
+        isDeleted: false,
       };
     } else {
       criteria = {
         ...query,
         company: ObjectId(companyId),
+        isDeleted: false,
       };
     }
 
@@ -471,6 +544,7 @@ class invoiceService {
     const invoiceData = await invoiceModel
       .findOne({
         invoiceNumber,
+        isDeleted: false,
       })
       .populate("company", "companyName email phone location")
       .populate("transactions");
@@ -478,7 +552,10 @@ class invoiceService {
 
     const template = await invoiceTemplate(invoiceData);
 
-    const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
+    const browser = await puppeteer.launch({
+      args: ["--no-sandbox"],
+      executablePath: "/usr/bin/chromium-browser",
+    });
     const page = await browser.newPage();
     const path = "invoice.pdf";
 

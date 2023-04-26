@@ -22,19 +22,18 @@ dropoffController.aggregateQuery = async ({
   page = 1,
   resultsPerPage = 20,
 }) => {
-  console.log("criteria", criteria);
   try {
     const paginationQuery = [
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
       {
         $skip: (page - 1) * resultsPerPage,
       },
       {
         $limit: resultsPerPage,
-      },
-      {
-        $sort: {
-          createdAt: -1,
-        },
       },
     ];
     const pipeline = [
@@ -81,6 +80,9 @@ dropoffController.aggregateQuery = async ({
           clientId: {
             $ifNull: ["$customer.userId", "$clientId"],
           },
+          phone: {
+            $ifNull: ["$customer.phone", "$phone"],
+          },
           scheduleCreator: 1,
           categories: 1,
           quantity: 1,
@@ -93,9 +95,6 @@ dropoffController.aggregateQuery = async ({
           expiryDuration: 1,
           state: 1,
           collectedBy: 1,
-          phone: 1,
-          locationId: 1,
-          location: 1,
         },
       },
       {
@@ -129,6 +128,7 @@ dropoffController.aggregateQuery = async ({
             $arrayElemAt: ["$cats.categories", 0],
           },
           fullname: 1,
+          phone: 1,
           clientId: 1,
           scheduleCreator: 1,
           categories: 1,
@@ -142,39 +142,6 @@ dropoffController.aggregateQuery = async ({
           expiryDuration: 1,
           state: 1,
           collectedBy: 1,
-          phone: 1,
-          locationId: 1,
-          location: 1,
-        },
-      },
-      {
-        $lookup: {
-          from: "dropoffs",
-          let: {
-            locationId: "$locationId",
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ["$_id", "$$locationId"],
-                },
-              },
-            },
-            {
-              $project: {
-                "location.address": 1,
-                _id: 0,
-              },
-            },
-          ],
-          as: "dropofflocation",
-        },
-      },
-      {
-        $unwind: {
-          path: "$dropofflocation",
-          preserveNullAndEmptyArrays: true,
         },
       },
     ];
@@ -309,10 +276,145 @@ dropoffController.dropOffs = async (req, res) => {
   }
 };
 
+dropoffController.userdropOffs = async (req, res) => {
+  try {
+    //const { user } = req;
+    //const currentScope = user.locationScope;
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      start,
+      end,
+      key,
+      completionStatus = "pending",
+      userId,
+    } = req.query;
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    const client = await userModel.findById(userId);
+
+    if (start || end) {
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+    }
+    // if (!key) {
+    //   if (!start || !end) {
+    //     return res.status(400).json({
+    //       error: true,
+    //       message: "Please pass a start and end date",
+    //     });
+    //   }
+    // }
+
+    let criteria;
+
+    if (key) {
+      criteria = {
+        $or: [
+          { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+          { fullname: { $regex: `.*${key}.*`, $options: "i" } },
+          { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+          { phone: { $regex: `.*${key}.*`, $options: "i" } },
+          { organisationPhone: { $regex: `.*${key}.*`, $options: "i" } },
+          //{ quantity: key },
+          { categories: { $in: [key] } },
+          { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
+          { Category: { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+        scheduleCreator: client.email,
+        completionStatus,
+      };
+    } else if (start || end) {
+      if (!start || !end) {
+        return res.status(400).json({
+          error: true,
+          message: "Please pass a start and end date",
+        });
+      }
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
+      criteria = {
+        createdAt: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+        scheduleCreator: client.email,
+        completionStatus,
+      };
+    } else {
+      criteria = {
+        scheduleCreator: client.email,
+        completionStatus,
+      };
+    }
+
+    // if (!currentScope) {
+    //   return res.status(400).json({
+    //     error: true,
+    //     message: "Invalid request",
+    //   });
+    // }
+
+    // if (currentScope === "All") {
+    //   criteria.state = {
+    //     $in: user.states,
+    //     scheduleCreator: client.email,
+    //     completionStatus,
+    //   };
+    // } else {
+    //   criteria.state = currentScope;
+    // }
+
+    console.log("criteria", criteria);
+
+    // const totalResult = await scheduleDropModel.countDocuments(criteria);
+
+    const { dropoffs, totalResult } = await dropoffController.aggregateQuery({
+      criteria,
+      page,
+      resultsPerPage,
+    });
+
+    return res.status(200).json({
+      error: false,
+      message: "success",
+      data: {
+        dropoffs,
+        totalResult,
+        page,
+        resultsPerPage,
+        totalPages: Math.ceil(totalResult / resultsPerPage),
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
 dropoffController.companydropOffs = async (req, res) => {
   try {
-    let { page = 1, resultsPerPage = 20, start, end, state, key } = req.query;
-    const { _id: organisation } = req.user;
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      start,
+      end,
+      state,
+      key,
+      scheduleApproval = { $ne: "" },
+      completionStatus = "pending",
+    } = req.query;
+    const { companyName: organisation } = req.user;
 
     if (typeof page === "string") page = parseInt(page);
     if (typeof resultsPerPage === "string")
@@ -349,7 +451,9 @@ dropoffController.companydropOffs = async (req, res) => {
           { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
           { Category: { $regex: `.*${key}.*`, $options: "i" } },
         ],
-        organisationCollection: organisation.toString(),
+        organisation,
+        //scheduleApproval,
+        completionStatus,
       };
     } else if (start || end) {
       if (!start || !end) {
@@ -365,11 +469,15 @@ dropoffController.companydropOffs = async (req, res) => {
           $gte: startDate,
           $lt: endDate,
         },
-        organisationCollection: organisation.toString(),
+        organisation,
+        //scheduleApproval,
+        completionStatus,
       };
     } else {
       criteria = {
-        organisationCollection: organisation.toString(),
+        organisation,
+        //scheduleApproval,
+        completionStatus,
       };
     }
 
@@ -427,7 +535,11 @@ dropoffController.deleteDropOff = async (req, res) => {
 dropoffController.addDropOffLocation = async (req, res) => {
   const dropLocation = { ...req.body };
   try {
-    const drop = await dropOffModel.create(dropLocation);
+    const newLocation = {
+      type: "Point",
+      coordinates: [dropLocation.location.long, dropLocation.location.lat],
+    };
+    const drop = await dropOffModel.create({ ...dropLocation, newLocation });
     return res.status(201).json({
       error: false,
       message: "Drop-off submitted successfully!",
@@ -557,20 +669,20 @@ dropoffController.rewardDropSystem = async (req, res) => {
       return res.status(400).json(householdReward);
     }
 
-    let wastePickerCoin = 0;
-    let wastePickerPercentage = 0;
-    let collectorPoint = collector.pointGained || 0;
-    if (collector.collectorType == "waste-picker") {
-      const wastepickerReward = await rewardService.picker(cat, organisation);
-      if (!wastepickerReward.error) {
-        wastePickerCoin = wastepickerReward.totalpointGained;
-        wastePickerPercentage = rewardService.calPercentage(
-          wastepickerReward.totalpointGained,
-          10
-        );
-        collectorPoint = wastePickerCoin - wastePickerPercentage;
-      }
-    }
+    // let wastePickerCoin = 0;
+    // let wastePickerPercentage = 0;
+    // let collectorPoint = collector.pointGained || 0;
+    // if (collector.collectorType == "waste-picker") {
+    //   const wastepickerReward = await rewardService.picker(cat, organisation);
+    //   if (!wastepickerReward.error) {
+    //     wastePickerCoin = wastepickerReward.totalpointGained;
+    //     wastePickerPercentage = rewardService.calPercentage(
+    //       wastepickerReward.totalpointGained,
+    //       10
+    //     );
+    //     collectorPoint = wastePickerCoin - wastePickerPercentage;
+    //   }
+    // }
 
     const userCoin =
       Number(householdReward.totalpointGained) - Number(pakamPercentage);
@@ -583,9 +695,11 @@ dropoffController.rewardDropSystem = async (req, res) => {
       length: 7,
       charset: "numeric",
     });
+    const amountTobePaid = userCoin + pakamPercentage;
     const t = await transactionModel.create({
       weight: householdReward.totalWeight,
       wastePickerCoin: 0,
+      wastePickerPercentage: 0,
       coin: userCoin,
       cardID: scheduler._id,
       completedBy: collectorId,
@@ -601,6 +715,8 @@ dropoffController.rewardDropSystem = async (req, res) => {
       ref_id: ref,
       percentage: pakamPercentage,
       address: dropoffs.address,
+      phone: scheduler.phone,
+      amountTobePaid,
     });
 
     const items = categories.map((category) => category.name);
@@ -615,14 +731,19 @@ dropoffController.rewardDropSystem = async (req, res) => {
       //include_player_ids: [`${scheduler.onesignal_id}`],
     };
 
-    await notificationModel.create({
-      title: "Dropoff Schedule completed",
-      lcd: scheduler.lcd,
-      message: `You have just been credited ${t.coin} for your ${items} drop off`,
-      schedulerId: scheduler._id,
-    });
+    // const userledgerBalance = {
+    //   dropoffId: dropoffs._id.toString(),
+    //   point: scheduler.availablePoints + userCoin,
+    // };
+    // const collectorledgerBalance = {
+    //   dropoffId: dropoffs._id.toString(),
+    //   point: collectorPoint + collector.pointGained,
+    // };
 
-    sendNotification(message);
+    // let newledgerBalance = scheduler.ledgerPoints || [];
+    // let newCollectorLedgerBalance = collector.ledgerPoints || [];
+    // newledgerBalance.push(userledgerBalance);
+    // newCollectorLedgerBalance.push(collectorledgerBalance);
 
     await scheduleDropModel.updateOne(
       { _id: dropoffs._id },
@@ -641,23 +762,26 @@ dropoffController.rewardDropSystem = async (req, res) => {
       {
         $set: {
           availablePoints: scheduler.availablePoints + userCoin,
+          //ledgerPoints: newledgerBalance,
           schedulePoints: scheduler.schedulePoints + 1,
         },
       }
     );
 
-    await collectorModel.updateOne(
-      { _id: collector._id },
-      {
-        $set: {
-          totalCollected:
-            collector.totalCollected + householdReward.totalWeight,
-          numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
-          busy: false,
-          last_logged_in: new Date(),
-        },
-      }
-    );
+    // await collectorModel.updateOne(
+    //   { _id: collector._id },
+    //   {
+    //     $set: {
+    //       totalCollected:
+    //         collector.totalCollected + householdReward.totalWeight,
+    //       numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
+    //       pointGained: collectorPoint + collector.pointGained,
+    //       //ledgerPoints: newCollectorLedgerBalance,
+    //       busy: false,
+    //       last_logged_in: new Date(),
+    //     },
+    //   }
+    // );
 
     // store the user activity for both scheduler and collector
     // collector
@@ -674,6 +798,16 @@ dropoffController.rewardDropSystem = async (req, res) => {
       message: `Dropoff completed. Reference ID: ${t.ref_id}`,
       activity_type: "dropoff",
     });
+
+    await notificationModel.create({
+      title: "Dropoff Schedule completed",
+      lcd: scheduler.lcd,
+      message: `You have just been credited ${t.coin} for your ${items} drop off`,
+      schedulerId: scheduler._id,
+    });
+
+    sendNotification(message);
+
     return res.status(200).json({
       error: false,
       message: "Dropoff completed successfully",
@@ -739,20 +873,11 @@ dropoffController.scheduledropOffs = async (req, res) => {
       });
     }
 
-    const dropoffLocation = await dropOffModel.findById(locationId);
-    if (!dropoffLocation) {
-      return res.status(400).json({
-        error: true,
-        message: "Dropoff has been removed from the system",
-      });
-    }
-
     const expireDate = moment(data.dropOffDate, "YYYY-MM-DD").add(7, "days");
     data.expiryDuration = expireDate;
     data.clientId = user._id.toString();
     data.state = user.state || "Lagos";
     data.categories = categories;
-    data.location = dropoffLocation.location.address;
 
     const schedule = await scheduleDropModel.create(data);
     const items = categories.map((category) => category.name);
@@ -805,4 +930,264 @@ dropoffController.scheduledropOffs = async (req, res) => {
   }
 };
 
+dropoffController.hubConfirmSchedule = async (req, res) => {
+  try {
+    const { user } = req;
+    const organisationId = user._id.toString();
+    const { scheduleId } = req.body;
+    console.log("s", scheduleId);
+    const schedule = await scheduleDropModel.findById(scheduleId);
+    if (!schedule) {
+      return res.status(400).json({
+        error: true,
+        message: "Schedule not found",
+      });
+    }
+
+    if (schedule.organisationCollection != organisationId) {
+      return res.status(400).json({
+        error: true,
+        message: "Action cannot be perform",
+      });
+    }
+
+    if (
+      schedule.scheduleApproval == "true" ||
+      schedule.scheduleApproval == "false"
+    ) {
+      return res.status(400).json({
+        error: true,
+        message: "Action cannot be perform. contact support team",
+      });
+    }
+
+    const scheduler = await userModel.findById(schedule.clientId);
+    if (!scheduler) {
+      return res.status(400).json({
+        error: true,
+        message: "No Household user connected to this schedule",
+      });
+    }
+
+    const userpoint = scheduler.ledgerPoints.find(
+      (schedule) => schedule.scheduleId == scheduleId
+    );
+
+    if (userpoint) {
+      const newledgerPoints = scheduler.ledgerPoints.filter(
+        (schedule) => schedule.scheduleId != scheduleId
+      );
+      scheduler.availablePoints = scheduler.availablePoints + userpoint.point;
+      scheduler.ledgerPoints = newledgerPoints;
+      scheduler.save();
+
+      schedule.scheduleApproval = "true";
+      schedule.approvedBy = {
+        user: "company",
+        email: user.email.trim(),
+        userId: user._id,
+      };
+      schedule.approvalDate = new Date();
+      schedule.save();
+
+      await transactionModel.updateOne(
+        { scheduleId: schedule._id.toString() },
+        {
+          approval: "true",
+        }
+      );
+    }
+
+    // const collector = await collectorModel.findById(schedule.collectedBy);
+
+    // if (!collector) {
+    //   return res.status(400).json({
+    //     error: true,
+    //     message: "No Collector connected to this schedule",
+    //   });
+    // }
+
+    // if (collector.collectorType == "waste-picker") {
+    //   const collectorPoint = collector.ledgerPoints.find(
+    //     (schedule) => schedule.scheduleId == scheduleId
+    //   );
+
+    //   if (collectorPoint) {
+    //     const newpoints = collector.ledgerPoints.filter(
+    //       (schedule) => schedule.scheduleId == scheduleId
+    //     );
+    //     collector.pointGained = collector.pointGained + collectorPoint.point;
+    //     collector.ledgerPoints = newpoints;
+    //     collector.save();
+    //   }
+    // }
+
+    return res.status(200).json({
+      error: false,
+      message: "Dropoff schedule verified successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+dropoffController.hubRejectSchedule = async (req, res) => {
+  try {
+    const { user } = req;
+    const organisationId = user._id.toString();
+    const { scheduleId, reason } = req.body;
+    const schedule = await scheduleDropModel.findById(scheduleId);
+    if (!schedule) {
+      return res.status(400).json({
+        error: true,
+        message: "Schedule not found",
+      });
+    }
+
+    if (
+      schedule.scheduleApproval == "true" ||
+      schedule.scheduleApproval == "false"
+    ) {
+      return res.status(400).json({
+        error: true,
+        message: "Action cannot be perform. contact support team",
+      });
+    }
+
+    if (schedule.organisationCollection != organisationId) {
+      return res.status(400).json({
+        error: true,
+        message: "Action cannot be perform",
+      });
+    }
+
+    schedule.scheduleApproval = "false";
+    schedule.rejectReason = reason;
+    schedule.rejectionDate = new Date();
+    schedule.save();
+
+    await transactionModel.updateOne(
+      { scheduleId: schedule._id.toString() },
+      {
+        approval: "false",
+      }
+    );
+
+    return res.status(200).json({
+      error: false,
+      message: "Drop off schedule rejected",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
+
+dropoffController.pakamConfirmSchedule = async (req, res) => {
+  try {
+    const { user } = req;
+    const organisationId = user._id.toString();
+    const { scheduleId } = req.body;
+    const schedule = await scheduleDropModel.findById(scheduleId);
+    if (!schedule) {
+      return res.status(400).json({
+        error: true,
+        message: "Schedule not found",
+      });
+    }
+
+    if (schedule.organisationCollection != organisationId) {
+      return res.status(400).json({
+        error: true,
+        message: "Action cannot be perform",
+      });
+    }
+
+    if (schedule.scheduleApproval == true) {
+      return res.status(400).json({
+        error: true,
+        message: "Schedule already been approved",
+      });
+    }
+
+    const scheduler = await userModel.findById(schedule.clientId);
+    if (!scheduler) {
+      return res.status(400).json({
+        error: true,
+        message: "No Household user connected to this schedule",
+      });
+    }
+
+    const userpoint = scheduler.ledgerPoints.find(
+      (schedule) => schedule.scheduleId == scheduleId
+    );
+
+    if (userpoint) {
+      const newledgerPoints = scheduler.ledgerPoints.filter(
+        (schedule) => schedule.scheduleId != scheduleId
+      );
+      scheduler.availablePoints = scheduler.availablePoints + userpoint.point;
+      scheduler.ledgerPoints = newledgerPoints;
+      scheduler.save();
+
+      schedule.scheduleApproval = true;
+      schedule.approvedBy = {
+        user: "company",
+        email: user.email.trim(),
+        userId: user._id,
+      };
+      schedule.approvalDate = new Date();
+      schedule.save();
+
+      await transactionModel.updateOne(
+        { scheduleId: schedule._id.toString() },
+        {
+          approval: "true",
+        }
+      );
+    }
+
+    const collector = await collectorModel.findById(schedule.collectedBy);
+
+    if (!collector) {
+      return res.status(400).json({
+        error: true,
+        message: "No Collector connected to this schedule",
+      });
+    }
+
+    if (collector.collectorType == "waste-picker") {
+      const collectorPoint = collector.ledgerPoints.find(
+        (schedule) => schedule.scheduleId == scheduleId
+      );
+
+      if (collectorPoint) {
+        const newpoints = collector.ledgerPoints.filter(
+          (schedule) => schedule.scheduleId == scheduleId
+        );
+        collector.pointGained = collector.pointGained + collectorPoint.point;
+        collector.ledgerPoints = newpoints;
+        collector.save();
+      }
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "Dropoff schedule verified successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
+  }
+};
 module.exports = dropoffController;

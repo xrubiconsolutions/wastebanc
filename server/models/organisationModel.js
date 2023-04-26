@@ -121,7 +121,7 @@ const organisation_Schema = new Schema({
   },
   createAt: {
     type: Date,
-    default: Date.now,
+    default: new Date(),
   },
   wallet: {
     type: Number,
@@ -157,7 +157,7 @@ const organisation_Schema = new Schema({
   },
   systemCharge: {
     type: Number,
-    default: 10,
+    default: 15,
   },
   newAreaOfAccess: {
     type: Array,

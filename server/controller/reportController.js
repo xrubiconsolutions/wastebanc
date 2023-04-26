@@ -27,7 +27,6 @@ reportController.report = (req, res) => {
   var token;
   var roomToSessionIdDictionary = {};
 
-
   opentok.createSession({ mediaMode: "routed" }, function (err, session) {
     if (err) {
       console.log(err);
@@ -35,42 +34,43 @@ reportController.report = (req, res) => {
       return;
     }
     var tokenOptions = {};
-    tokenOptions.expireTime = (Date.now() / 1000 ) +  2592000
+    tokenOptions.expireTime = Date.now() / 1000 + 2592000;
 
     // generate token
     token = opentok.generateToken(session.sessionId, tokenOptions);
-  MODEL.userModel.findOne({
-    _id: userID
-  }).then((userDetail)=>{
-  MODEL.reportModel({
-      name: userDetail.fullname,
-      email: userDetail.email,
-      phone: userDetail.phone,
-      apiKey: apiKey,
-      sessionID: session.sessionId,
-      token: token,
-      userReportID: userID,
-      lat: lat,
-      long: long,
-    }).save({}, (err, result) => {
-      console.log("error here", err);
-      if (err){
-        return res
-          .status(400)
-          .json({ message: "Could not save report incidence" });
-      console.log(result);
-    }
-    });
+    MODEL.userModel
+      .findOne({
+        _id: userID,
+      })
+      .then((userDetail) => {
+        MODEL.reportModel({
+          name: userDetail.fullname,
+          email: userDetail.email,
+          phone: userDetail.phone,
+          apiKey: apiKey,
+          sessionID: session.sessionId,
+          token: token,
+          userReportID: userID,
+          lat: lat,
+          long: long,
+        }).save({}, (err, result) => {
+          console.log("error here", err);
+          if (err) {
+            return res
+              .status(400)
+              .json({ message: "Could not save report incidence" });
+            console.log(result);
+          }
+        });
 
-    res.setHeader("Content-Type", "application/json");
-    return res.json({
-      apiKey: apiKey,
-      sessionID: session.sessionId,
-      token: token,
-    })
-  }
-  )
-})
+        res.setHeader("Content-Type", "application/json");
+        return res.json({
+          apiKey: apiKey,
+          sessionID: session.sessionId,
+          token: token,
+        });
+      });
+  });
 
   // MODEL.reportModel.findOne({userReportID: userID}).then((reports)=>{
   //   console.log("<<reports", reports)
@@ -82,23 +82,19 @@ reportController.report = (req, res) => {
   //     })
   //     .then((result, user) => {
   //       console.log("<<>>", result)
-  
+
   //       if(result){
-  
+
   //       var Valid = result.createdAt;
 
-
-       
-  
   //       var validity =  (Valid-result)/(3600*24*1000);
 
-
   //       console.log("<<validity", validity)
-  
+
   //       if (result && validity < 29) {
   //         return res.status(200).json(result);
-  //       } 
-        
+  //       }
+
   //     }else {
   //       MODEL.userModel.updateOne(
   //         { _id: userID },
@@ -115,20 +111,16 @@ reportController.report = (req, res) => {
   //           }
   //           var tokenOptions = {};
   //           tokenOptions.expireTime = (Date.now() / 1000 ) +  2592000
-  
-  
-  
+
   //           // generate token
   //           token = opentok.generateToken(session.sessionId, tokenOptions);
-  
-  
-  
+
   //           MODEL.userModel.findOne({_id: userID}).then(userDetail=>{
-            
+
   //           MODEL.reportModel.findOne({userReportID:userID}).then(result=>{
   //             console.log('<<>>', result)
   //             if(result && validity < 29 ) {
-  
+
   //               MODEL.reportModel.updateOne({ userReportID: result.userReportID }, { active : true , name: userDetail.firstname,
   //                 email: userDetail.email,
   //                 phone: userDetail.phone,
@@ -137,14 +129,14 @@ reportController.report = (req, res) => {
   //                 token: token,
   //                 userReportID: userID,
   //                 lat: lat,
-  //                 long: long,  }).then( test=> { MODEL.reportModel.findOne({userReportID:userID}).then(result=>{  
+  //                 long: long,  }).then( test=> { MODEL.reportModel.findOne({userReportID:userID}).then(result=>{
   //                   return res.status(200).json(result)
   //                 }) }
   //                   )
   //           }
-          
+
   //           })
-           
+
   //         })
   //         });
   //       }
@@ -152,7 +144,7 @@ reportController.report = (req, res) => {
   //   );
   //   }
   //   else {
-      
+
   //     opentok.createSession({ mediaMode: "routed" }, function (err, session) {
   //       if (err) {
   //         console.log(err);
@@ -162,14 +154,8 @@ reportController.report = (req, res) => {
   //       var tokenOptions = {};
   //       tokenOptions.expireTime = (Date.now() / 1000 ) +  2592000
 
-
-
   //       // generate token
   //       token = opentok.generateToken(session.sessionId, tokenOptions);
-
-
-
-
 
   //     MODEL.userModel.findOne({
   //       _id: userID
@@ -206,35 +192,33 @@ reportController.report = (req, res) => {
   // }
   // }
   // )
-  }
-
+};
 
 reportController.getReport = (req, res) => {
   var ID = req.body.userID;
 
   MODEL.reportModel
-    .updateOne({ userReportID: ID }, { active : true })
+    .updateOne({ userReportID: ID }, { active: true })
     .then((result) => {
-      if(!!result){
-        MODEL.reportModel.findOne({
-          userReportID: ID
-        }).then((user)=>{
-            
-    MODEL.userModel.updateOne(
-      { _id: req.body.userID },
-      { last_logged_in: new Date() },
-      (res) => {
-        console.log('Logged date updated', new Date());
-      }
-    );
-          return res.status(200).json(user);
-        })
+      if (!!result) {
+        MODEL.reportModel
+          .findOne({
+            userReportID: ID,
+          })
+          .then((user) => {
+            MODEL.userModel.updateOne(
+              { _id: req.body.userID },
+              { last_logged_in: new Date() },
+              (res) => {
+                console.log("Logged date updated", new Date());
+              }
+            );
+            return res.status(200).json(user);
+          });
       }
     })
     .catch((err) => res.status(500).json(err));
 };
-
-
 
 reportController.allReport = (REQUEST, RESPONSE) => {
   MODEL.reportModel
@@ -246,64 +230,89 @@ reportController.allReport = (REQUEST, RESPONSE) => {
     .catch((err) => RESPONSE.status(500).json(err));
 };
 
-
-reportController.endReport = (req,res)=>{
+reportController.endReport = async (req, res) => {
   var ID = req.body.userID;
   var addressArea = req.body.addressArea;
   var address = req.body.addressArea;
 
-  MODEL.reportModel
-  .findOne({ userReportID: ID })
-  .then((user) => {
-    if(!user){
-      console.log("user here", user)
-      return res.status(400).json({
-        message: "No user report here"
-      })
-    }
-    MODEL.reportModel.updateOne({ userReportID: ID }, { $set: { "active" : false } }, (err, resp)=>{
-      if(err) { return res.status(400).json(err) }
+  try {
+    const user = await MODEL.reportModel.findOne({ userReportID: ID });
+    await MODEL.reportModel.updateOne(
+      { userReportID: ID },
+      { $set: { active: false } }
+    );
+    await MODEL.userModel.updateOne(
+      { _id: req.body.userID },
+      { last_logged_in: new Date() }
+    );
+    const log = {
+      userReportID: user.userReportID,
+      active: false,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      lat: user.lat,
+      long: user.long,
+      addressArea: req.body.addressArea,
+      address: req.body.address,
+    };
 
-      else {
-        MODEL.userModel.updateOne(
-          { _id: req.body.userID },
-          { last_logged_in: new Date() },
-          (res) => {
-            console.log('Logged date updated', new Date());
-          }
-        );
-        var log =  { 
-          userReportID: user.userReportID,
-          active: false,
-          name: user.name,
-          email:user.email,
-          phone: user.phone,
-          lat: user.lat,
-          long: user.long,
-          addressArea: req.body.addressArea,
-          address: req.body.address
-         }
-            MODEL.reportLogModel(log).save( {} , (ERR, RESULT) => {
-              if(ERR) return res.status(400).json(ERR)
-      MODEL.reportModel
-      .deleteOne({
-        userReportID: ID,
-      })
-      .then((result) => {
-         console.log('User deleted successfully');
-      });
-              return res.status(200).json({message: "Session successfully ended"})
-            })
-      }
-      
-    })
-  })
-  .catch((err) => res.status(500).json(err));
+    await MODEL.reportLogModel.create(log);
+    await MODEL.reportModel.deleteOne({
+      userReportID: ID,
+    });
+    return res.status(200).json({ message: "Session successfully ended" });
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+  // MODEL.reportModel
+  // .findOne({ userReportID: ID })
+  // .then((user) => {
+  //   if(!user){
+  //     console.log("user here", user)
+  //     return res.status(400).json({
+  //       message: "No user report here"
+  //     })
+  //   }
+  //   MODEL.reportModel.updateOne({ userReportID: ID }, { $set: { "active" : false } }, (err, resp)=>{
+  //     if(err) { return res.status(400).json(err) }
 
-}
+  //     else {
+  //       MODEL.userModel.updateOne(
+  //         { _id: req.body.userID },
+  //         { last_logged_in: new Date() },
+  //         (res) => {
+  //           console.log('Logged date updated', new Date());
+  //         }
+  //       );
+  //       var log =  {
+  //         userReportID: user.userReportID,
+  //         active: false,
+  //         name: user.name,
+  //         email:user.email,
+  //         phone: user.phone,
+  //         lat: user.lat,
+  //         long: user.long,
+  //         addressArea: req.body.addressArea,
+  //         address: req.body.address
+  //        }
+  //           MODEL.reportLogModel(log).save( {} , (ERR, RESULT) => {
+  //             if(ERR) return res.status(400).json(ERR)
+  //     MODEL.reportModel
+  //     .deleteOne({
+  //       userReportID: ID,
+  //     })
+  //     .then((result) => {
+  //        console.log('User deleted successfully');
+  //     });
+  //             return res.status(200).json({message: "Session successfully ended"})
+  //           })
+  //     }
 
-
-
+  //   })
+  // })
+  // .catch((err) => res.status(500).json(err));
+};
 
 reportController.allReportAnalytics = (req, res) => {
   MODEL.reportModel
@@ -312,12 +321,11 @@ reportController.allReportAnalytics = (req, res) => {
     .then((user) => {
       return res.status(200).json({
         Videos: user.length,
-        Pictures: user.length
+        Pictures: user.length,
       });
     })
     .catch((err) => res.status(500).json(err));
 };
-
 
 /* export reportControllers */
 module.exports = reportController;

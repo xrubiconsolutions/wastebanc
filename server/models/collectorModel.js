@@ -106,15 +106,19 @@ const collector_Schema = new Schema({
     type: Number,
     default: 0,
   },
+  ledgerPoints: {
+    type: Array,
+    default: [],
+  },
   numberOfTripsCompleted: {
     type: Number,
     default: 0,
   },
   lat: {
-    type: String,
+    type: Number,
   },
   long: {
-    type: String,
+    type: Number,
   },
   onesignal_id: {
     type: String,
@@ -170,8 +174,9 @@ const collector_Schema = new Schema({
     default: "PENDING",
     enum: ["PENDING", "APPROVED", "DECLINED"],
   },
-  lcd: {
-    type: String,
+  requestedAmount: {
+    type: Number,
+    default: 0,
   },
 });
 

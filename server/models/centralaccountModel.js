@@ -12,4 +12,4 @@ const centralAccountModel = new Schema({
   bank: { type: String },
 });
 
-module.exports = MONGOOSE.model("centralaccounts", centralAccountModel);
+module.exports = MONGOOSE.model("centralaccount", centralAccountModel);

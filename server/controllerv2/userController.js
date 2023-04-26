@@ -5,6 +5,12 @@ const {
   verificationLogModel,
   organisationTypeModel,
   userBinModel,
+  scheduleModel,
+  scheduleDropModel,
+  disbursementRequestModel,
+  charityModel,
+  insuranceLog,
+  userInsuranceModel,
 } = require("../models");
 const {
   sendResponse,
@@ -12,19 +18,27 @@ const {
   encryptPassword,
   authToken,
   comparePassword,
+  paginateResponse,
 } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
 const request = require("request");
 const axios = require("axios");
 const uuid = require("uuid");
 const VerificationService = require("./verificationController");
-
+const ObjectId = require("mongodb").ObjectID;
 class UserService {
   static async getClients(req, res) {
     try {
       const { user } = req;
       const currentScope = user.locationScope;
-      let { page = 1, resultsPerPage = 20, start, end, key } = req.query;
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        start,
+        end,
+        key,
+        channel = "mobile",
+      } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
@@ -43,6 +57,7 @@ class UserService {
             { lcd: { $regex: `.*${key}.*`, $options: "i" } },
           ],
           roles: "client",
+          channel,
         };
       } else if (start || end) {
         const [startDate, endDate] = [new Date(start), new Date(end)];
@@ -59,9 +74,13 @@ class UserService {
             $lt: endDate,
           },
           roles: "client",
+          channel,
         };
       } else {
-        criteria = {};
+        criteria = {
+          roles: "client",
+          channel,
+        };
       }
 
       if (!currentScope) {
@@ -191,7 +210,6 @@ class UserService {
   }
 
   static async register(req, res) {
-    console.log(req.body);
     //bodyValidate(req, res);
     try {
       const onesignal_id = uuid.v1().toString();
@@ -211,7 +229,7 @@ class UserService {
         if (checkPhone.verified) {
           return res.status(400).json({
             error: true,
-            message: "Phone already exist",
+            message: "Phone number already exist",
           });
         }
 
@@ -263,6 +281,7 @@ class UserService {
             pin_id: send.data.pinId,
             verified: checkPhone.verified,
             terms_condition: checkPhone.terms_condition || false,
+            isChatAdmin: checkPhone.isChatAdmin || false,
             // uType: create.uType,
             // organisationType: create.organisationType,
             //organisationName: typename.name,
@@ -312,8 +331,8 @@ class UserService {
         state: body.state,
         password: await encryptPassword(body.password),
         gender: body.gender.toLowerCase(),
-        email: body.email.toLowerCase(),
-        lcd: body.lga || "",
+        email: body.email,
+        lcd: body.lga,
         uType: body.uType,
         organisationType: body.organisation,
         //onesignal_id: body.onesignal_id,
@@ -384,6 +403,8 @@ class UserService {
           // uType: create.uType,
           // organisationType: create.organisationType,
           organisationName: typename.name,
+          requestedAmount: create.requestedAmount,
+          isChatAdmin: create.isChatAdmin || false,
           token,
         },
       });
@@ -567,7 +588,7 @@ class UserService {
       if (!user) {
         return res.status(400).json({
           error: true,
-          message: "Invalid credentials",
+          message: "Incorrect phone number or password",
           statusCode: 400,
         });
       }
@@ -575,15 +596,25 @@ class UserService {
       if (user.status == "deleted") {
         return res.status(400).json({
           error: true,
-          message: "Invalid credentials",
+          message: "Account disabled contact support team",
           statusCode: 400,
         });
       }
 
-      if (!(await comparePassword(req.body.password, user.password))) {
+      if (user.status == "disabled") {
         return res.status(400).json({
           error: true,
-          message: "Invalid credentials",
+          message: "Account disabled contact support team",
+          statusCode: 400,
+        });
+      }
+
+      const compare = await comparePassword(req.body.password, user.password);
+      console.log("compare", compare);
+      if (!compare) {
+        return res.status(400).json({
+          error: true,
+          message: "Incorrect phone number or password",
           statusCode: 400,
         });
       }
@@ -598,6 +629,12 @@ class UserService {
         });
       }
 
+      let ledgerBalance = 0;
+      if (user.ledgerPoints) {
+        ledgerBalance = user.ledgerPoints
+          .map((x) => x.point)
+          .reduce((acc, curr) => acc + curr, 0);
+      }
       if (!user.verified) {
         const phoneNo = String(user.phone).substring(1, 11);
         const token = authToken(user);
@@ -630,8 +667,6 @@ class UserService {
           headers: options.headers,
         });
 
-        console.log("res", send.data);
-
         return res.status(200).json({
           error: false,
           message: "Phone number not verified",
@@ -654,14 +689,14 @@ class UserService {
             countryCode: user.countryCode,
             verified: user.verified,
             availablePoints: user.availablePoints,
+            ledgerBalance,
             rafflePoints: user.rafflePoints,
             schedulePoints: user.schedulePoints,
             cardID: user.cardID,
             lcd: user.lcd,
             last_logged_in: user.last_logged_in,
             pin_id: send.data.pinId,
-            accountNo: user.accountNo || "",
-            bankName: user.bankName || "",
+            isChatAdmin: user.isChatAdmin || false,
             token,
           },
         });
@@ -669,7 +704,7 @@ class UserService {
 
       let signal_id;
 
-      console.log("user id", user.onesignal_id);
+      //console.log("user id", user.onesignal_id);
       if (
         !user.onesignal_id ||
         user.onesignal_id === "" ||
@@ -679,20 +714,46 @@ class UserService {
         console.log("changing", signal_id);
         await userModel.updateOne(
           { email: user.email },
-          { $set: { last_logged_in: new Date(), onesignal_id: signal_id } }
+          {
+            $set: {
+              last_logged_in: new Date(),
+              onesignal_id: signal_id,
+              firstLogin: false,
+            },
+          }
         );
       } else {
         signal_id = user.onesignal_id;
         console.log("not changing", user.onesignal_id);
         await userModel.updateOne(
           { email: user.email },
-          { $set: { last_logged_in: new Date() } }
+          { $set: { last_logged_in: new Date(), firstLogin: false } }
         );
       }
 
       const token = authToken(user);
       delete user.password;
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
 
+      const userInsurance = await userInsuranceModel.findOne(
+        {
+          expiration_date: {
+            $gt: new Date(),
+          },
+          user: ObjectId(user._id),
+        },
+        {
+          _id: 1,
+          payment_plan: 1,
+          plan_name: 1,
+          product_id: 1,
+          price: 1,
+          expiration_date: 1,
+          activation_date: 1,
+          policy_id: 1,
+        }
+      );
       return res.status(200).json({
         error: false,
         message: "Login successfull",
@@ -715,17 +776,19 @@ class UserService {
           countryCode: user.countryCode,
           verified: user.verified,
           availablePoints: user.availablePoints,
+          ledgerBalance,
           rafflePoints: user.rafflePoints,
           schedulePoints: user.schedulePoints,
           onesignal_id: signal_id,
           cardID: user.cardID,
           lcd: user.lcd,
           last_logged_in: user.last_logged_in,
-          firstLogin: user.last_logged_in ? false : true,
+          firstLogin: user.firstLogin,
           terms_condition: user.terms_condition,
-          accountNo: user.accountNo || "",
-          bankName: user.bankName || "",
+          requestedAmount: user.requestedAmount,
+          isChatAdmin: user.isChatAdmin || false,
           token,
+          insurance: userInsurance,
         },
       });
     } catch (error) {
@@ -863,8 +926,9 @@ class UserService {
           cardID: user.cardID,
           lcd: user.lcd,
           last_logged_in: user.last_logged_in,
-          firstLogin: user.last_logged_in ? false : true,
+          firstLogin: user.firstLogin,
           terms_condition: true,
+          isChatAdmin: user.isChatAdmin || false,
           token,
         },
       });
@@ -909,6 +973,538 @@ class UserService {
       });
     }
   }
+
+  //TODO
+  // get user details
+  static async userDetails(req, res) {
+    try {
+      const { userId } = req.params;
+
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+      const totalSchedulePickup = await scheduleModel.countDocuments({
+        client: user.email,
+      });
+      const totalScheduleDrop = await scheduleDropModel.countDocuments({
+        clientId: user._id.toString(),
+      });
+
+      const pendingSchedulePickup = await scheduleModel.countDocuments({
+        client: user.email,
+        completionStatus: "pending",
+      });
+
+      const completedSchedulePickup = await scheduleModel.countDocuments({
+        client: user.email,
+        completionStatus: "completed",
+      });
+
+      const missedSchedulePickup = await scheduleModel.countDocuments({
+        client: user.email,
+        completionStatus: "missed",
+      });
+
+      return res.status(200).json({
+        error: false,
+        message: "User Details",
+        data: {
+          firstName: user.fullname,
+          phoneNumber: user.phone,
+          gender: user.gender,
+          lcd: user.lcd,
+          walletBalance: user.availablePoints,
+          address: user.address,
+          createdAt: user.createAt,
+          totalSchedulePickup,
+          pendingSchedulePickup,
+          completedSchedulePickup,
+          missedSchedulePickup,
+          totalScheduleDrop,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error deleting User",
+      });
+    }
+  }
+
+  // get user payment to bank requests
+
+  static async userBankPayoutRequests(req, res) {
+    try {
+      const { userId } = req.params;
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        key,
+        start,
+        end,
+        status = "initiated",
+      } = req.query;
+
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+
+      if (!key && (!start || !end))
+        return res.status(422).json({
+          error: true,
+          message: "Supply a date range (start and end) or key to search",
+        });
+
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
+
+      let criteria;
+
+      if (key) {
+        criteria = {
+          $or: [
+            { destinationAccount: { $regex: `.*${key}.*`, $options: "i" } },
+            { bankName: { $regex: `.*${key}.*`, $options: "i" } },
+            { status: { $regex: `.*${key}.*`, $options: "i" } },
+            { beneName: { $regex: `.*${key}.*`, $options: "i" } },
+            //{ withdrawalAmount: { $eq: parseFloat(key) } },
+          ],
+          user: user._id,
+          status,
+        };
+      } else if (key && parseFloat(key)) {
+        criteria = {
+          $or: [
+            { destinationAccount: { $regex: `.*${key}.*`, $options: "i" } },
+            { bankName: { $regex: `.*${key}.*`, $options: "i" } },
+            { status: { $regex: `.*${key}.*`, $options: "i" } },
+            { beneName: { $regex: `.*${key}.*`, $options: "i" } },
+            { withdrawalAmount: { $eq: parseFloat(key) } },
+          ],
+          user: user._id,
+          status,
+        };
+      } else if (startDate || endDate) {
+        criteria = {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          user: user._id,
+          status,
+        };
+      } else {
+        criteria = {
+          user: user._id,
+          status,
+        };
+      }
+
+      const totalPayments = await disbursementRequestModel.countDocuments(
+        criteria
+      );
+
+      const payments = await disbursementRequestModel.aggregate([
+        {
+          $match: criteria,
+        },
+        {
+          $lookup: {
+            from: "transactions",
+            localField: "transactions._id",
+            foreignField: "_id",
+            as: "transactions",
+          },
+        },
+        {
+          $project: {
+            otp: 0,
+          },
+        },
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+        {
+          $skip: (page - 1) * resultsPerPage,
+        },
+        {
+          $limit: resultsPerPage,
+        },
+      ]);
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          payments,
+          totalResult: totalPayments,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalPayments / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error retrieving data",
+      });
+    }
+  }
+
+  // get user payment to charity requests
+  static async userCharityPayments(req, res) {
+    try {
+      const { userId } = req.params;
+      let { page = 1, resultsPerPage = 20, key, start, end } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return res.status(400).json({
+          error: true,
+          message: "User not found",
+        });
+      }
+
+      if (!key && (!start || !end))
+        return res.status(422).json({
+          error: true,
+          message: "Supply a date range (start and end) or key to search",
+        });
+
+      if (new Date(start) > new Date(end)) {
+        return res.status(400).json({
+          error: true,
+          message: "Start date cannot be greater than end date",
+        });
+      }
+
+      const [startDate, endDate] = [new Date(start), new Date(end)];
+      endDate.setDate(endDate.getDate() + 1);
+
+      let criteria;
+
+      if (key && parseFloat(key)) {
+        criteria = {
+          $or: [{ amount: { $eq: parseFloat(key) } }],
+          cardID: user._id.toString(),
+        };
+      } else if (startDate || endDate) {
+        criteria = {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          cardID: user._id.toString(),
+        };
+      } else {
+        criteria = {
+          cardID: user._id.toString(),
+        };
+      }
+
+      console.log("c", criteria);
+
+      const totalCharityPayout = await charityModel.countDocuments(criteria);
+      const charityPayouts = await charityModel.aggregate([
+        {
+          $match: criteria,
+        },
+        {
+          $lookup: {
+            from: "charityorganisations",
+            localField: "charityOrganisation",
+            foreignField: "_id",
+            as: "charityOrganisation",
+          },
+        },
+        {
+          $unwind: {
+            path: "$charityOrganisation",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            "charityOrganisation._id": 0,
+            "charityOrganisation.bank": 0,
+            "charityOrganisation.accountNumber": 0,
+            "charityOrganisation.createdAt": 0,
+            "charityOrganisation.updatedAt": 0,
+            "charityOrganisation.__v": 0,
+          },
+        },
+        {
+          $sort: {
+            createdAt: -1,
+          },
+        },
+        {
+          $skip: (page - 1) * resultsPerPage,
+        },
+        {
+          $limit: resultsPerPage,
+        },
+      ]);
+
+      return res.status(200).json({
+        error: false,
+        message: "Data retrieved",
+        data: {
+          charityPayouts,
+          totalResult: totalCharityPayout,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalCharityPayout / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error retrieving data",
+      });
+    }
+  }
+
+  // get user insurance purchases
+  static async userInsurancePurchases(req, res) {
+    const { userId } = req.params;
+    const { key } = req.query;
+    try {
+      // find user or throw error if no user found
+      const user = await userModel.findById(userId);
+      if (!user)
+        return res.status(404).json({
+          error: true,
+          message: "Account not found",
+        });
+
+      // gather the user insurance history and return
+      const response = await paginateResponse({
+        model: userInsuranceModel,
+        query: {},
+        searchQuery: {
+          $or: [
+            { plan_name: { $regex: `.*${key}.*`, $options: "i" } },
+            { product_id: { $regex: `.*${key}.*`, $options: "i" } },
+            { price: { $regex: `.*${key}.*`, $options: "i" } },
+          ],
+        },
+        startDate: "2020-01-01",
+        endDate: new Date(),
+        ...req.query,
+        title: "data",
+        projection: {
+          _id: 1,
+          payment_plan: 1,
+          plan_name: 1,
+          product_id: 1,
+          price: 1,
+          expiration_date: 1,
+          activation_date: 1,
+          policy_id: 1,
+        },
+      });
+      return res.status(200).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error retrieving data",
+      });
+    }
+  }
+
+  //get insurance users
+
+  static async insuranceUser(req, res) {
+    let {
+      page = 1,
+      resultsPerPage = 20,
+      key,
+      start = "2020-01-01",
+      end = new Date(),
+    } = req.query;
+    // construct pagination data
+    if (typeof page === "string") page = parseInt(page);
+    if (typeof resultsPerPage === "string")
+      resultsPerPage = parseInt(resultsPerPage);
+
+    if (!key && (!start || !end))
+      return res.status(422).json({
+        error: true,
+        message: "Supply a date range (start and end) or key to search",
+      });
+
+    if (new Date(start) > new Date(end)) {
+      return res.status(400).json({
+        error: true,
+        message: "Start date cannot be greater than end date",
+      });
+    }
+
+    const [startDate, endDate] = [new Date(start), new Date(end)];
+    endDate.setDate(endDate.getDate() + 1);
+
+    // construct criteria
+    let criteria;
+
+    if (key) {
+      criteria = {
+        $or: [
+          {
+            phone: { $regex: `.*${key}.*`, $options: "i" },
+          },
+          {
+            first_name: {
+              $regex: `.*${key}.*`,
+              $options: "i",
+            },
+          },
+          {
+            last_name: {
+              $regex: `.*${key}.*`,
+              $options: "i",
+            },
+          },
+          { price: { $regex: `.*${key}.*`, $options: "i" } },
+          { plan_name: { $regex: `.*${key}.*`, $options: "i" } },
+        ],
+      };
+    } else if (startDate || endDate) {
+      criteria = {
+        activation_date: {
+          $gte: startDate,
+          $lt: endDate,
+        },
+      };
+    } else {
+      criteria = {};
+    }
+
+    const paginationQuery = [
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $skip: (page - 1) * resultsPerPage,
+      },
+      {
+        $limit: resultsPerPage,
+      },
+    ];
+
+    const pipeline = [
+      {
+        $match: criteria,
+      },
+      {
+        $group: {
+          _id: "$user",
+          purchases: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+      {
+        $project: {
+          lastPurchase: {
+            $last: "$purchases",
+          },
+          userId: "$_id",
+          _id: 0,
+        },
+      },
+      {
+        $project: {
+          _id: "$lastPurchase._id",
+          userId: 1,
+          plan_name: "$lastPurchase.plan_name",
+          price: "$lastPurchase.price",
+          phone: "$lastPurchase.phone",
+          activation_date: "$lastPurchase.activation_date",
+          expiration_date: "$lastPurchase.expiration_date",
+          createdAt: "$lastPurchase.createdAt",
+          fullName: {
+            $concat: [
+              "$lastPurchase.first_name",
+              " ",
+              "$lastPurchase.last_name",
+            ],
+          },
+        },
+      },
+    ];
+
+    const countCriteria = [
+      ...pipeline,
+      {
+        $count: "createdAt",
+      },
+    ];
+
+    try {
+      let totalResult = await userInsuranceModel.aggregate(countCriteria);
+      const users = await userInsuranceModel.aggregate([
+        ...pipeline,
+        ...paginationQuery,
+      ]);
+
+      let totalValue;
+      if (totalResult.length == 0) {
+        totalValue = 0;
+      } else {
+        totalValue = Object.values(totalResult[0])[0];
+      }
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          users,
+          totalResult: totalValue,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalValue / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "Error retrieving data",
+      });
+    }
+  }
+
+  // completed
 }
 
 module.exports = UserService;

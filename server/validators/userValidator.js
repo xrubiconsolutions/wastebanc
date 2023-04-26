@@ -9,32 +9,27 @@ module.exports = {
 
   userAgencies: [
     body("name")
-      .trim()
       .notEmpty()
       .withMessage("name is required")
       .isString()
       .withMessage("name should be string"),
     body("email").trim().notEmpty().withMessage("email is required"),
     body("countries")
-      .trim()
       .notEmpty()
       .withMessage("countries is required")
       .isArray()
       .withMessage("countries should be array"),
     body("states")
-      .trim()
       .notEmpty()
       .withMessage("states is required")
       .isArray()
       .withMessage("states should be array"),
     body("role")
-      .trim()
       .notEmpty()
       .withMessage("role is required")
       .isString()
       .withMessage("role should be string"),
     body("phone")
-      .trim()
       .notEmpty()
       .withMessage("phone is required")
       .isNumeric()
@@ -51,6 +46,7 @@ module.exports = {
 
   storeactivites: [
     body("userId")
+      .trim()
       .notEmpty()
       .withMessage("userId is required")
       .isString()
@@ -182,7 +178,6 @@ module.exports = {
 
   accountNo: [
     param("accountNo")
-      .trim()
       .notEmpty()
       .withMessage("accountNo is required")
       .isString()
@@ -191,19 +186,16 @@ module.exports = {
 
   openAccount: [
     body("bvn")
-      .trim()
       .notEmpty()
       .withMessage("bvn is required")
       .isString()
       .withMessage("bvn should be string"),
     body("nin")
-      .trim()
       .notEmpty()
       .withMessage("nin is required")
       .isString()
       .withMessage("nin should be string"),
     body("phone")
-      .trim()
       .notEmpty()
       .withMessage("phone is required")
       .isString()
@@ -212,25 +204,21 @@ module.exports = {
 
   nipTransfer: [
     body("OTP")
-      .trim()
       .notEmpty()
       .withMessage("OTP is required")
       .isString()
       .withMessage("OTP should be string"),
     body("accountNumber")
-      .trim()
       .notEmpty()
       .withMessage("accountNumber is required")
       .isString()
       .withMessage("accountNumber should be string"),
     body("customerName")
-      .trim()
       .notEmpty()
       .withMessage("customerName is required")
       .isString()
       .withMessage("customerName should be string"),
     body("bankCode")
-      .trim()
       .notEmpty()
       .withMessage("bankCode is required")
       .isString()
@@ -240,15 +228,13 @@ module.exports = {
       .withMessage("nesid is required")
       .isString()
       .withMessage("nesid should be string"),
-    body("nersp").trim().optional(),
+    body("nersp").optional(),
     body("bvn")
-      .trim()
       .notEmpty()
       .withMessage("bvn is required")
       .isString()
       .withMessage("bvn should be string"),
     body("kycLevel")
-      .trim()
       .notEmpty()
       .withMessage("kycLevel is required")
       .isString()
@@ -257,25 +243,21 @@ module.exports = {
 
   intraBankTransfer: [
     body("OTP")
-      .trim()
       .notEmpty()
       .withMessage("OTP is required")
       .isString()
       .withMessage("OTP should be string"),
     body("accountNumber")
-      .trim()
       .notEmpty()
       .withMessage("accountNumber is required")
       .isString()
       .withMessage("accountNumber should be string"),
     body("beneName")
-      .trim()
       .notEmpty()
       .withMessage("beneName is required")
       .isString()
       .withMessage("beneName should be string"),
     body("terms_condition")
-      .trim()
       .notEmpty()
       .withMessage("terms_condition is required")
       .isBoolean()
@@ -284,10 +266,19 @@ module.exports = {
 
   termsCondition: [
     body("userId")
-      .trim()
       .notEmpty()
       .withMessage("userId is required")
       .isString()
       .withMessage("userId should be string"),
+  ],
+
+  userDetails: [
+    param("userId")
+      .notEmpty()
+      .withMessage("userId is required")
+      .isString()
+      .withMessage("userId should be a string")
+      .isMongoId()
+      .withMessage("userId id is invalid"),
   ],
 };

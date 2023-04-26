@@ -102,17 +102,17 @@ class rewardService {
 
     console.log("t", totalpointGained);
 
-    if (totalpointGained <= 0) {
-      return {
-        error: true,
-        message: "Your company do not collect any of the waste category passed",
-      };
-    }
+    // if (totalpointGained <= 0) {
+    //   return {
+    //     error: true,
+    //     message: "Your company do not collect any of the waste category passed",
+    //   };
+    // }
 
     return {
       error: false,
       totalpointGained,
-      totalWeight,
+      totalWeight: +totalWeight.toFixed(2),
     };
   }
 
@@ -208,17 +208,17 @@ class rewardService {
       totalWeight += parseFloat(a["quantity"] || 0);
     });
 
-    if (totalpointGained <= 0) {
-      return {
-        error: true,
-        message: "Your company do not collect any of the waste category passed",
-      };
-    }
+    // if (totalpointGained <= 0) {
+    //   return {
+    //     error: true,
+    //     message: "Your company do not collect any of the waste category passed",
+    //   };
+    // }
 
     return {
       error: false,
       totalpointGained,
-      totalWeight,
+      totalWeight: +totalWeight.toFixed(2),
     };
   }
 

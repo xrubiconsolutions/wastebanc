@@ -10,9 +10,10 @@ let COMMON_FUN = require("../util/commonFunction");
 let SERVICE = require("../services/commonService");
 let CONSTANTS = require("../util/constants");
 var request = require("request");
-const payModel = require("../models/payModel");
 var ObjectId = require("mongodb").ObjectID;
 const axios = require("axios");
+const { payModel, charityOrganisationModel } = require("../models");
+const SlackService = require("../services/slackService");
 
 payController.getBanks = (req, res) => {
   request(
@@ -28,7 +29,7 @@ payController.getBanks = (req, res) => {
     //   json: true,
     // },
     {
-      url: "https://wastebancfin.pakam.ng/api/all/banks",
+      url: `${process.env.PAYMENT_URL}all/banks`,
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -50,7 +51,7 @@ payController.resolveAccount = (req, res) => {
   console.log({ user });
   request(
     {
-      url: `https://wastebancfin.pakam.ng/api/resolve/account?account_number=${account_number}&bank_code=${bank_code}&userId=${user._id}`,
+      url: `${process.env.PAYMENT_URL}resolve/account?account_number=${account_number}&bank_code=${bank_code}&userId=${user._id}`,
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -95,13 +96,13 @@ payController.saveR = async (req, res) => {
 
     if (Number(user.availablePoints) < 0) {
       return res.status(400).json({
-        message: "You don't have enough points to complete this transaction",
+        message: "Insufficent Available balance",
       });
     }
 
     if (Number(user.availablePoints) < 5000) {
       return res.status(400).json({
-        message: "You don't have enough points to complete this transaction",
+        message: "Insufficent Available balance",
       });
     }
 
@@ -200,10 +201,8 @@ payController.saveR = async (req, res) => {
 // new charity function nn
 payController.charityP = async (req, res) => {
   try {
-    const receipt = { ...req.body };
-    let cardID = req.body.cardID;
-    let amount = req.body.amount;
-    var balance;
+    const { cardID, amount, charityOrganisationID } = req.body;
+    let balance;
 
     const user = await MODEL.userModel.findOne({ cardID });
     if (!user) {
@@ -212,17 +211,32 @@ payController.charityP = async (req, res) => {
       });
     }
 
+    const charityOrganisation = await charityOrganisationModel.findById(
+      charityOrganisationID
+    );
+    if (!charityOrganisation)
+      return res.status(404).json({
+        error: true,
+        message: "Charity organisation not found!",
+      });
+
     if (Number(user.availablePoints) < 0) {
       return res.status(400).json({
         message: "You don't have enough points to complete this transaction",
       });
     }
 
-    if (Number(user.availablePoints) < 5000) {
+    if (Number(amount) > Number(user.availablePoints)) {
       return res.status(400).json({
         message: "You don't have enough points to complete this transaction",
       });
     }
+
+    // if (Number(user.availablePoints) < 5000) {
+    //   return res.status(400).json({
+    //     message: "You don't have enough points to complete this transaction",
+    //   });
+    // }
 
     balance = Number(user.availablePoints) - Number(amount);
 
@@ -233,79 +247,38 @@ payController.charityP = async (req, res) => {
       }
     );
 
-    //help
-    const allTransations = await MODEL.transactionModel.find({
-      paid: false,
-      requestedForPayment: false,
-      cardID: cardID,
+    await MODEL.charityModel.create({
+      cardID,
+      amount,
+      state: user.state,
+      user: user._id,
+      charityOrganisation: charityOrganisationID,
     });
 
-    await Promise.all(
-      allTransations.map(async (tran) => {
-        await MODEL.userModel.updateOne(
-          { _id: user._id },
-          {
-            availablePoints: balance,
-          }
-        );
-        const storePaymentRequest = await MODEL.charityModel.create({
-          ...receipt,
-          aggregatorName: tran.recycler || " ",
-          aggregatorId: tran.aggregatorId || " ",
-          aggregatorOrganisation: tran.organisation || " ",
-          scheduleId: tran.scheduleId || " ",
-          quantityOfWaste: tran.weight || " ",
-          amount: tran.coin,
-          organisation: tran.organisation,
-          organisationID: tran.organisationID,
-          status: user.state,
-          userPhone: user.phone,
-        });
+    await MODEL.transactionModel.create({
+      userId: user._id,
+      address: user.address,
+      fullname: user.fullname,
+      coin: amount,
+      wastePickerCoin: 0,
+      weight: 0,
+      type: "charity",
+      scheduleId: "",
+      cardID: user._id.toString(),
+      completedBy: user._id.toString(),
+      paid: true,
+      approval: "true",
+      phone: user.phone,
+      paymentResolution: "charity",
+      state: "Lagos",
+      ref_id: Math.floor(100000 + Math.random() * 900000),
+    });
 
-        console.log("store", storePaymentRequest);
-
-        await MODEL.transactionModel.updateOne(
-          { _id: tran._id },
-          {
-            $set: {
-              requestedForPayment: true,
-              paymentResolution: "charity",
-            },
-          }
-        );
-
-        // const organisation = await MODEL.organisationModel.findOne({
-        //   companyName: tran.organisation,
-        // });
-
-        // var phoneNo = String(organisation.phone);
-        // var data = {
-        //   to: `234${phoneNo}`,
-        //   from: "N-Alert",
-        //   sms: `Dear ${tran.organisation}, a user named ${receipt.fullname} just requested for a payout of ${unpaidFees[i].coin}, kindly attend to the payment.`,
-        //   type: "plain",
-        //   api_key:
-        //     "TLTKtZ0sb5eyWLjkyV1amNul8gtgki2kyLRrotLY0Pz5y5ic1wz9wW3U9bbT63",
-        //   channel: "dnd",
-        // };
-
-        // var options = {
-        //   method: "POST",
-        //   url: "https://termii.com/api/sms/send",
-        //   headers: {
-        //     "Content-Type": ["application/json", "application/json"],
-        //   },
-        //   body: JSON.stringify(data),
-        // };
-
-        // const send = await axios.post(options.url, options.body, {
-        //   headers: options.headers,
-        // });
-
-        console.log("res", send.data);
-      })
-    );
-
+    SlackService.charityPayment({
+      amount,
+      user: user._id,
+      charityOrganisation: charityOrganisation.name,
+    });
     return res.status(200).json({
       error: false,
       message: "payment successfully made to charity",
@@ -501,6 +474,10 @@ payController.afterPayment = async (req, res) => {
     }
     const token = COMMON_FUN.authToken(user);
 
+    const ledgerBalance = user.ledgerPoints
+      .map((x) => x.point)
+      .reduce((acc, curr) => acc + curr, 0);
+
     const test = {
       _id: user._id,
       firstname: user.firstname,
@@ -530,6 +507,8 @@ payController.afterPayment = async (req, res) => {
       token,
       charge: 100,
       withdrawableAmount: user.availablePoints - 100,
+      requestedAmount: user.requestedAmount,
+      ledgerBalance,
     };
     return res
       .status(200)
@@ -540,8 +519,6 @@ payController.afterPayment = async (req, res) => {
     //   var test = JSON.parse(JSON.stringify(result));
     //   var jwtToken = COMMON_FUN.createToken(test); /** creating jwt token */
     //   test.token = jwtToken;
-    //   test.charge = 100;
-    //   test.withdrawableAmount = test.availablePoints - 100;
     //   return res
     //     .status(200)
     //     .jsonp(
@@ -549,6 +526,7 @@ payController.afterPayment = async (req, res) => {
     //     );
     // });
   } catch (err) {
+    console.log(err);
     return res.status(500).json(err);
   }
 };

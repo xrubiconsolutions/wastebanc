@@ -22,17 +22,20 @@ class ScheduleService {
   static async aggregateQuery({ criteria, page = 1, resultsPerPage = 20 }) {
     const paginationQuery = [
       {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
         $skip: (page - 1) * resultsPerPage,
       },
       {
         $limit: resultsPerPage,
       },
-      {
-        $sort: {
-          createdAt: -1,
-        },
-      },
     ];
+
+    if (criteria.completionStatus === "completed") paginationQuery.shift();
+
     try {
       const pipeline = [
         {
@@ -118,6 +121,11 @@ class ScheduleService {
             state: 1,
             cancelReason: 1,
             collectorStatus: 1,
+            scheduleApproval: 1,
+            rejectReason: 1,
+            rejectionDate: 1,
+            approvalDate: 1,
+            channel: 1,
           },
         },
         {
@@ -189,6 +197,9 @@ class ScheduleService {
             state: 1,
             cancelReason: 1,
             collectorStatus: 1,
+            scheduleApproval: 1,
+            approvalDate: 1,
+            channel: 1,
           },
         },
       ];
@@ -327,6 +338,128 @@ class ScheduleService {
     }
   }
 
+  static async userSchedules(req, res) {
+    try {
+      const { user } = req;
+      const currentScope = user.locationScope;
+      let {
+        page = 1,
+        resultsPerPage = 20,
+        start,
+        end,
+        //state,
+        key,
+        completionStatus = { $ne: "" },
+        userId,
+      } = req.query;
+      if (typeof page === "string") page = parseInt(page);
+      if (typeof resultsPerPage === "string")
+        resultsPerPage = parseInt(resultsPerPage);
+
+      const household = await userModel.findById(userId);
+
+      console.log("email", household.email);
+      if (!household) {
+        return res.status(400).json({
+          error: true,
+          message: "Household user not found",
+        });
+      }
+      let criteria;
+      let collectorStatus = { $ne: "" };
+      if (completionStatus === "accepted") {
+        collectorStatus = "accept";
+        completionStatus = "pending";
+      } else if (completionStatus === "pending") {
+        collectorStatus = "decline";
+        completionStatus = "pending";
+      }
+      if (key) {
+        criteria = {
+          $or: [
+            { Category: { $regex: `.*${key}.*`, $options: "i" } },
+            { "categories.name": { $regex: `.*${key}.*`, $options: "i" } },
+            { categories: { $regex: `.*${key}.*`, $options: "i" } },
+            { organisation: { $regex: `.*${key}.*`, $options: "i" } },
+            { scheduleCreator: { $regex: `.*${key}.*`, $options: "i" } },
+            { collectorStatus: { $regex: `.*${key}.*`, $options: "i" } },
+            { client: { $regex: `.*${key}.*`, $options: "i" } },
+            { phone: { $regex: `.*${key}.*`, $options: "i" } },
+            { completionStatus: { $regex: `.*${key}.*`, $options: "i" } },
+            { recycler: { $regex: `.*${key}.*`, $options: "i" } },
+          ],
+          collectorStatus,
+          completionStatus,
+          client: household.email,
+        };
+      } else if (start || end) {
+        if (!start || !end) {
+          return res.status(400).json({
+            error: true,
+            message: "Please pass a start and end date",
+          });
+        }
+        const [startDate, endDate] = [new Date(start), new Date(end)];
+        endDate.setDate(endDate.getDate() + 1);
+        criteria = {
+          createdAt: {
+            $gte: startDate,
+            $lt: endDate,
+          },
+          collectorStatus,
+          completionStatus,
+          client: household.email,
+        };
+      } else {
+        criteria = {
+          collectorStatus,
+          completionStatus,
+          client: household.email,
+        };
+      }
+
+      if (!currentScope) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid request",
+        });
+      }
+
+      if (currentScope === "All") {
+        criteria.state = {
+          $in: user.states,
+          client: household.email,
+        };
+      } else {
+        criteria.state = currentScope;
+      }
+
+      const { schedules, totalResult } = await ScheduleService.aggregateQuery({
+        criteria,
+        page,
+        resultsPerPage,
+      });
+
+      return res.status(200).json({
+        error: false,
+        message: "success",
+        data: {
+          schedules,
+          totalResult,
+          page,
+          resultsPerPage,
+          totalPages: Math.ceil(totalResult / resultsPerPage),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
   static async searchSchedules(req, res) {
     let {
       state,
@@ -380,7 +513,7 @@ class ScheduleService {
       });
     } catch (error) {
       console.log(error);
-      return sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
+      sendResponse(res, STATUS_MSG.ERROR.DEFAULT);
     }
   }
 
@@ -425,9 +558,11 @@ class ScheduleService {
         req,
         {
           type: type === "pickup" ? "pickup" : "dropoff",
+          organisationID: companyId,
         },
         searchFields
       );
+    //console.log('c', criteria);
     try {
       const company = await organisationModel.findById(companyId);
       if (!company)
@@ -461,6 +596,7 @@ class ScheduleService {
       start,
       end,
       completionStatus = { $ne: "" },
+      scheduleApproval = { $ne: "" },
       key,
     },
     type = "pickup"
@@ -501,6 +637,7 @@ class ScheduleService {
           collectorStatus,
           completionStatus,
           organisationCollection,
+          scheduleApproval,
         }
       : {
           createdAt: {
@@ -510,6 +647,7 @@ class ScheduleService {
           organisationCollection,
           completionStatus,
           collectorStatus,
+          scheduleApproval,
         };
 
     try {
@@ -666,6 +804,7 @@ class ScheduleService {
         });
       }
 
+      //
       const scheduler = await userModel.findOne({
         email: schedule.client,
       });
@@ -698,6 +837,14 @@ class ScheduleService {
         });
       }
 
+      // check and make sure the number of category passed from the mobile is equal to the number of categories on the schedule
+
+      if (schedule.categories.length != categories.length) {
+        return res.status(400).json({
+          error: true,
+          message: "Error in the list of categories passed",
+        });
+      }
       let cat = [];
 
       await Promise.all(
@@ -733,11 +880,9 @@ class ScheduleService {
 
       let wastePickerCoin = 0;
       let wastePickerPercentage = 0;
-      let collectorPoint = collector.pointGained || 0;
+      let collectorPoint = 0;
       if (collector.collectorType == "waste-picker") {
-        console.log("happened");
         const wastepickerReward = await rewardService.picker(cat, organisation);
-        console.log("wap", wastepickerReward);
         if (!wastepickerReward.error) {
           wastePickerCoin = wastepickerReward.totalpointGained;
           wastePickerPercentage = rewardService.calPercentage(
@@ -761,10 +906,16 @@ class ScheduleService {
         charset: "numeric",
       });
 
+      // const userGain =
+      //   Number(householdReward.totalpointGained) - Number(pakamPercentage);
+
+      // sum up the total amount the recycler will be paying pakam
+      const amountTobePaid =
+        userCoin + collectorPoint + pakamPercentage + wastePickerPercentage;
       const t = await transactionModel.create({
         weight: householdReward.totalWeight,
-        coin: userCoin,
-        wastePickerCoin,
+        coin: +userCoin.toFixed(),
+        wastePickerCoin: +collectorPoint.toFixed(),
         wastePickerPercentage,
         cardID: scheduler._id,
         completedBy: collectorId,
@@ -780,16 +931,17 @@ class ScheduleService {
         ref_id: ref,
         percentage: pakamPercentage,
         address: schedule.address,
+        phone: schedule.phone,
+        amountTobePaid,
       });
 
       const items = categories.map((category) => category.name);
-      console.log(items);
 
       //  send push notification to household user
       const message = {
         app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
         contents: {
-          en: `You have just been credited ${userCoin} for your ${items} pickup`,
+          en: `You have just been credited ${userCoin.toFixed()} for your ${items} pickup`,
         },
         channel_for_external_user_ids: "push",
         include_external_user_ids: [scheduler.onesignal_id],
@@ -798,7 +950,7 @@ class ScheduleService {
       await notificationModel.create({
         title: "Pickup Schedule completed",
         lcd: scheduler.lcd,
-        message: `You have just been credited ${userCoin} for the ${items} pickup`,
+        message: `You have just been credited ${userCoin.toFixed()} for the ${items} pickup`,
         schedulerId: scheduler._id,
       });
 
@@ -819,11 +971,27 @@ class ScheduleService {
         }
       );
 
+      const userledgerBalance = {
+        scheduleId: schedule._id.toString(),
+        point: userCoin,
+      };
+      const collectorledgerBalance = {
+        scheduleId: schedule._id.toString(),
+        point: collectorPoint,
+      };
+
+      let newledgerBalance = scheduler.ledgerPoints || [];
+      let newCollectorLedgerBalance = collector.ledgerPoints || [];
+      newledgerBalance.push(userledgerBalance);
+      newCollectorLedgerBalance.push(collectorledgerBalance);
+
       await userModel.updateOne(
         { email: scheduler.email },
         {
           $set: {
-            availablePoints: scheduler.availablePoints + userCoin,
+            availablePoints:
+              scheduler.availablePoints + Number(userCoin.toFixed()),
+            //ledgerPoints: newledgerBalance,
             schedulePoints: scheduler.schedulePoints + 1,
           },
         }
@@ -836,7 +1004,9 @@ class ScheduleService {
             totalCollected:
               collector.totalCollected + householdReward.totalWeight,
             numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
-            pointGained: collectorPoint,
+            //pointGained: collectorPoint + collector.pointGained,
+            //ledgerPoints: collectorPoint + collector.pointGained,
+            ledgerPoints: newCollectorLedgerBalance,
             busy: false,
             last_logged_in: new Date(),
           },
@@ -861,7 +1031,7 @@ class ScheduleService {
       return res.status(200).json({
         error: false,
         message: "Pickup completed successfully",
-        data: householdReward.totalpointGained,
+        data: userCoin,
         da: householdReward.totalWeight,
       });
     } catch (error) {
@@ -877,10 +1047,10 @@ class ScheduleService {
     try {
       const { user } = req;
       let areaOfAccess;
-      if (user.organisationId) {
-        const organisation = await organisationModel.findById(
-          user.organisationId
-        );
+
+      if (user.organisationId || user.approvedBy) {
+        const organisationID = user.organisationId || user.approvedBy;
+        const organisation = await organisationModel.findById(organisationID);
         if (organisation) {
           areaOfAccess = organisation.streetOfAccess;
         }
@@ -894,24 +1064,17 @@ class ScheduleService {
       active_today.setHours(0);
       active_today.setMinutes(0);
       let tomorrow = new Date();
-      tomorrow.setDate(new Date().getDate() + 7);
+      tomorrow.setDate(new Date().getDate() + 1);
 
       const active_schedules = await scheduleModel.aggregate([
         {
           $match: {
-            $and: [
-              {
-                pickUpDate: {
-                  $gte: active_today,
-                },
-                pickUpDate: {
-                  $lt: tomorrow,
-                },
-                completionStatus: "pending",
-                collectorStatus: "decline",
-                state: user.state || "Lagos",
-              },
-            ],
+            completionStatus: "pending",
+            collectorStatus: "decline",
+            state: user.state || "Lagos",
+            expiryDuration: {
+              $gt: active_today,
+            },
           },
         },
         {
@@ -930,26 +1093,25 @@ class ScheduleService {
         },
         {
           $sort: {
-            _id: -1,
+            pickUpDate: 1,
           },
         },
       ]);
 
-      await Promise.all(
-        active_schedules.map(async (schedule) => {
-          if (collectorAccessArea.includes(schedule.lcd)) {
-            geofencedSchedules.push(schedule);
-          }
-          const splitAddress = schedule.address.split(", ");
-          await Promise.all(
-            splitAddress.map((address) => {
-              if (collectorAccessArea.includes(address)) {
-                geofencedSchedules.push(schedule);
-              }
-            })
-          );
-        })
-      );
+      console.log(active_schedules, JSON.stringify());
+      active_schedules.forEach((schedule) => {
+        if (collectorAccessArea.includes(schedule.lcd)) {
+          geofencedSchedules.push(schedule);
+        }
+        // const splitAddress = schedule.address.split(", ");
+        // await Promise.all(
+        //   splitAddress.map((address) => {
+        //     if (collectorAccessArea.includes(address)) {
+        //       geofencedSchedules.push(schedule);
+        //     }
+        //   })
+        // );
+      });
 
       const referenceSchedules = [...new Set(geofencedSchedules)];
 
@@ -1168,6 +1330,7 @@ class ScheduleService {
             organisationCollection: user.approvedBy,
             recycler: user.fullname,
             acceptedDate: new Date(),
+            collectorType: user.collectorType,
           },
         }
       );
@@ -1226,6 +1389,449 @@ class ScheduleService {
         error: false,
         message: "Pickup schedule accepted",
         data: schedule,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async hubConfirmSchedule(req, res) {
+    try {
+      const { user } = req;
+      const organisationId = user._id.toString();
+      const { scheduleId } = req.body;
+      const schedule = await scheduleModel.findById(scheduleId);
+      if (!schedule) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not found",
+        });
+      }
+
+      if (schedule.organisationCollection != organisationId) {
+        return res.status(400).json({
+          error: true,
+          message: "Action cannot be perform",
+        });
+      }
+
+      if (
+        schedule.scheduleApproval == "true" ||
+        schedule.scheduleApproval == "false"
+      ) {
+        return res.status(400).json({
+          error: true,
+          message: "Action cannot be perform. contact support team",
+        });
+      }
+
+      const scheduler = await userModel.findById(schedule.clientId);
+      if (!scheduler) {
+        return res.status(400).json({
+          error: true,
+          message: "No Household user connected to this schedule",
+        });
+      }
+
+      // const userpoint = scheduler.ledgerPoints.find(
+      //   (schedule) => schedule.scheduleId == scheduleId
+      // );
+
+      // if (userpoint) {
+      //   const newledgerPoints = scheduler.ledgerPoints.filter(
+      //     (schedule) => schedule.scheduleId != scheduleId
+      //   );
+      //   scheduler.availablePoints = scheduler.availablePoints + userpoint.point;
+      //   scheduler.ledgerPoints = newledgerPoints;
+      //   scheduler.save();
+
+      //   schedule.scheduleApproval = "true";
+      //   schedule.approvedBy = {
+      //     user: "company",
+      //     email: user.email.trim(),
+      //     userId: user._id,
+      //   };
+      //   schedule.approvalDate = new Date();
+      //   schedule.save();
+
+      //   await transactionModel.updateOne(
+      //     { scheduleId: schedule._id.toString() },
+      //     {
+      //       approval: "true",
+      //     }
+      //   );
+      // }
+
+      const collector = await collectorModel.findById(schedule.collectedBy);
+
+      if (collector) {
+        if (collector.collectorType == "waste-picker") {
+          const collectorPoint = collector.ledgerPoints.find(
+            (schedule) => schedule.scheduleId == scheduleId
+          );
+          if (collectorPoint) {
+            const newpoints = collector.ledgerPoints.filter(
+              (schedule) => schedule.scheduleId != scheduleId
+            );
+            collector.pointGained =
+              collector.pointGained + collectorPoint.point;
+            collector.ledgerPoints = newpoints;
+            collector.save();
+
+            schedule.scheduleApproval = "true";
+            schedule.approvedBy = {
+              user: "company",
+              email: user.email.trim(),
+              userId: user._id,
+            };
+            schedule.approvalDate = new Date();
+            schedule.save();
+
+            await transactionModel.updateOne(
+              { scheduleId: schedule._id.toString() },
+              {
+                approval: "true",
+              }
+            );
+          }
+        }
+      }
+
+      return res.status(200).json({
+        error: false,
+        message: "Pickup schedule verified successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async hubRejectSchedule(req, res) {
+    try {
+      const { user } = req;
+      const organisationId = user._id.toString();
+      const { scheduleId, reason } = req.body;
+      const schedule = await scheduleModel.findById(scheduleId);
+      if (!schedule) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not found",
+        });
+      }
+
+      if (
+        schedule.scheduleApproval == "true" ||
+        schedule.scheduleApproval == "false"
+      ) {
+        return res.status(400).json({
+          error: true,
+          message: "Action cannot be perform. contact support team",
+        });
+      }
+
+      if (schedule.organisationCollection != organisationId) {
+        return res.status(400).json({
+          error: true,
+          message: "Action cannot be perform",
+        });
+      }
+      schedule.scheduleApproval = "false";
+      schedule.rejectReason = reason;
+      schedule.rejectionDate = new Date();
+      schedule.save();
+
+      await transactionModel.updateOne(
+        { scheduleId: schedule._id.toString() },
+        {
+          approval: "false",
+        }
+      );
+
+      return res.status(200).json({
+        error: false,
+        message: "Pickup schedule rejected",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async pakamConfirmSchedule(req, res) {
+    try {
+      const { user } = req;
+      const organisationId = user._id.toString();
+      const { scheduleId } = req.body;
+      const schedule = await scheduleModel.findById(scheduleId);
+      if (!schedule) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not found",
+        });
+      }
+
+      // if (schedule.organisationCollection != organisationId) {
+      //   return res.status(400).json({
+      //     error: true,
+      //     message: "Action cannot be perform",
+      //   });
+      // }
+
+      if (schedule.scheduleApproval == true) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule already been approved",
+        });
+      }
+
+      const scheduler = await userModel.findById(schedule.clientId);
+      if (!scheduler) {
+        return res.status(400).json({
+          error: true,
+          message: "No Household user connected to this schedule",
+        });
+      }
+
+      const transaction = await transactionModel.findOne({
+        scheduleId: scheduleId,
+      });
+
+      if (!transaction) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not yet completed",
+        });
+      }
+
+      if (transaction.approval == "true") {
+        return res.status(400).json({
+          erro: true,
+          message: "Schedule already approved",
+        });
+      }
+
+      // const userpoint = scheduler.ledgerPoints.find(
+      //   (schedule) => schedule.scheduleId == scheduleId
+      // );
+
+      // if (userpoint) {
+      //   const newledgerPoints = scheduler.ledgerPoints.filter(
+      //     (schedule) => schedule.scheduleId != scheduleId
+      //   );
+      //   scheduler.availablePoints = scheduler.availablePoints + userpoint.point;
+      //   scheduler.ledgerPoints = newledgerPoints;
+      //   scheduler.save();
+
+      //   schedule.scheduleApproval = "true";
+      //   schedule.approvedBy = {
+      //     user: user.displayRole || user.roles,
+      //     email: user.email.trim(),
+      //     userId: user._id,
+      //   };
+      //   schedule.approvalDate = new Date();
+      //   schedule.save();
+
+      //   await transactionModel.updateOne(
+      //     { scheduleId: schedule._id.toString() },
+      //     {
+      //       approval: "true",
+      //     }
+      //   );
+      // }
+
+      const collector = await collectorModel.findById(schedule.collectedBy);
+
+      if (!collector) {
+        return res.status(400).json({
+          error: true,
+          message: "No Collector connected to this schedule",
+        });
+      }
+
+      if (collector.collectorType == "waste-picker") {
+        // const collectorPoint = collector.ledgerPoints.find(
+        //   (schedule) => schedule.scheduleId == scheduleId
+        // );
+        // if (collectorPoint) {
+        //   const newpoints = collector.ledgerPoints.filter(
+        //     (schedule) => schedule.scheduleId == scheduleId
+        //   );
+        //   collector.pointGained = collector.pointGained + collectorPoint.point;
+        //   collector.ledgerPoints = newpoints;
+        //   collector.save();
+        //   schedule.scheduleApproval = "true";
+        //   schedule.approvedBy = {
+        //     user: user.displayRole || user.roles,
+        //     email: user.email.trim(),
+        //     userId: user._id,
+        //   };
+        //   schedule.approvalDate = new Date();
+        //   schedule.save();
+        //   await transactionModel.updateOne(
+        //     { scheduleId: schedule._id.toString() },
+        //     {
+        //       approval: "true",
+        //     }
+        //   );
+        // }
+
+        collector.pointGained =
+          collector.pointGained + transaction.wastePickerCoin;
+        collector.save();
+        schedule.scheduleApproval = "true";
+        schedule.approvedBy = {
+          user: user.displayRole || user.roles,
+          email: user.email.trim(),
+          userId: user._id,
+        };
+        schedule.approvalDate = new Date();
+        schedule.save();
+        await transactionModel.updateOne(
+          { scheduleId: schedule._id.toString() },
+          {
+            approval: "true",
+          }
+        );
+      }
+
+      return res.status(200).json({
+        error: false,
+        message: "Pickup schedule verified successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred",
+      });
+    }
+  }
+
+  static async adminCompleteScheudle(req, res) {
+    try {
+      const { scheduleId } = req.body;
+      const schedule = await scheduleModel.findById(scheduleId);
+      if (!schedule) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not found",
+        });
+      }
+
+      const transaction = await transactionModel.findOne({
+        scheduleId,
+      });
+
+      if (!transaction) {
+        return res.status(400).json({
+          error: true,
+          message: "Schedule not found",
+        });
+      }
+
+      const organisation = await organisationModel.findById(
+        schedule.organisationCollection
+      );
+      if (!organisation) {
+        return res.status(400).json({
+          error: true,
+          message: "Invalid schedule",
+        });
+      }
+
+      let pointGained = [];
+      transaction.categories.forEach((cat) => {
+        const organisationCat = organisation.categories.find(
+          (category) => category.name.toString() == cat.name.toString()
+        );
+
+        if (organisationCat) {
+          console.log(organisationCat);
+          const p =
+            parseFloat(cat.quantity) * parseFloat(organisationCat.price);
+          pointGained.push(p);
+        } else {
+          const p = parseFloat(cat.quantity) * 0;
+          pointGained.push(p);
+        }
+      });
+
+      let totalPointGained = 0;
+      let totalWeight = 0;
+      let wastePickerCoin = 0;
+      let wastePickerPercentage = 0;
+      let collectorPoint = 0;
+
+      pointGained.forEach((a) => {
+        totalPointGained += parseFloat(a);
+      });
+
+      transaction.categories.forEach((a) => {
+        totalWeight += parseFloat(a["quantity"] || 0);
+      });
+
+      let cat = [];
+      await Promise.all(
+        transaction.categories.map(async (category) => {
+          console.log("c", category);
+          const catDetail = await categoryModel.findOne({
+            $or: [{ name: category.name }, { value: category.name }],
+          });
+          if (catDetail) {
+            const value = {
+              name: catDetail.name,
+              catId: catDetail._id,
+              quantity: category.quantity,
+            };
+            cat.push(value);
+          }
+        })
+      );
+
+      if (cat.length == 0) {
+        return res.status(400).json({
+          message: "Invaild category passed",
+          error: true,
+        });
+      }
+
+      const pakamPer = rewardService.calPercentage(totalPointGained, 10);
+
+      const userCoin = Number(totalPointGained) - Number(pakamPer);
+
+      const collector = await collectorModel.findById(schedule.collectedBy);
+      if (collector && collector.collectorType == "waste-picker") {
+        const wastepickerReward = await rewardService.picker(cat, organisation);
+        if (!wastepickerReward.error) {
+          wastePickerCoin = wastepickerReward.totalpointGained;
+          wastePickerPercentage = rewardService.calPercentage(
+            wastepickerReward.totalpointGained,
+            10
+          );
+          collectorPoint = wastePickerCoin - wastePickerPercentage;
+        }
+      }
+      console.log("collector not a waste picker");
+
+      return res.status(200).json({
+        totalPointGained,
+        totalWeight,
+        userCoin,
+        pakamPer,
+        wastePickerCoin,
+        collectorPoint,
+        wastePickerPercentage,
       });
     } catch (error) {
       console.log(error);

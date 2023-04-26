@@ -234,71 +234,130 @@ organisationController.changedlogedInPassword = (REQUEST, RESPONSE) => {
   });
 };
 
-organisationController.loginOrganisation = (REQUEST, RESPONSE) => {
+organisationController.loginOrganisation = async (REQUEST, RESPONSE) => {
   console.log("body", REQUEST.body);
   var PROJECTION = { __v: 0, createAt: 0 };
 
-  if (!REQUEST.body.email || !REQUEST.body.password) {
-    return RESPONSE.json({
-      error: false,
-      message: "Invalid Body request",
+  try {
+    if (!REQUEST.body.email || !REQUEST.body.password) {
+      return RESPONSE.json({
+        error: true,
+        message: "Invalid Body request",
+      });
+    }
+
+    const organisation = await MODEL.organisationModel.findOne({
+      email: REQUEST.body.email,
+    });
+
+    if (!organisation) {
+      return RESPONSE.status(400).json({
+        error: true,
+        message: "Incorrect email or password",
+      });
+    }
+
+    const compare = await COMMON_FUN.comparePassword(
+      REQUEST.body.password,
+      organisation.password
+    );
+    if (!compare) {
+      return RESPONSE.status(400).json({
+        error: true,
+        message: "Incorrect email or password",
+      });
+    }
+
+    if (organisation.isDisabled) {
+      return RESPONSE.status(400).json({
+        error: true,
+        message: "Account disabled contact support team",
+        statusCode: 400,
+      });
+    }
+
+    const token = COMMON_FUN.adminToken(organisation);
+
+    return RESPONSE.status(200).json({
+      _id: organisation._id,
+      role: organisation.role,
+      licence_active: organisation.licence_active,
+      areaOfAccess: organisation.areaOfAccess,
+      companyName: organisation.companyName,
+      location: organisation.location,
+      rcNo: organisation.rcNo,
+      email: organisation.email,
+      streetOfAccess: organisation.streetOfAccess,
+      roles: organisation.roles,
+      country: organisation.country,
+      firstLogin: organisation.firstLogin,
+      isDisabled: organisation.isDisabled,
+      state: organisation.state,
+      token,
+    });
+  } catch (error) {
+    console.log(error);
+    return RESPONSE.status(500).json({
+      error: true,
+      message: "An error occurred",
     });
   }
-  /** find user is exists or not */
-  MODEL.organisationModel
-    .findOne({ email: REQUEST.body.email }, PROJECTION, { lean: true })
-    .then((USER) => {
-      USER /** matching password */
-        ? COMMON_FUN.decryptPswrd(
-            REQUEST.body.password,
-            USER.password,
-            async (ERR, MATCHED) => {
-              if (ERR)
-                return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
-              else if (!MATCHED)
-                return RESPONSE.status(400).jsonp(
-                  COMMON_FUN.sendSuccess(
-                    CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
-                  )
-                );
-              else {
-                var jwtToken =
-                  COMMON_FUN.adminToken(USER); /** creating jwt token */
-                USER.token = jwtToken;
-                if (USER.licence_active == false) {
-                  return RESPONSE.status(400).json({
-                    message:
-                      "Your licence expired. Kindly contact support for difficulty in renewal",
-                  });
-                }
 
-                const firstLogin = USER.last_logged_in ? false : true;
-                const { password, resetToken, ...data } = USER;
-                if (USER.firstLogin && USER.firstLogin === true) {
-                  return RESPONSE.jsonp({
-                    message: "Please change password",
-                    ...data,
-                    firstLogin: true,
-                  });
-                } else {
-                  await MODEL.organisationModel.updateOne(
-                    {
-                      email: REQUEST.body.email,
-                    },
-                    { last_logged_in: new Date() }
-                  );
-                  return RESPONSE.jsonp({ ...data, firstLogin: false });
-                }
-              }
-            }
-          )
-        : RESPONSE.status(400).jsonp(
-            COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
-          );
-    })
-    .catch((err) => {
-      return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err));
-    });
+  /** find user is exists or not */
+  // MODEL.organisationModel
+  //   .findOne({ email: REQUEST.body.email }, PROJECTION, { lean: true })
+  //   .then((USER) => {
+  //     USER /** matching password */
+  //       ? COMMON_FUN.decryptPswrd(
+  //           REQUEST.body.password,
+  //           USER.password,
+  //           async (ERR, MATCHED) => {
+  //             if (ERR)
+  //               return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
+  //             else if (!MATCHED)
+  //               return RESPONSE.status(400).jsonp(
+  //                 COMMON_FUN.sendSuccess(
+  //                   CONSTANTS.STATUS_MSG.ERROR.INCORRECT_PASSWORD
+  //                 )
+  //               );
+  //             else {
+  //               var jwtToken =
+  //                 COMMON_FUN.adminToken(USER); /** creating jwt token */
+  //               USER.token = jwtToken;
+  //               if (USER.licence_active == false) {
+  //                 return RESPONSE.status(400).json({
+  //                   message:
+  //                     "Your licence expired. Kindly contact support for difficulty in renewal",
+  //                 });
+  //               }
+
+  //               const firstLogin = USER.last_logged_in ? false : true;
+  //               const { password, resetToken, ...data } = USER;
+  //               if (USER.firstLogin && USER.firstLogin === true) {
+  //                 return RESPONSE.jsonp({
+  //                   message: "Please change password",
+  //                   ...data,
+  //                   firstLogin: true,
+  //                 });
+  //               } else {
+  //                 await MODEL.organisationModel.updateOne(
+  //                   {
+  //                     email: REQUEST.body.email,
+  //                   },
+  //                   { last_logged_in: new Date() }
+  //                 );
+  //                 return RESPONSE.jsonp({ ...data, firstLogin: false });
+  //               }
+  //             }
+  //           }
+  //         )
+  //       : RESPONSE.status(400).jsonp(
+  //           COMMON_FUN.sendError(CONSTANTS.STATUS_MSG.ERROR.INVALID_EMAIL)
+  //         );
+  //   })
+  //   .catch((err) => {
+  //     return RESPONSE.status(500).jsonp(COMMON_FUN.sendError(err));
+  //   });
 };
 
 organisationController.listOrganisation = (req, res) => {
@@ -7836,94 +7895,144 @@ organisationController.getCompletedSchedulesDrop = (req, res) => {
   }
 };
 
+// organisationController.getDropOffUser = async (req, res) => {
+//   const lat = req.query.lat;
+//   const long = req.query.long;
+//   function rad(x) {
+//     return (x * Math.PI) / 180;
+//   }
+
+//   const getDistance = function (p1, p2) {
+//     let R = 6378137; // Earth’s mean radius in meter
+//     let dLat = rad(p2.lat - p1.lat);
+//     let dLong = rad(p2.long - p1.long);
+
+//     let a =
+//       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+//       Math.cos(rad(p1.lat)) *
+//         Math.cos(rad(p2.lat)) *
+//         Math.sin(dLong / 2) *
+//         Math.sin(dLong / 2);
+//     let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+//     let d = R * c;
+//     return d;
+//   };
+
+//   try {
+//     var nearestLocation = [];
+//     var nearestDistances = [];
+//     var addresses = [];
+//     var datum = [];
+
+//     const d = await MODEL.dropOffModel.find({});
+//     for (let i = 0; i < d.length; i++) {
+//       getDistance(d[i].location, { lat, long });
+
+//       nearestLocation.push(d[i].location);
+//       nearestDistances.push(getDistance(d[i].location, { lat, long }));
+//       datum.push(d[i]);
+//     }
+
+//     await Promise.all(
+//       datum
+//         .map(async (address) => {
+//           const categories = await MODEL.organisationModel
+//             .findById(address.organisationId)
+//             .select("categories");
+//           let r = {
+//             Organisation: address.organisation,
+//             phone: address.phone,
+
+//             OrganisationId: address.organisationId,
+//             distance: getDistance(address.location, { lat, long }),
+
+//             location: address.location,
+//             categories,
+//           };
+//           addresses.push(r);
+//         })
+//         .sort((a, b) => a.distance - b.distance)
+//     );
+
+//     return res.status(200).json(addresses);
+
+//     // MODEL.dropOffModel.find({}).then((drop) => {
+//     //   for (let i = 0; i < drop.length; i++) {
+//     //     getDistance(drop[i].location, { lat, long });
+
+//     //     nearestLocation.push(drop[i].location);
+//     //     nearestDistances.push(getDistance(drop[i].location, { lat, long }));
+//     //     datum.push(drop[i]);
+//     //   }
+//     //   addresses = datum
+//     //     .map((address) => ({
+//     //       Organisation: address.organisation,
+//     //       phone: address.phone,
+
+//     //       OrganisationId: address.organisationId,
+//     //       distance: getDistance(address.location, { lat, long }),
+
+//     //       location: address.location,
+//     //     }))
+//     //     .sort((a, b) => a.distance - b.distance);
+//     //   return res.status(200).json(addresses);
+//     // });
+//   } catch (err) {
+//     return res.status(500).json(err);
+//   }
+// };
+
 organisationController.getDropOffUser = async (req, res) => {
-  const lat = req.query.lat;
-  const long = req.query.long;
-  function rad(x) {
-    return (x * Math.PI) / 180;
-  }
-
-  const getDistance = function (p1, p2) {
-    let R = 6378137; // Earth’s mean radius in meter
-    let dLat = rad(p2.lat - p1.lat);
-    let dLong = rad(p2.long - p1.long);
-
-    let a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(rad(p1.lat)) *
-        Math.cos(rad(p2.lat)) *
-        Math.sin(dLong / 2) *
-        Math.sin(dLong / 2);
-    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    let d = R * c;
-    return d;
-  };
-
   try {
-    var nearestLocation = [];
-    var nearestDistances = [];
-    var addresses = [];
-    var datum = [];
+    const { lat, long } = req.query;
 
-    const d = await MODEL.dropOffModel.find({});
-    for (let i = 0; i < d.length; i++) {
-      getDistance(d[i].location, { lat, long });
+    const results = await MODEL.dropOffModel
+      .find({
+        newLocation: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [long, lat],
+            },
+            $minDistance: 1000,
+            $maxDistance: 5000,
+          },
+        },
+        status: "active",
+      })
 
-      nearestLocation.push(d[i].location);
-      nearestDistances.push(getDistance(d[i].location, { lat, long }));
-      datum.push(d[i]);
+      .populate("orgID", "categories")
+      .lean();
+
+    const addresses = [];
+
+    if (results.length > 0) {
+      results.forEach((result) => {
+        console.log("resu", result.orgID);
+        const r = {
+          Organisation: result.organisation,
+          phone: result.phone,
+
+          OrganisationId: result.organisationId,
+          distance: 0,
+
+          location: result.location,
+          categories: result.orgID.categories || [],
+        };
+        addresses.push(r);
+      });
+
+      return res.status(200).json(addresses);
     }
-
-    await Promise.all(
-      datum
-        .map(async (address) => {
-          const categories = await MODEL.organisationModel
-            .findById(address.organisationId)
-            .select("categories");
-          let r = {
-            locationId: address._id,
-            Organisation: address.organisation,
-            phone: address.phone,
-
-            OrganisationId: address.organisationId,
-            distance: getDistance(address.location, { lat, long }),
-
-            location: address.location,
-            categories,
-          };
-          addresses.push(r);
-        })
-        .sort((a, b) => a.distance - b.distance)
-    );
-
     return res.status(200).json(addresses);
-
-    // MODEL.dropOffModel.find({}).then((drop) => {
-    //   for (let i = 0; i < drop.length; i++) {
-    //     getDistance(drop[i].location, { lat, long });
-
-    //     nearestLocation.push(drop[i].location);
-    //     nearestDistances.push(getDistance(drop[i].location, { lat, long }));
-    //     datum.push(drop[i]);
-    //   }
-    //   addresses = datum
-    //     .map((address) => ({
-    //       Organisation: address.organisation,
-    //       phone: address.phone,
-
-    //       OrganisationId: address.organisationId,
-    //       distance: getDistance(address.location, { lat, long }),
-
-    //       location: address.location,
-    //     }))
-    //     .sort((a, b) => a.distance - b.distance);
-    //   return res.status(200).json(addresses);
-    // });
-  } catch (err) {
-    return res.status(500).json(err);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: true,
+      message: "An error occurred",
+    });
   }
 };
-
 organisationController.sendInvoiceMail = (req, res) => {
   const organisationId = req.body.organisationId;
   const file = req.body.file || " ";

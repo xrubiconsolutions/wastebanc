@@ -98,8 +98,4 @@ module.exports = {
       .isString()
       .withMessage("otp is should be string"),
   ],
-  openSAF: [
-    body("bvn").trim().notEmpty().withMessage("bvn is required").isString(),
-    body("nin").trim().notEmpty().withMessage("nin is required").isString(),
-  ],
 };

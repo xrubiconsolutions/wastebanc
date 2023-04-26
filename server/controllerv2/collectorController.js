@@ -30,15 +30,15 @@ class CollectorService {
         $match: criteria,
       },
       {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
         $skip: (page - 1) * resultsPerPage,
       },
       {
         $limit: resultsPerPage,
-      },
-      {
-        $sort: {
-          createdAt: -1,
-        },
       },
     ];
 
@@ -203,7 +203,6 @@ class CollectorService {
 
       //console.log
 
-      console.log(criteria);
       //if (state) criteria.state = state;
 
       const { collectors, totalResult } = await CollectorService.aggregateQuery(
@@ -304,7 +303,6 @@ class CollectorService {
       if (key) {
         criteria = {
           $or: [
-            { address: { $regex: `.*${key}.*`, $options: "i" } },
             { fullname: { $regex: `.*${key}.*`, $options: "i" } },
             { gender: { $regex: `.*${key}.*`, $options: "i" } },
             { phone: { $regex: `.*${key}.*`, $options: "i" } },
@@ -407,10 +405,9 @@ class CollectorService {
       });
       // return error if data doesn't exist for company
       if (!coordinateData)
-        return res.status(200).json({
-          error: false,
+        return res.status(400).json({
+          error: true,
           message: "Geo fence coordinates not found for organisation",
-          data: [],
         });
 
       // handle pagination
@@ -473,12 +470,16 @@ class CollectorService {
 
     // constructs criteria to find schedules
     const schedulesCriteria = {
-      pickUpDate: {
-        $gte: active_today,
-        $lt: nextWeek,
+      // pickUpDate: {
+      //   $gte: active_today,
+      //   $lt: nextWeek,
+      // },
+      expiryDuration: {
+        $gt: active_today,
       },
+      state: req.user.state || "Lagos",
       completionStatus: "pending",
-      collectorStatus: { $ne: "accept" },
+      collectorStatus: "decline",
     };
     try {
       const company = await organisationModel.findById(organisationId);
@@ -486,7 +487,9 @@ class CollectorService {
       const accessArea = company.streetOfAccess;
 
       // initial schedules
-      const initSchedules = await scheduleModel.find(schedulesCriteria);
+      const initSchedules = await scheduleModel
+        .find(schedulesCriteria)
+        .sort({ pickUpDate: 1 });
 
       // result schedules accumlation list
       let schedules = [];
@@ -494,13 +497,19 @@ class CollectorService {
       // for every area in company's access area, find schedules for which have
       // the schedule's lcd matches the current area or the current area is
       // included in the schedule's address
-      accessArea.forEach((area) => {
-        const matchSchedules = initSchedules.filter(
-          (schedule) =>
-            schedule?.address?.toLowerCase().indexOf(area?.toLowerCase()) >
-              -1 || schedule?.lcd === area
-        );
-        schedules = schedules.concat(matchSchedules);
+      // accessArea.forEach((area) => {
+      //   const matchSchedules = initSchedules.filter(
+      //     (schedule) =>
+      //       schedule?.address?.toLowerCase().indexOf(area?.toLowerCase()) >
+      //         -1 || schedule?.lcd === area
+      //   );
+      //   schedules = schedules.concat(matchSchedules);
+      // });
+
+      initSchedules.forEach((schedule) => {
+        if (accessArea.includes(schedule.lcd)) {
+          schedules.push(schedule);
+        }
       });
 
       // remove duplicate schedules
@@ -796,28 +805,24 @@ class CollectorService {
       let organisationName;
       let organisationId;
       let areaOfAccess = [];
-      const org = await organisationModel.findOne({});
-      organisationName = org.companyName;
-      organisationId = org._id.toString();
-      areaOfAccess = org.streetOfAccess;
-      // if (body.organisation) {
-      //   const org = await organisationModel.findOne({
-      //     companyName: body.organisation.trim(),
-      //   });
-      //   if (!org) {
-      //     return res.status(400).json({
-      //       error: true,
-      //       message: "Invalid organisation passed",
-      //     });
-      //   }
-      //   organisationName = org.companyName;
-      //   organisationId = org._id.toString();
-      //   areaOfAccess = org.streetOfAccess;
-      // } else {
-      //   organisationName = "";
-      //   organsationId = "";
-      //   areaOfAccess = [];
-      // }
+      if (body.organisation) {
+        const org = await organisationModel.findOne({
+          companyName: body.organisation.trim(),
+        });
+        if (!org) {
+          return res.status(400).json({
+            error: true,
+            message: "Invalid organisation passed",
+          });
+        }
+        organisationName = org.companyName;
+        organisationId = org._id.toString();
+        areaOfAccess = org.streetOfAccess;
+      } else {
+        organisationName = "";
+        organsationId = "";
+        areaOfAccess = [];
+      }
 
       const create = await collectorModel.create({
         fullname: body.fullname,
@@ -836,8 +841,10 @@ class CollectorService {
         onesignal_id,
         dateOfBirth: body.dateOfBirth || "",
         terms_condition: body.terms_condition || false,
-        lcd: body.lcd,
+        lcd: body.lcd || "",
         address: body.address || "",
+        status: "active",
+        companyVerified: false,
       });
       const token = authToken(create);
       const phoneNo = String(create.phone).substring(1, 11);
@@ -894,9 +901,8 @@ class CollectorService {
           pin_id: send.data.pinId,
           terms_condition: create.terms_condition,
           aggregatorId: create.aggregatorId,
+          requestedAmount: create.requestedAmount,
           token,
-          lcd: create.lcd,
-          address: create.address,
         },
       });
     } catch (error) {
@@ -919,6 +925,7 @@ class CollectorService {
         organisationId: req.user._id.toString(),
         companyVerified: true,
         collectorType,
+        status: { $ne: "deleted" },
       });
 
       // count male company collectors
@@ -928,6 +935,7 @@ class CollectorService {
         //verified: true,
         //companyVerified: true,
         collectorType,
+        status: { $ne: "deleted" },
       });
 
       // count female company collectors
@@ -937,6 +945,7 @@ class CollectorService {
         //verified: true,
         //companyVerified: true,
         collectorType,
+        status: { $ne: "deleted" },
       });
 
       // count new company collectors withon 30 days
@@ -950,6 +959,7 @@ class CollectorService {
         organisationId: req.user._id.toString(),
         //companyVerified: t,
         collectorType,
+        status: { $ne: "deleted" },
       });
 
       // get all company collectors
@@ -957,6 +967,7 @@ class CollectorService {
         organisationId: req.user._id.toString(),
         //companyVerified: true,
         collectorType,
+        status: { $ne: "deleted" },
       });
 
       return res.status(200).json({
@@ -1085,7 +1096,7 @@ class CollectorService {
           },
           createdAt: 1,
           weight: {
-            $ifNull: ["$categories.quantity", "$weight"],
+            $sum: { $ifNull: ["$categories.quantity", "$weight"] },
           },
         },
       },
@@ -1334,7 +1345,7 @@ class CollectorService {
       if (!collector) {
         return res.status(400).json({
           error: true,
-          message: "Invalid credentials",
+          message: "Incorrect phone number or password",
           statusCode: 400,
         });
       }
@@ -1342,14 +1353,22 @@ class CollectorService {
       if (collector.status == "deleted") {
         return res.status(400).json({
           error: true,
-          message: "Invalid credentials",
+          message: "Incorrect phone number or password",
+          statusCode: 400,
+        });
+      }
+
+      if (collector.isDisabled) {
+        return res.status(400).json({
+          error: true,
+          message: "Account disabled,Contact support team",
           statusCode: 400,
         });
       }
       if (!(await comparePassword(req.body.password, collector.password))) {
         return res.status(400).json({
           error: true,
-          message: "Invalid credentials",
+          message: "Incorrect phone number or password",
           statusCode: 400,
         });
       }
@@ -1637,24 +1656,21 @@ class CollectorService {
       await collectorModel.updateOne(
         { _id: user._id },
         {
-          $set: {
-            email,
-            phone: user.phone,
-            gender: req.body.gender.toLowerCase() || user.gender,
-            dateOfBirth: req.body.dateOfBirth || user.dateOfBirth,
-            address: req.body.address || user.address,
-            fullname,
-            country: req.body.country || user.country,
-            state: req.body.state || user.state,
-            place: req.body.place || user.place,
-            aggregatorId: req.body.aggregatorId || user.aggregatorId,
-            organisation: req.body.organisation || user.organisation,
-            organisationId: organisationId,
-            localGovernment: req.body.localGovernment || user.localGovernment,
-            profile_picture: req.body.profile_picture || user.profile_picture,
-            areaOfAccess:
-              organisation.streetOfAccess || user.areaOfAccess || [],
-          },
+          email,
+          phone: user.phone,
+          gender: req.body.gender || user.gender,
+          dateOfBirth: req.body.dateOfBirth,
+          address: req.body.address,
+          fullname: req.body.fullname,
+          country: req.body.country || user.country,
+          state: req.body.state || user.state,
+          place: req.body.place || user.place,
+          aggregatorId: req.body.aggregatorId,
+          organisation: req.body.organisation || user.organisation,
+          organisationId: organisationId,
+          localGovernment: req.body.localGovernment,
+          profile_picture: req.body.profile_picture,
+          areaOfAccess: organisation.streetOfAccess || user.areaOfAccess || [],
         }
       );
 
@@ -2084,16 +2100,29 @@ class CollectorService {
     try {
       const { user } = req;
       const collector = await collectorModel.findById(user._id);
+
       if (!collector) {
         return res.status(400).json({
           error: true,
           message: "Invalid collector, please contact support team",
         });
       }
+      let ledgerBalance = collector.ledgerPoints
+        .map((x) => x.point)
+        .reduce((acc, curr) => acc + curr, 0);
+
+      console.log(ledgerBalance);
+      if (ledgerBalance == null) {
+        ledgerBalance = 0;
+      }
       return res.status(200).json({
         error: false,
         message: "Point Balance",
-        data: collector.pointGained,
+        data: {
+          balance: collector.pointGained,
+          ledgerBalance,
+          requestedAmount: 0,
+        },
       });
     } catch (error) {
       console.log(error);
@@ -2180,7 +2209,7 @@ class CollectorService {
       };
 
       const result = await axios.post(
-        "https://wastebancfin.pakam.ng/api/wastepicker/withdrawal/summary",
+        `${process.env.PAYMENT_URL}wastepicker/withdrawal/summary`,
         body,
         {
           headers: {
@@ -2207,7 +2236,7 @@ class CollectorService {
         collectorId: user._id,
       };
       const result = await axios.post(
-        "https://wastebancfin.pakam.ng/api/wastepicker/request/otp",
+        `${process.env.PAYMENT_URL}wastepicker/request/otp`,
         body,
         {
           headers: {
@@ -2238,7 +2267,7 @@ class CollectorService {
       };
 
       const result = await axios.post(
-        "https://wastebancfin.pakam.ng/api/disbursement/collector/initiate",
+        `${process.env.PAYMENT_URL}disbursement/collector/initiate`,
         body,
         {
           headers: {
@@ -2268,7 +2297,7 @@ class CollectorService {
       };
 
       const result = await axios.post(
-        "https://wastebancfin.pakam.ng/api/wastepicker/request/otp",
+        `${process.env.PAYMENT_URL}wastepicker/request/otp`,
         body,
         {
           headers: {

@@ -56,8 +56,8 @@ class VerificationService {
       });
     } catch (error) {
       const { code, response, body } = error;
-      console.log(response.body);
-      if (code => 400) {
+      console.log(error);
+      if ((code) => 400) {
         return res.status(200).json({
           error: false,
           message: "Reset token sent successfully!",

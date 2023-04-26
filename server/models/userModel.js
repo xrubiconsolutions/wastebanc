@@ -33,7 +33,8 @@ const user_Schema = new Schema({
   },
   address: {
     type: String,
-    default: "",
+    required: true,
+    default: "Lagos",
   },
   cardID: {
     type: String,
@@ -55,7 +56,7 @@ const user_Schema = new Schema({
   },
   createAt: {
     type: Date,
-    default: Date.now,
+    default: new Date(),
   },
 
   role: {
@@ -92,6 +93,10 @@ const user_Schema = new Schema({
     type: Number,
     required: true,
     default: 0,
+  },
+  ledgerPoints: {
+    type: Array,
+    default: [],
   },
   rafflePoints: {
     type: Number,
@@ -174,11 +179,22 @@ const user_Schema = new Schema({
     type: Boolean,
     default: false,
   },
-  accountNo: { type: String, default: "" },
-  cifNo: { type: String, default: "" },
-  bankName: { type: String, default: "" },
-  bankCode: {type: String, default:""},
+  accountNo: { type: String },
+  cifNo: { type: String },
   percentageAcc: { type: Number },
+  requestedAmount: { type: Number, default: 0 },
+  insuranceUser: { type: Boolean, default: false },
+  insuranceAmount: { type: Number, default: 0 },
+  insurancePolicyID: { type: String },
+  channel: { type: String, default: "mobile" },
+  purchaseDate: { type: Date },
+  insuranceStartDate: { type: Date },
+  insuranceExpirationDate: { type: Date },
+  hmo_policy_id: { type: String },
+  purchaseAmount: { type: String },
+  calAmount: { type: String },
+  insuranceDetails: { type: Object },
+  isChatAdmin: { type: Boolean, default:false },
 });
 
 user_Schema.pre("save", function (next) {

@@ -117,10 +117,10 @@ module.exports = (APP) => {
     organisationController.completedSchedule
   );
 
-  APP.route("/api/organisation/account/details").get(
-    companyPakamDataValidation,
-    organisationController.accountDetails
-  );
+  // APP.route("/api/organisation/account/details").get(
+  //   companyPakamDataValidation,
+  //   organisationController.accountDetails
+  // );
 
   APP.route("/api/organisation/profile").get(
     companyPakamDataValidation,

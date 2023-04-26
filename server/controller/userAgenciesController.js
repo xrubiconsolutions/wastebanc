@@ -6,9 +6,9 @@ const COMMON_FUN = require("../util/commonFunction");
 const mongodb = require("mongodb");
 
 const { validationResult, body } = require("express-validator");
+const { userAgenciesMail } = require("../services/sendEmail");
 const sgMail = require("@sendgrid/mail");
 const welcomeTemplate = require("../../email-templates/welcome-email.template");
-const { userAgenciesMail } = require("../services/sendEmail");
 
 const bodyValidate = (req, res) => {
   // 1. Validate the request coming in
@@ -85,7 +85,7 @@ agenciesController.create = async (req, res) => {
       { email: agency.email },
       { cardID: agency._id }
     );
-    const emailTemplate = welcomeTemplate(agency, password);
+    //const emailTemplate = welcomeTemplate(agency, password);
 
     //send mail to the company holding the agencies password
     // sgMail.setApiKey(

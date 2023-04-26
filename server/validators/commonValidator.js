@@ -22,11 +22,14 @@ module.exports = {
       }),
   ],
   search: [query("key", "search key cannot be empty").exists().notEmpty()],
+  householdScheduleValidation: [
+    query("userId").notEmpty().withMessage("userId is required"),
+  ],
   createArea: [
     body("coverageArea").notEmpty().withMessage("coverageArea is required"),
     body("lga").notEmpty().withMessage("lga is required"),
-    body("country").optional({ default: "" }),
-    body("state").optional({ default: "" }),
+    body("country").optional({ default: "Nigeria" }),
+    body("state").optional({ default: "Lagos" }),
   ],
   areaId: [param("areaId").notEmpty().withMessage("areaId is required")],
   removenotification: [
@@ -43,5 +46,13 @@ module.exports = {
       .isString()
       .withMessage("companyId id is invalid")
       .isMongoId(),
+  ],
+  userId: [
+    param("userId")
+      .notEmpty()
+      .isString()
+      .withMessage("userId is required")
+      .isMongoId()
+      .withMessage("userId id is invalid"),
   ],
 };

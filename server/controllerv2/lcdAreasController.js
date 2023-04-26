@@ -23,18 +23,19 @@ areasController.create = async (req, res) => {
 
     if (req.body.lga.includes(" ")) {
       lga = req.body.lga.replace(" ", "-").toLowerCase();
-    } else if (req.body.lcd.includes(" ")) {
-      lcd = req.body.lcd.replace(" ", "-").toLowerCase();
+    } else if (req.body.coverageArea.includes(" ")) {
+      lcd = req.body.coverageArea.replace(" ", "-").toLowerCase();
     } else {
       lga = req.body.lga.toLowerCase();
-      lcd = req.body.lcd.toLowerCase();
+      lcd = req.body.coverageArea.toLowerCase();
     }
     const slug = `${lga}-${lcd}`;
+    console.log("lcd", lcd);
     const create = await localGovernmentModel.create({
       lcd: req.body.coverageArea,
       lga: req.body.lga,
-      country: req.body.country || "",
-      state: req.body.state || "",
+      country: req.body.country || "Nigeria",
+      state: req.body.state || "Lagos",
       slug,
     });
 
@@ -269,9 +270,9 @@ areasController.scriptlocation = async (req, res) => {
     const removeFirst = await localGovernmentModel.deleteMany();
     if (removeFirst) {
       const l = await localGovernmentModel.insertMany(locations);
-      return res.status(200).json({error:false, newData:l})
+      return res.status(200).json({ error: false, newData: l });
     }
-    return res.status(200).json({error: false, newData:null});
+    return res.status(200).json({ error: false, newData: null });
   } catch (error) {
     console.log(error);
     return res

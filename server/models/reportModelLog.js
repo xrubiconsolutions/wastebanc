@@ -7,41 +7,44 @@ const Constants = require("../util/constants");
 /**************************************************
  ************* Report Model or collection ***********
  **************************************************/
-const reportLog_Schema = new Schema({
-  userReportID: {
+const reportLog_Schema = new Schema(
+  {
+    userReportID: {
       type: String,
       required: true,
+    },
+    active: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
+    name: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
+    lat: {
+      type: String,
+    },
+    long: {
+      type: String,
+    },
+    // createdAt: {
+    //     type: Date,
+    //     default: Date.now
+    // },
+    addressArea: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
   },
-  active:{
-    type: Boolean,
-    required: true,
-    default: true
-  },
-  name: {
-    type: String
-  },
-  email:{
-    type: String
-  },
-  phone: {
-    type: String
-  },
-  lat: {
-    type: String
-  },
-  long: {
-    type: String
-  },
-  createdAt: {
-      type: Date,
-      default: Date.now
-  },
-  addressArea:{
-    type: String
-  },
-  address:{
-      type:String
-  }
-});
+  { timestamps: true }
+);
 
 module.exports = MONGOOSE.model("reportLog", reportLog_Schema);

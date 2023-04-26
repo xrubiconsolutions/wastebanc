@@ -16,11 +16,13 @@ const { validationResult, body } = require("express-validator");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const sgMail = require("@sendgrid/mail");
+// const sgMail = require("@sendgrid/mail");
 const passwordResetTemplate = require("../../email-templates/password-reset.template");
 const moment = require("moment-timezone");
 moment().tz("Africa/Lagos", false);
 const { sendNotification } = require("../util/commonFunction");
+const mongoose = require("mongoose");
+const ObjectId = require("mongodb").ObjectID;
 
 const ustorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -410,7 +412,7 @@ userController.loginUser = async (REQUEST, RESPONSE) => {
         ? COMMON_FUN.decryptPswrd(
             REQUEST.body.password,
             USER.password,
-            (ERR, MATCHED) => {
+            async (ERR, MATCHED) => {
               if (ERR)
                 return RESPONSE.status(400).jsonp(COMMON_FUN.sendError(ERR));
               else if (!MATCHED)
@@ -430,8 +432,29 @@ userController.loginUser = async (REQUEST, RESPONSE) => {
                     console.log("Logged date updated", new Date());
                   }
                 );
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const userInsurance = await MODEL.userInsuranceModel.findOne(
+                  {
+                    expiration_date: {
+                      $gt: new Date(),
+                    },
+                    user: ObjectId(USER._id),
+                  },
+                  {
+                    _id: 1,
+                    payment_plan: 1,
+                    plan_name: 1,
+                    product_id: 1,
+                    price: 1,
+                    expiration_date: 1,
+                    activation_date: 1,
+                    policy_id: 1,
+                  }
+                );
 
                 USER.token = jwtToken;
+                USER.insurance = userInsurance;
 
                 return RESPONSE.jsonp(USER);
               }
@@ -2554,11 +2577,18 @@ userController.totalGender = async (REQUEST, RESPONSE) => {
         gender: "female",
       })
       .countDocuments();
+    const totalInsuranceUser = await MODEL.userModel
+      .find({
+        ...criteria,
+        insuranceUser: true,
+      })
+      .countDocuments();
     return RESPONSE.status(200).json({
       message: "Total users",
       data: {
         male: totalMales,
         female: totalFemales,
+        totalInsuranceUser: totalInsuranceUser,
       },
     });
   } catch (error) {
@@ -2680,6 +2710,7 @@ userController.adminLogin = async (req, res) => {
       .findById(user.role)
       .populate({
         path: "claims.claimId",
+        //options: { sort: { "claims.claimId.display": -1 } },
         populate: {
           path: "children",
           match: { show: true },
@@ -2689,7 +2720,7 @@ userController.adminLogin = async (req, res) => {
           },
         },
       })
-      .sort({ display: -1 });
+      .sort({ "claims.claimId.display": 1 });
 
     if (!claims) {
       return res.status(400).json({

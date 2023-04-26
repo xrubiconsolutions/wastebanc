@@ -19,6 +19,7 @@ const {
   userModel,
   collectorModel,
 } = require("../models");
+const axios = require("axios");
 /**
  * incrypt password in case user login implementation
  * @param {*} userPassword
@@ -267,13 +268,13 @@ let createToken = (objData) => {
 
 const authToken = (user) => {
   return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
-    expiresIn: "3h",
+    expiresIn: "7h",
   });
 };
 
 const adminToken = (user) => {
   return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
-    expiresIn: "7h",
+    expiresIn: "4d",
   });
 };
 
@@ -521,6 +522,7 @@ const paginateResponse = async ({
   end,
   select,
   populate,
+  projection,
   title = "data",
 }) => {
   if (typeof page === "string") page = parseInt(page);
@@ -554,7 +556,7 @@ const paginateResponse = async ({
   }
   const totalResult = await model.countDocuments(criteria);
   const data = await model
-    .find(criteria)
+    .find(criteria, projection)
     .populate(populate)
     .select(select)
     .sort({ createdAt: -1 })
@@ -571,6 +573,16 @@ const paginateResponse = async ({
       totalPages: Math.ceil(totalResult / resultsPerPage),
     },
   };
+};
+
+const makeAxiosRequest = async (requestObj, contentType) => {
+  requestObj.headers = {
+    Authorization: requestObj.authorization,
+    "Content-Type": contentType,
+  };
+  console.log("obj", requestObj);
+  const result = await axios(requestObj);
+  return result.data;
 };
 
 /*exporting all object from here*/
@@ -612,4 +624,5 @@ module.exports = {
   updateCollector,
   storeActivites,
   paginateResponse,
+  makeAxiosRequest,
 };

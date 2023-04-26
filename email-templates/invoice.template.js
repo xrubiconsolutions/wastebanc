@@ -20,14 +20,23 @@ module.exports = async (invoice) => {
   const companyInfo = await companyInfoModel.findOne();
 
   const data = transactions.map(
-    ({ ref_id, fullname, type, categories, weight, coin }) => {
+    ({
+      ref_id,
+      address,
+      phone,
+      fullname,
+      type,
+      categories,
+      weight,
+      amountTobePaid,
+    }) => {
       const catgs = categories.map((cat) => cat.name).join(", ");
       return [
         ref_id,
-        `Payment to ${fullname}`,
-        catgs,
-        weight,
-        coin.toLocaleString(),
+        address,
+        phone,
+        weight.toFixed(2),
+        amountTobePaid.toLocaleString(),
       ];
     }
   );
@@ -52,7 +61,8 @@ module.exports = async (invoice) => {
   <body>
   <div
   style="
-    max-width: 1300px;
+    max-width: 1800px;
+    width: 800px;
     margin: auto;
     padding-left: 25px;
     padding-right: 25px;
@@ -174,8 +184,8 @@ module.exports = async (invoice) => {
           <thead>
             <tr>
               <th align="start">Ref No</th>
-              <th align="start">Description</th>
-              <th align="start">Waste category</th>
+              <th align="start">Customer address</th>
+              <th align="start">Customer's phone number</th>
               <th align="start">Weight (Kg)</th>
               <th align="start">Amount (₦)</th>
             </tr>

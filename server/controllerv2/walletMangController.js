@@ -4,7 +4,7 @@ const {
   transactionModel,
   payModel,
   userModel,
-  paymentRequestModel,
+  disbursementRequestModel,
 } = require("../models");
 const {
   generateRandomString,
@@ -37,13 +37,6 @@ class WalletController {
   static async requestOTP(req, res) {
     try {
       const { user } = req;
-
-      if (user.availablePoints < 5000) {
-        return res.status(400).json({
-          error: true,
-          message: "Insufficient Balance",
-        });
-      }
       const body = {
         userId: user._id,
         destinationAccount: req.body.destinationAccount,
@@ -61,7 +54,7 @@ class WalletController {
       };
 
       const result = await axios.post(
-        "https://wastebancfin.pakam.ng/api/request/otp",
+        `${process.env.PAYMENT_URL}request/otp`,
         body,
         {
           headers: {
@@ -90,9 +83,16 @@ class WalletController {
       otp: req.body.otp,
     };
 
+    if (user.availablePoints < 5000) {
+      return res.status(400).json({
+        message: "Insufficient available balance",
+        error: true,
+      });
+    }
+
     try {
       const result = await axios.post(
-        "https://wastebancfin.pakam.ng/api/disbursement/initiate",
+        `${process.env.PAYMENT_URL}disbursement/initiate`,
         body,
         {
           headers: {
@@ -634,163 +634,46 @@ class WalletController {
     }
   }
 
-  static async paymentRequest(req, res) {
+  static async markDisbursementAsCompleted(req, res) {
     try {
-      let {
-        page = 1,
-        key,
-        status = "initiated",
-        resultsPerPage = 20,
-        start,
-        end,
-      } = req.query;
-
-      if (typeof page === "string") page = parseInt(page);
-      if (typeof resultsPerPage === "string")
-        resultsPerPage = parseInt(resultsPerPage);
-
-      if (!key && (!start || !end))
-        return res.status(422).json({
+      const { reference } = req.body;
+      const disbursement = await disbursementRequestModel.findOne({
+        reference,
+      });
+      if (!disbursement) {
+        return res.status(400).json({
           error: true,
-          message: "Supply a date range (start and end) or key to search",
+          message: "No request attached to reference",
         });
-
-      let criteria;
-      if (key) {
-        criteria = {
-          $or: [
-            { fullname: { $regex: `.*${key}.*`, $options: "i" } },
-            { withdrawalAmount: { $eq: parseFloat(key) } },
-            { beneName: { $regex: `.*${key}.*`, $options: "i" } },
-            { destinationAccount: { $regex: `.*${key}.*`, $options: "i" } },
-            { bankName: { $regex: `.*${key}.*`, $options: "i" } },
-            { reference: { $regex: `.*${key}.*`, $options: "i" } },
-            { recycler: { $regex: `.*${key}.*`, $options: "i" } },
-            // { weigh: { $eq: parseFloat(key) } },
-            // { coin: { $eq: parseFloat(key) } },
-          ],
-          status,
-        };
-      } else if (start || end) {
-        const [startDate, endDate] = [new Date(start), new Date(end)];
-        endDate.setDate(endDate.getDate() + 1);
-        criteria = {
-          createdAt: {
-            $gte: startDate,
-            $lt: endDate,
-          },
-          status,
-        };
-      } else {
-        criteria = {
-          status,
-        };
       }
 
-      const paginationQuery = [
-        {
-          $skip: (page - 1) * resultsPerPage,
-        },
-        {
-          $limit: resultsPerPage,
-        },
-        {
-          $sort: {
-            createdAt: -1,
-          },
-        },
-      ];
-      const pipeline = [
-        {
-          $lookup: {
-            from: "users",
-            localField: "user",
-            foreignField: "_id",
-            as: "user",
-          },
-        },
-        {
-          $unwind: {
-            path: "$user",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
-          $project: {
-            user: 1,
-            transactions: 1,
-            status: 1,
-            withdrawalAmount: 1,
-            beneName: 1,
-            destinationAccount: 1,
-            bankName: 1,
-            reference: 1,
-            createdAt: 1,
-            updatedAt: 1,
-          },
-        },
-        {
-          $lookup: {
-            from: "transactions",
-            let: {
-              pid: "$transactions",
+      if (disbursement.status == "successful") {
+        return res.status(200).json({
+          error: false,
+          message: "Transaction already completed",
+        });
+      }
+
+      const transactions = disbursement.transactions;
+
+      transactions.forEach(async (transaction) => {
+        await transactionModel.updateOne(
+          { _id: transaction._id },
+          {
+            $set: {
+              paid: true,
+              dateOfCompletion: new Date(),
             },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $in: ["$_id", "$$pid"],
-                  },
-                },
-              },
-            ],
-            as: "trans",
-          },
-        },
-        // {
-        //   $unwind: {
-        //     path: "$trans",
-        //     preserveNullAndEmptyArrays: true,
-        //   },
-        // },
-        {
-          $project: {
-            //user: 1,
-            trans: 1,
-            status: 1,
-            withdrawalAmount: 1,
-            beneName: 1,
-            destinationAccount: 1,
-            bankName: 1,
-            reference: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            fullname: "$user.fullname",
-          },
-        },
-        {
-          $match: criteria,
-        },
-      ];
-      console.log({ pipeline, criteria, key });
+          }
+        );
+      });
 
-      const result = await paymentRequestModel.aggregate([
-        ...paginationQuery,
-        ...pipeline,
-      ]);
-
-      const total = result.length;
+      disbursement.status = "successful";
+      disbursement.save();
 
       return res.status(200).json({
         error: false,
-        message: "success",
-        data: {
-          result,
-          totalResult: total,
-          page,
-          resultsPerPage,
-          totalPages: Math.ceil(total / resultsPerPage),
-        },
+        message: "Transaction marked as completed successfully",
       });
     } catch (error) {
       console.log(error);
@@ -798,98 +681,6 @@ class WalletController {
         error: true,
         message: "An error occurred",
       });
-    }
-  }
-
-  static extractPaginationCriteria(
-    req,
-    conditions,
-    searchFields = [],
-    numFields = ["weight", "coin", "withdrawalAmount"]
-  ) {
-    let { page = 1, key, resultsPerPage = 20, start, end } = req.query;
-
-    // return error if neither date range nor search key is provided
-    const [startDate, endDate] = [new Date(start), new Date(end)];
-    endDate.setDate(endDate.getDate() + 1);
-
-    // seperate string from int fields for search
-    const stringSearchFields = searchFields.filter(
-      (field) => !numFields.includes(field)
-    );
-
-    let searchConditions = stringSearchFields.map((field) => ({
-      [field]: { $regex: `.*${key}.*`, $options: "i" },
-    }));
-
-    // add equality check to search conditions if key is a number
-    if (key && parseFloat(key)) {
-      const equalityChecks = numFields.map((field) => ({
-        [field]: { $eq: parseFloat(key) },
-      }));
-      searchConditions = searchConditions.concat(equalityChecks);
-    }
-
-    const criteria =
-      key && searchFields.length > 0
-        ? {
-            $or: searchConditions,
-            ...conditions,
-          }
-        : {
-            createdAt: {
-              $gte: startDate,
-              $lt: endDate,
-            },
-            ...conditions,
-          };
-
-    return { criteria, page, resultsPerPage };
-  }
-
-  static async paginateModelData({
-    model,
-    page = 1,
-    resultsPerPage = 20,
-    criteria,
-    aggregation,
-    countCriteria,
-  }) {
-    try {
-      // get length of schedules with criteria
-      let totalResult = countCriteria
-        ? await model.aggregate(countCriteria)
-        : await model.countDocuments(criteria);
-      console.log({
-        totalResult,
-      });
-
-      if (countCriteria)
-        totalResult.length > 0
-          ? (totalResult = Object.values(totalResult[0])[0])
-          : (totalResult = 0);
-
-      const data = aggregation
-        ? await model
-            .aggregate(aggregation)
-            .sort({ createdAt: -1 })
-            .skip((page - 1) * resultsPerPage)
-            .limit(resultsPerPage)
-        : await model
-            .find(criteria)
-            .sort({ createdAt: -1 })
-            .skip((page - 1) * resultsPerPage)
-            .limit(resultsPerPage);
-
-      return {
-        data,
-        totalResult,
-        page,
-        resultsPerPage,
-        totalPages: Math.ceil(totalResult / resultsPerPage),
-      };
-    } catch (error) {
-      throw error;
     }
   }
 }

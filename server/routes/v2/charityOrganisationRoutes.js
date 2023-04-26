@@ -5,7 +5,6 @@ const {
 } = require("../../validators/charityOrganisationValidator");
 const { checkRequestErrs } = require("../../util/commonFunction.js");
 
-//
 module.exports = (APP) => {
   APP.route("/api/v2/charity-organisations")
     .post(

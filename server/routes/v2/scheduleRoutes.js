@@ -18,6 +18,13 @@ module.exports = (APP) => {
     ScheduleService.getSchedulesWithFilter
   );
 
+  APP.route("/api/v2/household/schedules").get(
+    adminPakamValidation,
+    commonValidator.householdScheduleValidation,
+    checkRequestErrs,
+    ScheduleService.userSchedules
+  );
+
   APP.route("/api/v2/schedules/search").get(
     adminPakamValidation,
     commonValidator.search,
@@ -63,4 +70,27 @@ module.exports = (APP) => {
     checkRequestErrs,
     ScheduleService.getCompanySchedulesForAdmin
   );
+
+  APP.route("/api/v2/schedule/approve").post(
+    companyPakamDataValidation,
+    scheduleValidator.approveSchedule,
+    checkRequestErrs,
+    ScheduleService.hubConfirmSchedule
+  );
+
+  APP.route("/api/v2/schedule/disapprove").post(
+    companyPakamDataValidation,
+    scheduleValidator.disapproveSchedule,
+    checkRequestErrs,
+    ScheduleService.hubRejectSchedule
+  );
+
+  APP.route("/api/v2/schedule/admin/approve").post(
+    adminPakamValidation,
+    scheduleValidator.approveSchedule,
+    checkRequestErrs,
+    ScheduleService.pakamConfirmSchedule
+  );
+
+  APP.route("/api/v2/admin/reward").post(ScheduleService.adminCompleteScheudle);
 };
