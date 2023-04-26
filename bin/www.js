@@ -328,8 +328,8 @@ app.use(BODY_PARSER.urlencoded({ limit: "100mb", extended: false }));
 app.use(
   cors({
     origin: [
-      "https://dashboard.pakam.ng",
-      "https://ft-dev--musical-macaron-c39880.netlify.app",
+      "https://wastebanc_dashboard",
+      // "https://ft-dev--musical-macaron-c39880.netlify.app",
       "http://localhost:3000",
       "http://localhost:3001",
     ],
