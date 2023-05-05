@@ -94,6 +94,14 @@ const transaction_Schema = new Schema(
       type: Boolean,
       default: false,
     },
+    requestedEvacuation: {
+      type: Boolean,
+      default: false,
+    },
+    isEvacuated: {
+      type: Boolean,
+      default: false,
+    },
     percentage: {
       type: Number,
     },

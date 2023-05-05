@@ -227,4 +227,9 @@ module.exports = (APP) => {
     checkRequestErrs,
     CollectorService.saveWasteBancAgent
   );
+
+  APP.route("/api/collector/evacuation/request").get(
+    recyclerValidation,
+    CollectorService.requestEvacuation
+  );
 };

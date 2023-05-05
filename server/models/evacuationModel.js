@@ -1,0 +1,38 @@
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const { PROCESS_STATUSES_ENUM } = require("../util/constants");
+
+const evacuationSchema = new Schema(
+  {
+    transactions: {
+      type: [mongoose.Types.ObjectId],
+      required: true,
+      ref: "transaction",
+    },
+    collector: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "Collector",
+    },
+    organisation: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "Organisation",
+    },
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    totalWeight: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      default: PROCESS_STATUSES_ENUM[0],
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Evacuation", evacuationSchema);

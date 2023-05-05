@@ -553,6 +553,12 @@ const NEWS_CATEGORY_ENUM = Object.freeze([
   "PUBLICATIONS_PODCAST",
 ]);
 
+const PROCESS_STATUSES_ENUM = Object.freeze([
+  "PENDING",
+  "APPROVED",
+  "REJECTED",
+]);
+
 /***********************************
  ****** Application Constants ******
  ***********************************/
@@ -569,6 +575,7 @@ let APP_CONSTANTS = {
   ROLES_ENUM,
   WORK_TYPE_ENUM,
   NEWS_CATEGORY_ENUM,
+  PROCESS_STATUSES_ENUM,
 };
 
 /** Exporting APP CONSTANTS **/

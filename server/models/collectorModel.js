@@ -178,6 +178,10 @@ const collector_Schema = new Schema({
     type: Number,
     default: 0,
   },
+  canCompleteDropOff: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = MONGOOSE.model("Collector", collector_Schema);
