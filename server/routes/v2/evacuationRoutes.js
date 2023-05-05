@@ -11,4 +11,9 @@ module.exports = (APP) => {
     recyclerValidation,
     EvacuationService.requestEvacuation
   );
+
+  APP.route("/api/evacuation/all").get(
+    adminPakamValidation,
+    EvacuationService.getEvacuationRequests
+  );
 };

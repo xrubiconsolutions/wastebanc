@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const { PROCESS_STATUSES_ENUM } = require("../util/constants");
+const { EVACUATION_STATUSES_ENUM } = require("../util/constants");
 
 const evacuationSchema = new Schema(
   {
@@ -29,7 +29,7 @@ const evacuationSchema = new Schema(
     },
     status: {
       type: String,
-      default: PROCESS_STATUSES_ENUM[0],
+      default: EVACUATION_STATUSES_ENUM[0],
     },
   },
   { timestamps: true }
