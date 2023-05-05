@@ -74,6 +74,64 @@ class EvacuationService {
     }
   }
 
+  static async updateRequestStatus(req, res) {
+    const { action, requestId } = req.params;
+    const actionOptions = ["accept", "approve", "reject"];
+    try {
+      const evacuationRequest = await evacuationModel.findById(requestId);
+      if (!evacuationRequest)
+        return res.status(404).json({
+          error: true,
+          message: "Request Data not found",
+        });
+
+      if (action === actionOptions[0]) {
+        if (
+          [EVACUATION_STATUSES_ENUM[1], EVACUATION_STATUSES_ENUM[2]].includes(
+            evacuationRequest.status
+          )
+        )
+          return res.status(400).json({
+            error: true,
+            message: "Only pending or rejected requests can be accepted",
+          });
+        evacuationRequest.status = EVACUATION_STATUSES_ENUM[1];
+      } else if (action === actionOptions[1]) {
+        if (evacuationRequest.status !== EVACUATION_STATUSES_ENUM[1])
+          return res.status(400).json({
+            error: true,
+            message: "Only accepted requests can be approved",
+          });
+        evacuationRequest.status = EVACUATION_STATUSES_ENUM[2];
+      } else {
+        if (
+          [EVACUATION_STATUSES_ENUM[2], EVACUATION_STATUSES_ENUM[3]].includes(
+            evacuationRequest.status
+          )
+        )
+          return res.status(400).json({
+            error: true,
+            message: "Only non-approved requests can be rejected",
+          });
+
+        evacuationRequest.status = EVACUATION_STATUSES_ENUM[3];
+      }
+
+      // save the evacuation request instance
+      await evacuationRequest.save();
+      return res.status(200).json({
+        error: false,
+        message: "Request status updated!",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: true,
+        message: "An error occured!",
+      });
+    }
+  }
+
   static async getEvacuationRequests(req, res) {
     let {
       status,
