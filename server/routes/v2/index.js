@@ -22,4 +22,5 @@ module.exports = function (app) {
   require("./websiteRoutes")(app);
   require("./scriptRoutes")(app);
   require("./insuranceRoutes")(app);
+  require("./evacuationRoutes")(app);
 };
