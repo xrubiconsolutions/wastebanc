@@ -53,4 +53,5 @@ module.exports = {
   disbursementRequestModel: require("./disbursementRequestModel"),
   insuranceLog: require("./insuranceLogsModel"),
   userInsuranceModel: require("./userInsuranceModel"),
+  evacuationModel: require("./evacuationModel"),
 };

@@ -2,6 +2,7 @@ const {
   collectorModel,
   collectorBinModel,
   wastebancAgentModel,
+  evacuationModel,
 } = require("../models");
 const geofenceModel = require("../models/geofenceModel");
 const organisationModel = require("../models/organisationModel");
