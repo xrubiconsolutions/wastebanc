@@ -1539,7 +1539,15 @@ class CollectorService {
 
   static async recentTransaction(req, res) {
     try {
-      let { page = 1, resultsPerPage = 10, start, end, state, key } = req.query;
+      let {
+        page = 1,
+        resultsPerPage = 10,
+        start,
+        end,
+        state,
+        key,
+        evacuated,
+      } = req.query;
       if (typeof page === "string") page = parseInt(page);
       if (typeof resultsPerPage === "string")
         resultsPerPage = parseInt(resultsPerPage);
@@ -1558,6 +1566,11 @@ class CollectorService {
         }, 0);
 
       const condition = { completedBy: collectorId.toString() };
+
+      if (evacuated) {
+        if (evacuated === "true") condition.isEvacuated = true;
+        else if (evacuated === "false") condition.isEvacuated = false;
+      }
       const skip = (page - 1) * resultsPerPage;
 
       console.log(condition);

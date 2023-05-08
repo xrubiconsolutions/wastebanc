@@ -97,11 +97,21 @@ class EvacuationService {
           });
         evacuationRequest.status = EVACUATION_STATUSES_ENUM[1];
       } else if (action === actionOptions[1]) {
-        if (evacuationRequest.status !== EVACUATION_STATUSES_ENUM[1])
+        if (evacuationRequest.status !== EVACUATION_STATUSES_ENUM[1]) {
           return res.status(400).json({
             error: true,
             message: "Only accepted requests can be approved",
           });
+        }
+        console.log({ trns: evacuationRequest.transactions });
+        await transactionModel.updateMany(
+          {
+            _id: { $in: evacuationRequest.transactions },
+          },
+          {
+            isEvacuated: true,
+          }
+        );
         evacuationRequest.status = EVACUATION_STATUSES_ENUM[2];
       } else {
         if (
