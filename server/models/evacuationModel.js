@@ -30,6 +30,7 @@ const evacuationSchema = new Schema(
     status: {
       type: String,
       default: EVACUATION_STATUSES_ENUM[0],
+      enum: EVACUATION_STATUSES_ENUM,
     },
   },
   { timestamps: true }

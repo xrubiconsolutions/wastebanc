@@ -3,6 +3,7 @@ const {
   collectorBinModel,
   wastebancAgentModel,
   evacuationModel,
+  evacuationLogModel,
   transactionModel,
 } = require("../models");
 const { paginateResponse } = require("../util/commonFunction");
@@ -79,13 +80,17 @@ class EvacuationService {
     const actionOptions = ["accept", "approve", "reject"];
     try {
       const evacuationRequest = await evacuationModel.findById(requestId);
+
+      // return error if request not found
       if (!evacuationRequest)
         return res.status(404).json({
           error: true,
           message: "Request Data not found",
         });
+      const currentStatus = evacuationRequest.status;
 
       if (action === actionOptions[0]) {
+        // handle accept action
         if (
           [EVACUATION_STATUSES_ENUM[1], EVACUATION_STATUSES_ENUM[2]].includes(
             evacuationRequest.status
@@ -97,13 +102,13 @@ class EvacuationService {
           });
         evacuationRequest.status = EVACUATION_STATUSES_ENUM[1];
       } else if (action === actionOptions[1]) {
+        // handle approve action
         if (evacuationRequest.status !== EVACUATION_STATUSES_ENUM[1]) {
           return res.status(400).json({
             error: true,
             message: "Only accepted requests can be approved",
           });
         }
-        console.log({ trns: evacuationRequest.transactions });
         await transactionModel.updateMany(
           {
             _id: { $in: evacuationRequest.transactions },
@@ -114,6 +119,7 @@ class EvacuationService {
         );
         evacuationRequest.status = EVACUATION_STATUSES_ENUM[2];
       } else {
+        // handle reject action
         if (
           [EVACUATION_STATUSES_ENUM[2], EVACUATION_STATUSES_ENUM[3]].includes(
             evacuationRequest.status
@@ -129,6 +135,14 @@ class EvacuationService {
 
       // save the evacuation request instance
       await evacuationRequest.save();
+
+      // enter activity into evacuation log
+      await evacuationLogModel.create({
+        evacuation: evacuationRequest._id,
+        user: req.user._id,
+        action: action.toUpperCase(),
+        prevState: currentStatus,
+      });
       return res.status(200).json({
         error: false,
         message: "Request status updated!",
