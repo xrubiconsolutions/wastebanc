@@ -7,9 +7,6 @@ const transactionActivites = new Schema(
   {
     userId: { type: String },
     userType:{type:String}, // household, wastepicker
-    // transaction:{type:Schema.Types.ObjectId, ref:'transactions'},
-    // disbursument:{type:Schema.Types.ObjectId, ref:"disbursementrequests"},
-    // scheduleType: {type: String},
     transactionType: { type: String }, // debit or credit
     message: { type: String },
     amount: { type: String },
