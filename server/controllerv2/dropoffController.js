@@ -8,6 +8,8 @@ const {
   notificationModel,
   activitesModel,
   categoryModel,
+  transactionActivitesModel,
+  legderBalanceModel,
 } = require("../models");
 let dropoffController = {};
 const moment = require("moment-timezone");
@@ -700,7 +702,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       weight: householdReward.totalWeight,
       wastePickerCoin: 0,
       wastePickerPercentage: 0,
-      coin: userCoin,
+      coin: userCoin.toFixed(),
       cardID: scheduler._id,
       completedBy: collectorId,
       categories,
@@ -721,6 +723,17 @@ dropoffController.rewardDropSystem = async (req, res) => {
 
     const items = categories.map((category) => category.name);
 
+    await transactionActivitesModel.create({
+      userId: scheduler._id,
+      transaction: t._id,
+      type: "schedule_pickup",
+      transactionType: "credit",
+      amount: userCoin.toFixed(),
+      userType: "household",
+      message: `Point Credited for ${items} Scheduled`,
+      status: "successful",
+    });
+
     const message = {
       app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
       contents: {
@@ -731,19 +744,19 @@ dropoffController.rewardDropSystem = async (req, res) => {
       //include_player_ids: [`${scheduler.onesignal_id}`],
     };
 
-    // const userledgerBalance = {
-    //   dropoffId: dropoffs._id.toString(),
-    //   point: scheduler.availablePoints + userCoin,
-    // };
+    const userledgerBalance = {
+      dropoffId: dropoffs._id.toString(),
+      point: userCoin.toFixed(),
+    };
     // const collectorledgerBalance = {
     //   dropoffId: dropoffs._id.toString(),
     //   point: collectorPoint + collector.pointGained,
     // };
 
     // let newledgerBalance = scheduler.ledgerPoints || [];
-    // let newCollectorLedgerBalance = collector.ledgerPoints || [];
+    // //let newCollectorLedgerBalance = collector.ledgerPoints || [];
     // newledgerBalance.push(userledgerBalance);
-    // newCollectorLedgerBalance.push(collectorledgerBalance);
+    // // newCollectorLedgerBalance.push(collectorledgerBalance);
 
     await scheduleDropModel.updateOne(
       { _id: dropoffs._id },
@@ -761,12 +774,22 @@ dropoffController.rewardDropSystem = async (req, res) => {
       { email: scheduler.email },
       {
         $set: {
-          availablePoints: scheduler.availablePoints + userCoin,
+          //availablePoints: scheduler.availablePoints + userCoin,
           //ledgerPoints: newledgerBalance,
           schedulePoints: scheduler.schedulePoints + 1,
         },
       }
     );
+
+    await legderBalanceModel.create({
+      userId: scheduler._id,
+      pointGained: +userCoin.toFixed(),
+      userType: "household",
+      previousBalance: scheduler.availablePoints,
+      scheduleType: "dropoff",
+      scheduleId: dropoffs._id,
+      transactionId: t._id,
+    });
 
     // await collectorModel.updateOne(
     //   { _id: collector._id },
@@ -997,30 +1020,6 @@ dropoffController.hubConfirmSchedule = async (req, res) => {
         }
       );
     }
-
-    // const collector = await collectorModel.findById(schedule.collectedBy);
-
-    // if (!collector) {
-    //   return res.status(400).json({
-    //     error: true,
-    //     message: "No Collector connected to this schedule",
-    //   });
-    // }
-
-    // if (collector.collectorType == "waste-picker") {
-    //   const collectorPoint = collector.ledgerPoints.find(
-    //     (schedule) => schedule.scheduleId == scheduleId
-    //   );
-
-    //   if (collectorPoint) {
-    //     const newpoints = collector.ledgerPoints.filter(
-    //       (schedule) => schedule.scheduleId == scheduleId
-    //     );
-    //     collector.pointGained = collector.pointGained + collectorPoint.point;
-    //     collector.ledgerPoints = newpoints;
-    //     collector.save();
-    //   }
-    // }
 
     return res.status(200).json({
       error: false,

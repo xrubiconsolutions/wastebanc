@@ -4,9 +4,14 @@ const {
   wastebancAgentModel,
   evacuationModel,
   transactionModel,
+  organisationModel,
+  userModel,
+  legderBalanceModel,
 } = require("../models");
 const { paginateResponse } = require("../util/commonFunction");
 const { EVACUATION_STATUSES_ENUM } = require("../util/constants");
+const axios = require("axios");
+const rewardService = require("../services/rewardService");
 
 class EvacuationService {
   static async requestEvacuation(req, res) {
@@ -79,12 +84,16 @@ class EvacuationService {
     const actionOptions = ["accept", "approve", "reject"];
     try {
       const evacuationRequest = await evacuationModel.findById(requestId);
+
       if (!evacuationRequest)
         return res.status(404).json({
           error: true,
           message: "Request Data not found",
         });
 
+      const organisation = await organisationModel.findById(
+        evacuationRequest.organisation
+      );
       if (action === actionOptions[0]) {
         if (
           [EVACUATION_STATUSES_ENUM[1], EVACUATION_STATUSES_ENUM[2]].includes(
@@ -104,6 +113,30 @@ class EvacuationService {
           });
         }
         console.log({ trns: evacuationRequest.transactions });
+
+        // *** send a request to partner bank to move the the ***
+        const url = `${process.env.PAYMENT_URL}disbursement/account/funding`;
+        const percentage = rewardService.calPercentage(
+          evacuationRequest.totalAmount,
+          organisation.systemCharge
+        );
+        const amount = evacuationRequest.totalAmount + percentage;
+        const result = await axios.post(url, { Amount: toString(amount) });
+        console.log("result", result);
+        if (result.status !== 200) {
+          return res.status(500).json({
+            error: true,
+            message: "Error approving transactions!",
+          });
+        }
+
+        //**** End ********/
+
+        // update the legder balance to the available balance
+
+        const transactions = evacuationRequest.transactions;
+        await this.handleScheduleApproval(transactions);
+
         await transactionModel.updateMany(
           {
             _id: { $in: evacuationRequest.transactions },
@@ -323,6 +356,92 @@ class EvacuationService {
         error: true,
         message: "An error occured",
       });
+    }
+  }
+
+  static async handleScheduleApproval(transactions) {
+    const transactionLength = transactions.length;
+
+    for (let i = 0; i < transactionLength; ++i) {
+      const ledgerBalance = await legderBalanceModel.find({
+        transactionId: transactions[i],
+      });
+
+      if (ledgerBalance.length > 0) {
+        const userLB = ledgerBalance.filter((lb) => lb.userType == "household");
+        const wastepicker = ledgerBalance.filter(
+          (lb) => lb.userType == "wastepicker"
+        );
+
+        if (userLB) {
+          const userObject = await userModel.findById(userLB.userId);
+          userObject.availablePoints =
+            userObject.availablePoints + userLB.pointGained;
+        }
+
+        if (wastepicker) {
+          const collectorObject = await collectorModel.findById(
+            wastepicker.userId
+          );
+          collectorObject.pointGained =
+            collectorObject.pointGained + userLB.pointGained;
+        }
+      }
+
+      await legderBalanceModel.updateMany(
+        { transactionId: transactions[i] },
+        {
+          paidToBalance: true,
+        }
+      );
+      // const transactionObject = await transactionModel.findById(
+      //   transactions[i]
+      // );
+      // if (transactionObject) {
+      //   // update user ledger balance
+      //   const schedulerObject = await userModel.findById(
+      //     transactionObject.scheduledId
+      //   );
+      //   if (schedulerObject) {
+      //     const ledgerPoint = schedulerObject.ledgerPoints.find(
+      //       (schedule) => schedule.scheduleId == transactionObject.scheduleId
+      //     );
+
+      //     if (ledgerPoint) {
+      //       const newLedgerPoint = schedulerObject.ledgerPoints.filter(
+      //         (schedule) => schedule.scheduleId != transactionObject.scheduleId
+      //       );
+      //       schedulerObject.availablePoints =
+      //         ledgerPoint.availablePoints + schedulerObject.availablePoints;
+      //       schedulerObject.ledgerPoints = newLedgerPoint;
+      //       schedulerObject.save();
+      //     }
+      //   }
+      //   //********** End for updating user balance */
+
+      //   //*********** Handler updating of waste pickers balance */
+      //   // if (transactionObject.wastePickerCoin > 0) {
+      //   //   const collector = await collectorModel.findById(
+      //   //     transactionObject.completedBy
+      //   //   );
+      //   //   if (collector) {
+      //   //     const collectorLegderDetails = collector.ledgerPoints.find(
+      //   //       (schedule) => schedule.scheduleId == transactionObject.scheduleId
+      //   //     );
+      //   //     if (collectorLegderDetails) {
+      //   //       const newLedgerPoint = collector.ledgerPoints.filter(
+      //   //         (schedule) =>
+      //   //           schedule.scheduleId != transactionObject.scheduleId
+      //   //       );
+      //   //       collector.pointGained =
+      //   //         collector.pointGained + collectorLegderDetails.point;
+      //   //       collector.ledgerPoints = newLedgerPoint;
+      //   //       collector.save();
+      //   //     }
+      //   //   }
+      //   // }
+      //   //********* End Handleer for waste pickers balance */
+      // }
     }
   }
 }

@@ -11,6 +11,7 @@ const {
   charityModel,
   insuranceLog,
   userInsuranceModel,
+  legderBalanceModel,
 } = require("../models");
 const {
   sendResponse,
@@ -629,12 +630,19 @@ class UserService {
         });
       }
 
-      let ledgerBalance = 0;
-      if (user.ledgerPoints) {
-        ledgerBalance = user.ledgerPoints
-          .map((x) => x.point)
-          .reduce((acc, curr) => acc + curr, 0);
-      }
+      let ledgerBalance = await legderBalanceModel.aggregate([
+        {
+          $match: {
+            userId: user._id.toString(),
+          },
+        },
+        {
+          $project: {
+            balance: { $sum: "$pointGained" },
+          },
+        },
+      ]);
+      ledgerBalance = ledgerBalance[0].balance;
       if (!user.verified) {
         const phoneNo = String(user.phone).substring(1, 11);
         const token = authToken(user);

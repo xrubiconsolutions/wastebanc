@@ -8,6 +8,8 @@ const {
   activitesModel,
   centralAccountModel,
   categoryModel,
+  transactionActivitesModel,
+  legderBalanceModel,
 } = require("../models");
 const { sendResponse, bodyValidate } = require("../util/commonFunction");
 const { STATUS_MSG } = require("../util/constants");
@@ -816,6 +818,7 @@ class ScheduleService {
         });
       }
 
+      console.log("collectorId", collectorId);
       const collector = await collectorModel.findById(collectorId);
       if (!collector || collector.companyVerified === false) {
         return res.status(400).json({
@@ -887,7 +890,7 @@ class ScheduleService {
           wastePickerCoin = wastepickerReward.totalpointGained;
           wastePickerPercentage = rewardService.calPercentage(
             wastepickerReward.totalpointGained,
-            10
+            process.env.PAKAM_PERCENT
           );
           collectorPoint = wastePickerCoin - wastePickerPercentage;
         }
@@ -895,7 +898,7 @@ class ScheduleService {
 
       const pakamPercentage = rewardService.calPercentage(
         householdReward.totalpointGained,
-        10
+        process.env.PAKAM_PERCENT
       );
 
       const userCoin =
@@ -936,6 +939,17 @@ class ScheduleService {
       });
 
       const items = categories.map((category) => category.name);
+
+      await transactionActivitesModel.create({
+        userId: scheduler._id,
+        transaction: t._id,
+        type: "schedule_pickup",
+        transactionType: "credit",
+        amount: userCoin.toFixed(),
+        userType: "household",
+        message: `Point Credited for ${items} Scheduled`,
+        status: "successful",
+      });
 
       //  send push notification to household user
       const message = {
@@ -980,17 +994,50 @@ class ScheduleService {
         point: collectorPoint,
       };
 
-      let newledgerBalance = scheduler.ledgerPoints || [];
-      let newCollectorLedgerBalance = collector.ledgerPoints || [];
-      newledgerBalance.push(userledgerBalance);
-      newCollectorLedgerBalance.push(collectorledgerBalance);
+      await legderBalanceModel.create({
+        userId: scheduler._id,
+        pointGained: +userCoin.toFixed(),
+        userType: "household",
+        previousBalance: scheduler.availablePoints,
+        scheduleType: "pickup",
+        scheduleId: schedule._id,
+        transactionId: t._id,
+      });
+
+      if (collector.collectorType == "waste-picker") {
+        await transactionActivitesModel.create({
+          userId: collector._id,
+          transaction: t._id,
+          type: "schedule_pickup",
+          transactionType: "credit",
+          amount: collectorPoint.toFixed(),
+          userType: "wastepicker",
+          message: `Point Credited for ${items} Collected`,
+          status: "successful",
+        });
+
+        await legderBalanceModel.create({
+          userId: collector._id,
+          pointGained: +collectorPoint.toFixed(),
+          userType: "wastepicker",
+          previousBalance: collector.pointGained,
+          scheduleId: schedule._id,
+          scheduleType: "pickup",
+          transactionId: t._id,
+        });
+      }
+
+      // let newledgerBalance = scheduler.ledgerPoints || [];
+      // let newCollectorLedgerBalance = collector.ledgerPoints || [];
+      // newledgerBalance.push(userledgerBalance);
+      // newCollectorLedgerBalance.push(collectorledgerBalance);
 
       await userModel.updateOne(
         { email: scheduler.email },
         {
           $set: {
-            availablePoints:
-              scheduler.availablePoints + Number(userCoin.toFixed()),
+            //availablePoints:
+            //scheduler.availablePoints + Number(userCoin.toFixed()),
             //ledgerPoints: newledgerBalance,
             schedulePoints: scheduler.schedulePoints + 1,
           },
@@ -1006,7 +1053,7 @@ class ScheduleService {
             numberOfTripsCompleted: collector.numberOfTripsCompleted + 1,
             //pointGained: collectorPoint + collector.pointGained,
             //ledgerPoints: collectorPoint + collector.pointGained,
-            ledgerPoints: newCollectorLedgerBalance,
+            //ledgerPoints: newCollectorLedgerBalance,
             busy: false,
             last_logged_in: new Date(),
           },

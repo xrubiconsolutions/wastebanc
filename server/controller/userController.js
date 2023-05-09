@@ -1121,6 +1121,23 @@ userController.resetMobilePassword = (REQUEST, RESPONSE) => {
 userController.getUserTransactions = (req, res) => {
   const cardID = req.query.cardID || req.user._id.toString();
   const PROJECTION = {
+    transaction: 0,
+    userId: 0,
+  };
+  MODEL.transactionActivitesModel
+    .find({ userId: cardID }, PROJECTION)
+    .sort({ createdAt: -1 })
+    .then((result) => {
+      return res.status(200).json(result);
+    });
+  // MODEL.transactionModel.find({ cardID: cardID }, PROJECTION).then((result) => {
+  //   return res.status(200).json(result);
+  // });
+};
+
+userController.getUserTransactionsBackup = (req, res) => {
+  const cardID = req.query.cardID || req.user._id.toString();
+  const PROJECTION = {
     paid: 0,
     cardID: 0,
     scheduleId: 0,
