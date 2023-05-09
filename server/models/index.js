@@ -56,4 +56,5 @@ module.exports = {
   evacuationModel: require("./evacuationModel"),
   transactionActivitesModel: require("./transactionActivites.Model"),
   legderBalanceModel: require("./legderBalanceLogsModel"),
+  evacuationLogModel: require("./evacuationLogModel"),
 };

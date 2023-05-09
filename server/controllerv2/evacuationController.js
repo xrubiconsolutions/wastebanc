@@ -3,6 +3,7 @@ const {
   collectorBinModel,
   wastebancAgentModel,
   evacuationModel,
+  evacuationLogModel,
   transactionModel,
   organisationModel,
   userModel,
@@ -85,16 +86,19 @@ class EvacuationService {
     try {
       const evacuationRequest = await evacuationModel.findById(requestId);
 
+      // return error if request not found
       if (!evacuationRequest)
         return res.status(404).json({
           error: true,
           message: "Request Data not found",
         });
+      const currentStatus = evacuationRequest.status;
 
       const organisation = await organisationModel.findById(
         evacuationRequest.organisation
       );
       if (action === actionOptions[0]) {
+        // handle accept action
         if (
           [EVACUATION_STATUSES_ENUM[1], EVACUATION_STATUSES_ENUM[2]].includes(
             evacuationRequest.status
@@ -106,6 +110,7 @@ class EvacuationService {
           });
         evacuationRequest.status = EVACUATION_STATUSES_ENUM[1];
       } else if (action === actionOptions[1]) {
+        // handle approve action
         if (evacuationRequest.status !== EVACUATION_STATUSES_ENUM[1]) {
           return res.status(400).json({
             error: true,
@@ -147,6 +152,7 @@ class EvacuationService {
         );
         evacuationRequest.status = EVACUATION_STATUSES_ENUM[2];
       } else {
+        // handle reject action
         if (
           [EVACUATION_STATUSES_ENUM[2], EVACUATION_STATUSES_ENUM[3]].includes(
             evacuationRequest.status
@@ -162,6 +168,14 @@ class EvacuationService {
 
       // save the evacuation request instance
       await evacuationRequest.save();
+
+      // enter activity into evacuation log
+      await evacuationLogModel.create({
+        evacuation: evacuationRequest._id,
+        user: req.user._id,
+        action: action.toUpperCase(),
+        prevState: currentStatus,
+      });
       return res.status(200).json({
         error: false,
         message: "Request status updated!",
