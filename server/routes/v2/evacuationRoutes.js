@@ -25,4 +25,16 @@ module.exports = (APP) => {
     checkRequestErrs,
     EvacuationService.updateRequestStatus
   );
+
+  APP.route("/api/company/evacuation/all").get(
+    companyPakamDataValidation,
+    EvacuationService.getEvacuationRequests
+  );
+
+  APP.route("/api/company/evacuation/status/:action/:requestId").get(
+    companyPakamDataValidation,
+    statusUpdate,
+    checkRequestErrs,
+    EvacuationService.updateRequestStatus
+  );
 };
