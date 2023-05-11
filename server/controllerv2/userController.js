@@ -642,7 +642,11 @@ class UserService {
           },
         },
       ]);
-      ledgerBalance = ledgerBalance[0].balance;
+      if (ledgerBalance.length > 0) {
+        ledgerBalance = ledgerBalance[0].balance;
+      }
+      ledgerBalance = 0;
+
       if (!user.verified) {
         const phoneNo = String(user.phone).substring(1, 11);
         const token = authToken(user);
