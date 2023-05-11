@@ -326,6 +326,7 @@ class EvacuationService {
                 weight: 1,
                 address: 1,
                 createdAt: 1,
+                phone: 1,
               },
             },
           ],
