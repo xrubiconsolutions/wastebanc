@@ -375,14 +375,35 @@ class WalletController {
   static async openingAccount(req, res) {
     try {
       const { user } = req;
-      const { bvn, nin, phone } = req.body;
+      const { bvn, nin, phone, firstname, lastname, dateofbirth } = req.body;
 
       if (user.accountNo)
         return res.status(400).json({
           error: true,
           message: "User already has an account number registered",
         });
-      const result = await GenerateVirtualAccount(bvn, nin, phone);
+
+      const body = {
+        BVN: bvn,
+        NIN: nin,
+        PhoneNumber: phone,
+        DateOfBirth: dateofbirth,
+        FirstName: firstname,
+        LastName: lastname,
+      };
+
+      const result = await axios.post(
+        `${process.env.PAYMENT_URL}generate/saf/accountNumber`,
+        body,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+          },
+        }
+      );
+
+      console.log("here", result.data);
 
       if (result.error)
         return res.status(400).json({ error: true, message: result.message });

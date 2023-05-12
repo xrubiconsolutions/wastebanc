@@ -200,6 +200,21 @@ module.exports = {
       .withMessage("phone is required")
       .isString()
       .withMessage("phone is required"),
+    body("firstname")
+      .notEmpty()
+      .withMessage("firstname is required")
+      .isString()
+      .withMessage("firstname should be string"),
+    body("lastname")
+      .notEmpty()
+      .withMessage("lastname is required")
+      .isString()
+      .withMessage("lastname should be string"),
+    body("dateofbirth")
+      .notEmpty()
+      .withMessage("dateofbirth is required")
+      .isString()
+      .withMessage("dateofbirth should be string"),
   ],
 
   nipTransfer: [
