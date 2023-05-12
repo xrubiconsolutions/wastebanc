@@ -801,6 +801,8 @@ class UserService {
           isChatAdmin: user.isChatAdmin || false,
           token,
           insurance: userInsurance,
+          accountNo: user.accountNo || "",
+          bankName: user.bankName || "",
         },
       });
     } catch (error) {
