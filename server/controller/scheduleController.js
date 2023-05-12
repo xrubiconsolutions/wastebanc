@@ -598,7 +598,6 @@ scheduleController.allPendingSchedules = (REQUEST, RESPONSE) => {
 scheduleController.allCompletedSchedules = (REQUEST, RESPONSE) => {
   MODEL.scheduleModel
     .find({ completionStatus: "completed", client: REQUEST.query.client })
-
     .then((schedules) => {
       RESPONSE.status(200).jsonp(
         COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, schedules)

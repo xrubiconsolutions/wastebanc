@@ -474,9 +474,22 @@ payController.afterPayment = async (req, res) => {
     }
     const token = COMMON_FUN.authToken(user);
 
-    const ledgerBalance = user.ledgerPoints
-      .map((x) => x.point)
-      .reduce((acc, curr) => acc + curr, 0);
+    let ledgerBalance = await MODEL.legderBalanceModel.aggregate([
+      {
+        $match: {
+          userId: user._id.toString(),
+        },
+      },
+      {
+        $project: {
+          balance: { $sum: "$pointGained" },
+        },
+      },
+    ]);
+    if (ledgerBalance.length > 0) {
+      ledgerBalance = ledgerBalance[0].balance;
+    }
+    ledgerBalance = 0;
 
     const test = {
       _id: user._id,
