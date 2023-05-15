@@ -33,8 +33,8 @@ class EvacuationService {
 
       // return message if nothing is available to evacuate
       if (unevacTransactions.length === 0)
-        return res.status(200).json({
-          error: false,
+        return res.status(400).json({
+          error: true,
           message:
             "No unevacuated transaction or transaction without evacuation request",
         });

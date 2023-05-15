@@ -91,4 +91,9 @@ module.exports = (APP) => {
   APP.route("/api/transaction/markAsCompleted").post(
     walletController.markDisbursementAsCompleted
   );
+
+  APP.route("/api/user/safOTP/request").post(
+    userValidation,
+    walletController.requestSAFOTP
+  );
 };

@@ -704,6 +704,40 @@ class WalletController {
       });
     }
   }
+
+  static async requestSAFOTP(req, res) {
+    try {
+      const { user } = req;
+      if (user.availablePoints < 5000) {
+        return res.status(400).json({
+          error: true,
+          message: "Insufficient Balance",
+        });
+      }
+      const body = {
+        userId: user._id,
+      };
+      const result = await axios.post(
+        "https://wastebancfin.pakam.ng/api/saf/otp/request",
+        body,
+        {
+          headers: {
+            Accept: "application/json",
+            "Accept-Charset": "utf-8",
+          },
+        }
+      );
+
+      console.log("here", result.data);
+      return res.status(200).json(result.data);
+    } catch (error) {
+      console.log("err", error);
+      return res.status(error.response.status).json({
+        error: true,
+        message: error.response.data.message,
+      });
+    }
+  }
 }
 
 module.exports = WalletController;
