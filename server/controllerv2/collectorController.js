@@ -806,24 +806,28 @@ class CollectorService {
       let organisationName;
       let organisationId;
       let areaOfAccess = [];
-      if (body.organisation) {
-        const org = await organisationModel.findOne({
-          companyName: body.organisation.trim(),
-        });
-        if (!org) {
-          return res.status(400).json({
-            error: true,
-            message: "Invalid organisation passed",
-          });
-        }
-        organisationName = org.companyName;
-        organisationId = org._id.toString();
-        areaOfAccess = org.streetOfAccess;
-      } else {
-        organisationName = "";
-        organsationId = "";
-        areaOfAccess = [];
-      }
+       const org = await organisationModel.findOne({});
+      organisationName = org.companyName;
+      organisationId = org._id.toString();
+      areaOfAccess = org.streetOfAccess;
+      // if (body.organisation) {
+      //   const org = await organisationModel.findOne({
+      //     companyName: body.organisation.trim(),
+      //   });
+      //   if (!org) {
+      //     return res.status(400).json({
+      //       error: true,
+      //       message: "Invalid organisation passed",
+      //     });
+      //   }
+      //   organisationName = org.companyName;
+      //   organisationId = org._id.toString();
+      //   areaOfAccess = org.streetOfAccess;
+      // } else {
+      //   organisationName = "";
+      //   organsationId = "";
+      //   areaOfAccess = [];
+      // }
 
       const create = await collectorModel.create({
         fullname: body.fullname,
