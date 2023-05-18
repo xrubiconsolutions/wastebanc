@@ -3,6 +3,7 @@ const {
   collectorBinModel,
   wastebancAgentModel,
   evacuationModel,
+  legderBalanceModel,
 } = require("../models");
 const geofenceModel = require("../models/geofenceModel");
 const organisationModel = require("../models/organisationModel");
@@ -806,7 +807,7 @@ class CollectorService {
       let organisationName;
       let organisationId;
       let areaOfAccess = [];
-       const org = await organisationModel.findOne({});
+      const org = await organisationModel.findOne({});
       organisationName = org.companyName;
       organisationId = org._id.toString();
       areaOfAccess = org.streetOfAccess;
@@ -1388,6 +1389,29 @@ class CollectorService {
         });
       }
 
+      let ledgerBalance = await legderBalanceModel.aggregate([
+        {
+          $match: {
+            userId: user._id.toString(),
+          },
+        },
+        {
+          $group: {
+            _id: {},
+            balance: {
+              $sum: "$pointGained",
+            },
+          },
+        },
+      ]);
+      console.log("ledger", ledgerBalance);
+      if (ledgerBalance.length > 0) {
+        ledgerBalance = ledgerBalance[0].balance;
+      } else {
+        ledgerBalance = 0;
+      }
+      console.log("le", ledgerBalance);
+
       if (!collector.verified) {
         const phoneNo = String(collector.phone).substring(1, 11);
         const token = authToken(collector);
@@ -1448,6 +1472,7 @@ class CollectorService {
             pin_id: send.data.pinId,
             token,
             aggregatorId: collector.aggregatorId || "",
+            ledgerBalance,
           },
         });
       }
@@ -1529,6 +1554,7 @@ class CollectorService {
           aggregatorId: collector.aggregatorId || "",
           terms_condition: collector.terms_condition,
           firstLogin: collector.firstLogin,
+          ledgerBalance,
           token,
         },
       });
@@ -2125,14 +2151,29 @@ class CollectorService {
           message: "Invalid collector, please contact support team",
         });
       }
-      let ledgerBalance = collector.ledgerPoints
-        .map((x) => x.point)
-        .reduce((acc, curr) => acc + curr, 0);
-
-      console.log(ledgerBalance);
-      if (ledgerBalance == null) {
+      let ledgerBalance = await legderBalanceModel.aggregate([
+        {
+          $match: {
+            userId: user._id.toString(),
+          },
+        },
+        {
+          $group: {
+            _id: {},
+            balance: {
+              $sum: "$pointGained",
+            },
+          },
+        },
+      ]);
+      console.log("ledger", ledgerBalance);
+      if (ledgerBalance.length > 0) {
+        ledgerBalance = ledgerBalance[0].balance;
+      } else {
         ledgerBalance = 0;
       }
+      console.log("le", ledgerBalance);
+      
       return res.status(200).json({
         error: false,
         message: "Point Balance",

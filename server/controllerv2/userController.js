@@ -637,15 +637,21 @@ class UserService {
           },
         },
         {
-          $project: {
-            balance: { $sum: "$pointGained" },
+          $group: {
+            _id: {},
+            balance: {
+              $sum: "$pointGained",
+            },
           },
         },
       ]);
+      console.log("ledger", ledgerBalance);
       if (ledgerBalance.length > 0) {
         ledgerBalance = ledgerBalance[0].balance;
+      } else {
+        ledgerBalance = 0;
       }
-      ledgerBalance = 0;
+      console.log("le", ledgerBalance);
 
       if (!user.verified) {
         const phoneNo = String(user.phone).substring(1, 11);
