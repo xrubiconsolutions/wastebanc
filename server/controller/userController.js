@@ -728,6 +728,12 @@ userController.resendVerification = async (REQUEST, RESPONSE) => {
 
   try {
     var phone = REQUEST.body.phone;
+    if (!phone) {
+      return RESPONSE.status(400).json({
+        error: true,
+        message: "Phone number is required",
+      });
+    }
     const user = await MODEL.userModel.findOne({
       phone,
     });
@@ -767,19 +773,8 @@ userController.resendVerification = async (REQUEST, RESPONSE) => {
 
       return RESPONSE.status(200).json(JSON.parse(response.body));
     });
-
-    // client.verify
-    //   .services("VAeaa492de9598c3dcce55fd9243461ab3")
-    //   .verifications.create({
-    //     to: `+234${phone}`,
-    //     channel: "sms",
-    //   })
-    //   .then((verification) => {
-    //     console.log(verification.status);
-    //     RESPONSE.status(200).jsonp({ message: "Verification code sent" });
-    //   })
-    //   .catch((err) => RESPONSE.status(404).jsonp(err));
   } catch (err) {
+    console.log("error", err);
     return RESPONSE.status(400).jsonp(err);
   }
 };
