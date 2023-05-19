@@ -1392,7 +1392,7 @@ class CollectorService {
       let ledgerBalance = await legderBalanceModel.aggregate([
         {
           $match: {
-            userId: user._id.toString(),
+            userId: collector._id.toString(),
           },
         },
         {
@@ -2173,7 +2173,7 @@ class CollectorService {
         ledgerBalance = 0;
       }
       console.log("le", ledgerBalance);
-      
+
       return res.status(200).json({
         error: false,
         message: "Point Balance",
