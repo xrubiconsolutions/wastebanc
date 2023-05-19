@@ -296,4 +296,6 @@ module.exports = {
       .isMongoId()
       .withMessage("userId id is invalid"),
   ],
+
+  resendToken: [param("phone").trim().notEmpty().isString()],
 };

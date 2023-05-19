@@ -574,9 +574,9 @@ class UserService {
       }
     } catch (error) {
       console.log(error);
-      return res.status(500).json({
+      return res.status(error.response.data.status).json({
         error: true,
-        message: "An error occurred",
+        message: error.response.data.verified,
       });
     }
   }
