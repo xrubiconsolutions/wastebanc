@@ -730,7 +730,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       transactionType: "credit",
       amount: userCoin.toFixed(),
       userType: "household",
-      message: `Point Credited for ${items} Scheduled`,
+      message: `${items}`,
       status: "successful",
     });
 
