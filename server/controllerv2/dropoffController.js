@@ -541,7 +541,11 @@ dropoffController.addDropOffLocation = async (req, res) => {
       type: "Point",
       coordinates: [dropLocation.location.long, dropLocation.location.lat],
     };
-    const drop = await dropOffModel.create({ ...dropLocation, newLocation });
+    const drop = await dropOffModel.create({
+      ...dropLocation,
+      newLocation,
+      orgID: new mongoose.Types.ObjectId(dropLocation.organisationId),
+    });
     return res.status(201).json({
       error: false,
       message: "Drop-off submitted successfully!",
