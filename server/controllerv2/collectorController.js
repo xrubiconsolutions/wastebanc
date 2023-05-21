@@ -1683,7 +1683,7 @@ class CollectorService {
 
       let email;
 
-      if (req.body.email) {
+      if (req.body.email && req.body.email !== "") {
         email = req.body.email.trim().toLowerCase();
       } else {
         email = user.email.trim().toLowerCase();
