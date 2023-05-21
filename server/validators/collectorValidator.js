@@ -41,7 +41,7 @@ module.exports = {
       .optional()
       .isString()
       .withMessage("fullname should string"),
-    body("email").optional().isEmail().withMessage("Enter is valid email"),
+    body("email").optional(),
     body("gender").optional().isString("gender should be string"),
     body("address").optional().isString("address should be string"),
     body("aggregatorId").optional().isString("aggregatorId should be string"),
