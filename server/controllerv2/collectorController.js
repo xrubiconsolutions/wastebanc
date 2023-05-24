@@ -807,7 +807,9 @@ class CollectorService {
       let organisationName;
       let organisationId;
       let areaOfAccess = [];
-      const org = await organisationModel.findOne({});
+      const org = await organisationModel.findOne({
+        companyName: "WasteBanc",
+      });
       organisationName = org.companyName;
       organisationId = org._id.toString();
       areaOfAccess = org.streetOfAccess;
