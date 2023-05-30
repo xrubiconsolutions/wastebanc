@@ -351,7 +351,7 @@ const bodyValidate = (req, res, next) => {
 const sendNotification = function (data) {
   var headers = {
     "Content-Type": "application/json; charset=utf-8",
-    Authorization: "Basic MmVhY2VmZTMtZjUxNi00ZWJhLWIzZDEtMjIxMTYyZDFjMGI1",
+    Authorization: "Basic ODNjYzZiYjItNDgzMy00ZDY1LTlhOWUtN2ExYmJhODNjN2Uy",
   };
 
   var options = {
