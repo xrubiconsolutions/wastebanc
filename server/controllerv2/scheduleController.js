@@ -953,7 +953,7 @@ class ScheduleService {
 
       //  send push notification to household user
       const message = {
-        app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+        app_id: `${process.env.USER_ONE_SIGNAL_APPID}`,
         contents: {
           en: `You have just been credited ${userCoin.toFixed()} for your ${items} pickup`,
         },
@@ -968,7 +968,7 @@ class ScheduleService {
         schedulerId: scheduler._id,
       });
 
-      sendNotification(message);
+      sendNotification(message, process.env.USER_ONE_SIGNAL_APPID);
 
       //console.log('scheduler', scheduler);
       //console.log('schedule', schedule);
@@ -1286,7 +1286,7 @@ class ScheduleService {
           organisation.collectors.map(async (collector) => {
             if (!collector.onesignal_id || collector.onesignal_id !== "") {
               const message = {
-                app_id: "565970dc-d44a-456f-aab7-3f57e0504ff4",
+                app_id: `${process.env.AGENT_ONE_SIGNAL_APPID}`,
                 contents: {
                   en: `A user in ${schedule.lcd} just created a ${items} schedule`,
                 },
@@ -1294,7 +1294,7 @@ class ScheduleService {
                 include_external_user_ids: [collector.onesignal_id],
                 //include_player_ids: [`${collector.onesignal_id} || ' '`],
               };
-              sendNotification(message);
+              sendNotification(message, process.env.AGENT_ONE_SIGNAL_TOKEN);
               await notificationModel.create({
                 title: "Schedule made",
                 lcd: schedule.lcd,
@@ -1311,14 +1311,17 @@ class ScheduleService {
         console.log(user.onesignal_id);
         const playerIds = [user.onesignal_id];
 
-        sendNotification({
-          app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
-          contents: {
-            en: `Your ${items} schedule has been made successfully`,
+        sendNotification(
+          {
+            app_id: `${process.env.USER_ONE_SIGNAL_APPID}`,
+            contents: {
+              en: `Your ${items} schedule has been made successfully`,
+            },
+            channel_for_external_user_ids: "push",
+            include_external_user_ids: playerIds,
           },
-          channel_for_external_user_ids: "push",
-          include_external_user_ids: playerIds,
-        });
+          process.env.USER_ONE_SIGNAL_TOKEN
+        );
         await notificationModel.create({
           title: "Pickup Schedule made",
           lcd: schedule.lcd,
@@ -1393,13 +1396,13 @@ class ScheduleService {
 
       // notify client
       sendNotification({
-        app_id: "8d939dc2-59c5-4458-8106-1e6f6fbe392d",
+        app_id: `${process.env.USER_ONE_SIGNAL_APPID}`,
         contents: {
           en: "A collector just accepted your schedule",
         },
         channel_for_external_user_ids: "push",
         include_external_user_ids: [client.onesignal_id],
-      });
+      }, process.env.USER_ONE_SIGNAL_TOKEN);
       await notificationModel.create({
         title: "Pickup Schedule Accepted",
         lcd: client.lcd,

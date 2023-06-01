@@ -348,10 +348,10 @@ const bodyValidate = (req, res, next) => {
   }
 };
 
-const sendNotification = function (data) {
+const sendNotification = function (data, token) {
   var headers = {
     "Content-Type": "application/json; charset=utf-8",
-    Authorization: `Basic ${process.env.ONE_SIGNAL}`,
+    Authorization: `Basic ${token}`,
   };
 
   var options = {
