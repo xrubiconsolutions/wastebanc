@@ -722,7 +722,7 @@ dropoffController.rewardDropSystem = async (req, res) => {
       percentage: pakamPercentage,
       address: dropoffs.address,
       phone: scheduler.phone,
-      amountTobePaid,
+      amountTobePaid: amountTobePaid.toFixed(),
     });
 
     const items = categories.map((category) => category.name);

@@ -935,7 +935,7 @@ class ScheduleService {
         percentage: pakamPercentage,
         address: schedule.address,
         phone: schedule.phone,
-        amountTobePaid,
+        amountTobePaid: amountTobePaid.toFixed(),
       });
 
       const items = categories.map((category) => category.name);
@@ -1395,14 +1395,17 @@ class ScheduleService {
       }
 
       // notify client
-      sendNotification({
-        app_id: `${process.env.USER_ONE_SIGNAL_APPID}`,
-        contents: {
-          en: "A collector just accepted your schedule",
+      sendNotification(
+        {
+          app_id: `${process.env.USER_ONE_SIGNAL_APPID}`,
+          contents: {
+            en: "A collector just accepted your schedule",
+          },
+          channel_for_external_user_ids: "push",
+          include_external_user_ids: [client.onesignal_id],
         },
-        channel_for_external_user_ids: "push",
-        include_external_user_ids: [client.onesignal_id],
-      }, process.env.USER_ONE_SIGNAL_TOKEN);
+        process.env.USER_ONE_SIGNAL_TOKEN
+      );
       await notificationModel.create({
         title: "Pickup Schedule Accepted",
         lcd: client.lcd,

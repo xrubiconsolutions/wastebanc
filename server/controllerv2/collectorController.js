@@ -1647,7 +1647,7 @@ class CollectorService {
         error: false,
         message: "success",
         data: {
-          totalWaste: Math.ceil(totalWaste),
+          totalWaste: totalWaste.toFixed(),
           totalAmount: req.user.pointGained,
           transactions,
           totalResult,
