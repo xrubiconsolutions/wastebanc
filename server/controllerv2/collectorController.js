@@ -1590,6 +1590,7 @@ class CollectorService {
       });
       const t = await transactionModel.find({
         completedBy: collectorId,
+        requestedEvacuation: false,
       });
       const totalWaste = t
         .map((waste) => waste.weight)

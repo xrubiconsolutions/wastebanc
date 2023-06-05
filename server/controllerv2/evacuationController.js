@@ -36,7 +36,7 @@ class EvacuationService {
         return res.status(400).json({
           error: true,
           message:
-            "No unevacuated transaction or transaction without evacuation request",
+            "You have not collected or completed any pickup or drop-off task",
         });
 
       // get the total amount to be paid and waste quantity
