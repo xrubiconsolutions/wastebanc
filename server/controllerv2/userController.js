@@ -328,7 +328,7 @@ class UserService {
         fullname: body.fullname,
         username: body.fullname,
         phone: body.phone,
-        country: body.country || "Lagos",
+        country: body.country || "Nigeria",
         state: body.state || "Lagos",
         password: await encryptPassword(body.password),
         gender: body.gender.toLowerCase(),
