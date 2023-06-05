@@ -133,7 +133,7 @@ scheduleDropController.getCompletedScheduleUser = (REQUEST, RESPONSE) => {
   MODEL.scheduleDropModel
     .find({
       completionStatus: "completed",
-      phone: phone,
+      phone: REQUEST.user.phone,
     })
 
     .then((schedules) => {

@@ -89,6 +89,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/allMissed").get(
+    auth.userValidation,
     CONTROLLER.scheduleController.allMissedSchedules
   );
 
@@ -101,6 +102,7 @@ module.exports = (APP) => {
   );
 
   APP.route("/api/allCompleted").get(
+    auth.userValidation,
     CONTROLLER.scheduleController.allCompletedSchedules
   );
 
