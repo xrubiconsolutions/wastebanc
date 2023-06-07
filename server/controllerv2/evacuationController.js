@@ -126,6 +126,7 @@ class EvacuationService {
 					organisation.systemCharge
 				);
 				const amount = evacuationRequest.totalAmount + percentage;
+				console.log("amount", amount);
 				const body = {
 					Amount: amount.toString(),
 				};
