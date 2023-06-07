@@ -145,7 +145,7 @@ class EvacuationService {
 				// update the legder balance to the available balance
 
 				const transactions = evacuationRequest.transactions;
-				await this.handleScheduleApproval(transactions);
+				await handleScheduleApproval(transactions);
 
 				await transactionModel.updateMany(
 					{
