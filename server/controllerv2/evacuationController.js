@@ -145,7 +145,44 @@ class EvacuationService {
 				// update the legder balance to the available balance
 
 				const transactions = evacuationRequest.transactions;
-				await handleScheduleApproval(transactions);
+				//await handleScheduleApproval(transactions);
+				const transactionLength = transactions.length;
+
+				for (let i = 0; i < transactionLength; ++i) {
+					const ledgerBalance = await legderBalanceModel.find({
+						transactionId: transactions[i],
+					});
+
+					if (ledgerBalance.length > 0) {
+						const userLB = ledgerBalance.filter(
+							(lb) => lb.userType == "household"
+						);
+						const wastepicker = ledgerBalance.filter(
+							(lb) => lb.userType == "wastepicker"
+						);
+
+						if (userLB) {
+							const userObject = await userModel.findById(userLB.userId);
+							userObject.availablePoints =
+								userObject.availablePoints + userLB.pointGained;
+						}
+
+						if (wastepicker) {
+							const collectorObject = await collectorModel.findById(
+								wastepicker.userId
+							);
+							collectorObject.pointGained =
+								collectorObject.pointGained + userLB.pointGained;
+						}
+					}
+
+					await legderBalanceModel.updateMany(
+						{ transactionId: transactions[i] },
+						{
+							paidToBalance: true,
+						}
+					);
+				}
 
 				await transactionModel.updateMany(
 					{
@@ -414,54 +451,6 @@ class EvacuationService {
 					paidToBalance: true,
 				}
 			);
-			// const transactionObject = await transactionModel.findById(
-			//   transactions[i]
-			// );
-			// if (transactionObject) {
-			//   // update user ledger balance
-			//   const schedulerObject = await userModel.findById(
-			//     transactionObject.scheduledId
-			//   );
-			//   if (schedulerObject) {
-			//     const ledgerPoint = schedulerObject.ledgerPoints.find(
-			//       (schedule) => schedule.scheduleId == transactionObject.scheduleId
-			//     );
-
-			//     if (ledgerPoint) {
-			//       const newLedgerPoint = schedulerObject.ledgerPoints.filter(
-			//         (schedule) => schedule.scheduleId != transactionObject.scheduleId
-			//       );
-			//       schedulerObject.availablePoints =
-			//         ledgerPoint.availablePoints + schedulerObject.availablePoints;
-			//       schedulerObject.ledgerPoints = newLedgerPoint;
-			//       schedulerObject.save();
-			//     }
-			//   }
-			//   //********** End for updating user balance */
-
-			//   //*********** Handler updating of waste pickers balance */
-			//   // if (transactionObject.wastePickerCoin > 0) {
-			//   //   const collector = await collectorModel.findById(
-			//   //     transactionObject.completedBy
-			//   //   );
-			//   //   if (collector) {
-			//   //     const collectorLegderDetails = collector.ledgerPoints.find(
-			//   //       (schedule) => schedule.scheduleId == transactionObject.scheduleId
-			//   //     );
-			//   //     if (collectorLegderDetails) {
-			//   //       const newLedgerPoint = collector.ledgerPoints.filter(
-			//   //         (schedule) =>
-			//   //           schedule.scheduleId != transactionObject.scheduleId
-			//   //       );
-			//   //       collector.pointGained =
-			//   //         collector.pointGained + collectorLegderDetails.point;
-			//   //       collector.ledgerPoints = newLedgerPoint;
-			//   //       collector.save();
-			//   //     }
-			//   //   }
-			//   // }
-			//   //********* End Handleer for waste pickers balance */
-			// }
 		}
 	}
 }
