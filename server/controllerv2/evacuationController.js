@@ -151,6 +151,7 @@ class EvacuationService {
 				for (let i = 0; i < transactionLength; ++i) {
 					const ledgerBalance = await legderBalanceModel.find({
 						transactionId: transactions[i],
+						paidToBalance: false,
 					});
 
 					console.log("leg", ledgerBalance);
@@ -168,6 +169,7 @@ class EvacuationService {
 							if (userObject) {
 								userObject.availablePoints =
 									userObject.availablePoints + userLB.pointGained;
+								userObject.save();
 							}
 						}
 
@@ -178,11 +180,12 @@ class EvacuationService {
 							if (collectorObject) {
 								collectorObject.pointGained =
 									collectorObject.pointGained + userLB.pointGained;
+								userObject.save();
 							}
 						}
 					}
 
-					await legderBalanceModel.updateMany(
+					await legderBalanceModel.updateOne(
 						{ transactionId: transactions[i] },
 						{
 							paidToBalance: true,
