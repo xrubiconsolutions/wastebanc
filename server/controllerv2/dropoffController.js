@@ -690,13 +690,15 @@ dropoffController.rewardDropSystem = async (req, res) => {
     //   }
     // }
 
-    const userCoin =
-      Number(householdReward.totalpointGained) - Number(pakamPercentage);
-
-    const pakamPercentage = rewardService.calPercentage(
+     const pakamPercentage = rewardService.calPercentage(
       householdReward.totalpointGained,
       10
     );
+    
+    const userCoin =
+      Number(householdReward.totalpointGained) - Number(pakamPercentage);
+
+   
     const ref = randomstring.generate({
       length: 7,
       charset: "numeric",
