@@ -153,7 +153,9 @@ class EvacuationService {
 						transactionId: transactions[i],
 					});
 
-					if (ledgerBalance.length > 0) {
+					console.log("leg", ledgerBalance);
+
+					if (ledgerBalance) {
 						const userLB = ledgerBalance.filter(
 							(lb) => lb.userType == "household"
 						);
@@ -163,16 +165,20 @@ class EvacuationService {
 
 						if (userLB) {
 							const userObject = await userModel.findById(userLB.userId);
-							userObject.availablePoints =
-								userObject.availablePoints + userLB.pointGained;
+							if (userObject) {
+								userObject.availablePoints =
+									userObject.availablePoints + userLB.pointGained;
+							}
 						}
 
 						if (wastepicker) {
 							const collectorObject = await collectorModel.findById(
 								wastepicker.userId
 							);
-							collectorObject.pointGained =
-								collectorObject.pointGained + userLB.pointGained;
+							if (collectorObject) {
+								collectorObject.pointGained =
+									collectorObject.pointGained + userLB.pointGained;
+							}
 						}
 					}
 
