@@ -773,7 +773,7 @@ userController.resendVerification = async (REQUEST, RESPONSE) => {
 			headers: options.headers,
 		});
 		console.log("send", send);
-		return RESPONSE.status(200).json(JSON.parse(send.data));
+		return RESPONSE.status(200).json(send.data);
 
 		// request(options, function (error, response) {
 		//   if (error) throw new Error(error);
