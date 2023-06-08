@@ -69,7 +69,7 @@ class EvacuationService {
 			// return success message
 			return res.status(200).json({
 				error: false,
-				message: `Evacuation request made for ${transactionIds.length} transactions!`,
+				message: `Evacuation request made for ${transactionIds.length} transaction!`,
 			});
 		} catch (error) {
 			console.log(error);
@@ -156,7 +156,7 @@ class EvacuationService {
 
 					console.log("leg", ledgerBalance);
 
-					if (ledgerBalance) {
+					if (ledgerBalance.length > 0) {
 						const userLB = ledgerBalance.filter(
 							(lb) => lb.userType == "household"
 						);
