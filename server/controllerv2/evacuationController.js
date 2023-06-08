@@ -164,6 +164,7 @@ class EvacuationService {
 					console.log("leg", ledgerBalance);
 
 					if (ledgerBalance.length > 0) {
+						console.log("here");
 						const userLB = ledgerBalance.filter(
 							(lb) => lb.userType == "household"
 						);
@@ -172,6 +173,7 @@ class EvacuationService {
 						);
 
 						if (userLB) {
+							console.log("userLB", userLB);
 							const userObject = await userModel.findById(userLB.userId);
 							if (userObject) {
 								console.log("user", userObject);
