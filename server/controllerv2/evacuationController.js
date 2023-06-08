@@ -167,9 +167,17 @@ class EvacuationService {
 						if (userLB) {
 							const userObject = await userModel.findById(userLB.userId);
 							if (userObject) {
-								userObject.availablePoints =
-									userObject.availablePoints + userLB.pointGained;
-								userObject.save();
+								console.log("user", userObject);
+								// userObject.availablePoints =
+								// 	userObject.availablePoints + userLB.pointGained;
+								// userObject.save();
+								await userModel.updateOne(
+									{ email: userObject.email },
+									{
+										availablePoints:
+											userObject.availablePoints + userLB.pointGained,
+									}
+								);
 							}
 						}
 
