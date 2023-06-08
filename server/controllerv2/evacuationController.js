@@ -31,6 +31,7 @@ class EvacuationService {
 				unEvacTransactionsCriteria
 			);
 
+			console.log("unevacTransactions", unevacTransactions);
 			// return message if nothing is available to evacuate
 			if (unevacTransactions.length === 0)
 				return res.status(400).json({
@@ -40,10 +41,16 @@ class EvacuationService {
 				});
 
 			// get the total amount to be paid and waste quantity
-			const totalAmount = unevacTransactions.reduce(
-				(agg, current) => agg + (current.toObject().amountToBePaid || 0),
-				0
-			);
+			// const totalAmount = unevacTransactions.reduce(
+			// 	(agg, current) => agg + (current.toObject().amountToBePaid || 0),
+			// 	0
+			// );
+			let totalAmount = 0;
+			unevacTransactions.forEach((tran) => {
+				console.log("amountToPaid", tran.amountToBePaid);
+				totalAmount = totalAmount + tran.amountToBePaid;
+			});
+			console.log("totalAmount", totalAmount);
 			const totalWeight = unevacTransactions.reduce(
 				(agg, current) => agg + (current.toObject().weight || 0),
 				0

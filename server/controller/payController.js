@@ -478,6 +478,7 @@ payController.afterPayment = async (req, res) => {
 			{
 				$match: {
 					userId: user._id.toString(),
+					paidToBalance: false,
 				},
 			},
 			{
