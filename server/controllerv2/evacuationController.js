@@ -41,15 +41,11 @@ class EvacuationService {
 				});
 
 			// get the total amount to be paid and waste quantity
-			// const totalAmount = unevacTransactions.reduce(
-			// 	(agg, current) => agg + (current.toObject().amountToBePaid || 0),
-			// 	0
-			// );
-			let totalAmount = 0;
-			unevacTransactions.forEach((tran) => {
-				console.log("amountToPaid", tran.amountToBePaid);
-				totalAmount = totalAmount + tran.amountToBePaid;
-			});
+			const totalAmount = unevacTransactions.reduce(
+				(agg, current) => agg + (current.toObject().amountTobePaid || 0),
+				0
+			);
+
 			console.log("totalAmount", totalAmount);
 			const totalWeight = unevacTransactions.reduce(
 				(agg, current) => agg + (current.toObject().weight || 0),
