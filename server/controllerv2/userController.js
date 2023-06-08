@@ -630,6 +630,7 @@ class UserService {
 				});
 			}
 
+			let value = 0;
 			let ledgerBalance = await legderBalanceModel.aggregate([
 				{
 					$match: {
@@ -648,12 +649,10 @@ class UserService {
 			]);
 			console.log("ledger", ledgerBalance);
 			if (ledgerBalance.length > 0) {
-				
-				ledgerBalance = ledgerBalance.reduce(
-					(a, b) => a + b.toObject().balance || 0
-				);
-			} else {
-				ledgerBalance = 0;
+				ledgerBalance.forEach((bal) => {
+					console.log("bal", bal.balance);
+					value = bal.balance + value;
+				});
 			}
 			console.log("le", ledgerBalance);
 
@@ -798,7 +797,7 @@ class UserService {
 					countryCode: user.countryCode,
 					verified: user.verified,
 					availablePoints: user.availablePoints,
-					ledgerBalance,
+					ledgerBalance: value,
 					rafflePoints: user.rafflePoints,
 					schedulePoints: user.schedulePoints,
 					onesignal_id: signal_id,
