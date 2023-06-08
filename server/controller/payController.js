@@ -474,6 +474,7 @@ payController.afterPayment = async (req, res) => {
 		}
 		const token = COMMON_FUN.authToken(user);
 
+		let value = 0;
 		let ledgerBalance = await MODEL.legderBalanceModel.aggregate([
 			{
 				$match: {
@@ -489,10 +490,10 @@ payController.afterPayment = async (req, res) => {
 		]);
 		console.log("led", ledgerBalance);
 		if (ledgerBalance.length > 0) {
-			ledgerBalance = ledgerBalance[0].balance;
+			value = ledgerBalance[0].balance;
 		}
-		ledgerBalance = 0;
 
+		console.log("vl", value);
 		const test = {
 			_id: user._id,
 			firstname: user.firstname,
@@ -523,7 +524,7 @@ payController.afterPayment = async (req, res) => {
 			charge: 100,
 			withdrawableAmount: user.availablePoints - 100,
 			requestedAmount: user.requestedAmount,
-			ledgerBalance,
+			ledgerBalance: value,
 		};
 		console.log("test", test);
 		return res
