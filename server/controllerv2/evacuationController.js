@@ -165,10 +165,10 @@ class EvacuationService {
 
 					if (ledgerBalance.length > 0) {
 						console.log("here");
-						const userLB = ledgerBalance.filter(
+						const userLB = ledgerBalance.find(
 							(lb) => lb.userType == "household"
 						);
-						const wastepicker = ledgerBalance.filter(
+						const wastepicker = ledgerBalance.find(
 							(lb) => lb.userType == "wastepicker"
 						);
 
