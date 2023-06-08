@@ -490,7 +490,7 @@ payController.afterPayment = async (req, res) => {
 		]);
 		console.log("led", ledgerBalance);
 		if (ledgerBalance.length > 0) {
-			value = ledgerBalance.reduce((a, b) => a + b.balance || 0);
+			value = ledgerBalance.reduce((a, b) => a + b.toObject().balance || 0);
 		}
 
 		console.log("vl", value);
