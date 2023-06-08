@@ -164,7 +164,7 @@ payController.saveR = async (req, res) => {
 
 				var options = {
 					method: "POST",
-					url: "https://termii.com/api/sms/send",
+					url: "https://api.ng.termii.com/api/sms/send",
 					headers: {
 						"Content-Type": ["application/json", "application/json"],
 					},
@@ -362,7 +362,7 @@ payController.saveReceipt = (REQUEST, RESPONSE) => {
 
 											var options = {
 												method: "POST",
-												url: "https://termii.com/api/sms/send",
+												url: "https://api.ng.termii.com/api/sms/send",
 												headers: {
 													"Content-Type": [
 														"application/json",

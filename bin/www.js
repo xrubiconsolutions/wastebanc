@@ -30,7 +30,7 @@ var nodemailer = require("nodemailer");
 // };
 // var options = {
 //   method: "GET",
-//   url: "https://termii.com/api/insight/number/query",
+//   url: "https://api.ng.termii.com/api/insight/number/query",
 //   headers: {
 //     "Content-Type": ["application/json", "application/json"],
 //   },
@@ -46,11 +46,11 @@ var nodemailer = require("nodemailer");
 // https://api.ng.termii.com/api/insight/number/query?phone_number=phone_number&api_key=api_key&country_code=NG
 
 var transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "pakambusiness@gmail.com",
-    pass: "pakambusiness-2000",
-  },
+	service: "gmail",
+	auth: {
+		user: "pakambusiness@gmail.com",
+		pass: "pakambusiness-2000",
+	},
 });
 
 // var sendNotification = function (data) {
@@ -164,7 +164,7 @@ var transporter = nodemailer.createTransport({
 //     };
 // var options = {
 // 'method': 'GET',
-// 'url': ' https://termii.com/api/insight/number/query',
+// 'url': ' https://api.ng.termii.com/api/insight/number/query',
 // 'headers': {
 // 'Content-Type': ['application/json', 'application/json']
 // },
@@ -207,34 +207,34 @@ const reportModel = require("../server/models/reportModel");
 const PubNub = require("pubnub");
 const uuid = PubNub.generateUUID();
 const pubnub = new PubNub({
-  publishKey: "pub-c-d3fa9420-395b-4a69-ab8d-c33b8ec61f37",
-  subscribeKey: "sub-c-04c282b2-5c10-11eb-aca9-6efe1c667573",
-  uuid: uuid,
+	publishKey: "pub-c-d3fa9420-395b-4a69-ab8d-c33b8ec61f37",
+	subscribeKey: "sub-c-04c282b2-5c10-11eb-aca9-6efe1c667573",
+	uuid: uuid,
 });
 
 const changeStream = reportModel.watch();
 
 changeStream.on("change", function (change) {
-  console.log("COLLECTION CHANGED");
+	console.log("COLLECTION CHANGED");
 
-  reportModel.find({}, (err, data) => {
-    if (err) throw err;
-    console.log(data);
-    if (data) {
-      const publishConfig = {
-        channel: "reports",
-        message: { sender: uuid, content: data[data.length - 1] },
-      };
-      pubnub.publish(publishConfig, function (status, response) {
-        console.log(status, response);
-      });
-    }
-  });
+	reportModel.find({}, (err, data) => {
+		if (err) throw err;
+		console.log(data);
+		if (data) {
+			const publishConfig = {
+				channel: "reports",
+				message: { sender: uuid, content: data[data.length - 1] },
+			};
+			pubnub.publish(publishConfig, function (status, response) {
+				console.log(status, response);
+			});
+		}
+	});
 });
 
 pubnub.subscribe({
-  channels: ["reports"],
-  withPresence: true,
+	channels: ["reports"],
+	withPresence: true,
 });
 
 /**creating express server app for server */
@@ -242,26 +242,26 @@ const app = EXPRESS();
 const http = require("http").Server(app);
 
 const io = require("socket.io")(http, {
-  origins: ["https://dashboard.pakam.ng"],
+	origins: ["https://dashboard.pakam.ng"],
 
-  // res.writeHead(200, {
-  //   "Access-Control-Allow-Origin": [
-  //     "https://dashboard.pakam.ng",
-  //     "https://ft-dev--musical-macaron-c39880.netlify.app",
-  //     "http://localhost:3000",
-  //     "http://localhost:3001",
-  //     "http://localhost:3004",
-  //     "http://localhost:3005"
-  //   ],
-  handlePreflightRequest: (req, res) => {
-    res.writeHead(200, {
-      "Access-Control-Allow-Origin": ["*"],
-      "Access-Control-Allow-Methods": "GET,POST",
-      "Access-Control-Allow-Headers": "Access-Control-Allow-Origin",
-      "Access-Control-Allow-Credentials": true,
-    });
-    res.end();
-  },
+	// res.writeHead(200, {
+	//   "Access-Control-Allow-Origin": [
+	//     "https://dashboard.pakam.ng",
+	//     "https://ft-dev--musical-macaron-c39880.netlify.app",
+	//     "http://localhost:3000",
+	//     "http://localhost:3001",
+	//     "http://localhost:3004",
+	//     "http://localhost:3005"
+	//   ],
+	handlePreflightRequest: (req, res) => {
+		res.writeHead(200, {
+			"Access-Control-Allow-Origin": ["*"],
+			"Access-Control-Allow-Methods": "GET,POST",
+			"Access-Control-Allow-Headers": "Access-Control-Allow-Origin",
+			"Access-Control-Allow-Credentials": true,
+		});
+		res.end();
+	},
 });
 
 // const io = socket(app,  {
@@ -344,17 +344,17 @@ app.use(logger("dev"));
 
 /** middleware for api's logging with deployment mode */
 let apiLooger = (req, res, next) => {
-  ALLFILES.COMMON_FUN.messageLogs(
-    null,
-    `api hitted ${req.url} ${process.env.NODE_ENV}`
-  );
-  next();
+	ALLFILES.COMMON_FUN.messageLogs(
+		null,
+		`api hitted ${req.url} ${process.env.NODE_ENV}`
+	);
+	next();
 };
 
 app.use(
-  fileUpload({
-    createParentPath: true,
-  })
+	fileUpload({
+		createParentPath: true,
+	})
 );
 
 /** Used logger middleware for each api call **/
@@ -364,36 +364,36 @@ app.use(apiLooger);
  *** For handling CORS Error ***
  *******************************/
 app.all("/*", (REQUEST, RESPONSE, NEXT) => {
-  RESPONSE.header("Access-Control-Allow-Origin", "*");
-  RESPONSE.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type, api_key, Authorization, x-requested-with, Total-Count, Total-Pages, Error-Message"
-  );
-  RESPONSE.header(
-    "Access-Control-Allow-Methods",
-    "POST, GET, DELETE, PUT, OPTIONS"
-  );
-  RESPONSE.header("Access-Control-Max-Age", 1800);
-  NEXT();
+	RESPONSE.header("Access-Control-Allow-Origin", "*");
+	RESPONSE.header(
+		"Access-Control-Allow-Headers",
+		"Content-Type, api_key, Authorization, x-requested-with, Total-Count, Total-Pages, Error-Message"
+	);
+	RESPONSE.header(
+		"Access-Control-Allow-Methods",
+		"POST, GET, DELETE, PUT, OPTIONS"
+	);
+	RESPONSE.header("Access-Control-Max-Age", 1800);
+	NEXT();
 });
 
 /*******************************
  **** Swagger configuration ****
  *******************************/
 app.use(
-  SWAGGER.init(app, {
-    apiVersion: "1.0",
-    swaggerVersion: "1.0",
-    basePath:
-      "http://" +
-      ALLFILES.CONFIG.dbConfig.host +
-      ":" +
-      ALLFILES.CONFIG.dbConfig.port,
-    swaggerURL: "/api_documentation",
-    swaggerJSON: "/api-docs.json",
-    swaggerUI: "./swagger/swagger_dependencies/swagger",
-    apis: [PATH.join(__dirname, "/swagger/swagger_Routes/user.js")],
-  })
+	SWAGGER.init(app, {
+		apiVersion: "1.0",
+		swaggerVersion: "1.0",
+		basePath:
+			"http://" +
+			ALLFILES.CONFIG.dbConfig.host +
+			":" +
+			ALLFILES.CONFIG.dbConfig.port,
+		swaggerURL: "/api_documentation",
+		swaggerJSON: "/api-docs.json",
+		swaggerUI: "./swagger/swagger_dependencies/swagger",
+		apis: [PATH.join(__dirname, "/swagger/swagger_Routes/user.js")],
+	})
 );
 app.use(EXPRESS.static(PATH.join(__dirname, "swagger/swagger_dependencies")));
 
@@ -404,31 +404,31 @@ require("../server/routes")(app);
 
 /** server listening */
 module.exports = () => {
-  /*******************************
-   ****** Admin Bootstrapping ****
-   *******************************/
-  // BOOTSTRAPING.bootstrapAdmin((ERR, RESULT)=>{
-  //     if(ERR){
-  //         ALLFILES.COMMON_FUN.messageLogs(ERR.message, null);
-  //         process.exit(0);
-  //     }else{
-  //         ALLFILES.COMMON_FUN.messageLogs(null, "**************Bootstraping done**************");
-  //     }
-  // });
+	/*******************************
+	 ****** Admin Bootstrapping ****
+	 *******************************/
+	// BOOTSTRAPING.bootstrapAdmin((ERR, RESULT)=>{
+	//     if(ERR){
+	//         ALLFILES.COMMON_FUN.messageLogs(ERR.message, null);
+	//         process.exit(0);
+	//     }else{
+	//         ALLFILES.COMMON_FUN.messageLogs(null, "**************Bootstraping done**************");
+	//     }
+	// });
 
-  /*******************************
-   ****** Version Controller* ****
-   *******************************/
-  BOOTSTRAPING.bootstrapAppVersion();
+	/*******************************
+	 ****** Version Controller* ****
+	 *******************************/
+	BOOTSTRAPING.bootstrapAppVersion();
 
-  /** Server is running here */
-  app.listen(ALLFILES.CONFIG.dbConfig.port, () => {
-    ALLFILES.COMMON_FUN.messageLogs(
-      null,
-      `**************Server is running on ${ALLFILES.CONFIG.dbConfig.port} **************`
-    );
-  });
+	/** Server is running here */
+	app.listen(ALLFILES.CONFIG.dbConfig.port, () => {
+		ALLFILES.COMMON_FUN.messageLogs(
+			null,
+			`**************Server is running on ${ALLFILES.CONFIG.dbConfig.port} **************`
+		);
+	});
 
-  //AwakeHeroku.add("https://pakam-staging.herokuapp.com/");
-  //AwakeHeroku.start();
+	//AwakeHeroku.add("https://pakam-staging.herokuapp.com/");
+	//AwakeHeroku.start();
 };

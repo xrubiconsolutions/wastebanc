@@ -254,7 +254,7 @@ class UserService {
 
 				const options = {
 					method: "POST",
-					url: "https://termii.com/api/sms/otp/send",
+					url: "https://api.ng.termii.com/api/sms/otp/send",
 					headers: {
 						"Content-Type": ["application/json", "application/json"],
 					},
@@ -374,7 +374,7 @@ class UserService {
 			};
 			const options = {
 				method: "POST",
-				url: "https://termii.com/api/sms/otp/send",
+				url: "https://api.ng.termii.com/api/sms/otp/send",
 				headers: {
 					"Content-Type": ["application/json", "application/json"],
 				},
@@ -524,7 +524,7 @@ class UserService {
 			};
 
 			const send = await axios.post(
-				"https://termii.com/api/sms/otp/verify",
+				"https://api.ng.termii.com/api/sms/otp/verify",
 				JSON.stringify(data),
 				{
 					headers: {
@@ -677,7 +677,7 @@ class UserService {
 
 				const options = {
 					method: "POST",
-					url: "https://termii.com/api/sms/otp/send",
+					url: "https://api.ng.termii.com/api/sms/otp/send",
 					headers: {
 						"Content-Type": ["application/json", "application/json"],
 					},

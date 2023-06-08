@@ -197,7 +197,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
 										};
 										var options = {
 											method: "POST",
-											url: "https://termii.com/api/sms/otp/send",
+											url: "https://api.ng.termii.com/api/sms/otp/send",
 											headers: {
 												"Content-Type": [
 													"application/json",
@@ -231,7 +231,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
 												};
 												var options = {
 													method: "GET",
-													url: " https://termii.com/api/insight/number/query",
+													url: " https://api.ng.termii.com/api/insight/number/query",
 													headers: {
 														"Content-Type": [
 															"application/json",
@@ -763,7 +763,7 @@ userController.resendVerification = async (REQUEST, RESPONSE) => {
 		};
 		var options = {
 			method: "POST",
-			url: "https://termii.com/api/sms/otp/send",
+			url: "https://api.ng.termii.com/api/sms/otp/send",
 			headers: {
 				"Content-Type": ["application/json", "application/json"],
 			},
@@ -803,7 +803,7 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
 	// // };
 	// // var options = {
 	// // 'method': 'POST',
-	// // 'url': 'https://termii.com/api/sms/otp/verify',
+	// // 'url': 'https://api.ng.termii.com/api/sms/otp/verify',
 	// // 'headers': {
 	// // 'Content-Type': ['application/json', 'application/json']
 	// // },
@@ -874,7 +874,7 @@ userController.verifyPhone = (REQUEST, RESPONSE) => {
 	console.log("data", data);
 	var options = {
 		method: "POST",
-		url: "https://termii.com/api/sms/otp/verify",
+		url: "https://api.ng.termii.com/api/sms/otp/verify",
 		headers: {
 			"Content-Type": ["application/json", "application/json"],
 		},
@@ -1038,7 +1038,7 @@ userController.resetMobile = (REQUEST, RESPONSE) => {
 	};
 	var options = {
 		method: "POST",
-		url: "https://termii.com/api/sms/otp/verify",
+		url: "https://api.ng.termii.com/api/sms/otp/verify",
 		headers: {
 			"Content-Type": ["application/json", "application/json"],
 		},
