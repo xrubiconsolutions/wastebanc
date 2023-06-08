@@ -487,6 +487,7 @@ payController.afterPayment = async (req, res) => {
 				},
 			},
 		]);
+		console.log("led", ledgerBalance);
 		if (ledgerBalance.length > 0) {
 			ledgerBalance = ledgerBalance[0].balance;
 		}
