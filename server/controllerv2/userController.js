@@ -648,7 +648,7 @@ class UserService {
 			]);
 			console.log("ledger", ledgerBalance);
 			if (ledgerBalance.length > 0) {
-				ledgerBalance = ledgerBalance.reduce((a, (b) => a + b.balance) || 0);
+				ledgerBalance = ledgerBalance.reduce((a, b) => a + b.balance || 0);
 			} else {
 				ledgerBalance = 0;
 			}
