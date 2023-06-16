@@ -213,6 +213,7 @@ payController.charityP = async (req, res) => {
 		}
 
 		if (Number(amount) > +user.availablePoints) {
+			console.log("not enough balance");
 			return res.status(400).json({
 				error: true,
 				message: "You don't have enough points to complete this transaction",
