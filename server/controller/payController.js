@@ -207,7 +207,15 @@ payController.charityP = async (req, res) => {
 		const user = await MODEL.userModel.findOne({ cardID });
 		if (!user) {
 			return res.status(400).json({
+				error: true,
 				message: "Enter a valid card ID",
+			});
+		}
+
+		if (Number(amount) > +user.availablePoints) {
+			return res.status(400).json({
+				error: true,
+				message: "You don't have enough points to complete this transaction",
 			});
 		}
 
@@ -222,12 +230,7 @@ payController.charityP = async (req, res) => {
 
 		if (Number(user.availablePoints) < 0) {
 			return res.status(400).json({
-				message: "You don't have enough points to complete this transaction",
-			});
-		}
-
-		if (Number(amount) > Number(user.availablePoints)) {
-			return res.status(400).json({
+				error: true,
 				message: "You don't have enough points to complete this transaction",
 			});
 		}
