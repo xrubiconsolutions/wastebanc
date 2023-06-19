@@ -61,7 +61,7 @@ class EvacuationService {
 				totalAmount,
 				organisation.systemCharge
 			);
-			const amountTobePaid = evacuationRequest.totalAmount + percentage;
+			const amountTobePaid = totalAmount + percentage;
 			// create evacuation instance in db
 			await evacuationModel.create({
 				transactions: transactionIds,
