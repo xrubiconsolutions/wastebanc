@@ -216,7 +216,7 @@ payController.charityP = async (req, res) => {
 			console.log("not enough balance");
 			return res.status(400).json({
 				error: true,
-				message: "You don't have enough points to complete this transaction",
+				message: "Insufficient Balance",
 			});
 		}
 
