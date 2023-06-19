@@ -55,6 +55,13 @@ class EvacuationService {
 			// get all transactions id
 			const transactionIds = unevacTransactions.map((item) => item._id);
 
+			const organisation = await organisationModel.findById(organisationID);
+
+			const percentage = rewardService.calPercentage(
+				totalAmount,
+				organisation.systemCharge
+			);
+			const amountTobePaid = evacuationRequest.totalAmount + percentage;
 			// create evacuation instance in db
 			await evacuationModel.create({
 				transactions: transactionIds,
@@ -62,6 +69,7 @@ class EvacuationService {
 				totalAmount,
 				organisation: organisationID,
 				totalWeight,
+				amountTobePaid,
 			});
 
 			// update all transactions involved to have evacuation request sent
