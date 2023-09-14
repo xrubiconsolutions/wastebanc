@@ -1528,6 +1528,112 @@ class UserService {
 	}
 
 	// completed
+
+	static async getRegisteredUser(req, res) {
+		const request_key = req.headers["wkey"];
+
+		if (request_key != process.env.REQUEST_KEY) {
+			return res.status(401).json({
+				message: "unauthorized",
+			});
+		}
+		let { page = 1, resultsPerPage = 1000, start, end } = req.query;
+		if (typeof page === "string") page = parseInt(page);
+		if (typeof resultsPerPage === "string")
+			resultsPerPage = parseInt(resultsPerPage);
+
+		let criteria = {
+			email: {
+				$nin: [
+					"me@xrubiconsolutions.com",
+					"test@gmail.com",
+					"oreoluwa1@wastebancuser.com",
+				],
+			},
+			status: "active",
+		};
+		if (start && end) {
+			criteria.createdAt = {
+				$gte: new Date(start),
+				$lt: new Date(end),
+			};
+		}
+
+		try {
+			//const totalResult = await userModel.countDocuments(criteria);
+			const users = await userModel
+				.find(criteria)
+				.select({
+					_id: 0,
+					__v: 0,
+					password: 0,
+					country: 0,
+					state: 0,
+					firstname: 0,
+					lastname: 0,
+					othernames: 0,
+					roles: 0,
+					role: 0,
+					displayRole: 0,
+					countryCode: 0,
+					verified: 0,
+					userType: 0,
+					availablePoints: 0,
+					rafflePoints: 0,
+					schedulePoints: 0,
+					countries: 0,
+					states: 0,
+					status: 0,
+					firstLogin: 0,
+					terms_condition: 0,
+					accountNo: 0,
+					cifNo: 0,
+					bankName: 0,
+					bankCode: 0,
+					uType: 0,
+					organisationType: 0,
+					onesignal_id: 0,
+					expiry_licence: 0,
+					locationScope: 0,
+					cardID: 0,
+					last_logged_in: 0,
+					internet_provider: 0,
+					phone_OS: 0,
+					phone_type: 0,
+					ledgerPoints: 0,
+					requestedAmount: 0,
+					insuranceUser: 0,
+					insuranceAmount: 0,
+					channel: 0,
+					isChatAdmin: 0,
+					dateOfBirth: 0,
+					profile_picture: 0,
+				})
+				.sort({
+					createAt: -1,
+				})
+				.skip((page - 1) * resultsPerPage)
+				.limit(resultsPerPage);
+
+			return res.status(200).json({
+				// error: false,
+				message: "wastebanc users",
+				data: {
+					users,
+					// totalResult,
+					// page,
+					// resultsPerPage,
+					// totalPages: Math.ceil(totalResult / resultsPerPage),
+				},
+			});
+		} catch (error) {
+			console.log(error);
+			return res.status(500).json({
+				error: true,
+				message: "An error occurred",
+			});
+		}
+	}
 }
 
 module.exports = UserService;
