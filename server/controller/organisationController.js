@@ -7994,7 +7994,7 @@ organisationController.getDropOffUser = async (req, res) => {
               type: "Point",
               coordinates: [long, lat],
             },
-            $minDistance: 1000,
+            // $minDistance: 1000,
             $maxDistance: 5000,
           },
         },
