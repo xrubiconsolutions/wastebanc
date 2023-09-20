@@ -2,47 +2,47 @@ const nodemailer = require("nodemailer");
 const welcomeTemplate = require("../../email-templates/welcome-email.template");
 const invoiceTemplate = require("../../email-templates/invoice.template");
 const sendResetToken = async (email, token) => {
-  const resetData = getResetTokenData(email, token);
-  return await sendMail(resetData);
+	const resetData = getResetTokenData(email, token);
+	return await sendMail(resetData);
 };
 const organisationOnboardingMail = async (email, password) => {
-  const onboardingData = organisationOnboardingData(email, password);
-  return await sendMail(onboardingData);
+	const onboardingData = organisationOnboardingData(email, password);
+	return await sendMail(onboardingData);
 };
 const userAgenciesMail = async (agency, password) => {
-  const agenciesData = userAgenciesMailData(agency, password);
-  return await sendMail(agenciesData);
+	const agenciesData = userAgenciesMailData(agency, password);
+	return await sendMail(agenciesData);
 };
 const sendwebsiteMessage = async (email, message) => {
-  const messageMailData = messageData(email, message);
-  return await sendMail(messageMailData);
+	const messageMailData = messageData(email, message);
+	return await sendMail(messageMailData);
 };
 
 const sendInvoiceMail = async (invoiceData) => {
-  const invoice = await invoiceMailData(invoiceData);
-  return await sendMail(invoice);
+	const invoice = await invoiceMailData(invoiceData);
+	return await sendMail(invoice);
 };
 
 const sendResumeMail = async (data) => {
-  const resumeData = resumeMailData(data);
-  return await sendMail(resumeData);
+	const resumeData = resumeMailData(data);
+	return await sendMail(resumeData);
 };
 const resumeMailData = (params) => {
-  const {
-    fullname,
-    phonenumber,
-    email,
-    location,
-    linkedin,
-    attachment,
-    filename,
-    jobtitle,
-  } = params;
-  const data = {
-    to: "hr@pakam.ng",
-    cc: "info@pakam.ng",
-    subject: `${jobtitle} Application`,
-    html: `<p>User Details</p></br>
+	const {
+		fullname,
+		phonenumber,
+		email,
+		location,
+		linkedin,
+		attachment,
+		filename,
+		jobtitle,
+	} = params;
+	const data = {
+		to: "hr@pakam.ng",
+		cc: "info@pakam.ng",
+		subject: `${jobtitle} Application`,
+		html: `<p>User Details</p></br>
           <p>
             <ol>
               <li>FirstName - ${fullname}</li>
@@ -53,56 +53,56 @@ const resumeMailData = (params) => {
             </ol>
           </p></br>
     `,
-    attachments: [
-      {
-        content: attachment,
-        filename,
-        type: "application/pdf",
-        disposition: "attachment",
-      },
-    ],
-  };
-  return mailOptions(data);
+		attachments: [
+			{
+				content: attachment,
+				filename,
+				type: "application/pdf",
+				disposition: "attachment",
+			},
+		],
+	};
+	return mailOptions(data);
 };
 const invoiceMailData = async (invoiceData) => {
-  const template = await invoiceTemplate(invoiceData);
-  const data = {
-    to: invoiceData.company.email,
-    subject: "Transactions Invoice",
-    html: template,
-  };
-  return mailOptions(data);
+	const template = await invoiceTemplate(invoiceData);
+	const data = {
+		to: invoiceData.company.email,
+		subject: "Transactions Invoice",
+		html: template,
+	};
+	return mailOptions(data);
 };
 const messageData = (email, message) => {
-  const data = {
-    to: "support@pakam.ng",
-    subject: "FAQ Form Message",
-    html: `<p>Hello Support Team</p></br>
+	const data = {
+		to: "support@pakam.ng",
+		subject: "FAQ Form Message",
+		html: `<p>Hello Support Team</p></br>
     <p>You just received this message from the Pakam Website.</p></br>
     <p>Email:${email}</p></br>
     <p>Message:${message}</p></br>
     <p>Best Regards</p></br>
     <p>Pakam Technologies</p>
 `,
-  };
-  return mailOptions(data);
+	};
+	return mailOptions(data);
 };
 
 const userAgenciesMailData = (agency, password) => {
-  const emailTemplate = welcomeTemplate(agency, password);
-  const data = {
-    to: agency.email,
-    subject: "WELCOME TO PAKAM!!!",
-    html: emailTemplate,
-  };
+	const emailTemplate = welcomeTemplate(agency, password);
+	const data = {
+		to: agency.email,
+		subject: "WELCOME TO PAKAM!!!",
+		html: emailTemplate,
+	};
 
-  return mailOptions(data);
+	return mailOptions(data);
 };
 const organisationOnboardingData = (email, password) => {
-  const data = {
-    to: email,
-    subject: "WELCOME TO PAKAM!!!",
-    html: `<p>Congratulations, you have been approved by Pakam and have been on-boarded to the Pakam waste management ecosystem.</p></br>
+	const data = {
+		to: email,
+		subject: "WELCOME TO PAKAM!!!",
+		html: `<p>Congratulations, you have been approved by Pakam and have been on-boarded to the Pakam waste management ecosystem.</p></br>
                 <p>Kindly use the following login details to sign in to your Pakam Company Dashboard.</p></br>
                 <ol>
                     <li>Email: ${email}</li>
@@ -149,51 +149,51 @@ const organisationOnboardingData = (email, password) => {
           <p>Best Regards</p></br>
           <p>Pakam Team</p></br>
         `,
-  };
-  return mailOptions(data);
+	};
+	return mailOptions(data);
 };
 const getResetTokenData = (email, token) => {
-  const data = {
-    to: email,
-    subject: "Passwowrd Reset token",
-    html: `<p>Your password reset request was recieved below is your reset token</p></br>
+	const data = {
+		to: email,
+		subject: "Password Reset token",
+		html: `<p>Your password reset request was recieved below is your reset token</p></br>
                 <p>Token: ${token}</p></br>
                 <p>Best Regards</p></br>
                 <p>Pakam Technologies</p>`,
-  };
-  return mailOptions(data);
+	};
+	return mailOptions(data);
 };
 const transporter = nodemailer.createTransport({
-  host: "smtp.zoho.com",
-  secure: true,
-  port: 465,
-  auth: {
-    user: "info@pakam.ng",
-    pass: "Leyeolaide1",
-  },
+	host: "smtp.zoho.com",
+	secure: true,
+	port: 465,
+	auth: {
+		user: "info@pakam.ng",
+		pass: "Leyeolaide1",
+	},
 });
 const mailOptions = (data) => {
-  const { to, subject, html } = data;
-  return {
-    from: "info@pakam.ng",
-    to,
-    subject,
-    html,
-  };
+	const { to, subject, html } = data;
+	return {
+		from: "info@pakam.ng",
+		to,
+		subject,
+		html,
+	};
 };
 const sendMail = async (mailOptions) => {
-  transporter.sendMail(mailOptions, (err, info) => {
-    if (err) {
-      console.log(err);
-    }
-  });
+	transporter.sendMail(mailOptions, (err, info) => {
+		if (err) {
+			console.log(err);
+		}
+	});
 };
 
 module.exports = {
-  sendResetToken,
-  organisationOnboardingMail,
-  userAgenciesMail,
-  sendwebsiteMessage,
-  sendInvoiceMail,
-  sendResumeMail,
+	sendResetToken,
+	organisationOnboardingMail,
+	userAgenciesMail,
+	sendwebsiteMessage,
+	sendInvoiceMail,
+	sendResumeMail,
 };
