@@ -1620,7 +1620,7 @@ class UserService {
 				message: "wastebanc users",
 				data: {
 					users,
-					totalResult,
+					totalUsers: totalResult,
 					// page,
 					// resultsPerPage,
 					// totalPages: Math.ceil(totalResult / resultsPerPage),
