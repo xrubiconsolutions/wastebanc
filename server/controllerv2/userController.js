@@ -1551,6 +1551,7 @@ class UserService {
 				],
 			},
 			status: "active",
+			roles: "client",
 		};
 		if (start && end) {
 			criteria.createdAt = {
@@ -1560,7 +1561,8 @@ class UserService {
 		}
 
 		try {
-			//const totalResult = await userModel.countDocuments(criteria);
+			const totalResult = await userModel.countDocuments(criteria);
+
 			const users = await userModel
 				.find(criteria)
 				.select({
@@ -1620,7 +1622,7 @@ class UserService {
 				message: "wastebanc users",
 				data: {
 					users,
-					// totalResult,
+					totalResult,
 					// page,
 					// resultsPerPage,
 					// totalPages: Math.ceil(totalResult / resultsPerPage),
