@@ -476,7 +476,7 @@ payController.afterPayment = async (req, res) => {
 				data: null,
 			});
 		}
-		const token = COMMON_FUN.authToken(user);
+		const token = req.headers.authorization.split(" ")[1];
 
 		let value = 0;
 		let ledgerBalance = await MODEL.legderBalanceModel.aggregate([
