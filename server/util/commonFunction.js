@@ -267,7 +267,7 @@ let createToken = (objData) => {
 };
 
 const authToken = (user) => {
-	const expirationTime = "5s"; // 40 minutes in seconds
+	const expirationTime = "15m"; // 40 minutes in seconds
 	return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
 		expiresIn: expirationTime,
 	});
