@@ -470,7 +470,6 @@ payController.afterPayment = async (req, res) => {
 	try {
 		const token = req.headers.authorization.split(" ")[1];
 
-		console.log("token", token);
 		const user = await MODEL.userModel.findById(userID);
 		if (!user) {
 			return res.status(400).json({
@@ -502,7 +501,7 @@ payController.afterPayment = async (req, res) => {
 				},
 			},
 		]);
-		console.log("led", ledgerBalance);
+
 		if (ledgerBalance.length > 0) {
 			ledgerBalance.forEach((bal) => {
 				console.log("bal", bal.balance);
@@ -510,7 +509,6 @@ payController.afterPayment = async (req, res) => {
 			});
 		}
 
-		console.log("vl", value);
 		const test = {
 			_id: user._id,
 			firstname: user.firstname,
@@ -543,22 +541,12 @@ payController.afterPayment = async (req, res) => {
 			requestedAmount: user.requestedAmount,
 			ledgerBalance: value,
 		};
-		console.log("test", test);
+
 		return res
 			.status(200)
 			.jsonp(
 				COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, test)
 			);
-		// MODEL.userModel.findOne({ _id: userID }).then((result) => {
-		//   var test = JSON.parse(JSON.stringify(result));
-		//   var jwtToken = COMMON_FUN.createToken(test); /** creating jwt token */
-		//   test.token = jwtToken;
-		//   return res
-		//     .status(200)
-		//     .jsonp(
-		//       COMMON_FUN.sendSuccess(CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT, test)
-		//     );
-		// });
 	} catch (err) {
 		console.log(err);
 		return res.status(500).json(err);
