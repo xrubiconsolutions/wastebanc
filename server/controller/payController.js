@@ -468,6 +468,9 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
 payController.afterPayment = async (req, res) => {
 	const userID = req.query.userID;
 	try {
+		const token = req.headers.authorization.split(" ")[1];
+
+		console.log("token", token);
 		const user = await MODEL.userModel.findById(userID);
 		if (!user) {
 			return res.status(400).json({
@@ -476,7 +479,6 @@ payController.afterPayment = async (req, res) => {
 				data: null,
 			});
 		}
-		const token = req.headers.authorization.split(" ")[1];
 
 		if (!token) {
 			return res.status(401).json({
