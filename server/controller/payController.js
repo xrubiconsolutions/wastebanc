@@ -476,7 +476,15 @@ payController.afterPayment = async (req, res) => {
 				data: null,
 			});
 		}
-		const token = COMMON_FUN.authToken(user);
+		const token = req.headers.authorization.split(" ")[1];
+
+		if (!token) {
+			return res.status(401).json({
+				error: true,
+				message: "Session timeout",
+				statusCode: 401,
+			});
+		}
 
 		let value = 0;
 		let ledgerBalance = await MODEL.legderBalanceModel.aggregate([
