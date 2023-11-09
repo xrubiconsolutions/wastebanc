@@ -466,7 +466,7 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
 };
 
 payController.afterPayment = async (req, res) => {
-	const userID = req.query.userID;
+	const userID = req.user._id;
 	try {
 		const user = await MODEL.userModel.findById(userID);
 		if (!user) {
