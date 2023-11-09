@@ -466,7 +466,7 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
 };
 
 payController.afterPayment = async (req, res) => {
-	const userID = req.query.userID;
+	const userID = req.user._id;
 	try {
 		const token = req.headers.authorization.split(" ")[1];
 
