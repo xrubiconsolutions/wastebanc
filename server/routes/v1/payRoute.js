@@ -28,7 +28,7 @@ module.exports = (APP) => {
 	);
 
 	APP.route("/api/payment/user/current").get(
-		auth.userValidation,
+		//auth.userValidation,
 		CONTROLLER.payController.afterPayment
 	);
 
