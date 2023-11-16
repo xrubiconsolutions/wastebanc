@@ -747,7 +747,7 @@ class CollectorService {
 					pin_length: 4,
 					pin_placeholder: "< 1234 >",
 					message_text:
-						"Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+						"Your Wastebanc Verification code is < 1234 >. It expires in 5 minutes",
 					pin_type: "NUMERIC",
 				};
 
@@ -868,7 +868,7 @@ class CollectorService {
 				pin_length: 4,
 				pin_placeholder: "< 1234 >",
 				message_text:
-					"Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+					"Your Wastebanc Verification code is < 1234 >. It expires in 5 minutes",
 				pin_type: "NUMERIC",
 			};
 			const options = {
@@ -1429,7 +1429,7 @@ class CollectorService {
 					pin_length: 4,
 					pin_placeholder: "< 1234 >",
 					message_text:
-						"Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+						"Your Wastebanc Verification code is < 1234 >. It expires in 5 minutes",
 					pin_type: "NUMERIC",
 				};
 
@@ -1909,7 +1909,7 @@ class CollectorService {
 				to: `+234${phoneNo}`,
 				from: "N-Alert",
 				channel: "dnd",
-				sms: `Welcome to pakam, Your Password is ${password}`,
+				sms: `Welcome to wastebanc, Your Password is ${password}`,
 			};
 			const url = "https://api.ng.termii.com/api/sms/send";
 

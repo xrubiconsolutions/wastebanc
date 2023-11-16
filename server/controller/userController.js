@@ -192,7 +192,7 @@ userController.registerUser = (REQUEST, RESPONSE) => {
 											pin_length: 4,
 											pin_placeholder: "< 1234 >",
 											message_text:
-												"Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+												"Your Wastebanc Verification code is < 1234 >. It expires in 5 minutes",
 											pin_type: "NUMERIC",
 										};
 										var options = {
@@ -758,7 +758,7 @@ userController.resendVerification = async (REQUEST, RESPONSE) => {
 			pin_length: 4,
 			pin_placeholder: "< 1234 >",
 			message_text:
-				"Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+				"Your Wastebanc Verification code is < 1234 >. It expires in 5 minutes",
 			pin_type: "NUMERIC",
 		};
 		var options = {
@@ -1027,7 +1027,7 @@ userController.resetMobile = (REQUEST, RESPONSE) => {
 		pin_length: 4,
 		pin_placeholder: "< 1234 >",
 		message_text:
-			"Your Pakam Verification code is < 1234 >. It expires in 5 minutes",
+			"Your Wastebanc Verification code is < 1234 >. It expires in 5 minutes",
 		pin_type: "NUMERIC",
 	};
 
