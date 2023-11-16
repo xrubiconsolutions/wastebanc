@@ -270,7 +270,7 @@ const authToken = (user) => {
 	const expirationTime = Math.floor(Date.now() / 1000) + 15 * 60; // 15 minutes in seconds
 	console.log("exp", expirationTime);
 	return JWT.sign({ userId: user._id }, CONSTANTS.SERVER.JWT_SECRET_KEY, {
-		expiresIn: "15m",
+		expiresIn: expirationTime,
 	});
 };
 
