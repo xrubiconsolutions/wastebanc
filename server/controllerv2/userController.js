@@ -503,6 +503,16 @@ class UserService {
 		const pin_id = req.body.pin_id;
 
 		console.log("phone", phone);
+		console.log("token", token);
+		console.log("pin_id", pin_id);
+		if (!token) {
+			return res.status(400).json({
+				error: true,
+				message: "Invalid token passed",
+			});
+		}
+
+		console.log("phone", phone);
 
 		const user = await userModel.findOne({
 			phone,
