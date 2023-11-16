@@ -468,7 +468,7 @@ payController.charityPayment = (REQUEST, RESPONSE) => {
 payController.afterPayment = async (req, res) => {
 	const userID = req.user._id;
 	try {
-		//const token = req.headers.authorization.split(" ")[1];
+		const token = req.headers.authorization.split(" ")[1];
 
 		const user = await MODEL.userModel.findById(userID);
 		if (!user) {
@@ -479,13 +479,13 @@ payController.afterPayment = async (req, res) => {
 			});
 		}
 
-		// if (!token) {
-		// 	return res.status(401).json({
-		// 		error: true,
-		// 		message: "Session timeout",
-		// 		statusCode: 401,
-		// 	});
-		// }
+		if (!token) {
+			return res.status(401).json({
+				error: true,
+				message: "Session timeout",
+				statusCode: 401,
+			});
+		}
 
 		let value = 0;
 		let ledgerBalance = await MODEL.legderBalanceModel.aggregate([
