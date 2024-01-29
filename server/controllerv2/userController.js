@@ -543,7 +543,7 @@ class UserService {
 				}
 			);
 
-			//console.log(send.data);
+			console.log(send.data);
 
 			//     pinId: '41a11125-e3c9-4f66-9f94-596ba0d2f115',
 			// verified: true,
