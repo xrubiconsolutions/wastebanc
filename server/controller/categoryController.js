@@ -84,7 +84,7 @@ categoryController.addCategory = async (req, res) => {
 
 categoryController.allCategories = async (req, res) => {
   try {
-    const catgories = await MODEL.categoryModel.find({});
+    const catgories = await MODEL.categoryModel.find({isVisible:true});
     return res.status(200).json({
       message: "All categories",
       statusCode: 200,
