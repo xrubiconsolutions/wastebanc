@@ -901,8 +901,7 @@ class ScheduleService {
         process.env.PAKAM_PERCENT
       );
 
-      const userCoin =
-        Number(householdReward.totalpointGained) - Number(pakamPercentage);
+      const userCoin = Number(householdReward.totalpointGained);
 
       const ref = randomstring.generate({
         length: 7,
@@ -1859,9 +1858,9 @@ class ScheduleService {
         });
       }
 
-      const pakamPer = rewardService.calPercentage(totalPointGained, 10);
+      const pakamPer = rewardService.calPercentage(totalPointGained,  process.env.PAKAM_PERCENT);
 
-      const userCoin = Number(totalPointGained) - Number(pakamPer);
+      const userCoin = totalPointGained;
 
       const collector = await collectorModel.findById(schedule.collectedBy);
       if (collector && collector.collectorType == "waste-picker") {
@@ -1870,7 +1869,7 @@ class ScheduleService {
           wastePickerCoin = wastepickerReward.totalpointGained;
           wastePickerPercentage = rewardService.calPercentage(
             wastepickerReward.totalpointGained,
-            10
+            process.env.PAKAM_PERCENT
           );
           collectorPoint = wastePickerCoin - wastePickerPercentage;
         }
